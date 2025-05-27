@@ -18,8 +18,8 @@ public class Chest implements Passable, Drawable {
             double tileSide = Tile.HALF_SIDE*2;
             double x0 = (xNum - 1) * tileSide;
             double x1 = (xNum + 1) * tileSide;
-            double y0 = Map.height - (yNum + 1) * tileSide;
-            double y1 = Map.height - (yNum - 1) * tileSide;
+            double y0 = (yNum - 1) * tileSide;
+            double y1 = (yNum + 1) * tileSide;
             coordinates = new double[]{x0, y0, x1, y1};
             collisionBox = new double[]{x0, y0, x1, (y0 + y1) / 2};
         }

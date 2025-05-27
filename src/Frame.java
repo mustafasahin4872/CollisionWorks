@@ -79,9 +79,9 @@ public class Frame {
         map.draw();
         StdDraw.setPenColor();
         StdDraw.setFont();
-        StdDraw.textLeft(frameX - X_SCALE/2 + 10, frameY - Y_SCALE/2 + 10, "x-y: %.1f %.1f".formatted(player.getX(), player.getY()));
-        StdDraw.textLeft(frameX - X_SCALE/2 + 10, frameY - Y_SCALE/2 + 30, "vx: %.1f".formatted(player.getxVelocity()));
-        StdDraw.textLeft(frameX - X_SCALE/2 + 10, frameY - Y_SCALE/2 + 50, "vy: %.1f".formatted(player.getyVelocity()));
+        StdDraw.textLeft(frameX - X_SCALE/2 + 10, frameY + Y_SCALE/2 - 10, "x-y: %.1f %.1f".formatted(player.getX(), player.getY()));
+        StdDraw.textLeft(frameX - X_SCALE/2 + 10, frameY + Y_SCALE/2 - 30, "vx: %.1f".formatted(player.getxVelocity()));
+        StdDraw.textLeft(frameX - X_SCALE/2 + 10, frameY + Y_SCALE/2 - 50, "vy: %.1f".formatted(player.getyVelocity()));
         player.drawHPBar(frameX, frameY);
         player.drawCoinAmount(frameX, frameY);
     }
@@ -100,9 +100,9 @@ public class Frame {
             player.setxDirection(-1);
         }
         if (StdDraw.isKeyPressed(keyCodes[1])) {
-            player.setyDirection(1);
-        }  else if (StdDraw.isKeyPressed(keyCodes[3])) {
             player.setyDirection(-1);
+        }  else if (StdDraw.isKeyPressed(keyCodes[3])) {
+            player.setyDirection(1);
         }
     }
 
@@ -119,14 +119,14 @@ public class Frame {
         }
 
         if (player.getY()-Y_SCALE/2<0) {
-            StdDraw.setYscale(0, Y_SCALE);
+            StdDraw.setYscale(Y_SCALE, 0);
             frameY = Y_SCALE/2;
         } else {
             if (player.getY()+Y_SCALE/2> map.getHeight()) {
-                StdDraw.setYscale(map.getHeight() -Y_SCALE, map.getHeight());
+                StdDraw.setYscale(map.getHeight(), map.getHeight() -Y_SCALE);
                 frameY = map.getHeight() -Y_SCALE/2;
             } else {
-                StdDraw.setYscale(player.getY() - Frame.Y_SCALE / 2, player.getY() + Frame.Y_SCALE / 2);
+                StdDraw.setYscale(player.getY() + Frame.Y_SCALE / 2, player.getY() - Frame.Y_SCALE / 2);
                 frameY = player.getY();
             }
         }

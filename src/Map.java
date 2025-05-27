@@ -103,7 +103,7 @@ public class Map {
                     if (tile.isSolid() && tile.isApproachable()) {
                         checkCollision(tile.getCoordinates());
                     }
-                    if (playerIsIn(player, tile.getCoordinates())) {
+                    if (isIn(player.getX(), player.getY(), tile.getCoordinates())) {
                         tile.playerIsOn(player);
                     }
                 }
@@ -268,7 +268,7 @@ public class Map {
 
         for (int y = tileRange[1]; y<= tileRange[3]; y++) {
             for (int x = tileRange[0]; x<=tileRange[2]; x++) {
-                int index = (y-1)*64+x-1;
+                int index = (y-1)*xTile+x-1;
                 tiles[index].draw();
             }
         }
@@ -316,7 +316,7 @@ public class Map {
         int tileSize = Tile.HALF_SIDE * 2;
 
         int xNum = (int) (player.getX() / tileSize);
-        int yNum = (int) ((height - player.getY()) / tileSize); // FLIP THE Y
+        int yNum = (int) (player.getY() / tileSize);
 
         int minX = xNum - RANGE;
         int maxX = xNum + RANGE;

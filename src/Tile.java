@@ -16,8 +16,8 @@ public abstract class Tile implements Passable, Drawable {
         this.xNum = xNum;
         this.yNum = yNum;
         coordinates = new double[]{
-                (xNum - 1) * HALF_SIDE * 2, (Y_TILE - yNum) * HALF_SIDE * 2,
-                xNum * HALF_SIDE * 2, (Y_TILE - yNum + 1) * HALF_SIDE * 2
+                (xNum - 1) * HALF_SIDE * 2, (yNum-1) * HALF_SIDE * 2,
+                xNum * HALF_SIDE * 2, yNum * HALF_SIDE * 2
         };
         centerX = (coordinates[0] + coordinates[2]) / 2;
         centerY = (coordinates[1] + coordinates[3]) / 2;

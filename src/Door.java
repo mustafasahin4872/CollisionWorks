@@ -49,12 +49,12 @@ public class Door implements Drawable{
             if (alignment == ALIGNMENT.V) {
                 x0 = (xNum-1) * TILE_SIDE + SPACE_ON_SIDE;
                 x1 = xNum * TILE_SIDE - SPACE_ON_SIDE;
-                y0 = Map.height - (yNum+length-1) * TILE_SIDE;
-                y1 = Map.height - (yNum-1) * TILE_SIDE;
+                y0 = (yNum-1) * TILE_SIDE;
+                y1 = (yNum+length-1) * TILE_SIDE;
                 doorFloor = y0;
             } else {
-                y0 = Map.height - yNum * TILE_SIDE + SPACE_ON_SIDE;
-                y1 = Map.height - (yNum - 1) * TILE_SIDE - SPACE_ON_SIDE;
+                y0 = (yNum-1) * TILE_SIDE + SPACE_ON_SIDE;
+                y1 = (yNum) * TILE_SIDE - SPACE_ON_SIDE;
                 x0 = (xNum - 1) * TILE_SIDE;
                 x1 = (xNum + length -1) * TILE_SIDE;
                 doorFloor = x0;

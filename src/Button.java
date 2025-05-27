@@ -34,15 +34,15 @@ public class Button implements Passable, Drawable {
     public void setLittleCoordinates() {
         coordinates[0] = (xNum - 1) * tileSide;
         coordinates[2] = (xNum) * tileSide;
-        coordinates[1] = Map.height - yNum * tileSide;
-        coordinates[3] = Map.height - (yNum - 1) * tileSide;
+        coordinates[1] = (yNum-1) * tileSide;
+        coordinates[3] = (yNum) * tileSide;
     }
 
     public void setCoordinates() {
         coordinates[0] = (xNum - 1) * tileSide;
         coordinates[2] = (xNum + 1) * tileSide;
-        coordinates[1] = Map.height - (yNum + 1) * tileSide;
-        coordinates[3] = Map.height - (yNum - 1) * tileSide;
+        coordinates[1] = (yNum-1) * tileSide;
+        coordinates[3] = (yNum+1) * tileSide;
     }
 
     public boolean isPressed() {

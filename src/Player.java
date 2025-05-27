@@ -3,7 +3,7 @@ public class Player implements Drawable {
     private static final double DEFAULT_SIDE = 50;
     private static double side;
     private static final double DEFAULT_SPAWN_X = 100;
-    private static final double DEFAULT_SPAWN_Y = 1500;
+    private static final double DEFAULT_SPAWN_Y = 300;
     private double spawnX;
     private double spawnY;
     private double x;
@@ -325,7 +325,7 @@ public class Player implements Drawable {
         StdDraw.setPenColor(StdDraw.BLACK);
         StdDraw.filledRectangle(
                 frameX - Frame.X_SCALE/2.0 + 15 + (MAX_HP/2.0 + thickness),
-                frameY + Frame.Y_SCALE/2.0 - 15 - (barHalfheight + thickness),
+                frameY - Frame.Y_SCALE/2.0 + 15 + (barHalfheight + thickness),
                 MAX_HP/2.0 + thickness,
                 barHalfheight + thickness);
 
@@ -333,7 +333,7 @@ public class Player implements Drawable {
         StdDraw.setPenColor(StdDraw.GREEN);
         StdDraw.filledRectangle(
                 frameX - Frame.X_SCALE/2.0 + 15 + thickness + hitPoints/2.0,
-                frameY + Frame.Y_SCALE/2.0 - 15 - (barHalfheight + thickness),
+                frameY - Frame.Y_SCALE/2.0 + 15 + (barHalfheight + thickness),
                 hitPoints/2.0,
                 barHalfheight
         );
@@ -341,9 +341,9 @@ public class Player implements Drawable {
 
     public void drawCoinAmount(double frameX, double frameY) {
 
-        StdDraw.picture(frameX + Frame.X_SCALE/2.0 - 30, frameY + Frame.Y_SCALE/2.0 - 30, "misc/coinImages/coin.png", 40, 40);
+        StdDraw.picture(frameX + Frame.X_SCALE/2.0 - 30, frameY - Frame.Y_SCALE/2.0 + 30, "misc/coinImages/coin.png", 40, 40);
         StdDraw.setFont(); StdDraw.setPenColor();
-        StdDraw.text(frameX + Frame.X_SCALE/2.0 - 30, frameY + Frame.Y_SCALE/2.0 - 30, "%d".formatted(coinsCollected));
+        StdDraw.text(frameX + Frame.X_SCALE/2.0 - 30, frameY - Frame.Y_SCALE/2.0 + 30, "%d".formatted(coinsCollected));
 
     }
 

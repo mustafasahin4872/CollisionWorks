@@ -1,4 +1,3 @@
-import javax.swing.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.*;
@@ -12,8 +11,9 @@ public class MapMaker {
     private final int worldIndex;
     private final int levelIndex;
     private final File mapFile;
+    private final int xTile, yTile;
 
-    private final Tile[] tiles = new Tile[Tile.X_TILE * Tile.Y_TILE];
+    private final Tile[] tiles;
     private final Set<Button> buttons = new HashSet<>();
     private final Map<String, Button> buttonMap = new HashMap<>();
     private final Set<Chest> chests = new HashSet<>();
@@ -52,9 +52,17 @@ for special tile codes, the identifier O in the first argument is enough: MOM; V
 
     //CONSTRUCTOR
 
+
     public MapMaker(int worldIndex, int levelIndex) {
+        this(worldIndex, levelIndex, 64, 36);
+    }
+
+    public MapMaker(int worldIndex, int levelIndex, int xTile, int yTile) {
         this.worldIndex = worldIndex;
         this.levelIndex = levelIndex;
+        this.xTile = xTile;
+        this.yTile = yTile;
+        tiles = new Tile[xTile*yTile];
         mapFile = new File(("misc/maps/%d%d.txt").formatted(worldIndex, levelIndex));
     }
 
@@ -84,9 +92,9 @@ for special tile codes, the identifier O in the first argument is enough: MOM; V
     //MAIN METHOD
 
     public void mapMaker() {
-        String[][] mapData = new String[Tile.Y_TILE][Tile.X_TILE];
+        String[][] mapData = new String[yTile][xTile];
         ArrayList<String> objectDetails = new ArrayList<>();
-        boolean[][] approachability = new boolean[Tile.Y_TILE][Tile.X_TILE];
+        boolean[][] approachability = new boolean[yTile][xTile];
 
         // fill the mapData and objectDetails storages
         extractMapData(mapData, objectDetails);
@@ -108,8 +116,8 @@ for special tile codes, the identifier O in the first argument is enough: MOM; V
         //hold the D37 codes here with their locations to later wire them to buttons
         Map<String, int[]> doorsToWire = new HashMap<>();
 
-        for (int y = 0; y < Tile.Y_TILE; y++) {
-            for (int x = 0; x < Tile.X_TILE; x++) {
+        for (int y = 0; y < yTile; y++) {
+            for (int x = 0; x < xTile; x++) {
                 String tileCode = mapData[y][x];
                 boolean isApproachable = approachability[y][x];
                 Tile tile;
@@ -153,7 +161,7 @@ for special tile codes, the identifier O in the first argument is enough: MOM; V
                     }
                 }
 
-                tiles[y * Tile.X_TILE + x] = tile;
+                tiles[y * xTile + x] = tile;
             }
         }
 
@@ -288,17 +296,17 @@ for special tile codes, the identifier O in the first argument is enough: MOM; V
     //EXTRACT
 
     private void extractApproachability(String[][] mapData, boolean[][] approachability) {
-        for (int y = 0; y < Tile.Y_TILE; y++) {
-            for (int x = 0; x < Tile.X_TILE; x++) {
+        for (int y = 0; y < yTile; y++) {
+            for (int x = 0; x < xTile; x++) {
                 String tileCode = mapData[y][x];
 
                 if (isPassable(tileCode)) {
                     approachability[y][x] = true;
                 } else {
                     String up = y > 0 ? mapData[y - 1][x] : "###";
-                    String down = y < Tile.Y_TILE - 1 ? mapData[y + 1][x] : "###";
+                    String down = y < yTile - 1 ? mapData[y + 1][x] : "###";
                     String left = x > 0 ? mapData[y][x - 1] : "###";
-                    String right = x < Tile.X_TILE - 1 ? mapData[y][x + 1] : "###";
+                    String right = x < xTile - 1 ? mapData[y][x + 1] : "###";
 
                     approachability[y][x] = isApproachable(up, down, left, right);
                 }
@@ -309,9 +317,9 @@ for special tile codes, the identifier O in the first argument is enough: MOM; V
     private void extractMapData(String[][] mapData, ArrayList<String> objectDetails) {
         try (Scanner scanner = new Scanner(mapFile)) {
             int row = 0;
-            while (scanner.hasNextLine() && row < Tile.Y_TILE) {
+            while (scanner.hasNextLine() && row < yTile) {
                 String line = scanner.nextLine();
-                for (int col = 0; col < Tile.X_TILE; col++) {
+                for (int col = 0; col < xTile; col++) {
                     if (col*3 < line.length()) {
                         mapData[row][col] = line.substring(col*3, (col+1)*3);
                     } else {

@@ -18,8 +18,8 @@ public class Coin implements Passable, Drawable {
         this.coinAmount = coinAmount;
         this.fileName = fileName;
         coordinates = new double[]{
-                (xNum - 1) * Tile.HALF_SIDE * 2 + spaceOnSide, (Tile.Y_TILE - yNum) * Tile.HALF_SIDE * 2 + spaceOnSide,
-                xNum * Tile.HALF_SIDE * 2 - spaceOnSide, (Tile.Y_TILE - yNum + 1) * Tile.HALF_SIDE * 2 - spaceOnSide
+                (xNum - 1) * Tile.HALF_SIDE * 2 + spaceOnSide, (yNum-1) * Tile.HALF_SIDE * 2 + spaceOnSide,
+                xNum * Tile.HALF_SIDE * 2 - spaceOnSide, (yNum) * Tile.HALF_SIDE * 2 - spaceOnSide
         };
     }
 
