@@ -1,36 +1,28 @@
-public abstract class Tile implements Passable, Drawable {
-    public static final int HALF_SIDE = 25;
+package mapobjects;
 
-    public final int worldIndex;
-    private final int xNum, yNum;
-    private final double[] coordinates;
-    private final double centerX, centerY;
-    private final char symbol;
+import game.Player;
+import lib.StdDraw;
+
+public abstract class Tile extends MapObject {
+    public static final double HALF_SIDE = TILE_SIDE/2;
+
     private final boolean isSolid;
     private final String fileName;
     private static final String ROOT = "misc/tileImages/";
     private final boolean isApproachable; //false for tiles locked inside solid tiles
 
     // Main constructor
-    public Tile(int xNum, int yNum, char symbol, boolean isApproachable, boolean isSolid, int worldIndex, String fileName) {
-        this.xNum = xNum;
-        this.yNum = yNum;
+    public Tile(int xNum, int yNum, boolean isApproachable, boolean isSolid, int worldIndex, String fileName) {
+        super(worldIndex, xNum, yNum);
         coordinates = new double[]{
                 (xNum - 1) * HALF_SIDE * 2, (yNum-1) * HALF_SIDE * 2,
                 xNum * HALF_SIDE * 2, yNum * HALF_SIDE * 2
         };
-        centerX = (coordinates[0] + coordinates[2]) / 2;
-        centerY = (coordinates[1] + coordinates[3]) / 2;
-        this.symbol = symbol;
         this.isApproachable = isApproachable;
         this.isSolid = isSolid;
-        this.worldIndex = worldIndex;
         this.fileName = fileName;
     }
 
-    public char getSymbol() {
-        return symbol;
-    }
 
     public boolean isSolid() {
         return isSolid;
@@ -41,20 +33,20 @@ public abstract class Tile implements Passable, Drawable {
     }
 
     @Override
-    public double[] getCoordinates() {
+    public double[] getCollisionBox() {
         return coordinates;
     }
 
     @Override
     public void draw() {
-        StdDraw.picture(centerX, centerY, fileName, HALF_SIDE*2, HALF_SIDE*2);
+        StdDraw.picture(centerCoordinates[0], centerCoordinates[1], fileName, HALF_SIDE*2, HALF_SIDE*2);
     }
 
     public abstract void playerIsOn(Player player);
 
     public static class SpaceTile extends Tile {
         public SpaceTile(int xNum, int yNum, int worldIndex) {
-            super(xNum, yNum, ' ', true, false, worldIndex, ROOT + "SpaceTile" + worldIndex + ".jpg");
+            super(xNum, yNum, true, false, worldIndex, ROOT + "SpaceTile" + worldIndex + ".jpg");
         }
 
         public void playerIsOn(Player player) {
@@ -67,7 +59,7 @@ public abstract class Tile implements Passable, Drawable {
 
     public static class WallTile extends Tile {
         public WallTile(int xNum, int yNum, boolean isApproachable, int worldIndex) {
-            super(xNum, yNum, 'W', isApproachable,true, worldIndex, ROOT + "WallTile" + worldIndex + ".jpg");
+            super(xNum, yNum, isApproachable,true, worldIndex, ROOT + "WallTile" + worldIndex + ".jpg");
         }
 
         public void playerIsOn(Player player) {} //impossible
@@ -76,16 +68,16 @@ public abstract class Tile implements Passable, Drawable {
 
     public static class RiverTile extends Tile {
         public RiverTile(int xNum, int yNum, boolean isApproachable, int worldIndex) {
-            super(xNum, yNum, 'R', isApproachable,true, worldIndex, ROOT + "RiverTile" + worldIndex + ".jpg");
+            super(xNum, yNum, isApproachable,true, worldIndex, ROOT + "RiverTile" + worldIndex + ".jpg");
         }
 
         public void playerIsOn(Player player) {} //impossible
 
     }
 
-    public static class MudTile extends Tile {
-        public MudTile(int xNum, int yNum) {
-            super(xNum, yNum, 'M', true,false, 1, ROOT + "MudTile" + ".jpg"); // earthy brown
+    public static class SlowTile extends Tile {
+        public SlowTile(int xNum, int yNum) {
+            super(xNum, yNum, true,false, 1, ROOT + "SlowTile" + ".jpg"); // earthy brown
         }
 
         public void playerIsOn(Player player) {
@@ -94,9 +86,9 @@ public abstract class Tile implements Passable, Drawable {
 
     }
 
-    public static class IceTile extends Tile {
-        public IceTile(int xNum, int yNum) {
-            super(xNum, yNum, 'I', true, false,2, ROOT + "IceTile" + ".jpg"); // icy blue
+    public static class SpecialTile extends Tile {
+        public SpecialTile(int xNum, int yNum) {
+            super(xNum, yNum, true, false,2, ROOT + "SpecialTile" + ".jpg"); // icy blue
         }
 
         public void playerIsOn(Player player) {
@@ -107,7 +99,7 @@ public abstract class Tile implements Passable, Drawable {
 
     public static class DamageTile extends Tile {
         public DamageTile(int xNum, int yNum, int worldIndex) {
-            super(xNum, yNum, 'D', true, false, worldIndex, ROOT + "DamageTile" + worldIndex + ".jpg");
+            super(xNum, yNum, true, false, worldIndex, ROOT + "DamageTile" + worldIndex + ".jpg");
         }
 
         public void playerIsOn(Player player) {
@@ -121,7 +113,7 @@ public abstract class Tile implements Passable, Drawable {
 
     public static class HealTile extends Tile {
         public HealTile(int xNum, int yNum, int worldIndex) { //golden yellow tile, draw a + in it
-            super(xNum, yNum, 'H', true, false, worldIndex, ROOT + "HealTile" + ".jpg");
+            super(xNum, yNum, true, false, worldIndex, ROOT + "HealTile" + ".jpg");
         }
 
         public void playerIsOn(Player player) {

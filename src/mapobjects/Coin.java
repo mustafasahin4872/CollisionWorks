@@ -1,26 +1,27 @@
-public class Coin implements Passable, Drawable {
+package mapobjects;
+
+import game.Player;
+import lib.StdDraw;
+
+public class Coin extends MapObject {
 
     private boolean collected = false;
     private final String fileName;
-    private final int xNum;
-    private final int yNum;
     private final int coinAmount;
-    private final double[] coordinates;
-
-    private double size;
-    private double spaceOnSide;
+    private final double size;
 
     public Coin(int xNum, int yNum, double size, int coinAmount, String fileName) {
-        this.xNum = xNum;
-        this.yNum = yNum;
+        super(xNum, yNum);
         this.size = size;
-        spaceOnSide = (Tile.HALF_SIDE*2- size)/2;
         this.coinAmount = coinAmount;
         this.fileName = fileName;
-        coordinates = new double[]{
-                (xNum - 1) * Tile.HALF_SIDE * 2 + spaceOnSide, (yNum-1) * Tile.HALF_SIDE * 2 + spaceOnSide,
-                xNum * Tile.HALF_SIDE * 2 - spaceOnSide, (yNum) * Tile.HALF_SIDE * 2 - spaceOnSide
-        };
+
+        double spaceOnSide = (TILE_SIDE - size) / 2;
+        coordinates[0] += spaceOnSide;
+        coordinates[1] += spaceOnSide;
+        coordinates[2] -= spaceOnSide;
+        coordinates[3] -= spaceOnSide;
+        collisionBox = coordinates;
     }
 
     public int getCoinAmount() {
@@ -29,23 +30,15 @@ public class Coin implements Passable, Drawable {
 
     @Override
     public void playerIsOn(Player player) {
-        if (!collected) {
-            player.collectCoin(coinAmount);
-        }
+        if (collected) return;
+        player.collectCoin(coinAmount);
         collected = true;
     }
 
     @Override
-    public double[] getCoordinates() {
-        return coordinates;
-    }
-
-    @Override
     public void draw() {
-        if (!collected) {
-            StdDraw.picture((coordinates[0]+coordinates[2])/2, (coordinates[1]+coordinates[3])/2,
-                    fileName, size, size);
-        }
+        if (collected) return;
+        StdDraw.picture(centerCoordinates[0], centerCoordinates[1], fileName, size, size);
     }
 
     public static class SingleCoin extends Coin {

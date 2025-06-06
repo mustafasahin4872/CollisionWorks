@@ -1,12 +1,16 @@
-public class Map {
+package game;
+
+import helperobjects.Drawable;
+import helperobjects.MapMaker;
+import mapobjects.*;
+import lib.StdDraw;
+
+public class GameMap {
 
     private final Player player;
+    private final int worldIndex, levelIndex;
+    private boolean xCollided, yCollided;
 
-    private int worldIndex, levelIndex;
-
-    private boolean xCollided = false, yCollided = false;
-
-    //every map has boundaries of 0-3200 and 0-1800 for x and y.
     private final double width, height; //default 3200x1800
     private final int xTile, yTile; //default 64x34
 
@@ -22,43 +26,73 @@ public class Map {
     private final Door[] doors;
     private final Chest[] chests;
     private final Coin[] coins;
+    private final Sign[] signs;
+    private final Accessory[] accessories;
+
+    private final int[][] checkPoints;
+    private final int[][] winPoints;
 
     private final int totalCoinOnMap;
-
-    private final double[] winArea = {3200, 100, 3500, 600};
 
     //------------------------------------------------------------------------------------------------------------
     //CONSTRUCTOR
 
 
-    public Map(int worldIndex, int levelIndex) {
-        this(worldIndex, levelIndex, 64, 36);
+    public GameMap(int worldIndex, int levelIndex, Player player) {
+        this(worldIndex, levelIndex, player, null);
     }
 
-    public Map(int worldIndex, int levelIndex, int xTile, int yTile) {
+    public GameMap(int worldIndex, int levelIndex, Player player, Accessory[] accessories) {
+        this(worldIndex, levelIndex, 64, 36, player, accessories);
+    }
+
+    public GameMap(int worldIndex, int levelIndex, int xTile, int yTile, Player player) {
+        this(worldIndex, levelIndex, xTile, yTile, player, null);
+    }
+
+    public GameMap(int worldIndex, int levelIndex, int xTile, int yTile, Player player, Accessory[] accessories) {
         this.worldIndex = worldIndex;
         this.levelIndex = levelIndex;
         this.xTile = xTile;
         this.yTile = yTile;
+        this.player = player;
+        this.accessories = accessories;
+
         width = xTile*Tile.HALF_SIDE*2;
         height = yTile*Tile.HALF_SIDE*2;
-        player = new Player();
-        MapMaker mapMaker = new MapMaker(worldIndex, levelIndex);
+
+        MapMaker mapMaker = new MapMaker(worldIndex, levelIndex, xTile, yTile);
         mapMaker.mapMaker();
         tiles = mapMaker.getTiles();
         buttons = mapMaker.getButtons().toArray(new Button[0]);
         chests = mapMaker.getChests().toArray(new Chest[0]);
         doors = mapMaker.getDoors().toArray(new Door[0]);
         coins = mapMaker.getCoins().toArray(new Coin[0]);
+        signs = mapMaker.getSigns().toArray(new Sign[0]);
         totalCoinOnMap = calculateTotalCoinAmount();
+        checkPoints = mapMaker.getCheckPoints();
+        winPoints = mapMaker.getWinPoints();
+        int[] spawnPoint = checkPoints[0];
+        player.setSpawnX((spawnPoint[0]-0.5)*MapObject.TILE_SIDE);
+        player.setSpawnY((spawnPoint[1]-0.5)*MapObject.TILE_SIDE);
+        player.respawn();
         setFrameTileRange();
     }
 
     //------------------------------------------------------------------------------------------------------------
     //GETTERS AND SETTERS
 
-    public boolean stagePassed() {
-        return playerIsIn(player.getX(), player.getY(), winArea);
+    public int stagePassed() {
+        int c = 0;
+        for (int[] winTile : winPoints) {
+            c++;
+            if (winTile == null) continue;
+            int index = winTile[0]-1 + (winTile[1]-1)*xTile;
+            if (playerIsIn(player, tiles[index].getCollisionBox())) {
+                return c;
+            }
+        }
+        return 0;
     }
 
     public int getWorldIndex() {
@@ -81,12 +115,8 @@ public class Map {
         return height;
     }
 
-    public int getxTile() {
-        return xTile;
-    }
-
-    public int getyTile() {
-        return yTile;
+    public Accessory[] getAccessories() {
+        return accessories;
     }
 
     //------------------------------------------------------------------------------------------------------------
@@ -96,14 +126,14 @@ public class Map {
     public void playerPositionChecks() {
 
         if (tiles != null) {
-            for (int y = tileRange[1]; y<=tileRange[3]; y++) {
-                for (int x = tileRange[0]; x<=tileRange[2]; x++) {
-                    int index = (y-1)*64+x-1;
+            for (int y = tileRange[1]; y<tileRange[3]; y++) {
+                for (int x = tileRange[0]; x<tileRange[2]; x++) {
+                    int index = (y-1)*xTile+x-1;
                     Tile tile = tiles[index];
                     if (tile.isSolid() && tile.isApproachable()) {
-                        checkCollision(tile.getCoordinates());
+                        checkCollision(tile.getCollisionBox());
                     }
-                    if (isIn(player.getX(), player.getY(), tile.getCoordinates())) {
+                    if (isIn(player.getX(), player.getY(), tile.getCollisionBox())) {
                         tile.playerIsOn(player);
                     }
                 }
@@ -112,20 +142,25 @@ public class Map {
         checkPlayerIsOn(buttons);
         checkPlayerIsOn(chests);
         checkPlayerIsOn(coins);
-
+        checkPlayerIsOn(signs);
 
         if (doors != null) {
             for (Door door : doors) {
                 checkCollision(door.getCoordinates());
-                door.checkOpen(player);
+                door.checkOpen();
             }
         }
 
         if (!xCollided) {
-            player.setX(player.getX()+ player.getxVelocity()*Frame.DT);
+            player.setX(player.getX()+ player.getxVelocity() * Frame.DT);
         }
         if (!yCollided) {
             player.setY(player.getY() + player.getyVelocity() * Frame.DT);
+        }
+        if (accessories!= null) {
+            for (Accessory accessory : accessories) {
+                accessory.setCoordinates();
+            }
         }
 
         xCollided = false;
@@ -140,13 +175,13 @@ public class Map {
             if (player.getxVelocity() > 0) {
                 if (playerLineCollision(coordinates, Side.LEFT)) {
                     xCollided = true;
-                    player.setX(coordinates[0] - Player.getSide() / 2);
+                    player.setX(coordinates[0] - player.getSide() / 2);
                     player.setxVelocity(0);
                 }
             } else if (player.getxVelocity() < 0) {
                 if (playerLineCollision(coordinates, Side.RIGHT)) {
                     xCollided = true;
-                    player.setX(coordinates[2] + Player.getSide() / 2);
+                    player.setX(coordinates[2] + player.getSide() / 2);
                     player.setxVelocity(0);
                 }
             }
@@ -156,24 +191,24 @@ public class Map {
             if (player.getyVelocity() > 0) {
                 if (playerLineCollision(coordinates, Side.BOTTOM)) {
                     yCollided = true;
-                    player.setY(coordinates[1] - Player.getSide() / 2);
+                    player.setY(coordinates[1] - player.getSide() / 2);
                     player.setyVelocity(0);
                 }
             } else if (player.getyVelocity() < 0) {
                 if (playerLineCollision(coordinates, Side.TOP)) {
                     yCollided = true;
-                    player.setY(coordinates[3] + Player.getSide() / 2);
+                    player.setY(coordinates[3] + player.getSide() / 2);
                     player.setyVelocity(0);
                 }
             }
         }
     }
 
-    private void checkPlayerIsOn(Passable[] passables) {
-        if (passables != null) {
-            for (Passable passable : passables) {
-                if (playerIsIn(player, passable.getCoordinates())) {
-                    passable.playerIsOn(player);
+    private void checkPlayerIsOn(MapObject[] mapObjects) {
+        if (mapObjects != null) {
+            for (MapObject mapObject : mapObjects) {
+                if (playerIsIn(player, mapObject.getCollisionBox())) {
+                    mapObject.playerIsOn(player);
                 }
             }
         }
@@ -191,7 +226,7 @@ public class Map {
         double y = player.getY();
         double nextX = x + player.getxVelocity() * Frame.DT;
         double nextY = y + player.getyVelocity() * Frame.DT;
-        double halfSide = Player.getSide() / 2;
+        double halfSide = player.getSide() / 2;
 
         if (side == Side.TOP) {
             return xLineCollision(x - halfSide, y - halfSide, nextY - halfSide, x0, x1, y1) ||
@@ -238,8 +273,8 @@ public class Map {
 
     }
 
-    public static boolean playerIsIn(double x, double y, double[] obstacle) {
-        double halfSide = Player.getSide() / 2;
+    public boolean playerIsIn(double x, double y, double[] obstacle) {
+        double halfSide = player.getSide()/2;
         return isIn(x + halfSide, y + halfSide, obstacle) ||
                 isIn(x + halfSide, y - halfSide, obstacle) ||
                 isIn(x - halfSide, y + halfSide, obstacle) ||
@@ -247,8 +282,8 @@ public class Map {
     }
 
     public static boolean playerIsIn(Player player, double[] obstacle) {
+        double halfSide = player.getSide()/2;
         double x = player.getX(), y = player.getY();
-        double halfSide = Player.getSide() / 2;
         return isIn(x + halfSide, y + halfSide, obstacle) ||
                 isIn(x + halfSide, y - halfSide, obstacle) ||
                 isIn(x - halfSide, y + halfSide, obstacle) ||
@@ -276,27 +311,23 @@ public class Map {
         drawDrawables(buttons);
         drawDrawables(chests);
         drawDrawables(coins);
+        for (int i = 1; i<=5; i++) {
+            int[] winTile = winPoints[i-1];
+            if (winTile == null) continue;
+            StdDraw.picture((winTile[0]-0.5)*Tile.HALF_SIDE*2, (winTile[1]-0.5)*Tile.HALF_SIDE*2, "misc/winImages/"+i+".png", MapObject.TILE_SIDE, MapObject.TILE_SIDE);
+        }
         drawDrawables(doors);
-
+        drawDrawables(signs);
         player.draw();
+        drawDrawables(accessories);
     }
 
     private static void drawDrawables(Drawable[] drawables) {
-        if (drawables!= null) {
+        if (drawables != null) {
             for (Drawable drawable : drawables) {
                 drawable.draw();
             }
         }
-    }
-
-    public static void drawRectangle(double[] region) {
-        StdDraw.filledRectangle((region[0] + region[2]) / 2.0, (region[1] + region[3]) / 2.0,
-                (region[2] - region[0]) / 2.0, (region[3] - region[1]) / 2.0);
-    }
-
-    public static void drawRectangleOutline(double[] region) {
-        StdDraw.rectangle((region[0] + region[2]) / 2.0, (region[1] + region[3]) / 2.0,
-                (region[2] - region[0]) / 2.0, (region[3] - region[1]) / 2.0);
     }
 
     //--------------------------------------------------------------------------------------------------
@@ -313,20 +344,20 @@ public class Map {
     }
 
     public void setFrameTileRange() {
-        int tileSize = Tile.HALF_SIDE * 2;
-
-        int xNum = (int) (player.getX() / tileSize);
-        int yNum = (int) (player.getY() / tileSize);
+        int xNum = (int) (player.getX() / MapObject.TILE_SIDE);
+        int yNum = (int) (player.getY() / MapObject.TILE_SIDE);
 
         int minX = xNum - RANGE;
         int maxX = xNum + RANGE;
 
         if (minX<1) {
             minX = 1;
-            maxX = minX+ RANGE *2;
+            maxX = Math.min(minX + RANGE * 2, xTile);
+
         } else if (maxX> xTile) {
             maxX = xTile;
-            minX = maxX - RANGE * 2;
+            minX = Math.max(maxX - RANGE * 2, 1);
+
         }
 
         int minY = yNum - RANGE;
@@ -334,13 +365,14 @@ public class Map {
 
         if (minY<1) {
             minY = 1;
-            maxY = minY+ RANGE *2;
+            maxY = Math.min(minY + RANGE * 2, yTile);
         }
         else if (maxY > yTile) {
             maxY = yTile;
-            minY = maxY - RANGE *2;
+            minY = Math.max(maxY - RANGE *2, 1);
         }
 
         tileRange = new int[]{minX, minY, maxX, maxY};
     }
+
 }

@@ -1,27 +1,23 @@
-import java.awt.*;
+package mapobjects;
 
-public class Door implements Drawable{
+import java.awt.*;
+import lib.StdDraw;
+import game.Player;
+import game.Frame;
+import static helperobjects.DrawMethods.drawRectangle;
+
+public abstract class Door extends MapObject {
 
     public enum ALIGNMENT {V, H} // vertical or horizontal alignment for doors
-
     private final ALIGNMENT alignment;
-    private boolean isOpen = false;
-    //private boolean reverse = false; //if the door is opens in reverse
-
-    private final int xNum;
-    private final int yNum;
-    private final int length; //length value in tiles
-    private final double[] coordinates;
-    private final double doorFloor;
-
-    private static final double TILE_SIDE = Tile.HALF_SIDE * 2;
-    private static final double THICKNESS = 40;
-    private static final double SPACE_ON_SIDE = (TILE_SIDE-THICKNESS)/2;
-    private static final double SPEED = 2; //sliding speed of door
-
-    private final Color color = new Color((int) (Math.random()*255), 0, (int) (Math.random()*255));
     private final Button[] buttons;
 
+    private boolean isOpen;
+    private final double doorFloor;
+
+    private final Color color = new Color((int) (Math.random()*255), 0, (int) (Math.random()*255));
+    private static final double THICKNESS = 40, SPACE_ON_SIDE = (TILE_SIDE-THICKNESS)/2,
+            SPEED = 2, DELTA = SPEED * Frame.DT;
 
 
     public Door(ALIGNMENT alignment, int xNum, int yNum) {
@@ -39,28 +35,24 @@ public class Door implements Drawable{
 
     // door with buttons wired to it, defined by its alignment and the tiles it lies on.
     public Door(ALIGNMENT alignment, int xNum, int yNum, int length, Button[] buttons) {
+        super(xNum, yNum);
         this.alignment = alignment;
-        this.xNum = xNum;
-        this.yNum = yNum;
-        this.length = length;
+        //length value in tiles
         this.buttons = buttons;
-        {
-            double x0, y0, x1, y1;
-            if (alignment == ALIGNMENT.V) {
-                x0 = (xNum-1) * TILE_SIDE + SPACE_ON_SIDE;
-                x1 = xNum * TILE_SIDE - SPACE_ON_SIDE;
-                y0 = (yNum-1) * TILE_SIDE;
-                y1 = (yNum+length-1) * TILE_SIDE;
-                doorFloor = y0;
-            } else {
-                y0 = (yNum-1) * TILE_SIDE + SPACE_ON_SIDE;
-                y1 = (yNum) * TILE_SIDE - SPACE_ON_SIDE;
-                x0 = (xNum - 1) * TILE_SIDE;
-                x1 = (xNum + length -1) * TILE_SIDE;
-                doorFloor = x0;
-            }
-            coordinates = new double[]{x0, y0, x1, y1};
+
+        if (alignment == ALIGNMENT.V) {
+            coordinates[0] += SPACE_ON_SIDE;
+            coordinates[2] -= SPACE_ON_SIDE;
+            coordinates[3] += (length-1)*TILE_SIDE;
+            doorFloor = coordinates[1];
+        } else {
+            coordinates[1] += SPACE_ON_SIDE;
+            coordinates[3] -= SPACE_ON_SIDE;
+            coordinates[2] += (length-1)*TILE_SIDE;
+            doorFloor = coordinates[0];
         }
+        collisionBox = coordinates;
+
         if (buttons != null) {
             for (Button button : buttons) {
                 button.setUnpressedColor(color);
@@ -68,19 +60,14 @@ public class Door implements Drawable{
         }
     }
 
-
-
-    public double[] getCoordinates() {
-        return coordinates;
-    }
-
-    public void checkOpen(Player player) {
+    public void checkOpen() {
         if (buttons == null) return;
 
         boolean pressed = true;
         for (Button button : buttons) {
             if (!button.isPressed()) {
                 pressed = false;
+                break;
             }
         }
         isOpen = pressed;
@@ -88,10 +75,14 @@ public class Door implements Drawable{
 
     //decreases the door's y coordinates by doorSpeed*timeStep if door is set to be open and is not fully opened(vertical)
     private void slideDoor() {
-        if (isOpen && alignment == ALIGNMENT.V && coordinates[3] > doorFloor) {
-            coordinates[3]-= SPEED * Frame.DT;
-        } else if (isOpen && alignment == ALIGNMENT.H && coordinates[2] > doorFloor) {
-            coordinates[2]-= SPEED * Frame.DT;
+        if (!isOpen) return;
+
+        if (alignment == ALIGNMENT.V && coordinates[3] > doorFloor) {
+            coordinates[3] = Math.max(coordinates[3] - DELTA, doorFloor); // Ensure top >= bottom
+            collisionBox[3] = Math.max(collisionBox[3] - DELTA, doorFloor);
+        } else if (alignment == ALIGNMENT.H && coordinates[2] > doorFloor) {
+            coordinates[2] = Math.max(coordinates[2] - DELTA, doorFloor); // Ensure right >= left
+            collisionBox[2] = Math.max(collisionBox[2] - DELTA, doorFloor);
         }
     }
 
@@ -100,9 +91,11 @@ public class Door implements Drawable{
     public void draw() {
         slideDoor();
         StdDraw.setPenColor(color);
-        Map.drawRectangle(coordinates);
+        drawRectangle(coordinates);
     }
 
+    @Override
+    public void playerIsOn(Player player) {} //not possible
 
 
     public static class VerticalDoor extends Door {

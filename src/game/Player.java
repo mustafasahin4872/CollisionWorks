@@ -1,29 +1,23 @@
-public class Player implements Drawable {
+package game;
 
-    private static final double DEFAULT_SIDE = 50;
-    private static double side;
-    private static final double DEFAULT_SPAWN_X = 100;
-    private static final double DEFAULT_SPAWN_Y = 300;
-    private double spawnX;
-    private double spawnY;
-    private double x;
-    private double y;
+import lib.StdDraw;
 
-    private double xVelocity = 0;
-    private double yVelocity = 0;
+public class Player {
 
+    private final String name;
+    private final double defaultSide;
+    private final String fileRoot;
+    private double side;
+    private double spawnX, spawnY, x, y, xVelocity, yVelocity;
     private static final double MAX_SPEED1 = 10, MAX_SPEED2 = 20, MAX_SPEED3 = 40, A1 = 0.2, A2 = 0.4, A3 = 0.8;
     private double maxSpeed = MAX_SPEED2, acceleration = A2, deceleration = A2;
-
-    private int xDirection = 0, yDirection = 0;
-
+    private int xDirection, yDirection;
     private static final double MAX_HP = 200;
     private double hitPoints = MAX_HP;
-
     private int coinsCollected = 0;
-
     private boolean isPlayerDead = false;
 
+    private final boolean[] checkPointsReached = new boolean[6];
     private long playerTime;
     private final double[] effectTimer = new double[3];
 
@@ -34,41 +28,37 @@ public class Player implements Drawable {
 
     //CONSTRUCTORS
 
-    public Player(){
-        this(DEFAULT_SIDE);
+    public Player() {
+        this("Bob");
     }
 
-    public Player(double spawnX, double spawnY) {
-        this(spawnX, spawnY, DEFAULT_SIDE);
-    }
-
-    public Player(double side) {
-        this(DEFAULT_SPAWN_X, DEFAULT_SPAWN_Y, side);
-    }
-
-    public Player(double spawnX, double spawnY, double side) {
-        this.spawnX = spawnX;
-        this.spawnY = spawnY;
+    public Player(String name) {
+        this.name = name;
+        fileRoot = "misc/playerImages/" + name + "/";
         x = spawnX;
         y = spawnY;
-        Player.side = side;
+        defaultSide = switch (name) {
+            case "Bob", "Mike" -> 50;
+            default -> 50;
+        };
+        this.side = defaultSide;
     }
 
 
     public void updateVelocity() {
 
-        double dt = Frame.DT;
-        double sqrt2 = Math.sqrt(2);
+        final double DT = Frame.DT;
+        final double SQRT2 = Math.sqrt(2);
 
         double nextVx;
         double nextVy;
 
         if (xDirection != 0 && yDirection != 0) {
-            nextVx = xVelocity + xDirection * acceleration / sqrt2 * dt;
-            nextVy = yVelocity + yDirection * acceleration / sqrt2 * dt;
+            nextVx = xVelocity + xDirection * acceleration / SQRT2 * DT;
+            nextVy = yVelocity + yDirection * acceleration / SQRT2 * DT;
         }  else {
-            nextVx = xVelocity + xDirection * acceleration * dt;
-            nextVy = yVelocity + yDirection * acceleration * dt;
+            nextVx = xVelocity + xDirection * acceleration * DT;
+            nextVy = yVelocity + yDirection * acceleration * DT;
         }
 
         double nextVSquared = Math.pow(nextVx, 2) + Math.pow(nextVy, 2);
@@ -83,26 +73,26 @@ public class Player implements Drawable {
         }
 
         if (xDirection == 0) {
-            if ((xVelocity >= 0 && xVelocity - deceleration * dt < 0) || (xVelocity <= 0 && xVelocity + deceleration * dt > 0)) {
+            if ((xVelocity >= 0 && xVelocity - deceleration * DT < 0) || (xVelocity <= 0 && xVelocity + deceleration * DT > 0)) {
                 setxVelocity(0);
             } else {
                 if (xVelocity > 0) {
-                    setxVelocity(xVelocity - deceleration * dt);
+                    setxVelocity(xVelocity - deceleration * DT);
                 } else {
-                    setxVelocity(xVelocity + deceleration * dt);
+                    setxVelocity(xVelocity + deceleration * DT);
                 }
             }
         }
 
         if (yDirection == 0) {
 
-            if ((yVelocity >= 0 && yVelocity - deceleration * dt < 0) || (yVelocity <= 0 && yVelocity + deceleration * dt > 0)) {
+            if ((yVelocity >= 0 && yVelocity - deceleration * DT < 0) || (yVelocity <= 0 && yVelocity + deceleration * DT > 0)) {
                 setyVelocity(0);
             } else {
                 if (yVelocity > 0) {
-                    setyVelocity(yVelocity  - deceleration * dt);
+                    setyVelocity(yVelocity - deceleration * DT);
                 } else {
-                    setyVelocity(yVelocity + deceleration * dt);
+                    setyVelocity(yVelocity + deceleration * DT);
                 }
             }
         }
@@ -139,6 +129,7 @@ public class Player implements Drawable {
     }
 
     public void buff(char[] buffs, double time) {
+        if (buffs==null) return;
         for (char buff : buffs) {
             if (buff == 'F') {
                 effectTimer[0] += time;
@@ -177,15 +168,54 @@ public class Player implements Drawable {
         setPlayerTime();
     }
 
+    public void reachCheckPoint(int index) {
+        checkPointsReached[index] = true;
+    }
+
 
     //GETTERS AND SETTERS
 
-    public static double getSide() {
+
+    public String getName() {
+        return name;
+    }
+
+    public double[] getSpawnPoint() {
+        return new double[]{spawnX, spawnY};
+    }
+
+    public void setSpawnPoint(double[] spawnPoint) {
+        setSpawnX(spawnPoint[0]);
+        setSpawnY(spawnPoint[1]);
+        respawn();
+    }
+
+    public void setSpawnX(double spawnX) {
+        this.spawnX = spawnX;
+    }
+
+    public void setSpawnY(double spawnY) {
+        this.spawnY = spawnY;
+    }
+
+    public double getSide() {
         return side;
     }
 
-    public static void setSide(double side) {
-        Player.side = side;
+    public void setSide(double side) {
+        this.side = side;
+    }
+
+    public double getDefaultSide() {
+        return defaultSide;
+    }
+
+    public void resize(double multiplier) {
+        side *= multiplier;
+    }
+
+    public void resetSide() {
+        side = defaultSide;
     }
 
     public double getX() {
@@ -292,29 +322,59 @@ public class Player implements Drawable {
         x = spawnX;
         y = spawnY;
     }
+
+    public boolean[] getCheckPointsReached() {
+        return checkPointsReached;
+    }
+
     //DRAW
 
-    @Override
     public void draw() {
 
-        if (xDirection == 1 && yDirection == 1) {
-            StdDraw.picture(x, y, "misc/playerImages/playerUR.png", side, side);
-        } else if (xDirection == 0 && yDirection == 1) {
-            StdDraw.picture(x, y, "misc/playerImages/playerU.png", side, side);
-        } else if (xDirection == -1 && yDirection == 1) {
-            StdDraw.picture(x, y, "misc/playerImages/playerUL.png", side, side);
-        } else if (xDirection == -1 && yDirection == 0) {
-            StdDraw.picture(x, y, "misc/playerImages/playerL.png", side, side);
-        } else if (xDirection == -1 && yDirection == -1) {
-            StdDraw.picture(x, y, "misc/playerImages/playerDL.png", side, side);
+        if (xDirection == 1 && yDirection == -1) {
+            StdDraw.picture(x, y, fileRoot+"UR.jpg", side, side);
         } else if (xDirection == 0 && yDirection == -1) {
-            StdDraw.picture(x, y, "misc/playerImages/playerD.png", side, side);
-        } else if (xDirection == 1 && yDirection == -1) {
-            StdDraw.picture(x, y, "misc/playerImages/playerDR.png", side, side);
+            StdDraw.picture(x, y, fileRoot+"U.jpg", side, side);
+        } else if (xDirection == -1 && yDirection == -1) {
+            StdDraw.picture(x, y, fileRoot+"UL.jpg", side, side);
+        } else if (xDirection == -1 && yDirection == 0) {
+            StdDraw.picture(x, y, fileRoot+"L.jpg", side, side);
+        } else if (xDirection == -1 && yDirection == 1) {
+            StdDraw.picture(x, y, fileRoot+"DL.jpg", side, side);
+        } else if (xDirection == 0 && yDirection == 1) {
+            StdDraw.picture(x, y, fileRoot+"D.jpg", side, side);
+        } else if (xDirection == 1 && yDirection == 1) {
+            StdDraw.picture(x, y, fileRoot+"DR.jpg", side, side);
         } else if (xDirection == 1 && yDirection == 0){
-            StdDraw.picture(x, y, "misc/playerImages/playerR.png", side, side);
+            StdDraw.picture(x, y, fileRoot+"R.jpg", side, side);
+        } else if (xDirection == 0 && yDirection == 0){
+            StdDraw.picture(x, y, fileRoot+"0.jpg", side, side);
         } else {
-            StdDraw.picture(x, y, "misc/playerImages/player.png", side, side);
+            System.out.println("drawing error for player!");
+        }
+    }
+
+    public void drawBig(double multiplier) {
+
+        double sideResized = side*multiplier;
+        if (xDirection == 1 && yDirection == 1) {
+            StdDraw.picture(x, y, fileRoot+"UR.jpg", sideResized, sideResized);
+        } else if (xDirection == 0 && yDirection == 1) {
+            StdDraw.picture(x, y, fileRoot+"U.jpg", sideResized, sideResized);
+        } else if (xDirection == -1 && yDirection == 1) {
+            StdDraw.picture(x, y, fileRoot+"UL.jpg", sideResized, sideResized);
+        } else if (xDirection == -1 && yDirection == 0) {
+            StdDraw.picture(x, y, fileRoot+"L.jpg", sideResized, sideResized);
+        } else if (xDirection == -1 && yDirection == -1) {
+            StdDraw.picture(x, y, fileRoot+"DL.jpg", sideResized, sideResized);
+        } else if (xDirection == 0 && yDirection == -1) {
+            StdDraw.picture(x, y, fileRoot+"D.jpg", sideResized, sideResized);
+        } else if (xDirection == 1 && yDirection == -1) {
+            StdDraw.picture(x, y, fileRoot+"DR.jpg", sideResized, sideResized);
+        } else if (xDirection == 1 && yDirection == 0){
+            StdDraw.picture(x, y, fileRoot+"R.jpg", sideResized, sideResized);
+        } else {
+            StdDraw.picture(x, y, fileRoot+"0.jpg", sideResized, sideResized);
         }
     }
 
@@ -346,5 +406,8 @@ public class Player implements Drawable {
         StdDraw.text(frameX + Frame.X_SCALE/2.0 - 30, frameY - Frame.Y_SCALE/2.0 + 30, "%d".formatted(coinsCollected));
 
     }
+
+
+
 
 }

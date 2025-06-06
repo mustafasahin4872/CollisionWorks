@@ -1,31 +1,42 @@
+package game;
+
+import mapobjects.Sign;
+import lib.StdDraw;
+
 import java.awt.event.KeyEvent;
 
 public class Frame {
 
     //the area of player's sight
-    public static final double X_SCALE = 900;
-    public static final double Y_SCALE = 600;
+    public static final double X_SCALE = 900, Y_SCALE = 600;
 
-    public static double frameX;
-    public static double frameY;
+    public static final double DT = 1; //time step between each frame
+    public static final int PAUSE = 20; //pause value for each frame
 
-    //time step between each frame
-    public static final double DT = 1;
-    //pause value for each frame
-    public static final int PAUSE = 20;
-
-    private final Map map;
+    private final GameMap gameMap;
     private final Player player;
 
-    public Frame(Map map) {
-        this.map = map;
-        player = map.getPlayer();
+    public double frameX, frameY;
+
+    public Frame(GameMap gameMap, Player player) {
+        this.gameMap = gameMap;
+        this.player = player;
     }
 
-    public void play() {
+    public Player getPlayer() {
+        return player;
+    }
 
-        //the gameplay
-        while (!map.stagePassed() && !player.isPlayerDead()) {
+    public GameMap getGameMap() {
+        return gameMap;
+    }
+
+    //returns special codes for different win areas
+    public int play() {
+
+        int passCode = 0;
+        while (passCode == 0 && !player.isPlayerDead()) {
+            passCode = gameMap.stagePassed();
             long startTime = System.currentTimeMillis();
 
             //takes input and sets moveDirection variables
@@ -33,13 +44,13 @@ public class Frame {
             //uses moveDirection to update velocities
             player.updateVelocity();
             //with the updated velocities, sets player's x and y coordinates
-            map.playerPositionChecks();
-            player.readBuffs();
+            gameMap.playerPositionChecks();
 
-            //sets the frame to center player if it is not in the edges of map
-            //if the frame would get out of the map, set frame to show up to edge
+            //sets the frame to center player if it is not in the edges of gameMap
+            //if the frame would get out of the gameMap, set frame to show up to edge
             setFrame();
-            map.setFrameTileRange();
+            gameMap.setFrameTileRange();
+            Sign.updateDisplayCenter(frameX, frameY);
 
             //draws everything
             StdDraw.clear();
@@ -55,28 +66,25 @@ public class Frame {
             }
         }
 
-        Map nextMap = getNextMap();
-        Frame nextFrame = new Frame(nextMap);
-        nextFrame.play();
-
+        return passCode;
     }
 
-    private Map getNextMap() {
-        Map nextMap;
-        if (map.getLevelIndex()==15) {
-            if (map.getWorldIndex()==3) {
-                nextMap = new Map(1,1);
+    public GameMap getNextMap() {
+        GameMap nextGameMap;
+        if (gameMap.getLevelIndex()==12) {
+            if (gameMap.getWorldIndex()==4) {
+                nextGameMap = new GameMap(1,1, player, gameMap.getAccessories());
             } else {
-                nextMap = new Map(map.getWorldIndex(), 1);
+                nextGameMap = new GameMap(gameMap.getWorldIndex()+1, 1, player, gameMap.getAccessories());
             }
         } else {
-            nextMap = new Map(map.getWorldIndex(), map.getLevelIndex()+1);
+            nextGameMap = new GameMap(gameMap.getWorldIndex(), gameMap.getLevelIndex()+1, player, gameMap.getAccessories());
         }
-        return nextMap;
+        return nextGameMap;
     }
 
     public void draw() {
-        map.draw();
+        gameMap.draw();
         StdDraw.setPenColor();
         StdDraw.setFont();
         StdDraw.textLeft(frameX - X_SCALE/2 + 10, frameY + Y_SCALE/2 - 10, "x-y: %.1f %.1f".formatted(player.getX(), player.getY()));
@@ -110,9 +118,9 @@ public class Frame {
         if (player.getX()-X_SCALE/2<0) {
             StdDraw.setXscale(0, X_SCALE);
             frameX = X_SCALE/2;
-        } else if (player.getX()+X_SCALE/2>map.getWidth()) {
-            StdDraw.setXscale(map.getWidth() -X_SCALE, map.getWidth());
-            frameX = map.getWidth() -X_SCALE/2;
+        } else if (player.getX()+X_SCALE/2> gameMap.getWidth()) {
+            StdDraw.setXscale(gameMap.getWidth() -X_SCALE, gameMap.getWidth());
+            frameX = gameMap.getWidth() -X_SCALE/2;
         } else {
             StdDraw.setXscale(player.getX() - Frame.X_SCALE / 2, player.getX() + Frame.X_SCALE / 2);
             frameX = player.getX();
@@ -122,9 +130,9 @@ public class Frame {
             StdDraw.setYscale(Y_SCALE, 0);
             frameY = Y_SCALE/2;
         } else {
-            if (player.getY()+Y_SCALE/2> map.getHeight()) {
-                StdDraw.setYscale(map.getHeight(), map.getHeight() -Y_SCALE);
-                frameY = map.getHeight() -Y_SCALE/2;
+            if (player.getY()+Y_SCALE/2> gameMap.getHeight()) {
+                StdDraw.setYscale(gameMap.getHeight(), gameMap.getHeight() -Y_SCALE);
+                frameY = gameMap.getHeight() -Y_SCALE/2;
             } else {
                 StdDraw.setYscale(player.getY() + Frame.Y_SCALE / 2, player.getY() - Frame.Y_SCALE / 2);
                 frameY = player.getY();
