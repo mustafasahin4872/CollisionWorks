@@ -4,7 +4,6 @@ import game.Player;
 import lib.StdDraw;
 
 public abstract class Tile extends MapObject {
-    public static final double HALF_SIDE = TILE_SIDE/2;
 
     private final boolean isSolid;
     private final String fileName;

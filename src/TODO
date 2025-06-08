@@ -1,39 +1,30 @@
 NEEDED AS FIRST
-order the packages reduce the imports
-coordinates to collisionBoxes
-win area styles(9 needed or lower the possibilities)
-two more special tiles
 
-make win area more noticeable
-add alternate win areas triggering different outcomes
-for example in in between scene, you should be able to return to main screen
+design the shop, first design the crystal palace
+fix the selection's world index gimmick, change the 13-14 indexed levels, make them make sense
+add signal handling: next, shop, selection, death...
 add random rewards to the in between every x levels
-generalize mud tile to the 3 worlds
-add special tile to the other worlds, counterparts of ice tile
-add a quit button
+
 make the buff symbols, and add the buff mechanics.
-add hearts and a respawn mechanic, return to lobby when game over.
+generalize mud and special tile to the 4 worlds
+
 add skin to test
 add skin with default size big and small to test
-reset speed when respawned
+accessories size and coordinate changes are needed!
 
 
 NEW MECHANICS, FUTURE IDEAS
-in game currency, shop
-volcano and icicles
 fake wall
-fake obstacle
-checkpoints
 moving monsters
 shooting monsters
+in game currency, shop
 boss
 
 
 INCREASE FLEXIBILITY
-different quick codes for mapmaker
 
 NEW CLASS IDEAS //BELA ARAMAK
-add a subclass: mid version of Headpiece for şerif
+opponent class: icicles, mortar, monster
 
 OBJECT INITIALIZATION //HAMALLIK
 add stages

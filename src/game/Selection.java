@@ -9,10 +9,10 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import static helperobjects.CollisionMethods.isIn;
 
-public class Selection implements Drawable {
+public class Selection {
 
-    private int totalCoin=0;
     private int currentWorldIndex = 0, currentLevelIndex = 1,
             currentAccessoryIndex = 0, currentSkinIndex = 0;
 
@@ -57,48 +57,39 @@ public class Selection implements Drawable {
             null, "THE SPRING FESTIVAL", "INTO THE ICE CAVE", "TO THE TOP OF THE VOLCANO", "CRYSTAL PALACE"
     };
 
-    private static final double BUTTON_HALF_SIDE = 0.5;
-    private static final double BUTTON_SIDE = BUTTON_HALF_SIDE*2;
+
     //centers of buttons
+    private final double[][]
+            leftArrowCoordinates = {null, {1, Y_TILE - 5}, {1, Y_TILE - 5},
+                                    {1, Y_TILE - 5}, {1, Y_TILE - 8}},
+            rightArrowCoordinates = {{X_TILE - 1, Y_TILE - 8}, {X_TILE - 1, Y_TILE - 8},
+                                     {X_TILE - 1, Y_TILE - 7}, {X_TILE - 1, Y_TILE - 4}, null};
 
-    private final double[][] leftArrowCoordinates = {
-            null,
-            {1 * BUTTON_SIDE, Y_TILE - 5 * BUTTON_SIDE},
-            {1 * BUTTON_SIDE, Y_TILE - 5 * BUTTON_SIDE},
-            {1 * BUTTON_SIDE, Y_TILE - 5 * BUTTON_SIDE},
-            {1 * BUTTON_SIDE, Y_TILE - 8 * BUTTON_SIDE},
-    };
-    private final double[][] rightArrowCoordinates = {
-            {X_TILE - 1 * BUTTON_SIDE, Y_TILE - 8 * BUTTON_SIDE},
-            {X_TILE - 1 * BUTTON_SIDE, Y_TILE - 8 * BUTTON_SIDE},
-            {X_TILE - 1 * BUTTON_SIDE, Y_TILE - 7 * BUTTON_SIDE},
-            {X_TILE - 1 * BUTTON_SIDE, Y_TILE - 4 * BUTTON_SIDE},
-            null
-    };
-    private final double[] accessoryLeftCoordinates = new double[]{
-            4*BUTTON_SIDE+BUTTON_HALF_SIDE, Y_TILE-8-BUTTON_HALF_SIDE
-    }, accessoryRightCoordinates = new double[]{
-            X_TILE-2-4*BUTTON_SIDE-BUTTON_HALF_SIDE ,Y_TILE-8-BUTTON_HALF_SIDE
-    }, accessoryChooseCoordinates = new double[]{
-            (accessoryLeftCoordinates[0]+accessoryRightCoordinates[0])/2, Y_TILE-9-BUTTON_HALF_SIDE
-    };
+    private final double[]
+            accessoryLeftCoordinates = new double[]{4*0.5, Y_TILE-6.5-0.5},
+            accessoryRightCoordinates = new double[]{X_TILE-2-4*-0.5 ,Y_TILE-6.5-0.5},
+            accessoryChooseCoordinates = new double[]{(accessoryLeftCoordinates[0]+accessoryRightCoordinates[0])/2, Y_TILE-7.5-0.5},
+            shopCoordinates = new double[]{8, 11};
 
-    private final double[][] leftArrowBox = new double[5][4], rightArrowBox = new double[5][4];
-    private final double[][] levelBoxCoordinates = new double[12][2];
-    private final double[] accessoryLeftBox = new double[4], accessoryRightBox = new double[4], accessoryChooseBox = new double[4];
+    private final double[][]
+            leftArrowBox = new double[5][4], rightArrowBox = new double[5][4],
+            levelBoxCoordinates = new double[12][2];
+    private final double[]
+            accessoryLeftBox = new double[4], accessoryRightBox = new double[4],
+            accessoryChooseBox = new double[4], shopBox = new double[4];
+
 
     public Selection() {
 
         fillArrowBoxes();
-
         fillLevelBoxes();
 
         for (Player skin : SKINS) {
             skin.setSpawnPoint(WORLDS[0].getPlayer().getSpawnPoint());
+            skin.respawn();
         }
 
     }
-
 
     private boolean levelChosen(){
         return currentWorldIndex!=0 && StdDraw.isKeyPressed(KeyEvent.VK_SPACE);
@@ -120,7 +111,8 @@ public class Selection implements Drawable {
             }
         }
 
-        return new GameMap(currentWorldIndex, currentLevelIndex, currentSkin, selectedAccessories.toArray(new Accessory[0]));
+        currentSkin.setAccessories(selectedAccessories.toArray(new Accessory[0]));
+        return new GameMap(currentWorldIndex, currentLevelIndex, currentSkin);
     }
 
     private void handleInput() {
@@ -153,26 +145,26 @@ public class Selection implements Drawable {
 
         if (StdDraw.isMousePressed()) {
             if (currentWorldIndex!=0) {
-                if (GameMap.isIn(mouseX, mouseY, leftArrowBox[currentWorldIndex])) {
+                if (isIn(mouseX, mouseY, leftArrowBox[currentWorldIndex])) {
                     currentWorldIndex--;
                     currentLevelIndex=1;
                 }
                 for (int i = 0; i< levelBoxCoordinates.length; i++) {
-                    if (levelBoxCoordinates[i][0]- BUTTON_HALF_SIDE < mouseX &&
-                            levelBoxCoordinates[i][0] + BUTTON_HALF_SIDE > mouseX &&
-                            levelBoxCoordinates[i][1] - BUTTON_HALF_SIDE < mouseY &&
-                            levelBoxCoordinates[i][1] + BUTTON_HALF_SIDE > mouseY) {
+                    if (levelBoxCoordinates[i][0]- 0.5 < mouseX &&
+                            levelBoxCoordinates[i][0] + 0.5 > mouseX &&
+                            levelBoxCoordinates[i][1] - 0.5 < mouseY &&
+                            levelBoxCoordinates[i][1] + 0.5 > mouseY) {
                         currentLevelIndex = i+1;
                     }
                 }
             } else {
-                if (GameMap.isIn(mouseX, mouseY, accessoryLeftBox)) {
+                if (isIn(mouseX, mouseY, accessoryLeftBox)) {
                     currentAccessoryIndex--;
-                } else if (GameMap.isIn(mouseX, mouseY, accessoryRightBox)) {
+                } else if (isIn(mouseX, mouseY, accessoryRightBox)) {
                     currentAccessoryIndex++;
                 }
                 currentAccessoryIndex = (currentAccessoryIndex + ACCESSORIES.length) % ACCESSORIES.length;
-                if (GameMap.isIn(mouseX, mouseY, accessoryChooseBox)) {
+                if (isIn(mouseX, mouseY, accessoryChooseBox)) {
                     ACCESSORY_CHOSEN[currentAccessoryIndex] = !ACCESSORY_CHOSEN[currentAccessoryIndex];
                     StdDraw.pause(Frame.PAUSE*10);
                     if (ACCESSORY_CHOSEN[0]) {
@@ -182,7 +174,7 @@ public class Selection implements Drawable {
 
             }
             if (currentWorldIndex!=WORLDS.length-1){
-                if (GameMap.isIn(mouseX, mouseY, rightArrowBox[currentWorldIndex])) {
+                if (isIn(mouseX, mouseY, rightArrowBox[currentWorldIndex])) {
                     currentWorldIndex++;
                     currentLevelIndex=1;
                 }
@@ -192,7 +184,6 @@ public class Selection implements Drawable {
 
     }
 
-    @Override
     public void draw() {
 
         GameMap currentWorld = WORLDS[currentWorldIndex];
@@ -219,12 +210,12 @@ public class Selection implements Drawable {
 
         if (currentWorldIndex == 0) {
             StdDraw.setFont(new Font("Monospaced", Font.BOLD, 50));
-            StdDraw.text(X_TILE/2.0-1, Y_TILE-2-BUTTON_HALF_SIDE-0.15, currentSkin.getName());
+            StdDraw.text(X_TILE/2.0-1, Y_TILE-1.5-0.5-0.15, currentSkin.getName());
             StdDraw.setFont(new Font("Monospaced", Font.BOLD, 30));
             if (currentAccessory!=null) {
-                StdDraw.text(X_TILE/2.0-1, Y_TILE-8-BUTTON_HALF_SIDE, currentAccessory.getName());
+                StdDraw.text(X_TILE/2.0-1, Y_TILE-6.5-0.5, currentAccessory.getName());
             } else {
-                StdDraw.text(X_TILE/2.0-1, Y_TILE-8-BUTTON_HALF_SIDE, "no accessory");
+                StdDraw.text(X_TILE/2.0-1, Y_TILE-6.5-0.5, "no accessory");
             }
             StdDraw.text(accessoryLeftCoordinates[0], accessoryLeftCoordinates[1], "<");
             StdDraw.text(accessoryRightCoordinates[0], accessoryRightCoordinates[1], ">");
@@ -236,25 +227,13 @@ public class Selection implements Drawable {
 
         } else {
             StdDraw.setFont(new Font("Monospaced", Font.BOLD, 30));
-            StdDraw.text(X_TILE/2.0, Y_TILE-2- BUTTON_HALF_SIDE, WORLD_NAMES[currentWorldIndex]);
+            StdDraw.text(X_TILE/2.0, Y_TILE-2- 0.5, WORLD_NAMES[currentWorldIndex]);
         }
-
-
-        //right and left arrow buttons
-        StdDraw.setFont(new Font("Monospaced", Font.BOLD, 90));
-        if (currentWorldIndex!=0) {
-            StdDraw.text(leftArrowCoordinates[currentWorldIndex][0], leftArrowCoordinates[currentWorldIndex][1], "<");
-        }
-        if (currentWorldIndex!=4) {
-            StdDraw.text(rightArrowCoordinates[currentWorldIndex][0], rightArrowCoordinates[currentWorldIndex][1], ">");
-        }
-
 
         //level buttons
         if (currentWorldIndex!=0) {
             drawLevelButtons();
         }
-
 
     }
 
@@ -264,11 +243,11 @@ public class Selection implements Drawable {
         for (int i = 0; i< levelBoxCoordinates.length; i++) {
             double[] currentButton = levelBoxCoordinates[i];
             StdDraw.setPenColor();
-            StdDraw.square(currentButton[0], currentButton[1], BUTTON_HALF_SIDE);
+            StdDraw.square(currentButton[0], currentButton[1], 0.5);
             StdDraw.setPenColor(StdDraw.WHITE);
-            StdDraw.text(currentButton[0]+ BUTTON_HALF_SIDE /2, currentButton[1]- BUTTON_HALF_SIDE /2, ""+(i+1));
+            StdDraw.text(currentButton[0]+ 0.5 /2, currentButton[1]- 0.5 /2, ""+(i+1));
             if (i+1 == currentLevelIndex) {
-                StdDraw.square(currentButton[0], currentButton[1], BUTTON_HALF_SIDE);
+                StdDraw.square(currentButton[0], currentButton[1], 0.5);
             }
         }
     }
@@ -277,25 +256,26 @@ public class Selection implements Drawable {
         for (int i = 0; i<3; i++) {
             for (int j = 0; j<4; j++) {
                 levelBoxCoordinates[i*4+j] = new double[]{
-                        BUTTON_HALF_SIDE + 4*BUTTON_SIDE + j*3*BUTTON_SIDE,
-                        Y_TILE - BUTTON_HALF_SIDE -4*BUTTON_SIDE-2*i*BUTTON_SIDE};
+                        0.5 + 4 + j*3,
+                        Y_TILE - 0.5 - 4 -2*i};
             }
         }
+        fillBoxes(shopCoordinates, shopBox, 2);
     }
 
     private void fillArrowBoxes() {
         for (int i = 0; i<5; i++) {
             if (leftArrowCoordinates[i]!=null) {
-                fillBoxes(leftArrowCoordinates[i], leftArrowBox[i], BUTTON_SIDE);
+                fillBoxes(leftArrowCoordinates[i], leftArrowBox[i], 1);
             }
             if (rightArrowCoordinates[i] != null) {
-                fillBoxes(rightArrowCoordinates[i], rightArrowBox[i], BUTTON_SIDE);
+                fillBoxes(rightArrowCoordinates[i], rightArrowBox[i], 1);
             }
         }
 
-        fillBoxes(accessoryLeftCoordinates, accessoryLeftBox, BUTTON_HALF_SIDE);
-        fillBoxes(accessoryRightCoordinates, accessoryRightBox, BUTTON_HALF_SIDE);
-        fillBoxes(accessoryChooseCoordinates, accessoryChooseBox, BUTTON_HALF_SIDE);
+        fillBoxes(accessoryLeftCoordinates, accessoryLeftBox, 0.5);
+        fillBoxes(accessoryRightCoordinates, accessoryRightBox, 0.5);
+        fillBoxes(accessoryChooseCoordinates, accessoryChooseBox, 0.5);
 
     }
 

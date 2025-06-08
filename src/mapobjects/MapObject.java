@@ -6,7 +6,7 @@ public abstract class MapObject implements Drawable {
 
     protected final int worldIndex, xNum, yNum;
     protected double[] centerCoordinates, coordinates, collisionBox;
-    public static final double TILE_SIDE = 50;
+    public static final double HALF_SIDE = 25, TILE_SIDE = HALF_SIDE*2;
 
     public MapObject(int xNum, int yNum) {
         this(0, xNum, yNum);
@@ -23,7 +23,8 @@ public abstract class MapObject implements Drawable {
                 (xNum-1)*TILE_SIDE, (yNum-1)*TILE_SIDE,
                 (xNum)*TILE_SIDE, (yNum)*TILE_SIDE
         };
-        collisionBox = coordinates;
+        collisionBox = new double[4];
+        resetCollisionBox();
     }
 
     public abstract void playerIsOn(Player player);
@@ -35,6 +36,10 @@ public abstract class MapObject implements Drawable {
 
     public double[] getCollisionBox() {
         return collisionBox;
+    }
+
+    public double[] getCenterCoordinates() {
+        return centerCoordinates;
     }
 
     protected void set2x2CenterCoordinates() {
@@ -49,4 +54,29 @@ public abstract class MapObject implements Drawable {
         coordinates[3] = (yNum + 1) * TILE_SIDE;
     }
 
+    protected void resetCollisionBox() {
+        System.arraycopy(coordinates, 0, collisionBox, 0, 4);
+    }
+
+    //shifts coordinates, collisionBox, center
+    protected void shiftPosition(double xShift, double yShift) {
+        xShift(xShift);
+        yShift(yShift);
+    }
+
+    protected void xShift(double xShift) {
+        centerCoordinates[0] += xShift;
+        coordinates[0] += xShift;
+        coordinates[2] += xShift;
+        collisionBox[0] += xShift;
+        collisionBox[2] += xShift;
+    }
+
+    protected void yShift(double yShift) {
+        centerCoordinates[1] += yShift;
+        coordinates[1] += yShift;
+        coordinates[3] += yShift;
+        collisionBox[1] += yShift;
+        collisionBox[3] += yShift;
+    }
 }

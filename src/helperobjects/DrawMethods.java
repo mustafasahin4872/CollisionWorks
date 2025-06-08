@@ -2,6 +2,7 @@ package helperobjects;
 
 import lib.StdDraw;
 
+//static methods for drawing
 public class DrawMethods {
 
     public static void drawRectangle(double[] region) {

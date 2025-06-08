@@ -154,7 +154,7 @@ public abstract class Accessory implements Drawable {
 
         @Override
         public void draw() {
-            int i = switch (player.getxDirection()) {
+            int i = switch (player.getXDirection()) {
                 case -1 -> 0;
                 case 0 -> 1;
                 case 1 -> 2;
@@ -196,7 +196,7 @@ public abstract class Accessory implements Drawable {
 
         @Override
         public void draw() {
-            int i = switch (player.getxDirection()) {
+            int i = switch (player.getXDirection()) {
                 case -1 -> 0;
                 case 0 -> 1;
                 case 1 -> 2;

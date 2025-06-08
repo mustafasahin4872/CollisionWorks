@@ -18,6 +18,11 @@ public class Frame {
 
     public double frameX, frameY;
 
+    private static final int[] RIGHT_CODES = {KeyEvent.VK_RIGHT, KeyEvent.VK_D};
+    private static final int[] UP_CODES = {KeyEvent.VK_UP, KeyEvent.VK_W};
+    private static final int[] LEFT_CODES = {KeyEvent.VK_LEFT, KeyEvent.VK_A};
+    private static final int[] DOWN_CODES = {KeyEvent.VK_DOWN, KeyEvent.VK_S};
+
     public Frame(GameMap gameMap, Player player) {
         this.gameMap = gameMap;
         this.player = player;
@@ -32,11 +37,9 @@ public class Frame {
     }
 
     //returns special codes for different win areas
-    public int play() {
+    public Player.PASSCODE play() {
 
-        int passCode = 0;
-        while (passCode == 0 && !player.isPlayerDead()) {
-            passCode = gameMap.stagePassed();
+        while (player.getPassCode() == Player.PASSCODE.ZERO) {
             long startTime = System.currentTimeMillis();
 
             //takes input and sets moveDirection variables
@@ -46,9 +49,14 @@ public class Frame {
             //with the updated velocities, sets player's x and y coordinates
             gameMap.playerPositionChecks();
 
+            if (player.isPlayerDead()) {
+                player.die();
+                //add a death animation?
+            }
+
             //sets the frame to center player if it is not in the edges of gameMap
             //if the frame would get out of the gameMap, set frame to show up to edge
-            setFrame();
+            setFrameCenter();
             gameMap.setFrameTileRange();
             Sign.updateDisplayCenter(frameX, frameY);
 
@@ -57,28 +65,29 @@ public class Frame {
             draw();
             StdDraw.show();
 
-            player.setxDirection(0);
-            player.setyDirection(0);
+            player.setXDirection(0);
+            player.setYDirection(0);
+            player.setPlayerTime();
 
             int timeElapsed = (int)(System.currentTimeMillis()- startTime);
             if (timeElapsed<PAUSE) {
-                StdDraw.pause(Frame.PAUSE-timeElapsed);
+                StdDraw.pause(PAUSE-timeElapsed);
             }
         }
 
-        return passCode;
+        return player.getPassCode();
     }
 
     public GameMap getNextMap() {
         GameMap nextGameMap;
         if (gameMap.getLevelIndex()==12) {
             if (gameMap.getWorldIndex()==4) {
-                nextGameMap = new GameMap(1,1, player, gameMap.getAccessories());
+                nextGameMap = new GameMap(1,1, player);
             } else {
-                nextGameMap = new GameMap(gameMap.getWorldIndex()+1, 1, player, gameMap.getAccessories());
+                nextGameMap = new GameMap(gameMap.getWorldIndex()+1, 1, player);
             }
         } else {
-            nextGameMap = new GameMap(gameMap.getWorldIndex(), gameMap.getLevelIndex()+1, player, gameMap.getAccessories());
+            nextGameMap = new GameMap(gameMap.getWorldIndex(), gameMap.getLevelIndex()+1, player);
         }
         return nextGameMap;
     }
@@ -88,33 +97,40 @@ public class Frame {
         StdDraw.setPenColor();
         StdDraw.setFont();
         StdDraw.textLeft(frameX - X_SCALE/2 + 10, frameY + Y_SCALE/2 - 10, "x-y: %.1f %.1f".formatted(player.getX(), player.getY()));
-        StdDraw.textLeft(frameX - X_SCALE/2 + 10, frameY + Y_SCALE/2 - 30, "vx: %.1f".formatted(player.getxVelocity()));
-        StdDraw.textLeft(frameX - X_SCALE/2 + 10, frameY + Y_SCALE/2 - 50, "vy: %.1f".formatted(player.getyVelocity()));
+        StdDraw.textLeft(frameX - X_SCALE/2 + 10, frameY + Y_SCALE/2 - 30, "vx: %.1f".formatted(player.getXVelocity()));
+        StdDraw.textLeft(frameX - X_SCALE/2 + 10, frameY + Y_SCALE/2 - 50, "vy: %.1f".formatted(player.getYVelocity()));
+        player.draw();
         player.drawHPBar(frameX, frameY);
         player.drawCoinAmount(frameX, frameY);
+        player.drawLifeAmount(frameX, frameY);
     }
 
     public void handleInput(Player player) {
-        int RIGHT_CODE = KeyEvent.VK_RIGHT;
-        int UP_CODE = KeyEvent.VK_UP;
-        int LEFT_CODE = KeyEvent.VK_LEFT;
-        int DOWN_CODE = KeyEvent.VK_DOWN;
 
-        int[] keyCodes = {RIGHT_CODE, UP_CODE, LEFT_CODE, DOWN_CODE};
+        for (int RIGHT_CODE : RIGHT_CODES) {
+            if (StdDraw.isKeyPressed(RIGHT_CODE)) {
+                player.setXDirection(1);
+            }
+        }
+        for (int LEFT_CODE : LEFT_CODES) {
+                if (StdDraw.isKeyPressed(LEFT_CODE)) {
+                player.setXDirection(-1);
+            }
+        }
+        for (int UP_CODE : UP_CODES) {
+            if (StdDraw.isKeyPressed(UP_CODE)) {
+                player.setYDirection(-1);
+            }
+        }
+        for (int DOWN_CODE : DOWN_CODES) {
+            if (StdDraw.isKeyPressed(DOWN_CODE)) {
+                player.setYDirection(1);
+            }
+        }
 
-        if (StdDraw.isKeyPressed(keyCodes[0])) {
-            player.setxDirection(1);
-        } else if (StdDraw.isKeyPressed(keyCodes[2])) {
-            player.setxDirection(-1);
-        }
-        if (StdDraw.isKeyPressed(keyCodes[1])) {
-            player.setyDirection(-1);
-        }  else if (StdDraw.isKeyPressed(keyCodes[3])) {
-            player.setyDirection(1);
-        }
     }
 
-    private void setFrame() {
+    private void setFrameCenter() {
         if (player.getX()-X_SCALE/2<0) {
             StdDraw.setXscale(0, X_SCALE);
             frameX = X_SCALE/2;

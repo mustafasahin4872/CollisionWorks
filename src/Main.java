@@ -11,21 +11,24 @@ public class Main {
     //infinite recursion! add a quiting option
     private static void playFrames(Frame currentFrame) {
 
+        Player currentPlayer = currentFrame.getPlayer();
+
         while (true) {
 
             currentFrame.play();
-
-            Player currentPlayer = currentFrame.getPlayer();
+            currentPlayer.resetPassCode();
             GameMap gameMap = currentFrame.getGameMap();
             GameMap nextGameMap = currentFrame.getNextMap();
 
             //the in between scene
             int nextWorldIndex = gameMap.getWorldIndex();
             if (gameMap.getLevelIndex() == 12) {nextWorldIndex++;}
-            GameMap inBetweenMap = new GameMap(nextWorldIndex, 0, 32, 16, currentPlayer, gameMap.getAccessories());
+            GameMap inBetweenMap = new GameMap(nextWorldIndex, 0, 32, 16, currentPlayer);
             Frame inBetweenFrame = new Frame(inBetweenMap, currentPlayer);
-            int passCode = inBetweenFrame.play();
-            if (passCode == 5) {break;} //edit code to be of multiple return possibilities(enum or int types)
+            Player.PASSCODE passCode = inBetweenFrame.play();
+
+            if (passCode == Player.PASSCODE.SHOP) {break;} //add meaningful passcode mechanics
+            currentPlayer.resetPassCode(); //put this to somewhere meaningful
 
             currentFrame = new Frame(nextGameMap, currentPlayer);
         }

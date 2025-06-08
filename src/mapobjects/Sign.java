@@ -19,7 +19,7 @@ public class Sign extends MapObject {
     private final double halfWidth, halfHeight;
     private static double[] displayCenter = new double[2], displayCoordinates = new double[4];
     private static final Font FONT = new Font("Arial", Font.PLAIN, 32);
-    private final Color color;
+    private final Color color = new Color(103, 2, 9);
 
     public Sign(int worldIndex, int xNum, int yNum, String[] messages) {
         this(worldIndex, xNum, yNum, messages, true);
@@ -37,7 +37,6 @@ public class Sign extends MapObject {
 
         halfWidth = SPACE_ON_SIDE + maxLength/2.0*CHAR_WIDTH;
         halfHeight = SPACE_ON_SIDE + messages.length/2.0*CHAR_HEIGHT;
-        color = Selection.WORLD_COLORS[worldIndex];
     }
 
     @Override
@@ -46,23 +45,26 @@ public class Sign extends MapObject {
             StdDraw.picture(centerCoordinates[0], centerCoordinates[1], "misc/signImages/sign.png", TILE_SIDE, TILE_SIDE);
         }
         if (!displayMessage) return;
-        updateDisplayCoordinates();
-        StdDraw.setPenColor(color);
-        drawRectangle(displayCoordinates);
-        StdDraw.setPenColor(StdDraw.BLACK);
-        drawRectangleOutline(displayCoordinates);
-        StdDraw.setFont(FONT);
-
-        for (int i = 0; i < messages.length; i++) {
-            double messageHeight = displayCenter[1] - halfHeight + SPACE_ON_SIDE + CHAR_HEIGHT/2 + i*CHAR_HEIGHT;
-            StdDraw.text(displayCenter[0], messageHeight, messages[i]);
-        }
+        display();
         displayMessage = false;
     }
 
     @Override
     public void playerIsOn(Player player) {
         displayMessage = true;
+    }
+
+    private void display() {
+        updateDisplayCoordinates();
+        StdDraw.setPenColor(color);
+        drawRectangle(displayCoordinates);
+        StdDraw.setPenColor(StdDraw.BLACK);
+        drawRectangleOutline(displayCoordinates);
+        StdDraw.setFont(FONT);
+        for (int i = 0; i < messages.length; i++) {
+            double messageHeight = displayCenter[1] - halfHeight + SPACE_ON_SIDE + CHAR_HEIGHT/2 + i*CHAR_HEIGHT;
+            StdDraw.text(displayCenter[0], messageHeight, messages[i]);
+        }
     }
 
     public static void updateDisplayCenter(double frameX, double frameY) {

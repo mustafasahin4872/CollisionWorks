@@ -4,24 +4,30 @@ import lib.StdDraw;
 
 public class Player {
 
-    private final String name;
+    public enum PASSCODE {
+        ZERO, DEAD, NEXT, ALTERNATE1, ALTERNATE2, ALTERNATE3, SHOP
+    }
+
+    private PASSCODE passCode = PASSCODE.ZERO;
+    private final String name, fileRoot;
     private final double defaultSide;
-    private final String fileRoot;
     private double side;
-    private double spawnX, spawnY, x, y, xVelocity, yVelocity;
-    private static final double MAX_SPEED1 = 10, MAX_SPEED2 = 20, MAX_SPEED3 = 40, A1 = 0.2, A2 = 0.4, A3 = 0.8;
-    private double maxSpeed = MAX_SPEED2, acceleration = A2, deceleration = A2;
+    private static final double
+            MAX_SPEED1 = 10, MAX_SPEED2 = 20, MAX_SPEED3 = 40,
+            A1 = 0.2, A2 = 0.4, A3 = 0.8;
+    private double spawnX, spawnY, x, y, xVelocity, yVelocity,
+            maxSpeed = MAX_SPEED2, acceleration = A2, deceleration = A2;
     private int xDirection, yDirection;
+    private int lives = 3;
     private static final double MAX_HP = 200;
     private double hitPoints = MAX_HP;
     private int coinsCollected = 0;
-    private boolean isPlayerDead = false;
-
-    private final boolean[] checkPointsReached = new boolean[6];
+    private int lastCheckPoint;
     private long playerTime;
     private final double[] effectTimer = new double[3];
-
     private char onTileType = ' ';
+    private Accessory[] accessories;
+
     //there are 5 possible buffs, all are false at first and set true if buffed
     //fast, small, immune, magnetic, eagle eye
 
@@ -39,11 +45,42 @@ public class Player {
         y = spawnY;
         defaultSide = switch (name) {
             case "Bob", "Mike" -> 50;
+            case "Zahit" -> 70;
             default -> 50;
         };
-        this.side = defaultSide;
+        side = defaultSide;
     }
 
+    //GENERAL GETTERS AND SETTERS
+
+    public String getName() {
+        return name;
+    }
+
+    public char getOnTileType() {
+        return onTileType;
+    }
+
+    public void setOnTileType(char onTileType) {
+        this.onTileType = onTileType;
+    }
+
+    public void setAccessories(Accessory[] accessories) {
+        this.accessories = accessories;
+        for (Accessory accessory : accessories) {
+            accessory.resize(defaultSide/50);
+        }
+    }
+
+    public long getPlayerTime() {
+        return playerTime;
+    }
+
+    public void setPlayerTime() {
+        playerTime = System.currentTimeMillis();
+    }
+
+    //MOVEMENTS
 
     public void updateVelocity() {
 
@@ -65,21 +102,21 @@ public class Player {
         double nextSpeed = Math.sqrt(nextVSquared);
         if (nextVSquared > maxSpeed * maxSpeed) {
             double scale = maxSpeed / nextSpeed;
-            setxVelocity(nextVx * scale);
-            setyVelocity(nextVy * scale);
+            setXVelocity(nextVx * scale);
+            setYVelocity(nextVy * scale);
         } else {
-            setxVelocity(nextVx);
-            setyVelocity(nextVy);
+            setXVelocity(nextVx);
+            setYVelocity(nextVy);
         }
 
         if (xDirection == 0) {
             if ((xVelocity >= 0 && xVelocity - deceleration * DT < 0) || (xVelocity <= 0 && xVelocity + deceleration * DT > 0)) {
-                setxVelocity(0);
+                setXVelocity(0);
             } else {
                 if (xVelocity > 0) {
-                    setxVelocity(xVelocity - deceleration * DT);
+                    setXVelocity(xVelocity - deceleration * DT);
                 } else {
-                    setxVelocity(xVelocity + deceleration * DT);
+                    setXVelocity(xVelocity + deceleration * DT);
                 }
             }
         }
@@ -87,12 +124,12 @@ public class Player {
         if (yDirection == 0) {
 
             if ((yVelocity >= 0 && yVelocity - deceleration * DT < 0) || (yVelocity <= 0 && yVelocity + deceleration * DT > 0)) {
-                setyVelocity(0);
+                setYVelocity(0);
             } else {
                 if (yVelocity > 0) {
-                    setyVelocity(yVelocity - deceleration * DT);
+                    setYVelocity(yVelocity - deceleration * DT);
                 } else {
-                    setyVelocity(yVelocity + deceleration * DT);
+                    setYVelocity(yVelocity + deceleration * DT);
                 }
             }
         }
@@ -111,113 +148,6 @@ public class Player {
         maxSpeed = MAX_SPEED1;
     }
 
-    public void heal(double healAmount) {
-        if (hitPoints + healAmount > MAX_HP) {
-            hitPoints = MAX_HP;
-        } else {
-            hitPoints += healAmount;
-        }
-    }
-
-    public void damage(double damageAmount) {
-        if (hitPoints - damageAmount <= 0) {
-            hitPoints = 0;
-            isPlayerDead = true;
-        } else {
-            hitPoints -= damageAmount;
-        }
-    }
-
-    public void buff(char[] buffs, double time) {
-        if (buffs==null) return;
-        for (char buff : buffs) {
-            if (buff == 'F') {
-                effectTimer[0] += time;
-            } else if (buff == 'S') {
-                effectTimer[1] += time;
-            } else if (buff == 'I') {
-                effectTimer[2] += time;
-            }
-        }
-    }
-
-    public void collectCoin(int n) {
-        coinsCollected += n;
-    }
-
-    public void readBuffs() {
-        for (int i = 0; i< effectTimer.length; i++) {
-            double timeLeft = effectTimer[i];
-            if (timeLeft - (System.currentTimeMillis()-playerTime) < 0) {
-                effectTimer[i] = 0;
-            } else {
-                effectTimer[i] = timeLeft - (System.currentTimeMillis()-playerTime);
-            }
-
-            if (timeLeft != 0) {
-                if (i == 0) {
-
-                } else if (i == 1) {
-
-                } else if (i == 2) {
-
-                }
-            }
-        }
-
-        setPlayerTime();
-    }
-
-    public void reachCheckPoint(int index) {
-        checkPointsReached[index] = true;
-    }
-
-
-    //GETTERS AND SETTERS
-
-
-    public String getName() {
-        return name;
-    }
-
-    public double[] getSpawnPoint() {
-        return new double[]{spawnX, spawnY};
-    }
-
-    public void setSpawnPoint(double[] spawnPoint) {
-        setSpawnX(spawnPoint[0]);
-        setSpawnY(spawnPoint[1]);
-        respawn();
-    }
-
-    public void setSpawnX(double spawnX) {
-        this.spawnX = spawnX;
-    }
-
-    public void setSpawnY(double spawnY) {
-        this.spawnY = spawnY;
-    }
-
-    public double getSide() {
-        return side;
-    }
-
-    public void setSide(double side) {
-        this.side = side;
-    }
-
-    public double getDefaultSide() {
-        return defaultSide;
-    }
-
-    public void resize(double multiplier) {
-        side *= multiplier;
-    }
-
-    public void resetSide() {
-        side = defaultSide;
-    }
-
     public double getX() {
         return x;
     }
@@ -234,19 +164,19 @@ public class Player {
         this.y = y;
     }
 
-    public double getxVelocity() {
+    public double getXVelocity() {
         return xVelocity;
     }
 
-    public void setxVelocity(double xVelocity) {
+    public void setXVelocity(double xVelocity) {
         this.xVelocity = xVelocity;
     }
 
-    public double getyVelocity() {
+    public double getYVelocity() {
         return yVelocity;
     }
 
-    public void setyVelocity(double yVelocity) {
+    public void setYVelocity(double yVelocity) {
         this.yVelocity = yVelocity;
     }
 
@@ -286,45 +216,170 @@ public class Player {
         acceleration = A2;
     }
 
-    public int getxDirection() {
+    public int getXDirection() {
         return xDirection;
     }
 
-    public void setxDirection(int xDirection) {
+    public void setXDirection(int xDirection) {
         this.xDirection = xDirection;
     }
 
-    public int getyDirection() {
+    public int getYDirection() {
         return yDirection;
     }
 
-    public void setyDirection(int yDirection) {
+    public void setYDirection(int yDirection) {
         this.yDirection = yDirection;
     }
 
+    //SIZE
+
+    public double getSide() {
+        return side;
+    }
+
+    public double getDefaultSide() {
+        return defaultSide;
+    }
+
+    public void resize(double multiplier) {
+        side *= multiplier;
+    }
+
+    public void resetSide() {
+        side = defaultSide;
+    }
+
+    //HP
+
+    public void heal(double healAmount) {
+        if (hitPoints + healAmount > MAX_HP) {
+            hitPoints = MAX_HP;
+        } else {
+            hitPoints += healAmount;
+        }
+    }
+
+    public void damage(double damageAmount) {
+        if (hitPoints - damageAmount < 0) {
+            hitPoints = 0;
+        } else {
+            hitPoints -= damageAmount;
+        }
+    }
+
     public boolean isPlayerDead() {
-        return isPlayerDead;
-    }
-
-    public void setPlayerTime() {
-        playerTime = System.currentTimeMillis();
-    }
-
-    public char getOnTileType() {
-        return onTileType;
-    }
-
-    public void setOnTileType(char onTileType) {
-        this.onTileType = onTileType;
+        return hitPoints == 0;
     }
 
     public void respawn() {
         x = spawnX;
         y = spawnY;
+        xVelocity = 0;
+        yVelocity = 0;
+        acceleration = 0;
+        deceleration = 0;
     }
 
-    public boolean[] getCheckPointsReached() {
-        return checkPointsReached;
+    public void die() {
+        lives--;
+        if (lives == 0) {
+            passCode = PASSCODE.DEAD;
+            return;
+        }
+        hitPoints = MAX_HP;
+        respawn();
+    }
+
+    public void addLives(int n) {
+        lives+=n;
+    }
+
+    public void addLife() {
+        lives++;
+    }
+
+    //BUFFS
+
+    public void buff(char[] buffs, double time) {
+        if (buffs==null) return;
+        for (char buff : buffs) {
+            if (buff == 'F') {
+                effectTimer[0] += time;
+            } else if (buff == 'S') {
+                effectTimer[1] += time;
+            } else if (buff == 'I') {
+                effectTimer[2] += time;
+            }
+        }
+    }
+
+    public void readBuffs() {
+        for (int i = 0; i< effectTimer.length; i++) {
+            double timeLeft = effectTimer[i];
+            if (timeLeft - (System.currentTimeMillis()-playerTime) < 0) {
+                effectTimer[i] = 0;
+            } else {
+                effectTimer[i] = timeLeft - (System.currentTimeMillis()-playerTime);
+            }
+
+            if (timeLeft != 0) {
+                if (i == 0) {
+
+                } else if (i == 1) {
+
+                } else if (i == 2) {
+
+                }
+            }
+        }
+    }
+
+    public void collectCoin(int n) {
+        coinsCollected += n;
+    }
+
+
+    //CHECKPOINT AND SPAWNPOINT
+
+    public double[] getSpawnPoint() {
+        return new double[]{spawnX, spawnY};
+    }
+
+    public void setSpawnPoint(double[] spawnPoint) {
+        setSpawnX(spawnPoint[0]);
+        setSpawnY(spawnPoint[1]);
+    }
+
+    public void setSpawnX(double spawnX) {
+        this.spawnX = spawnX;
+    }
+
+    public void setSpawnY(double spawnY) {
+        this.spawnY = spawnY;
+    }
+
+    public void updateLastCheckPoint() {
+        lastCheckPoint++;
+    }
+
+    public int getLastCheckPoint() {
+        return lastCheckPoint;
+    }
+
+
+    //PASSCODE
+
+    public PASSCODE getPassCode() {
+        return passCode;
+    }
+
+    public void setPassCode(PASSCODE passCode) {
+        this.passCode = passCode;
+    }
+
+    public void resetPassCode() {
+        passCode = PASSCODE.ZERO;
     }
 
     //DRAW
@@ -352,6 +407,12 @@ public class Player {
         } else {
             System.out.println("drawing error for player!");
         }
+
+        if (accessories == null) return;
+        for (Accessory accessory : accessories) {
+            accessory.setCoordinates();
+            accessory.draw();
+        }
     }
 
     public void drawBig(double multiplier) {
@@ -375,6 +436,12 @@ public class Player {
             StdDraw.picture(x, y, fileRoot+"R.jpg", sideResized, sideResized);
         } else {
             StdDraw.picture(x, y, fileRoot+"0.jpg", sideResized, sideResized);
+        }
+
+        if (accessories == null) return;
+        for (Accessory accessory : accessories) {
+            accessory.setCoordinates();
+            accessory.drawBig(multiplier);
         }
     }
 
@@ -407,7 +474,12 @@ public class Player {
 
     }
 
+    public void drawLifeAmount(double frameX, double frameY) {
 
+        StdDraw.picture(frameX + Frame.X_SCALE/2.0 - 80, frameY - Frame.Y_SCALE/2.0 + 30, "misc/misc/heart.png", 40, 40);
+        StdDraw.setFont(); StdDraw.setPenColor();
+        StdDraw.text(frameX + Frame.X_SCALE/2.0 - 80, frameY - Frame.Y_SCALE/2.0 + 30, "%d".formatted(lives));
 
+    }
 
 }
