@@ -2,7 +2,6 @@ package mapobjects;
 
 import game.Frame;
 import game.Player;
-import helperobjects.Alignment;
 import helperobjects.Direction;
 import lib.StdDraw;
 
@@ -12,20 +11,12 @@ public class Projectile extends MapObject{
     private final Direction direction;
     private static final double DEFAULT_SPEED = 1;
     private final double speed, delta;
-    private final double width, height;
     private static final double DEFAULT_DAMAGE = 20;
     private final double damage;
 
     public Projectile(int worldIndex, int xNum, int yNum, Direction direction, double width, double height) {
-        super(worldIndex, xNum, yNum);
+        super(worldIndex, xNum, yNum, width, height);
         this.direction = direction;
-        this.width = width;
-        this.height = height;
-        coordinates[0] += TILE_SIDE-width/2;
-        coordinates[1] += TILE_SIDE-height/2;
-        coordinates[2] -= TILE_SIDE-width/2;
-        coordinates[3] -= TILE_SIDE-height/2;
-        resetCollisionBox();
         damage = DEFAULT_DAMAGE*worldIndex;
 
         if (direction == Direction.D || direction == Direction.R) {

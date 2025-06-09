@@ -26,7 +26,7 @@ public class Sign extends MapObject {
     }
 
     public Sign(int worldIndex, int xNum, int yNum, String[] messages, boolean displaySign) {
-        super(worldIndex, xNum, yNum);
+        super(worldIndex, xNum, yNum, "misc/signImages/sign.png");
         this.messages = messages;
         this.displaySign = displaySign;
 
@@ -42,7 +42,7 @@ public class Sign extends MapObject {
     @Override
     public void draw() {
         if (displaySign) {
-            StdDraw.picture(centerCoordinates[0], centerCoordinates[1], "misc/signImages/sign.png", TILE_SIDE, TILE_SIDE);
+            super.draw();
         }
         if (!displayMessage) return;
         display();

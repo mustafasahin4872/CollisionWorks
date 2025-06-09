@@ -1,34 +1,108 @@
 package mapobjects;
 import game.Player;
-import helperobjects.Drawable;
+import lib.StdDraw;
 
-public abstract class MapObject implements Drawable {
+import static helperobjects.CollisionMethods.playerIsIn;
 
+public abstract class MapObject {
+
+    protected final boolean cornerAligned;
+    protected String fileName;
     protected final int worldIndex, xNum, yNum;
-    protected double[] centerCoordinates, coordinates, collisionBox;
+    protected final double width, height, halfWidth, halfHeight; //in tiles
+    protected final double[] centerCoordinates, coordinates, collisionBox;
     public static final double HALF_SIDE = 25, TILE_SIDE = HALF_SIDE*2;
 
     public MapObject(int xNum, int yNum) {
-        this(0, xNum, yNum);
+        this(0, xNum, yNum, 1, 1, null, false);
     }
 
     public MapObject(int worldIndex, int xNum, int yNum) {
+        this(worldIndex, xNum, yNum, 1, 1, null, false);
+    }
+
+    public MapObject(int xNum, int yNum, String fileName) {
+        this(0, xNum, yNum, 1, 1, fileName, false);
+    }
+
+    public MapObject(int xNum, int yNum, double width, double height) {
+        this(0, xNum, yNum, width, height, null, false);
+    }
+
+    public MapObject(int worldIndex, int xNum, int yNum, double width, double height) {
+        this(worldIndex, xNum, yNum, width, height, null, false);
+    }
+
+    public MapObject(int xNum, int yNum, double width, double height, String fileName) {
+        this(0, xNum, yNum, width, height, fileName, false);
+    }
+
+    public MapObject(int worldIndex, int xNum, int yNum, String fileName) {
+        this(worldIndex, xNum, yNum, 1, 1, fileName, false);
+    }
+
+
+
+    public MapObject(int xNum, int yNum, boolean cornerAligned) {
+        this(0, xNum, yNum, 1, 1, null, cornerAligned);
+    }
+
+    public MapObject(int worldIndex, int xNum, int yNum, boolean cornerAligned) {
+        this(worldIndex, xNum, yNum, 1, 1, null, cornerAligned);
+    }
+
+    public MapObject(int xNum, int yNum, String fileName, boolean cornerAligned) {
+        this(0, xNum, yNum, 1, 1, fileName, cornerAligned);
+    }
+
+    public MapObject(int xNum, int yNum, double width, double height, boolean cornerAligned) {
+        this(0, xNum, yNum, width, height, null, cornerAligned);
+    }
+
+    public MapObject(int worldIndex, int xNum, int yNum, double width, double height, boolean cornerAligned) {
+        this(worldIndex, xNum, yNum, width, height, null, cornerAligned);
+    }
+
+    public MapObject(int xNum, int yNum, double width, double height, String fileName, boolean cornerAligned) {
+        this(0, xNum, yNum, width, height, fileName, cornerAligned);
+    }
+
+    public MapObject(int worldIndex, int xNum, int yNum, double width, double height, String fileName, boolean cornerAligned) {
         this.worldIndex = worldIndex;
         this.xNum = xNum;
         this.yNum = yNum;
-        centerCoordinates = new double[]{
-                (xNum-0.5)*TILE_SIDE, (yNum-0.5)*TILE_SIDE
-        };
+        this.width = width;
+        this.height = height;
+        halfWidth = width/2;
+        halfHeight = height/2;
+        this.fileName = fileName;
+        this.cornerAligned = cornerAligned;
+
+        if (cornerAligned) {
+            centerCoordinates = new double[]{(xNum-0.5+halfWidth)*TILE_SIDE, (yNum-0.5+halfHeight)*TILE_SIDE};
+        } else {
+            centerCoordinates = new double[]{(xNum-0.5)*TILE_SIDE, (yNum-0.5)*TILE_SIDE};
+        }
         coordinates = new double[]{
-                (xNum-1)*TILE_SIDE, (yNum-1)*TILE_SIDE,
-                (xNum)*TILE_SIDE, (yNum)*TILE_SIDE
-        };
+                centerCoordinates[0]-halfWidth*TILE_SIDE, centerCoordinates[1]-halfHeight*TILE_SIDE,
+                centerCoordinates[0]+halfWidth*TILE_SIDE,centerCoordinates[0]+halfHeight*TILE_SIDE,
+                };
+
         collisionBox = new double[4];
-        resetCollisionBox();
+        setCollisionBoxToCoordinates();
+    }
+
+    public void isPlayerOn(Player player) {
+        if (playerIsIn(player, collisionBox)) {
+            playerIsOn(player);
+        }
     }
 
     public abstract void playerIsOn(Player player);
-    public abstract void draw();
+
+    public void draw() {
+        StdDraw.picture(centerCoordinates[0], centerCoordinates[1], fileName, coordinates[2]-coordinates[0], coordinates[3]-coordinates[1]);
+    }
 
     public double[] getCoordinates() {
         return coordinates;
@@ -42,19 +116,14 @@ public abstract class MapObject implements Drawable {
         return centerCoordinates;
     }
 
-    protected void set2x2CenterCoordinates() {
-        centerCoordinates[0] = xNum*TILE_SIDE;
-        centerCoordinates[1] = yNum*TILE_SIDE;
+    protected void setCollisionBox(double[] collisionBox) {
+        this.collisionBox[0] = collisionBox[0];
+        this.collisionBox[1] = collisionBox[1];
+        this.collisionBox[2] = collisionBox[2];
+        this.collisionBox[3] = collisionBox[3];
     }
 
-    protected void set2x2Coordinates() {
-        coordinates[0] = (xNum - 1) * TILE_SIDE;
-        coordinates[2] = (xNum + 1) * TILE_SIDE;
-        coordinates[1] = (yNum - 1) * TILE_SIDE;
-        coordinates[3] = (yNum + 1) * TILE_SIDE;
-    }
-
-    protected void resetCollisionBox() {
+    protected void setCollisionBoxToCoordinates() {
         System.arraycopy(coordinates, 0, collisionBox, 0, 4);
     }
 

@@ -6,7 +6,6 @@ import lib.StdDraw;
 public abstract class Point extends MapObject{
 
     protected final int index;
-    protected String fileName;
     protected boolean isBig;
 
     public Point(int xNum, int yNum, int index, String type) {
@@ -14,14 +13,9 @@ public abstract class Point extends MapObject{
     }
 
     public Point(int xNum, int yNum, int index, String type, boolean isBig) {
-        super(xNum, yNum);
+        super(xNum, yNum, (isBig)?2:1, (isBig)?2:1, "misc/"+type+"Images/"+index+".png", isBig);
         this.index = index;
         this.isBig = isBig;
-        fileName = "misc/"+type+"Images/"+index+".png";
-        if (isBig) {
-            set2x2CenterCoordinates();
-            set2x2Coordinates();
-        }
     }
 
     @Override

@@ -8,14 +8,12 @@ import game.Player;
 import game.Frame;
 import static helperobjects.DrawMethods.drawRectangle;
 
-public abstract class Door extends MapObject {
+public class Door extends MapObject {
 
     private final Alignment alignment;
     private final Button[] buttons;
-
     private boolean isOpen;
     private final double doorFloor;
-
     private final Color color = new Color((int) (Math.random()*255), 0, (int) (Math.random()*255));
     private static final double THICKNESS = 40, SPACE_ON_SIDE = (TILE_SIDE-THICKNESS)/2,
             SPEED = 2, DELTA = SPEED * Frame.DT;
@@ -36,23 +34,15 @@ public abstract class Door extends MapObject {
 
     // door with buttons wired to it, defined by its alignment and the tiles it lies on.
     public Door(Alignment alignment, int xNum, int yNum, int length, Button[] buttons) {
-        super(xNum, yNum);
+        super(xNum, yNum, (alignment==Alignment.H)?length:(THICKNESS/TILE_SIDE), (alignment==Alignment.V)?length:(THICKNESS/TILE_SIDE), true);
         this.alignment = alignment;
-        //length value in tiles
         this.buttons = buttons;
 
         if (alignment == Alignment.V) {
-            coordinates[0] += SPACE_ON_SIDE;
-            coordinates[2] -= SPACE_ON_SIDE;
-            coordinates[3] += (length-1)*TILE_SIDE;
             doorFloor = coordinates[1];
         } else {
-            coordinates[1] += SPACE_ON_SIDE;
-            coordinates[3] -= SPACE_ON_SIDE;
-            coordinates[2] += (length-1)*TILE_SIDE;
             doorFloor = coordinates[0];
         }
-        collisionBox = coordinates;
 
         if (buttons != null) {
             for (Button button : buttons) {
@@ -98,28 +88,4 @@ public abstract class Door extends MapObject {
     @Override
     public void playerIsOn(Player player) {} //not possible
 
-
-    public static class VerticalDoor extends Door {
-        public VerticalDoor(int xNum, int yNum, int length, Button[] buttons) {
-            super(Alignment.V, xNum, yNum, length, buttons);
-        }
-        public VerticalDoor(int xNum, int yNum, int length) {
-            super(Alignment.V, xNum, yNum, length);
-        }
-        public VerticalDoor(int xNum, int yNum) {
-            super(Alignment.V, xNum, yNum);
-        }
-    }
-
-    public static class HorizontalDoor extends Door {
-        public HorizontalDoor(int xNum, int yNum, int length, Button[] buttons) {
-            super(Alignment.H, xNum, yNum, length, buttons);
-        }
-        public HorizontalDoor(int xNum, int yNum, int length) {
-            super(Alignment.H, xNum, yNum, length);
-        }
-        public HorizontalDoor(int xNum, int yNum) {
-            super(Alignment.H, xNum, yNum);
-        }
-    }
 }

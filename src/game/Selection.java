@@ -1,7 +1,6 @@
 package game;
 
 import lib.StdDraw;
-import helperobjects.Drawable;
 import mapobjects.MapObject;
 
 import java.awt.*;
@@ -66,8 +65,8 @@ public class Selection {
                                      {X_TILE - 1, Y_TILE - 7}, {X_TILE - 1, Y_TILE - 4}, null};
 
     private final double[]
-            accessoryLeftCoordinates = new double[]{4*0.5, Y_TILE-6.5-0.5},
-            accessoryRightCoordinates = new double[]{X_TILE-2-4*-0.5 ,Y_TILE-6.5-0.5},
+            accessoryLeftCoordinates = new double[]{4+0.5, Y_TILE-6.5-0.5},
+            accessoryRightCoordinates = new double[]{X_TILE-2-4-0.5 ,Y_TILE-6.5-0.5},
             accessoryChooseCoordinates = new double[]{(accessoryLeftCoordinates[0]+accessoryRightCoordinates[0])/2, Y_TILE-7.5-0.5},
             shopCoordinates = new double[]{8, 11};
 

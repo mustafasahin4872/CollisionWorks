@@ -1,25 +1,16 @@
 package mapobjects;
 
 import game.Player;
-import lib.StdDraw;
 
 public abstract class Tile extends MapObject {
 
-    private final boolean isSolid;
-    private final String fileName;
     private static final String ROOT = "misc/tileImages/";
-    private final boolean isApproachable; //false for tiles locked inside solid tiles
+    private final boolean isSolid, isApproachable;
 
-    // Main constructor
     public Tile(int xNum, int yNum, boolean isApproachable, boolean isSolid, int worldIndex, String fileName) {
-        super(worldIndex, xNum, yNum);
-        coordinates = new double[]{
-                (xNum - 1) * HALF_SIDE * 2, (yNum-1) * HALF_SIDE * 2,
-                xNum * HALF_SIDE * 2, yNum * HALF_SIDE * 2
-        };
+        super(worldIndex, xNum, yNum, fileName);
         this.isApproachable = isApproachable;
         this.isSolid = isSolid;
-        this.fileName = fileName;
     }
 
 
@@ -29,16 +20,6 @@ public abstract class Tile extends MapObject {
 
     public boolean isApproachable() {
         return isApproachable;
-    }
-
-    @Override
-    public double[] getCollisionBox() {
-        return coordinates;
-    }
-
-    @Override
-    public void draw() {
-        StdDraw.picture(centerCoordinates[0], centerCoordinates[1], fileName, HALF_SIDE*2, HALF_SIDE*2);
     }
 
     public abstract void playerIsOn(Player player);

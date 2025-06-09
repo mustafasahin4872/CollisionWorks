@@ -6,26 +6,19 @@ import lib.StdDraw;
 import java.awt.*;
 import static helperobjects.DrawMethods.*;
 
-
-//fix the protected ones
 public class Button extends MapObject {
 
-    protected boolean pressed = false;
-    protected Color unpressedColor = new Color(178, 23, 23);
-    protected static final Color PRESSED_COLOR = new Color(106, 192, 45), FRAME_COLOR = new Color(71, 21, 21);
+    private boolean pressed = false;
+    private Color unpressedColor = new Color(178, 23, 23);
+    private static final Color PRESSED_COLOR = new Color(106, 192, 45), FRAME_COLOR = new Color(71, 21, 21);
 
     public Button(int xNum, int yNum) {
         this(xNum, yNum, false);
     }
 
     public Button(int xNum, int yNum, boolean isLittle) {
-        super(xNum, yNum);
-        if (!isLittle) {
-            set2x2Coordinates();
-            collisionBox = coordinates;
-        }
+        super(xNum, yNum, (isLittle)?1:2, (isLittle)?1:2, !isLittle);
     }
-
 
     public boolean isPressed() {
         return pressed;

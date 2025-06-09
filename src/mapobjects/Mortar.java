@@ -1,7 +1,6 @@
 package mapobjects;
 
 import game.Player;
-import lib.StdDraw;
 
 import java.util.Arrays;
 import java.util.Random;
@@ -23,14 +22,12 @@ public class Mortar extends MapObject {
     }
 
     public Mortar(int worldIndex, int xNum, int yNum, Tile[] tiles, int xTile, int mineNum) {
-        super(worldIndex, xNum, yNum);
+        super(worldIndex, xNum, yNum, 2, 2, "misc/misc/mortar.png", true);
         this.mineNum = mineNum;
         this.tiles = tiles;
         this.xTile = xTile;
         mines = new Mine[mineNum];
         Arrays.fill(mines, new Mine(worldIndex, xNum, yNum));
-        set2x2CenterCoordinates();
-        set2x2Coordinates();
         collisionBox[0] -= (RANGE)*TILE_SIDE;
         collisionBox[1] -= (RANGE)*TILE_SIDE;
         collisionBox[2] += (RANGE+1)*TILE_SIDE;
@@ -63,7 +60,7 @@ public class Mortar extends MapObject {
 
     @Override
     public void draw() {
-        StdDraw.picture(centerCoordinates[0], centerCoordinates[1], "misc/misc/mortar.png", TILE_SIDE*2, TILE_SIDE*2);
+        super.draw();
         for (Mine mine : mines) {mine.draw();}
     }
 
