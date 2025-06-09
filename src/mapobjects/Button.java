@@ -6,26 +6,16 @@ import lib.StdDraw;
 import java.awt.*;
 import static helperobjects.DrawMethods.*;
 
+public abstract class Button extends MapObject {
 
-//fix the protected ones
-public class Button extends MapObject {
+    private boolean pressed;
+    private Color unpressedColor = new Color(178, 23, 23); // Default color;
+    private final Color pressedColor = new Color(106, 192, 45);
+    private final Color frameColor = new Color(71, 21, 21);
 
-    protected boolean pressed = false;
-    protected Color unpressedColor = new Color(178, 23, 23);
-    protected static final Color PRESSED_COLOR = new Color(106, 192, 45), FRAME_COLOR = new Color(71, 21, 21);
-
-    public Button(int xNum, int yNum) {
-        this(xNum, yNum, false);
+    public Button(int worldIndex, int xNum, int yNum, double width, double height, boolean cornerAligned) {
+        super(worldIndex, xNum, yNum, width, height, cornerAligned);
     }
-
-    public Button(int xNum, int yNum, boolean isLittle) {
-        super(xNum, yNum);
-        if (!isLittle) {
-            set2x2Coordinates();
-            collisionBox = coordinates;
-        }
-    }
-
 
     public boolean isPressed() {
         return pressed;
@@ -35,21 +25,32 @@ public class Button extends MapObject {
         this.unpressedColor = unpressedColor;
     }
 
+    public void press() {
+        this.pressed = true;
+    }
+
     @Override
     public void draw() {
-        if (pressed) {
-            StdDraw.setPenColor(PRESSED_COLOR);
-        } else {
-            StdDraw.setPenColor(unpressedColor);
-        }
+        StdDraw.setPenColor(pressed ? pressedColor : unpressedColor);
         drawRectangle(coordinates);
-        StdDraw.setPenColor(FRAME_COLOR);
+        StdDraw.setPenColor(frameColor);
         drawRectangleOutline(coordinates);
     }
 
     @Override
     public void playerIsOn(Player player) {
-        pressed = true;
+        press();
     }
 
+    public static class LittleButton extends Button {
+        public LittleButton(int worldIndex, int xNum, int yNum) {
+            super(worldIndex, xNum, yNum, 1, 1, false);
+        }
+    }
+
+    public static class BigButton extends Button {
+        public BigButton(int worldIndex, int xNum, int yNum) {
+            super(worldIndex, xNum, yNum, 2, 2, true);
+        }
+    }
 }

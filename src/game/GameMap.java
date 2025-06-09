@@ -1,13 +1,12 @@
 package game;
 
-import helperobjects.Drawable;
 import helperobjects.MapMaker;
 import mapobjects.*;
 
 import java.util.ArrayList;
 
-import static helperobjects.CollisionMethods.playerIsIn;
 import static helperobjects.CollisionMethods.isIn;
+import static helperobjects.CollisionMethods.playerIsIn;
 
 public class GameMap {
 
@@ -217,12 +216,8 @@ public class GameMap {
     }
 
     private void checkPlayerIsOn(MapObject[] mapObjects) {
-        if (mapObjects != null) {
-            for (MapObject mapObject : mapObjects) {
-                if (playerIsIn(player, mapObject.getCollisionBox())) {
-                    mapObject.playerIsOn(player);
-                }
-            }
+        for (MapObject mapObject : mapObjects) {
+            mapObject.checkPlayerIsOn(player);
         }
     }
 
@@ -312,9 +307,9 @@ public class GameMap {
 
     }
 
-    private static void drawDrawables(Drawable[] drawables) {
+    private static void drawDrawables(MapObject[] drawables) {
         if (drawables != null) {
-            for (Drawable drawable : drawables) {
+            for (MapObject drawable : drawables) {
                 drawable.draw();
             }
         }
@@ -325,7 +320,7 @@ public class GameMap {
     private int calculateTotalCoinAmount() {
         int total = 0;
         for (Coin coin : coins) {
-            total += coin.getCoinAmount();
+            total += coin.getValue();
         }
         for (Chest chest : chests) {
             total += chest.getCoinNum();

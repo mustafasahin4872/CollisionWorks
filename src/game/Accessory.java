@@ -1,10 +1,10 @@
 package game;
 
 import lib.StdDraw;
-import helperobjects.Drawable;
+
 import mapobjects.Tile;
 
-public abstract class Accessory implements Drawable {
+public abstract class Accessory {
 
     protected final String name;
     protected final String[] fileNames = new String[9];
@@ -50,8 +50,7 @@ public abstract class Accessory implements Drawable {
     protected abstract void setCoordinates();
 
     protected abstract void setFileNames();
-
-    @Override
+    
     public abstract void draw();
 
     public void drawBig(double multiplier) {

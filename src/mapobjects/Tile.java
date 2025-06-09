@@ -1,27 +1,17 @@
 package mapobjects;
 
 import game.Player;
-import lib.StdDraw;
 
 public abstract class Tile extends MapObject {
 
-    private final boolean isSolid;
-    private final String fileName;
     private static final String ROOT = "misc/tileImages/";
-    private final boolean isApproachable; //false for tiles locked inside solid tiles
+    private final boolean isSolid, isApproachable;
 
-    // Main constructor
-    public Tile(int xNum, int yNum, boolean isApproachable, boolean isSolid, int worldIndex, String fileName) {
-        super(worldIndex, xNum, yNum);
-        coordinates = new double[]{
-                (xNum - 1) * HALF_SIDE * 2, (yNum-1) * HALF_SIDE * 2,
-                xNum * HALF_SIDE * 2, yNum * HALF_SIDE * 2
-        };
+    public Tile(int worldIndex, int xNum, int yNum, boolean isApproachable, boolean isSolid, String type) {
+        super(worldIndex, xNum, yNum, ROOT + type + worldIndex + ".jpg");
         this.isApproachable = isApproachable;
         this.isSolid = isSolid;
-        this.fileName = fileName;
     }
-
 
     public boolean isSolid() {
         return isSolid;
@@ -31,96 +21,89 @@ public abstract class Tile extends MapObject {
         return isApproachable;
     }
 
-    @Override
-    public double[] getCollisionBox() {
-        return coordinates;
-    }
-
-    @Override
-    public void draw() {
-        StdDraw.picture(centerCoordinates[0], centerCoordinates[1], fileName, HALF_SIDE*2, HALF_SIDE*2);
+    protected void resetPlayerStats(Player player) {
+        player.resetDeceleration();
+        player.resetAcceleration();
+        player.resetMaxSpeed();
     }
 
     public abstract void playerIsOn(Player player);
 
     public static class SpaceTile extends Tile {
-        public SpaceTile(int xNum, int yNum, int worldIndex) {
-            super(xNum, yNum, true, false, worldIndex, ROOT + "SpaceTile" + worldIndex + ".jpg");
+        public SpaceTile(int worldIndex, int xNum, int yNum) {
+            super(worldIndex, xNum, yNum, true, false, "SpaceTile");
         }
 
+        @Override
         public void playerIsOn(Player player) {
-            player.resetDeceleration();
-            player.resetAcceleration();
-            player.resetMaxSpeed();
+            resetPlayerStats(player);
         }
-
     }
 
     public static class WallTile extends Tile {
-        public WallTile(int xNum, int yNum, boolean isApproachable, int worldIndex) {
-            super(xNum, yNum, isApproachable,true, worldIndex, ROOT + "WallTile" + worldIndex + ".jpg");
+        public WallTile(int worldIndex, int xNum, int yNum, boolean isApproachable) {
+            super(worldIndex, xNum, yNum, isApproachable, true, "WallTile");
         }
 
-        public void playerIsOn(Player player) {} //impossible
-
+        @Override
+        public void playerIsOn(Player player) {} // Impossible
     }
 
     public static class RiverTile extends Tile {
-        public RiverTile(int xNum, int yNum, boolean isApproachable, int worldIndex) {
-            super(xNum, yNum, isApproachable,true, worldIndex, ROOT + "RiverTile" + worldIndex + ".jpg");
+        public RiverTile(int worldIndex, int xNum, int yNum, boolean isApproachable) {
+            super(worldIndex, xNum, yNum, isApproachable, true, "RiverTile");
         }
 
-        public void playerIsOn(Player player) {} //impossible
-
+        @Override
+        public void playerIsOn(Player player) {} // Impossible
     }
 
     public static class SlowTile extends Tile {
-        public SlowTile(int xNum, int yNum) {
-            super(xNum, yNum, true,false, 1, ROOT + "SlowTile" + ".jpg"); // earthy brown
+
+        public SlowTile(int worldIndex, int xNum, int yNum) {
+            super(worldIndex, xNum, yNum, true, false, "SlowTile"); // Earthy brown
         }
 
+        @Override
         public void playerIsOn(Player player) {
             player.slow();
         }
-
     }
 
     public static class SpecialTile extends Tile {
-        public SpecialTile(int xNum, int yNum) {
-            super(xNum, yNum, true, false,2, ROOT + "SpecialTile" + ".jpg"); // icy blue
+
+        public SpecialTile(int worldIndex, int xNum, int yNum) {
+            super(worldIndex, xNum, yNum, true, false, "SpecialTile"); // Icy blue
         }
 
+        @Override
         public void playerIsOn(Player player) {
             player.slip();
         }
-
     }
 
     public static class DamageTile extends Tile {
-        public DamageTile(int xNum, int yNum, int worldIndex) {
-            super(xNum, yNum, true, false, worldIndex, ROOT + "DamageTile" + worldIndex + ".jpg");
+        public DamageTile(int worldIndex, int xNum, int yNum) {
+            super(worldIndex, xNum, yNum, true, false, "DamageTile");
         }
 
+        @Override
         public void playerIsOn(Player player) {
-            player.resetDeceleration();
-            player.resetAcceleration();
-            player.resetMaxSpeed();
+            resetPlayerStats(player);
             player.damage(worldIndex);
         }
 
     }
 
     public static class HealTile extends Tile {
-        public HealTile(int xNum, int yNum, int worldIndex) { //golden yellow tile, draw a + in it
-            super(xNum, yNum, true, false, worldIndex, ROOT + "HealTile" + ".jpg");
+        public HealTile(int worldIndex, int xNum, int yNum) { // Golden yellow tile, draw a + in it
+            super(worldIndex, xNum, yNum, true, false, "HealTile");
         }
 
+        @Override
         public void playerIsOn(Player player) {
-            player.resetDeceleration();
-            player.resetAcceleration();
-            player.resetMaxSpeed();
-            player.heal(3.0/worldIndex);
+            resetPlayerStats(player);
+            player.heal(3.0 / worldIndex);
         }
-
     }
 }

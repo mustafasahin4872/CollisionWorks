@@ -6,22 +6,20 @@ import lib.StdDraw;
 public abstract class Point extends MapObject{
 
     protected final int index;
-    protected String fileName;
     protected boolean isBig;
 
-    public Point(int xNum, int yNum, int index, String type) {
-        this(xNum, yNum, index, type, false);
+    public Point(int worldIndex, int xNum, int yNum, int index, String type) {
+        this(worldIndex, xNum, yNum, index, type, false);
     }
 
-    public Point(int xNum, int yNum, int index, String type, boolean isBig) {
-        super(xNum, yNum);
+    public Point(int worldIndex, int xNum, int yNum, int index, String type, boolean isBig) {
+        super(worldIndex, xNum, yNum, getSize(isBig), getSize(isBig), "misc/" + type + "Images/" + index + ".png", isBig);
         this.index = index;
         this.isBig = isBig;
-        fileName = "misc/"+type+"Images/"+index+".png";
-        if (isBig) {
-            set2x2CenterCoordinates();
-            set2x2Coordinates();
-        }
+    }
+
+    private static int getSize(boolean isBig) {
+        return isBig ? 2 : 1;
     }
 
     @Override
@@ -33,13 +31,15 @@ public abstract class Point extends MapObject{
     }
 
     public static class WinPoint extends Point {
+
         private final Player.PASSCODE passcode;
-        public WinPoint(int xNum, int yNum, int index) {
-            this(xNum, yNum, index, false);
+
+        public WinPoint(int worldIndex, int xNum, int yNum, int index) {
+            this(worldIndex, xNum, yNum, index, false);
         }
 
-        public WinPoint(int xNum, int yNum, int index, boolean isBig) {
-            super(xNum, yNum, index, "winPoint", isBig);
+        public WinPoint(int worldIndex, int xNum, int yNum, int index, boolean isBig) {
+            super(worldIndex, xNum, yNum, index, "winPoint", isBig);
             passcode = switch (index) {
                 case 0 -> Player.PASSCODE.NEXT;
                 case 1 -> Player.PASSCODE.ALTERNATE1;
@@ -54,57 +54,62 @@ public abstract class Point extends MapObject{
         public void playerIsOn(Player player) {
             player.setPassCode(passcode);
         }
+
     }
 
     public static class CheckPoint extends Point {
 
         private CheckPoint prev;
         protected boolean visited;
-        private final Sign errorSign = new Sign(0, xNum, yNum, new String[]{"first unlock the previous checkpoint"}, false);
+        private static final Sign ERROR_SIGN = new Sign(0, 0, 0, new String[]{"first unlock the previous checkpoint"}, false);
 
-        public CheckPoint(int xNum, int yNum, int index) {
-            this(xNum, yNum, index, false);
+        public CheckPoint(int worldIndex, int xNum, int yNum, int index) {
+            this(worldIndex, xNum, yNum, index, false);
         }
 
-        public CheckPoint(int xNum, int yNum, int index, boolean isBig) {
-            super(xNum, yNum, index, "checkPoint", isBig);
+        public CheckPoint(int worldIndex, int xNum, int yNum, int index, boolean isBig) {
+            super(worldIndex, xNum, yNum, index, "checkPoint", isBig);
         }
 
         @Override
         public void playerIsOn(Player player) {
             if (visited) return;
+
             int lastCheckPointIndex = player.getLastCheckPoint();
-            if (index==lastCheckPointIndex+1) {
-                player.updateLastCheckPoint();
-                visited = true;
-                fileName = "misc/checkPointImages/0.png";
-                prev.updateFileName();
-                player.setSpawnPoint(centerCoordinates);
-            } else if (index>lastCheckPointIndex) {
-                errorSign.playerIsOn(player);
+
+            if (index == lastCheckPointIndex + 1) {
+                markVisited(player);
+            } else if (index > lastCheckPointIndex) {
+                ERROR_SIGN.playerIsOn(player);
             }
         }
 
+        private void markVisited(Player player) {
+            visited = true;
+            setFileName("misc/checkPointImages/0.png");
+            if (prev != null) prev.setFileName("misc/checkPointImages/-1.png");
+            player.updateLastCheckPoint();
+            player.setSpawnPoint(centerCoordinates);
+        }
+
         public Sign getErrorSign() {
-            return errorSign;
+            return ERROR_SIGN;
         }
 
         public void setPrev(CheckPoint prev) {
             this.prev = prev;
         }
 
-        public void updateFileName() {
-            fileName = "misc/checkPointImages/-1.png";
-        }
     }
 
     public static class SpawnPoint extends CheckPoint {
-        public SpawnPoint(int xNum, int yNum) {
-            this(xNum, yNum, false);
+
+        public SpawnPoint(int worldIndex, int xNum, int yNum) {
+            this(worldIndex, xNum, yNum, false);
         }
 
-        public SpawnPoint(int xNum, int yNum, boolean isBig) {
-            super(xNum, yNum, 0, isBig);
+        public SpawnPoint(int worldIndex, int xNum, int yNum, boolean isBig) {
+            super(worldIndex, xNum, yNum, 0, isBig);
             visited = true;
         }
 
@@ -112,4 +117,5 @@ public abstract class Point extends MapObject{
         public void playerIsOn(Player player) {} //no action needed
 
     }
+
 }

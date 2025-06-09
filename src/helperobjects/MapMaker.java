@@ -15,7 +15,6 @@ public class MapMaker {
 
     private final Tile[] tiles;
     private final Set<Button> buttons = new HashSet<>();
-    private final Map<String, Button> buttonMap = new HashMap<>();
     private final Set<Chest> chests = new HashSet<>();
     private final Set<Door> doors = new HashSet<>();
     private final Set<Sign> signs = new HashSet<>();
@@ -24,7 +23,12 @@ public class MapMaker {
     private final Set<Mortar> mortars = new HashSet<>();
     private final Set<Shooter> shooters = new HashSet<>();
     private final Set<Point.WinPoint> winPoints = new HashSet<>();
-    private Point.CheckPoint[] checkPoints = {null, null, null, null, null};
+    private Point.CheckPoint[] checkPoints = {new Point.SpawnPoint(0,0,0),
+                                              new Point.CheckPoint(0,0,0,1),
+                                              new Point.CheckPoint(0,0,0,2),
+                                              new Point.CheckPoint(0,0,0,3),
+                                              new Point.CheckPoint(0,0,0,4),
+                                              };
 
     private static final Set<String> IMPASSABLE_CODES = new HashSet<>(Set.of("XXX", "###", "%%%"));
     private static final Set<Character>
@@ -32,49 +36,57 @@ public class MapMaker {
                     ' ', '_', // space
                     'X', '%', '#', // wall/boundary/river
                     'w', // mud
-                    '^', '+', // damage/heal
-                    '!' // special
-            )),
+                    '-', '+', // damage/heal
+                    '?' // special
+            )), //special characters must not clash with basic characters
             SPECIAL_CHARACTERS = new HashSet<>(Set.of(
-                    '|', '—', // alignment information(also door initializer)
-                    'U', 'D', 'L', 'R', // direction information
-                    '~', '≈', '=', // wooden/silver/golden chest
+
+                    '|', '—', // alignment information
+                    '^', 'v', '<', '>', // direction information
+
+                    'o', '*', '$', // single/triple/bag coins
                     ':', '.', // big/little button
-                    'o', '*', '&', // single/triple/bag coins
-                    '>', '»', // single/multi line sign
+                    '@', '%', // mine and mortar
+
                     '0', '1', '2', '3', '4', // spawn/check points
                     '5', '6', '7', '8', '9', // win points
-                    'v', 'V' // mine and mortar
+                    '~', '≈', '=', // wooden/silver/golden chest
 
-            )); //add moving monster
+                    'C', 'D', 'E', 'S', //chest, door, enemy, sign
+                    'a', 'b', 'c', 'd' // subtype symbols for all objects, 4 kinds
+            ));
 
 
 /*
 MapMaker class initializes tiles and other objects and holds them
-upon taking the world and level indexes from constructor, it reads the corresponding map file
+upon taking the world and level indexes from constructor, it reads the corresponding map data file
 in the file, every 3 letters are 1 tileCode, and tileCodes are used to initialize objects
 
-quick code format 1: aba where a is the tile under, b is the specific object type
-spawn/check/win points, coins, buttons, mines, mortars are always called with quick code format 1
+every tile code must have a tile below it. if the tile code is 3 of the same characters, it represents a tile.
+if it consists of different characters, it initializes an object. there are multiple formats of tileCodes for object initialization
 
-quick code format 2: abc where b is the specific object type, c is one property of that object
-chests can have 1 buff: v~F is a silver chest on a mud tile with a fast buff
-doors can have length up to 9 tiles: ^|5
+general object initializer A37: A represents the class, 37 is the line in which details are written
+details contain multiple information, the information is divided by ";",
+if the information consists of multiple elements, they are divided by ","
+the first information is always on tile type. the following information are unique to each class.
+the objects that can be initialized with A37 are: chests(C), doors(D), signs(S)
+C37: !!!; =; F, S // on tile type; chest type; buffs
+D37: vvv; —; 12:12, 14:19; 5 // on tile type; alignment; coordinates of buttons to wire
+S37: ###; '; text 1, text 2 // on tile type; single/multiple line indicator; messages or message lines
+
+quick code formats:
+points, coins, buttons, mines, mortars, non-moving enemies are always called with quick codes.
+1) ABA where A is the tile under, B is the object type
+coins, buttons, mines, mortars, non-moving enemies are always called with this.
+doors and signs cannot be initialized this way, chests initialized cant have buffs.
+
+2) ABC where B is the object type, C is one property of that object
+chests can have 1 buff, doors have alignment indicator,
 points can have the indicator B for big displays, special to the selection screen
 
-A37 general object initializers: A is the general object type, 37 is the line where details are written
-details are in format: on top tile; subtype; extra; extra; ... . examples:
-C37: !!!; =; F, S is a gold chest on top of a special tile with buffs fast and small.
-D37: vvv; —; 12:12, 14:19; 5 is a horizontal door with a length of 5 tiles on a slow tile with 2 buttons in given coordinates
-S37: ###; >; text line here, second line here, ...
-is a single line sign on top of a river tile with given texts
 */
 
     //CONSTRUCTOR
-
-    public MapMaker(int worldIndex, int levelIndex) {
-        this(worldIndex, levelIndex, 64, 36);
-    }
 
     public MapMaker(int worldIndex, int levelIndex, int xTile, int yTile) {
         this.worldIndex = worldIndex;
@@ -83,7 +95,6 @@ is a single line sign on top of a river tile with given texts
         this.yTile = yTile;
         tiles = new Tile[xTile*yTile];
         mapFile = new File(("misc/maps/%d%d.txt").formatted(worldIndex, levelIndex));
-
     }
 
     //GETTERS
@@ -145,105 +156,95 @@ is a single line sign on top of a river tile with given texts
         // assign approachability to tiles
         extractApproachability(mapData, approachability);
 
-        // initialize the tiles, chests, buttons and doors parsing through mapData.
+        // initialize all objects parsing through mapData and objectDetails
         initializeObjects(mapData, approachability, objectDetails);
-        // tiles, chests and doors are now ready to be processed
+
+        // all objects are ready to be processed. use getters to access them
     }
 
 
     //INITIALIZERS
 
-    //creates tile, button, chest, door objects by calling all other initializers
+    //creates all objects
     private void initializeObjects(String[][] mapData, boolean[][] approachability, ArrayList<String> objectDetails) {
 
         //hold the D37 codes here with their locations to later wire them to buttons
         Map<Integer, int[]> doorsToWire = new HashMap<>();
+        Map<String, Button> buttonMap = new HashMap<>();
 
         for (int y = 0; y < yTile; y++) {
             for (int x = 0; x < xTile; x++) {
 
+                MapObject initialized;
                 boolean isApproachable = approachability[y][x];
                 String tileCode = mapData[y][x];
                 Tile tile;
                 char char0 = tileCode.charAt(0);
 
-                if (BASIC_CHARACTERS.contains(char0)) {
+                if (BASIC_CHARACTERS.contains(char0)) { //quick codes
+
                     char char1 = tileCode.charAt(1), char2 = tileCode.charAt(2);
                     tile = initializeBasicTile(char0, x, y, isApproachable);
 
-                    if (char0!=char2) { //quick code 2
-                        switch (char1) {
-                            case '0' -> checkPoints[0] = new Point.SpawnPoint(x+1, y+1, true);
-                            case '1', '2', '3', '4' -> checkPoints[char1-'0'] = new Point.CheckPoint(x+1, y+1, char1-'0', true);
-                            case '5', '6', '7', '8', '9' -> winPoints.add(new Point.WinPoint(x+1, y+1, char1-'5', true));
-                            case '|' -> doors.add(new Door.VerticalDoor(x + 1, y + 1, char2-'0'));
-                            case '—' -> doors.add(new Door.HorizontalDoor(x + 1, y + 1, char2-'0'));
-                            case '~' -> chests.add(new Chest.WoodenChest(x + 1, y + 1, new char[]{char2}));
-                            case '≈' -> chests.add(new Chest.SilverChest(x + 1, y + 1, new char[]{char2}));
-                            case '=' -> chests.add(new Chest.GoldenChest(x + 1, y + 1, new char[]{char2}));
-                            default -> System.out.println("error for quick code 2");
+                    switch (char1) {
+                        case 'o' -> coins.add(new Coin.SingleCoin(worldIndex, x+1, y+1));
+                        case '*' -> coins.add(new Coin.TripleCoin(worldIndex, x+1, y+1));
+                        case '$' -> coins.add(new Coin.CoinBag(worldIndex, x+1, y+1));
+                        case '@' -> mines.add(new Mine(worldIndex, x+1, y+1));
+                        case '%' -> mortars.add(new Mortar(worldIndex, x+1, y+1, tiles, xTile));
+                        case ':' -> {
+                            Button button = new Button.BigButton(worldIndex, x + 1, y + 1);
+                            buttonMap.put("%d:%d".formatted(x+1, y+1), button);
+                            buttons.add(button);
                         }
-
-                    } else if (char0!=char1) { //quick code 1
-                        switch (char1) {
-                            case '0' -> checkPoints[0] = new Point.SpawnPoint(x+1, y+1);
-                            case '1', '2', '3', '4' -> checkPoints[char1-'0'] = new Point.CheckPoint(x+1, y+1, char1-'0');
-                            case '5', '6', '7', '8', '9' -> winPoints.add(new Point.WinPoint(x+1, y+1, char1-'5'));
-                            case 'o' -> coins.add(new Coin.SingleCoin(x+1, y+1));
-                            case '*' -> coins.add(new Coin.TripleCoin(x+1, y+1));
-                            case '&' -> coins.add(new Coin.CoinBag(x+1, y+1));
-                            case '|' -> doors.add(new Door.VerticalDoor(x+1, y+1));
-                            case '—' -> doors.add(new Door.HorizontalDoor(x+1, y+1));
-                            case '~' -> chests.add(new Chest.WoodenChest(x+1, y+1, null));
-                            case '≈' -> chests.add(new Chest.SilverChest(x+1, y+1, null));
-                            case '=' -> chests.add(new Chest.GoldenChest(x+1, y+1, null));
-                            case 'v' -> mines.add(new Mine(worldIndex, x+1, y+1));
-                            case 'V' -> mortars.add(new Mortar(worldIndex, x+1, y+1, tiles, xTile));
-                            case ':' -> {
-                                Button button = new Button(x + 1, y + 1);
-                                buttonMap.put("%d:%d".formatted(x+1, y+1), button);
-                                buttons.add(button);
-                            }
-                            case '.' -> {
-                                Button button = new Button(x + 1, y + 1, true);
-                                buttonMap.put("%d:%d".formatted(x+1, y+1), button);
-                                buttons.add(button);
-                            }
-                            default -> System.out.println("error for quick code 1");
+                        case '.' -> {
+                            Button button = new Button.LittleButton(worldIndex, x + 1, y + 1);
+                            buttonMap.put("%d:%d".formatted(x+1, y+1), button);
+                            buttons.add(button);
                         }
+                        case '0' -> checkPoints[0] = new Point.SpawnPoint(worldIndex, x+1, y+1, char2 == 'B');
+                        case '1', '2', '3', '4' -> checkPoints[char1-'0'] = new Point.CheckPoint(worldIndex, x+1, y+1, char1-'0', char2 == 'B');
+                        case '5', '6', '7', '8', '9' -> winPoints.add(new Point.WinPoint(worldIndex, x+1, y+1, char1-'5', char2 == 'B'));
+                        case '~' -> chests.add(new Chest.WoodenChest(worldIndex, x+1, y+1, new char[]{char2}));
+                        case '≈' -> chests.add(new Chest.SilverChest(worldIndex, x+1, y+1, new char[]{char2}));
+                        case '=' -> chests.add(new Chest.GoldenChest(worldIndex,  x+1, y+1, new char[]{char2}));
+                        case 'D' -> {
+                            Alignment alignment = (char2 == '|') ? Alignment.V : Alignment.H;
+                            doors.add(new Door(worldIndex, x + 1, y + 1, alignment));
+                        }
+                        default -> System.out.println("error for quick code 1");
                     }
 
-                } else { //T37 initializer, !there can be coins on top
+                } else { //T37 initializer, there can be coins on top!
 
                     int lineIndex = Integer.parseInt(tileCode.substring(1,3))-37;
-                    String[] items = objectDetails.get(lineIndex).split("; ");
+                    String[] details = objectDetails.get(lineIndex).split("; ");
 
-                    String onTileCode = items[0], extra = items[2];
-                    char subType = items[1].charAt(0);
+                    String onTileCode = details[0];
 
                     tile = initializeBasicTile(onTileCode.charAt(0), x, y, isApproachable);
 
                     switch (onTileCode.charAt(1)) { //check if there is a coin on top
-                        case 'o' -> coins.add(new Coin.SingleCoin(x+1, y+1));
-                        case '*' -> coins.add(new Coin.TripleCoin(x+1, y+1));
-                        case '&' -> coins.add(new Coin.CoinBag(x+1, y+1));
+                        case 'o' -> coins.add(new Coin.SingleCoin(worldIndex, x+1, y+1));
+                        case '*' -> coins.add(new Coin.TripleCoin(worldIndex, x+1, y+1));
+                        case '$' -> coins.add(new Coin.CoinBag(worldIndex, x+1, y+1));
                     }
 
                     switch (char0) {
                         case 'C' -> {
-                            String[] buffs = extra.split(", ");
-                            switch (subType) {
-                                case '~' -> chests.add(new Chest.WoodenChest(x+1, y+1, toCharArray(buffs)));
-                                case '≈' -> chests.add(new Chest.SilverChest(x+1, y+1, toCharArray(buffs)));
-                                case '=' -> chests.add(new Chest.GoldenChest(x+1, y+1, toCharArray(buffs)));
+                            String[] buffs = details[2].split(", ");
+                            switch (details[1].charAt(0)) {
+                                case '~' -> chests.add(new Chest.WoodenChest(worldIndex, x+1, y+1, toCharArray(buffs)));
+                                case '≈' -> chests.add(new Chest.SilverChest(worldIndex, x+1, y+1, toCharArray(buffs)));
+                                case '=' -> chests.add(new Chest.GoldenChest(worldIndex, x+1, y+1, toCharArray(buffs)));
                             }
                         }
                         case 'D' -> doorsToWire.put(lineIndex, new int[]{x, y});
                         case 'S' -> {
-                            String[] messages = extra.split(", ");
-                            Sign sign = switch (subType) {
-                                case '>' -> new Sign(worldIndex, x+1, y+1, messages);
-                                case '»' -> {
+                            String[] messages = details[2].split(", ");
+                            Sign sign = switch (details[1].charAt(0)) {
+                                case '\'' -> new Sign(worldIndex, x+1, y+1, messages);
+                                case '"' -> {
                                     for (int i = 0; i<messages.length; i++) {
                                         messages[i] = objectDetails.get(Integer.parseInt(messages[i]) - 37);
                                     }
@@ -265,7 +266,7 @@ is a single line sign on top of a river tile with given texts
             }
         }
 
-        initializeD37(objectDetails, doorsToWire);
+        initializeD37(objectDetails, doorsToWire, buttonMap);
         finalizePoints();
 
     }
@@ -283,7 +284,7 @@ is a single line sign on top of a river tile with given texts
         checkPoints = checkPointsHolder.toArray(new Point.CheckPoint[0]);
     }
 
-    private void initializeD37(ArrayList<String> objectDetails, Map<Integer, int[]> doorsToWire) {
+    private void initializeD37(ArrayList<String> objectDetails, Map<Integer, int[]> doorsToWire, Map<String, Button> buttonMap) {
         //wire doors to buttons:
         for (Map.Entry<Integer, int[]> pair : doorsToWire.entrySet()) {
             String[] items = objectDetails.get(pair.getKey()).split("; ");
@@ -308,8 +309,8 @@ is a single line sign on top of a river tile with given texts
 
             //initialize door
             switch (items[1].charAt(0)) {
-                case '|' -> doors.add(new Door.VerticalDoor(x+1, y+1, l, buttonsToWire.toArray(new Button[0])));
-                case '—' -> doors.add(new Door.HorizontalDoor(x+1, y+1, l, buttonsToWire.toArray(new Button[0])));
+                case '|' -> doors.add(new Door(worldIndex, x+1, y+1, Alignment.V, l, buttonsToWire.toArray(new Button[0])));
+                case '—' -> doors.add(new Door(worldIndex, x+1, y+1, Alignment.H, l, buttonsToWire.toArray(new Button[0])));
                 default -> System.out.println("default message for initializing door, an error occurred");
             }
         }
@@ -317,13 +318,13 @@ is a single line sign on top of a river tile with given texts
 
     private Tile initializeBasicTile(char char0, int x, int y, boolean isApproachable) {
         return switch (char0) {
-            case ' ', '_' -> new Tile.SpaceTile(x + 1, y + 1, worldIndex);
-            case 'w' -> new Tile.SlowTile(x + 1, y + 1);
-            case '!' -> new Tile.SpecialTile(x + 1, y + 1);
-            case '^' -> new Tile.DamageTile(x + 1, y + 1, worldIndex);
-            case '+' -> new Tile.HealTile(x + 1, y + 1, worldIndex);
-            case 'X' -> new Tile.WallTile(x + 1, y + 1, isApproachable, worldIndex);
-            case '#' -> new Tile.RiverTile(x + 1, y + 1, isApproachable, worldIndex);
+            case ' ', '_' -> new Tile.SpaceTile(worldIndex, x + 1, y + 1);
+            case 'w' -> new Tile.SlowTile(worldIndex, x + 1, y + 1);
+            case '!' -> new Tile.SpecialTile(worldIndex, x + 1, y + 1);
+            case '-' -> new Tile.DamageTile(worldIndex, x + 1, y + 1);
+            case '+' -> new Tile.HealTile(worldIndex, x + 1, y + 1);
+            case 'X' -> new Tile.WallTile(worldIndex, x + 1, y + 1, isApproachable);
+            case '#' -> new Tile.RiverTile(worldIndex, x + 1, y + 1, isApproachable);
             default -> {
                 System.out.println("default message for basic tiles, an error occurred");
                 yield new Tile.SpaceTile(x + 1, y + 1, worldIndex);

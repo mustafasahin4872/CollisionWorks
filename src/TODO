@@ -1,5 +1,11 @@
 NEEDED AS FIRST
 
+Hold all MapObjects together.
+set the worldIndex, xNum, yNum after the initialization in the mapmaker
+the set method must replace some actions in the constructor, like determining the coordinates etc.
+add abstract call() to mapobjects, containing every action that should be done in every frame call
+rename playerPositionChecks method to the general framecall method
+
 design the shop, first design the crystal palace
 fix the selection's world index gimmick, change the 13-14 indexed levels, make them make sense
 add signal handling: next, shop, selection, death...
@@ -14,6 +20,8 @@ accessories size and coordinate changes are needed!
 
 
 NEW MECHANICS, FUTURE IDEAS
+generalize projectile direction to 360
+homing missiles, aiming monsters
 fake wall
 moving monsters
 shooting monsters
