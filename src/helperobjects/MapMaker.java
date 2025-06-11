@@ -168,123 +168,115 @@ points can have the indicator B for big displays, special to the selection scree
     //creates all objects
     private void initializeObjects(String[][] mapData, boolean[][] approachability, ArrayList<String> objectDetails) {
 
-        //hold the D37 codes here with their locations to later wire them to buttons
+        // hold the D37 codes here with their locations to later wire them to buttons
         Map<Integer, int[]> doorsToWire = new HashMap<>();
         Map<String, Button> buttonMap = new HashMap<>();
 
-        for (int y = 0; y < yTile; y++) {
-            for (int x = 0; x < xTile; x++) {
+        for (int y = 1; y <= yTile; y++) {
+            for (int x = 1; x <= xTile; x++) {
 
-                MapObject initialized;
-                boolean isApproachable = approachability[y][x];
-                String tileCode = mapData[y][x];
+                boolean isApproachable = approachability[y - 1][x - 1];
+                String tileCode = mapData[y - 1][x - 1];
                 Tile tile;
                 char char0 = tileCode.charAt(0);
 
-                if (BASIC_CHARACTERS.contains(char0)) { //quick codes
+                if (BASIC_CHARACTERS.contains(char0)) { // quick codes
 
                     char char1 = tileCode.charAt(1), char2 = tileCode.charAt(2);
                     tile = initializeBasicTile(char0, x, y, isApproachable);
 
                     switch (char1) {
-                        case 'o' -> coins.add(new Coin.SingleCoin(worldIndex, x+1, y+1));
-                        case '*' -> coins.add(new Coin.TripleCoin(worldIndex, x+1, y+1));
-                        case '$' -> coins.add(new Coin.CoinBag(worldIndex, x+1, y+1));
-                        case '@' -> mines.add(new Mine(worldIndex, x+1, y+1));
-                        case '%' -> mortars.add(new Mortar(worldIndex, x+1, y+1, tiles, xTile));
+                        case 'o' -> coins.add(new Coin.SingleCoin(worldIndex, x, y));
+                        case '*' -> coins.add(new Coin.TripleCoin(worldIndex, x, y));
+                        case '$' -> coins.add(new Coin.CoinBag(worldIndex, x, y));
+                        case '@' -> mines.add(new Mine(worldIndex, x, y));
+                        case '%' -> mortars.add(new Mortar(worldIndex, x, y, tiles, xTile));
                         case ':' -> {
-                            Button button = new Button.BigButton(worldIndex, x + 1, y + 1);
-                            buttonMap.put("%d:%d".formatted(x+1, y+1), button);
+                            Button button = new Button.BigButton(worldIndex, x, y);
+                            buttonMap.put("%d:%d".formatted(x, y), button);
                             buttons.add(button);
                         }
                         case '.' -> {
-                            Button button = new Button.LittleButton(worldIndex, x + 1, y + 1);
-                            buttonMap.put("%d:%d".formatted(x+1, y+1), button);
+                            Button button = new Button.LittleButton(worldIndex, x, y);
+                            buttonMap.put("%d:%d".formatted(x, y), button);
                             buttons.add(button);
                         }
-                        case '0' -> checkPoints[0] = new Point.SpawnPoint(worldIndex, x+1, y+1, char2 == 'B');
-                        case '1', '2', '3', '4' -> checkPoints[char1-'0'] = new Point.CheckPoint(worldIndex, x+1, y+1, char1-'0', char2 == 'B');
-                        case '5', '6', '7', '8', '9' -> winPoints.add(new Point.WinPoint(worldIndex, x+1, y+1, char1-'5', char2 == 'B'));
-                        case '~' -> chests.add(new Chest.WoodenChest(worldIndex, x+1, y+1, new char[]{char2}));
-                        case '≈' -> chests.add(new Chest.SilverChest(worldIndex, x+1, y+1, new char[]{char2}));
-                        case '=' -> chests.add(new Chest.GoldenChest(worldIndex,  x+1, y+1, new char[]{char2}));
+                        case '0' -> checkPoints[0] = new Point.SpawnPoint(worldIndex, x, y, char2 == 'B');
+                        case '1', '2', '3', '4' -> checkPoints[char1 - '0'] = new Point.CheckPoint(worldIndex, x, y, char1 - '0', char2 == 'B');
+                        case '5', '6', '7', '8', '9' -> winPoints.add(new Point.WinPoint(worldIndex, x, y, char1 - '5', char2 == 'B'));
+                        case '~' -> chests.add(new Chest.WoodenChest(worldIndex, x, y, new char[]{char2}));
+                        case '≈' -> chests.add(new Chest.SilverChest(worldIndex, x, y, new char[]{char2}));
+                        case '=' -> chests.add(new Chest.GoldenChest(worldIndex, x, y, new char[]{char2}));
                         case 'D' -> {
                             Alignment alignment = (char2 == '|') ? Alignment.V : Alignment.H;
-                            doors.add(new Door(worldIndex, x + 1, y + 1, alignment));
+                            doors.add(new Door(worldIndex, x, y, alignment));
                         }
-                        default -> System.out.println("error for quick code 1");
                     }
 
-                } else { //T37 initializer, there can be coins on top!
+                } else { // A37 initializer, there can be coins on top!
 
-                    int lineIndex = Integer.parseInt(tileCode.substring(1,3))-37;
+                    int lineIndex = Integer.parseInt(tileCode.substring(1, 3)) - 37;
                     String[] details = objectDetails.get(lineIndex).split("; ");
 
                     String onTileCode = details[0];
 
                     tile = initializeBasicTile(onTileCode.charAt(0), x, y, isApproachable);
 
-                    switch (onTileCode.charAt(1)) { //check if there is a coin on top
-                        case 'o' -> coins.add(new Coin.SingleCoin(worldIndex, x+1, y+1));
-                        case '*' -> coins.add(new Coin.TripleCoin(worldIndex, x+1, y+1));
-                        case '$' -> coins.add(new Coin.CoinBag(worldIndex, x+1, y+1));
+                    switch (onTileCode.charAt(1)) { // check if there is a coin on top
+                        case 'o' -> coins.add(new Coin.SingleCoin(worldIndex, x, y));
+                        case '*' -> coins.add(new Coin.TripleCoin(worldIndex, x, y));
+                        case '$' -> coins.add(new Coin.CoinBag(worldIndex, x, y));
                     }
 
                     switch (char0) {
                         case 'C' -> {
                             String[] buffs = details[2].split(", ");
                             switch (details[1].charAt(0)) {
-                                case '~' -> chests.add(new Chest.WoodenChest(worldIndex, x+1, y+1, toCharArray(buffs)));
-                                case '≈' -> chests.add(new Chest.SilverChest(worldIndex, x+1, y+1, toCharArray(buffs)));
-                                case '=' -> chests.add(new Chest.GoldenChest(worldIndex, x+1, y+1, toCharArray(buffs)));
+                                case '~' -> chests.add(new Chest.WoodenChest(worldIndex, x, y, toCharArray(buffs)));
+                                case '≈' -> chests.add(new Chest.SilverChest(worldIndex, x, y, toCharArray(buffs)));
+                                case '=' -> chests.add(new Chest.GoldenChest(worldIndex, x, y, toCharArray(buffs)));
                             }
                         }
-                        case 'D' -> doorsToWire.put(lineIndex, new int[]{x, y});
+                        case 'D' -> doorsToWire.put(lineIndex, new int[]{x - 1, y - 1});
                         case 'S' -> {
                             String[] messages = details[2].split(", ");
                             Sign sign = switch (details[1].charAt(0)) {
-                                case '\'' -> new Sign(worldIndex, x+1, y+1, messages);
+                                case '\'' -> new Sign(worldIndex, x, y, messages);
                                 case '"' -> {
-                                    for (int i = 0; i<messages.length; i++) {
+                                    for (int i = 0; i < messages.length; i++) {
                                         messages[i] = objectDetails.get(Integer.parseInt(messages[i]) - 37);
                                     }
-                                    yield new Sign(worldIndex, x+1, y+1, messages);
+                                    yield new Sign(worldIndex, x, y, messages);
                                 }
                                 default -> {
                                     System.out.println("default message for sign initialization, an error occurred");
-                                    yield new Sign(worldIndex, x+1, y+1, new String[0]);
+                                    yield new Sign(worldIndex, x, y, new String[0]);
                                 }
                             };
                             signs.add(sign);
                         }
-                        default -> System.out.println("default message for T37, an error occurred.");
+                        default -> System.out.println("default message for A37, an error occurred.");
                     }
-
                 }
 
-                tiles[y * xTile + x] = tile;
+                tiles[(y - 1) * xTile + (x - 1)] = tile;
             }
         }
 
-        initializeD37(objectDetails, doorsToWire, buttonMap);
-        finalizePoints();
-
+        wireDoorsToButtons(objectDetails, doorsToWire, buttonMap);
+        setPrevToCheckPoints();
     }
 
-    private void finalizePoints() {
-        ArrayList<Point.CheckPoint> checkPointsHolder = new ArrayList<>();
+    private void setPrevToCheckPoints() {
         for (int i = 0; i<5; i++) {
             Point.CheckPoint currentCheckPoint = checkPoints[i];
-            if (currentCheckPoint == null) break;
             if (i!=0) {
                 currentCheckPoint.setPrev(checkPoints[i-1]);
             }
-            checkPointsHolder.add(currentCheckPoint);
         }
-        checkPoints = checkPointsHolder.toArray(new Point.CheckPoint[0]);
     }
 
-    private void initializeD37(ArrayList<String> objectDetails, Map<Integer, int[]> doorsToWire, Map<String, Button> buttonMap) {
+    private void wireDoorsToButtons(ArrayList<String> objectDetails, Map<Integer, int[]> doorsToWire, Map<String, Button> buttonMap) {
         //wire doors to buttons:
         for (Map.Entry<Integer, int[]> pair : doorsToWire.entrySet()) {
             String[] items = objectDetails.get(pair.getKey()).split("; ");
@@ -318,16 +310,16 @@ points can have the indicator B for big displays, special to the selection scree
 
     private Tile initializeBasicTile(char char0, int x, int y, boolean isApproachable) {
         return switch (char0) {
-            case ' ', '_' -> new Tile.SpaceTile(worldIndex, x + 1, y + 1);
-            case 'w' -> new Tile.SlowTile(worldIndex, x + 1, y + 1);
-            case '!' -> new Tile.SpecialTile(worldIndex, x + 1, y + 1);
-            case '-' -> new Tile.DamageTile(worldIndex, x + 1, y + 1);
-            case '+' -> new Tile.HealTile(worldIndex, x + 1, y + 1);
-            case 'X' -> new Tile.WallTile(worldIndex, x + 1, y + 1, isApproachable);
-            case '#' -> new Tile.RiverTile(worldIndex, x + 1, y + 1, isApproachable);
+            case ' ', '_' -> new Tile.SpaceTile(worldIndex, x, y);
+            case 'w' -> new Tile.SlowTile(worldIndex, x, y);
+            case '!' -> new Tile.SpecialTile(worldIndex, x, y);
+            case '-' -> new Tile.DamageTile(worldIndex, x, y);
+            case '+' -> new Tile.HealTile(worldIndex, x, y);
+            case 'X' -> new Tile.WallTile(worldIndex, x, y, isApproachable);
+            case '#' -> new Tile.RiverTile(worldIndex, x, y, isApproachable);
             default -> {
                 System.out.println("default message for basic tiles, an error occurred");
-                yield new Tile.SpaceTile(x + 1, y + 1, worldIndex);
+                yield new Tile.SpaceTile(x, y, worldIndex);
             }
         };
     }
@@ -363,7 +355,7 @@ points can have the indicator B for big displays, special to the selection scree
                     if (col*3 < line.length()) {
                         mapData[row][col] = line.substring(col*3, (col+1)*3);
                     } else {
-                        mapData[row][col] = "   "; // Default to empty/passable if line is short
+                        mapData[row][col] = "   ";
                     }
                 }
                 row++;
