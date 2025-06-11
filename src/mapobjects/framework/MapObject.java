@@ -1,15 +1,17 @@
-package mapobjects;
+package mapobjects.framework;
 import game.Player;
 import lib.StdDraw;
 
 import static helperobjects.CollisionMethods.playerIsIn;
 
-public class MapObject {
+public abstract class MapObject extends Blueprint {
+
+    protected static final char VERTICAL = '|', HORIZONTAL = '—',
+            RIGHT = '>', LEFT = '<', UP = '^', DOWN = 'v';
 
     protected final boolean cornerAligned;
     //if cornerAligned, the object's coordinates box's upper left corner is fixed in the upper left corner of the initializing box
     protected String fileName; //null if object is not drawn with picture
-    protected final int worldIndex, xNum, yNum;
     protected final double width, height, halfWidth, halfHeight; //in tiles
     protected final double[] centerCoordinates, coordinates, collisionBox; //in pixels
     public static final double HALF_SIDE = 25, TILE_SIDE = HALF_SIDE*2; //one tile's dimensions
@@ -40,9 +42,7 @@ public class MapObject {
     }
 
     public MapObject(int worldIndex, int xNum, int yNum, double width, double height, String fileName, boolean cornerAligned) {
-        this.worldIndex = worldIndex;
-        this.xNum = xNum;
-        this.yNum = yNum;
+        super(worldIndex, xNum, yNum);
         this.width = width;
         this.height = height;
         halfWidth = width/2;
@@ -69,7 +69,7 @@ public class MapObject {
         }
     }
 
-    public void playerIsOn(Player player) {}
+    public abstract void playerIsOn(Player player);
 
     public void draw() {
         StdDraw.picture(centerCoordinates[0], centerCoordinates[1], fileName, coordinates[2]-coordinates[0], coordinates[3]-coordinates[1]);

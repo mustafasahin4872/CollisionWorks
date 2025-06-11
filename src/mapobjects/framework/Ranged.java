@@ -1,4 +1,4 @@
-package mapobjects;
+package mapobjects.framework;
 
 import game.Player;
 
@@ -7,7 +7,6 @@ import static helperobjects.CollisionMethods.playerIsIn;
 public interface Ranged {
 
     double[] getRangeBox();
-    void shiftRangeBox();
 
     void playerInRange(Player player);
 

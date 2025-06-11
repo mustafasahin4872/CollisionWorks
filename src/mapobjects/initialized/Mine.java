@@ -1,11 +1,15 @@
-package mapobjects;
+package mapobjects.initialized;
 
 import game.Player;
 import lib.StdDraw;
+import mapobjects.framework.MapObject;
+import mapobjects.framework.RangeComponent;
 
 import static helperobjects.CollisionMethods.playerIsIn;
 
-public class Mine extends MapObject{
+public class Mine extends MapObject {
+
+    private final RangeComponent rangeComponent;
 
     private static final double RANGE = 2; //in tiles
     private boolean active, complete;
@@ -18,6 +22,7 @@ public class Mine extends MapObject{
 
     public Mine(int worldIndex, int xNum, int yNum) {
         super(worldIndex, xNum, yNum);
+        rangeComponent = new RangeComponent(this, RANGE);
         damage = worldIndex* DEFAULT_DAMAGE;
         fullTime = DEFAULT_FULL_TIME/worldIndex;
         collisionBox[0] -= RANGE*TILE_SIDE;

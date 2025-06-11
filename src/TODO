@@ -1,8 +1,6 @@
 NEEDED AS FIRST
 
 Hold all MapObjects together.
-set the worldIndex, xNum, yNum after the initialization in the mapmaker
-the set method must replace some actions in the constructor, like determining the coordinates etc.
 add abstract call() to mapobjects, containing every action that should be done in every frame call
 rename playerPositionChecks method to the general framecall method
 

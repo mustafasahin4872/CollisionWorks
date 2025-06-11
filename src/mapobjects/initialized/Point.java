@@ -1,9 +1,10 @@
-package mapobjects;
+package mapobjects.initialized;
 
 import game.Player;
 import lib.StdDraw;
+import mapobjects.framework.MapObject;
 
-public abstract class Point extends MapObject{
+public abstract class Point extends MapObject {
 
     protected final int index;
     protected boolean isBig;

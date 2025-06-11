@@ -1,12 +1,12 @@
 package game;
 
 import helperobjects.MapMaker;
-import mapobjects.*;
+import mapobjects.framework.MapObject;
+import mapobjects.initialized.*;
 
 import java.util.ArrayList;
 
 import static helperobjects.CollisionMethods.isIn;
-import static helperobjects.CollisionMethods.playerIsIn;
 
 public class GameMap {
 

@@ -1,24 +1,21 @@
-package mapobjects;
+package mapobjects.initialized;
 
 import game.Player;
-import helperobjects.Alignment;
-import helperobjects.Direction;
-import lib.StdDraw;
+import mapobjects.framework.MapObject;
 
 import java.util.ArrayList;
 
 //can move?
 public class Shooter extends MapObject {
 
-    private final Alignment alignment;
-    private final Direction direction;
+    private final char alignment, direction;
     private final ArrayList<Projectile> projectiles = new ArrayList<>();
     private static final double DEFAULT_PERIOD = 12000; //in milliseconds
     private final double period;
     private final long startTime;
     private int shotProjectilesNumber;
 
-    public Shooter(int worldIndex, int xNum, int yNum, Alignment alignment, Direction direction) {
+    public Shooter(int worldIndex, int xNum, int yNum, char alignment, char direction) {
         super(worldIndex, xNum, yNum, "misc/misc/shooter.png");
         this.alignment = alignment;
         this.direction = direction;

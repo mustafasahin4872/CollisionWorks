@@ -1,7 +1,7 @@
 package game;
 
 import lib.StdDraw;
-import mapobjects.MapObject;
+import mapobjects.framework.MapObject;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;

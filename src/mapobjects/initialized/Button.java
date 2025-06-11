@@ -1,7 +1,8 @@
-package mapobjects;
+package mapobjects.initialized;
 
 import game.Player;
 import lib.StdDraw;
+import mapobjects.framework.MapObject;
 
 import java.awt.*;
 import static helperobjects.DrawMethods.*;

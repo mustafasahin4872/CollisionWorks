@@ -1,6 +1,7 @@
-package mapobjects;
+package mapobjects.initialized;
 
 import game.Player;
+import mapobjects.framework.MapObject;
 
 public abstract class Chest extends MapObject {
 

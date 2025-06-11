@@ -1,6 +1,6 @@
 package game;
 
-import mapobjects.Sign;
+import mapobjects.initialized.Sign;
 import lib.StdDraw;
 
 import java.awt.event.KeyEvent;

@@ -1,6 +1,6 @@
-package mapobjects;
+package mapobjects.framework;
 
-public abstract class TimerComponent extends MapObject implements Timer{
+public abstract class TimerComponent extends MapObject implements Timed {
 
     protected boolean active, complete, recurring;
     protected long startTime;

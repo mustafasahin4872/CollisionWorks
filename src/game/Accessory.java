@@ -2,7 +2,7 @@ package game;
 
 import lib.StdDraw;
 
-import mapobjects.Tile;
+import mapobjects.initialized.Tile;
 
 public abstract class Accessory {
 
