@@ -8,6 +8,7 @@ import game.Player;
 import game.Frame;
 import mapobjects.framework.MapObject;
 
+import static helperobjects.CollisionMethods.checkCollision;
 import static helperobjects.DrawMethods.drawRectangle;
 
 public class Door extends MapObject {
@@ -39,6 +40,11 @@ public class Door extends MapObject {
         return (alignment == VERTICAL) ? length : THICKNESS;
     }
 
+    @Override
+    public void call(Player player) {
+        checkCollision(player, collisionBox);
+        checkOpen();
+    }
 
     public void setButtons(Button[] buttons) {
         this.buttons = buttons;

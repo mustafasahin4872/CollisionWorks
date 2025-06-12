@@ -3,6 +3,8 @@ package mapobjects.initialized;
 import game.Player;
 import mapobjects.framework.MapObject;
 
+import static helperobjects.CollisionMethods.*;
+
 public abstract class Tile extends MapObject {
 
     private static final String ROOT = "misc/tileImages/";
@@ -12,6 +14,11 @@ public abstract class Tile extends MapObject {
         super(worldIndex, xNum, yNum, ROOT + type + worldIndex + ".jpg");
         this.isApproachable = isApproachable;
         this.isSolid = isSolid;
+    }
+
+    @Override
+    public void call(Player player) {
+        if (isIn(player, collisionBox)) {playerIsOn(player);}
     }
 
     public boolean isSolid() {
@@ -47,12 +54,22 @@ public abstract class Tile extends MapObject {
         }
 
         @Override
+        public void call(Player player) {
+            if (isApproachable()) checkCollision(player, collisionBox);
+        }
+
+        @Override
         public void playerIsOn(Player player) {} // Impossible
     }
 
     public static class RiverTile extends Tile {
         public RiverTile(int worldIndex, int xNum, int yNum, boolean isApproachable) {
             super(worldIndex, xNum, yNum, isApproachable, true, "RiverTile");
+        }
+
+        @Override
+        public void call(Player player) {
+            if (isApproachable()) checkCollision(player, collisionBox);
         }
 
         @Override

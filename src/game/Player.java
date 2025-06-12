@@ -18,6 +18,7 @@ public class Player {
     private double spawnX, spawnY, x, y, xVelocity, yVelocity,
             maxSpeed = MAX_SPEED2, acceleration = A2, deceleration = A2;
     private int xDirection, yDirection;
+    private boolean xCollided, yCollided;
     private int lives = 3;
     private static final double MAX_HP = 200;
     private double hitPoints = MAX_HP;
@@ -78,6 +79,32 @@ public class Player {
 
     public void setPlayerTime() {
         playerTime = System.currentTimeMillis();
+    }
+
+    //COLLISION
+
+    public void resetXCollided() {
+        xCollided = false;
+    }
+
+    public void resetYCollided() {
+        yCollided = false;
+    }
+
+    public void xCollide() {
+        xCollided = true;
+    }
+
+    public void yCollide() {
+        yCollided = true;
+    }
+
+    public boolean isXCollided() {
+        return xCollided;
+    }
+
+    public boolean isYCollided() {
+        return yCollided;
     }
 
     //MOVEMENTS

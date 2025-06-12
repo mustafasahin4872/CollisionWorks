@@ -5,6 +5,8 @@ import mapobjects.framework.MapObject;
 
 import java.util.ArrayList;
 
+import static helperobjects.CollisionMethods.checkCollision;
+
 //can move?
 public class Shooter extends MapObject {
 
@@ -14,13 +16,27 @@ public class Shooter extends MapObject {
     private final double period;
     private final long startTime;
     private int shotProjectilesNumber;
+    private final Tile[] tiles;
+    private final int xTile;
 
-    public Shooter(int worldIndex, int xNum, int yNum, char alignment, char direction) {
+    public Shooter(int worldIndex, int xNum, int yNum, char alignment, char direction, Tile[] tiles, int xTile) {
         super(worldIndex, xNum, yNum, "misc/misc/shooter.png");
         this.alignment = alignment;
         this.direction = direction;
+        this.tiles = tiles;
+        this.xTile = xTile;
         period = DEFAULT_PERIOD/worldIndex;
         startTime = System.currentTimeMillis();
+    }
+
+    @Override
+    public void call(Player player) {
+        checkCollision(player, collisionBox);
+        shoot();
+        for (Projectile projectile : projectiles) {
+            projectile.call(player);
+            projectile.checkWallCollision(tiles, xTile);
+        }
     }
 
     public ArrayList<Projectile> getProjectiles() {

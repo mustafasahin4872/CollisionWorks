@@ -4,15 +4,10 @@ import helperobjects.MapMaker;
 import mapobjects.framework.MapObject;
 import mapobjects.initialized.*;
 
-import java.util.ArrayList;
-
-import static helperobjects.CollisionMethods.isIn;
-
 public class GameMap {
 
     private final Player player;
     private final int worldIndex, levelIndex;
-    private boolean xCollided, yCollided;
 
     private final double width, height; //default 3200x1800
     private final int xTile, yTile; //default 64x34
@@ -23,6 +18,8 @@ public class GameMap {
     //all the elements in map is rectangular. The format of each rectangular region coordinates is
     //{x0, y0, x1, y1} unless stated otherwise.
     //(x0, y0) and (x1, y1) are the rectangle's bottom left and top right corners.
+
+    private final MapObject[][][] layers;
 
     private final Tile[] tiles;
     private final Button[] buttons;
@@ -58,6 +55,7 @@ public class GameMap {
 
         MapMaker mapMaker = new MapMaker(worldIndex, levelIndex, xTile, yTile);
         mapMaker.mapMaker();
+        layers = mapMaker.getLayers();
         tiles = mapMaker.getTiles();
         buttons = mapMaker.getButtons().toArray(new Button[0]);
         chests = mapMaker.getChests().toArray(new Chest[0]);
@@ -113,23 +111,26 @@ public class GameMap {
     //POSITION AND VELOCITY UPDATES
 
     //the loops of the tiles,
-    public void playerPositionChecks() {
+    public void mapObjectCalls() {
 
-        if (tiles != null) {
-            for (int y = tileRange[1]; y<tileRange[3]; y++) {
-                for (int x = tileRange[0]; x<tileRange[2]; x++) {
-                    int index = (y-1)*xTile+x-1;
-                    Tile tile = tiles[index];
-                    if (tile.isSolid() && tile.isApproachable()) {
-                        checkCollision(tile.getCollisionBox());
-                    }
-                    if (isIn(player.getX(), player.getY(), tile.getCollisionBox())) {
-                        tile.playerIsOn(player);
+        for (int y = tileRange[1]; y<tileRange[3]; y++) {
+            for (int x = tileRange[0]; x<tileRange[2]; x++) {
+                int index = (y-1)*xTile+x-1;
+                Tile tile = tiles[index];
+                tile.call(player);
+
+                for (MapObject[][] layer : layers) {
+                    MapObject mapObject = layer[y][x];
+                    if (mapObject != null) {
+                        mapObject.call(player);
                     }
                 }
+
             }
         }
+
         callMapObjects(buttons);
+        callMapObjects(doors);
         callMapObjects(chests);
         callMapObjects(coins);
         callMapObjects(signs);
@@ -137,140 +138,24 @@ public class GameMap {
         callMapObjects(mortars);
         callMapObjects(winPoints);
         callMapObjects(checkPoints);
+        callMapObjects(shooters);
 
-        if (doors != null) {
-            for (Door door : doors) {
-                checkCollision(door.getCoordinates());
-                door.checkOpen();
-            }
-        }
-
-        for (Mortar mortar : mortars) {
-            checkCollision(mortar.getCoordinates());
-        }
-
-        for (Shooter shooter : shooters) {
-            checkCollision(shooter.getCoordinates());
-            shooter.shoot();
-            ArrayList<Projectile> projectiles = shooter.getProjectiles();
-            callMapObjects(projectiles.toArray(new Projectile[0]));
-            for (Projectile projectile : projectiles) {
-                projectile.checkWallCollision(tiles, xTile);
-            }
-        }
-
-
-        if (!xCollided) {
+        if (!player.isXCollided()) {
             player.setX(player.getX()+ player.getXVelocity() * Frame.DT);
         }
-        if (!yCollided) {
+        if (!player.isYCollided()) {
             player.setY(player.getY() + player.getYVelocity() * Frame.DT);
         }
 
-        xCollided = false;
-        yCollided = false;
+        player.resetXCollided();
+        player.resetYCollided();
 
-    }
-
-    //updates position and velocity if player collides to a wall
-    private void checkCollision(double[] coordinates) {
-        // X-axis collision
-        if (!xCollided) {
-            if (player.getXVelocity() > 0) {
-                if (playerLineCollision(coordinates, Side.LEFT)) {
-                    xCollided = true;
-                    player.setX(coordinates[0] - player.getSide() / 2);
-                    player.setXVelocity(0);
-                }
-            } else if (player.getXVelocity() < 0) {
-                if (playerLineCollision(coordinates, Side.RIGHT)) {
-                    xCollided = true;
-                    player.setX(coordinates[2] + player.getSide() / 2);
-                    player.setXVelocity(0);
-                }
-            }
-        }
-        // Y-axis collision
-        if (!yCollided) {
-            if (player.getYVelocity() > 0) {
-                if (playerLineCollision(coordinates, Side.BOTTOM)) {
-                    yCollided = true;
-                    player.setY(coordinates[1] - player.getSide() / 2);
-                    player.setYVelocity(0);
-                }
-            } else if (player.getYVelocity() < 0) {
-                if (playerLineCollision(coordinates, Side.TOP)) {
-                    yCollided = true;
-                    player.setY(coordinates[3] + player.getSide() / 2);
-                    player.setYVelocity(0);
-                }
-            }
-        }
     }
 
     private void callMapObjects(MapObject[] mapObjects) {
         for (MapObject mapObject : mapObjects) {
             mapObject.call(player);
         }
-    }
-
-
-    //----------------------------------------------------------------------------------------------
-    //COLLISIONS
-
-    public enum Side {TOP, BOTTOM, RIGHT, LEFT}
-    private boolean playerLineCollision(double[] obstacle, Side side) {
-        double x0 = obstacle[0], y0 = obstacle[1], x1 = obstacle[2], y1 = obstacle[3];
-
-        double x = player.getX();
-        double y = player.getY();
-        double nextX = x + player.getXVelocity() * Frame.DT;
-        double nextY = y + player.getYVelocity() * Frame.DT;
-        double halfSide = player.getSide() / 2;
-
-        if (side == Side.TOP) {
-            return xLineCollision(x - halfSide, y - halfSide, nextY - halfSide, x0, x1, y1) ||
-                    xLineCollision(x + halfSide, y - halfSide, nextY - halfSide, x0, x1, y1) ||
-                    xLineCollision(x, y - halfSide, nextY - halfSide, x0, x1, y1);
-        } else if (side == Side.BOTTOM) {
-            return xLineCollision(x - halfSide, y + halfSide, nextY + halfSide, x0, x1, y0) ||
-                    xLineCollision(x + halfSide, y + halfSide, nextY + halfSide, x0, x1, y0) ||
-                    xLineCollision(x, y + halfSide, nextY + halfSide, x0, x1, y0);
-        } else if (side == Side.LEFT) {
-            return yLineCollision(x + halfSide, y - halfSide, nextX - halfSide, y0, y1, x0) ||
-                    yLineCollision(x + halfSide, y + halfSide, nextX - halfSide, y0, y1, x0) ||
-                    yLineCollision(x + halfSide, y, nextX - halfSide, y0, y1, x0);
-        } else { // RIGHT
-            return yLineCollision(x - halfSide, y - halfSide, nextX + halfSide, y0, y1, x1) ||
-                    yLineCollision(x - halfSide, y + halfSide, nextX + halfSide, y0, y1, x1) ||
-                    yLineCollision(x - halfSide, y, nextX + halfSide, y0, y1, x1);
-        }
-    }
-
-    private boolean xLineCollision(double x, double y, double nextY, double x0, double x1, double y0) {
-        // Check if y0 is between y and nextY, or if both y and nextY are equal to y0
-        if (y <= y0 && y0 <= nextY || y >= y0 && y0 >= nextY) {
-
-            // Handle the case where the line is exactly horizontal (y == nextY == y0)
-            if (y == nextY && y != y0) {
-                return false;
-            }
-            return x0 < x && x < x1;
-        }
-        return false;
-    }
-    private boolean yLineCollision(double x, double y, double nextX, double y0, double y1, double x0) {
-        // Check if x0 is between x and nextX, or if both x and nextX are equal to x0
-        if (x <= x0 && x0 <= nextX || x >= x0 && x0 >= nextX) {
-
-            // Handle the case where the line is exactly vertical (x == nextX == x0)
-            if (x == nextX && x != x0) {
-                return false;
-            }
-            return y0<y && y<y1;
-        }
-        return false;
-
     }
 
 

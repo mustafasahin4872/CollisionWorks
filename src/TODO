@@ -1,8 +1,11 @@
 NEEDED AS FIRST
 
-Hold all MapObjects together.
-add abstract call() to mapobjects, containing every action that should be done in every frame call
-rename playerPositionChecks method to the general framecall method
+new layer approach
+add specific call methods to tiles and other objects: door call should check for collisions
+add xCollided and yCollided to player as data field
+make player file more beautiful
+
+door coordinates need a shift, it should be corner aligned in one axis only
 
 design the shop, first design the crystal palace
 fix the selection's world index gimmick, change the 13-14 indexed levels, make them make sense

@@ -7,6 +7,8 @@ import java.util.Arrays;
 
 import java.util.ArrayList;
 
+import static helperobjects.CollisionMethods.checkCollision;
+
 public class Mortar extends MapObject implements Ranged, Timed {
 
     private final TimeComponent timer;
@@ -41,6 +43,7 @@ public class Mortar extends MapObject implements Ranged, Timed {
 
     @Override
     public void call(Player player) {
+        checkCollision(player, collisionBox);
         updateTimer();
         if (isComplete()) return; //in cooldown
         if (isActive()) {

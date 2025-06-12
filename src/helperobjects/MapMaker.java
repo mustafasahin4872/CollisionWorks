@@ -111,6 +111,10 @@ points can have the indicator B for big displays, special to the selection scree
 
     //GETTERS
 
+    public MapObject[][][] getLayers() {
+        return layers;
+    }
+
     public Tile[] getTiles() {
         return tiles;
     }
