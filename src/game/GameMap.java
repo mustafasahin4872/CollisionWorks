@@ -4,6 +4,8 @@ import helperobjects.MapMaker;
 import mapobjects.framework.MapObject;
 import mapobjects.initialized.*;
 
+import java.util.function.Consumer;
+
 public class GameMap {
 
     private final Player player;
@@ -21,19 +23,7 @@ public class GameMap {
 
     private final MapObject[][][] layers;
 
-    private final Tile[] tiles;
-    private final Button[] buttons;
-    private final Door[] doors;
-    private final Chest[] chests;
-    private final Coin[] coins;
-    private final Sign[] signs, errorMessages;
-    private final Mine[] mines;
-    private final Mortar[] mortars;
-    private final Shooter[] shooters;
-    private final Point.WinPoint[] winPoints;
-    private final Point.CheckPoint[] checkPoints;
-
-    private final int totalCoinOnMap;
+    //private final int totalCoinOnMap;
 
     //------------------------------------------------------------------------------------------------------------
     //CONSTRUCTOR
@@ -53,34 +43,10 @@ public class GameMap {
         width = xTile*Tile.HALF_SIDE*2;
         height = yTile*Tile.HALF_SIDE*2;
 
-        MapMaker mapMaker = new MapMaker(worldIndex, levelIndex, xTile, yTile);
+        MapMaker mapMaker = new MapMaker(worldIndex, levelIndex, xTile, yTile, player);
         mapMaker.mapMaker();
         layers = mapMaker.getLayers();
-        tiles = mapMaker.getTiles();
-        buttons = mapMaker.getButtons().toArray(new Button[0]);
-        chests = mapMaker.getChests().toArray(new Chest[0]);
-        doors = mapMaker.getDoors().toArray(new Door[0]);
-        coins = mapMaker.getCoins().toArray(new Coin[0]);
-        signs = mapMaker.getSigns().toArray(new Sign[0]);
-        mines = mapMaker.getMines().toArray(new Mine[0]);
-        mortars = mapMaker.getMortars().toArray(new Mortar[0]);
-        shooters = mapMaker.getShooters().toArray(new Shooter[0]);
-        winPoints = mapMaker.getWinPoints().toArray(new Point.WinPoint[0]);
-        checkPoints = mapMaker.getCheckPoints();
 
-        if (checkPoints.length!=0) {
-            player.setSpawnPoint(checkPoints[0].getCenterCoordinates());
-            player.respawn();
-            errorMessages = new Sign[checkPoints.length-1];
-            for (int i = 1; i<checkPoints.length; i++) {
-                errorMessages[i-1] = checkPoints[i].getErrorSign();
-            }
-        } else {
-            errorMessages = new Sign[0];
-        }
-
-
-        totalCoinOnMap = calculateTotalCoinAmount();
         setFrameTileRange();
     }
 
@@ -110,35 +76,10 @@ public class GameMap {
     //------------------------------------------------------------------------------------------------------------
     //POSITION AND VELOCITY UPDATES
 
-    //the loops of the tiles,
+
     public void mapObjectCalls() {
 
-        for (int y = tileRange[1]; y<tileRange[3]; y++) {
-            for (int x = tileRange[0]; x<tileRange[2]; x++) {
-                int index = (y-1)*xTile+x-1;
-                Tile tile = tiles[index];
-                tile.call(player);
-
-                for (MapObject[][] layer : layers) {
-                    MapObject mapObject = layer[y][x];
-                    if (mapObject != null) {
-                        mapObject.call(player);
-                    }
-                }
-
-            }
-        }
-
-        callMapObjects(buttons);
-        callMapObjects(doors);
-        callMapObjects(chests);
-        callMapObjects(coins);
-        callMapObjects(signs);
-        callMapObjects(mines);
-        callMapObjects(mortars);
-        callMapObjects(winPoints);
-        callMapObjects(checkPoints);
-        callMapObjects(shooters);
+        iterateCurrentFrameObjects(mapObject -> mapObject.call(player));
 
         if (!player.isXCollided()) {
             player.setX(player.getX()+ player.getXVelocity() * Frame.DT);
@@ -152,9 +93,16 @@ public class GameMap {
 
     }
 
-    private void callMapObjects(MapObject[] mapObjects) {
-        for (MapObject mapObject : mapObjects) {
-            mapObject.call(player);
+    private void iterateCurrentFrameObjects(Consumer<MapObject> action) {
+        for (int y = tileRange[1]; y <= tileRange[3]; y++) {
+            for (int x = tileRange[0]; x <= tileRange[2]; x++) {
+                for (MapObject[][] layer : layers) {
+                    MapObject mapObject = layer[y - 1][x - 1];
+                    if (mapObject != null) {
+                        action.accept(mapObject); // 💅 do the thing
+                    }
+                }
+            }
         }
     }
 
@@ -163,48 +111,10 @@ public class GameMap {
     //DRAW
 
     public void draw() {
-
-        for (int y = tileRange[1]; y<= tileRange[3]; y++) {
-            for (int x = tileRange[0]; x<=tileRange[2]; x++) {
-                int index = (y-1)*xTile+x-1;
-                tiles[index].draw();
-            }
-        }
-
-        drawDrawables(buttons);
-        drawDrawables(chests);
-        drawDrawables(coins);
-        drawDrawables(checkPoints);
-        drawDrawables(winPoints);
-        drawDrawables(doors);
-        drawDrawables(signs);
-        drawDrawables(errorMessages);
-        drawDrawables(mines);
-        drawDrawables(mortars);
-        drawDrawables(shooters);
-
-    }
-
-    private static void drawDrawables(MapObject[] drawables) {
-        if (drawables != null) {
-            for (MapObject drawable : drawables) {
-                drawable.draw();
-            }
-        }
+        iterateCurrentFrameObjects(MapObject::draw);
     }
 
     //--------------------------------------------------------------------------------------------------
-
-    private int calculateTotalCoinAmount() {
-        int total = 0;
-        for (Coin coin : coins) {
-            total += coin.getValue();
-        }
-        for (Chest chest : chests) {
-            total += chest.getCoinNum();
-        }
-        return total;
-    }
 
     public void setFrameTileRange() {
         int xNum = (int) (player.getX() / MapObject.TILE_SIDE);

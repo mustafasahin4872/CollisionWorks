@@ -1,7 +1,9 @@
 package helperobjects;
 
+import game.Player;
 import mapobjects.framework.Blueprint;
 import mapobjects.framework.MapObject;
+import mapobjects.framework.SpawnComponent;
 import mapobjects.initialized.*;
 
 import java.io.File;
@@ -14,23 +16,13 @@ public class MapMaker {
     private final int worldIndex, levelIndex;
     private final File mapFile;
     private final int xTile, yTile;
+    private final Player player;
 
     private final MapObject[][][] layers;
-    private final Tile[][] tileLayer;
-    private final MapObject[][] mapObjectLayer;
-    private final Coin[][] coinLayer;
+    private final Tile[][] tiles;
+    private final MapObject[][] mapObjects;
+    private final Coin[][] coins;
 
-    private final Tile[] tiles;
-
-    private final Set<Button> buttons = new HashSet<>();
-    private final Set<Chest> chests = new HashSet<>();
-    private final Set<Door> doors = new HashSet<>();
-    private final Set<Sign> signs = new HashSet<>();
-    private final Set<Coin> coins = new HashSet<>();
-    private final Set<Mine> mines = new HashSet<>();
-    private final Set<Mortar> mortars = new HashSet<>();
-    private final Set<Shooter> shooters = new HashSet<>();
-    private final Set<Point.WinPoint> winPoints = new HashSet<>();
     private Point.CheckPoint[] checkPoints = {new Point.SpawnPoint(0,0,0),
                                               new Point.CheckPoint(0,0,0,1),
                                               new Point.CheckPoint(0,0,0,2),
@@ -96,16 +88,16 @@ points can have the indicator B for big displays, special to the selection scree
 
     //CONSTRUCTOR
 
-    public MapMaker(int worldIndex, int levelIndex, int xTile, int yTile) {
+    public MapMaker(int worldIndex, int levelIndex, int xTile, int yTile, Player player) {
         this.worldIndex = worldIndex;
         this.levelIndex = levelIndex;
         this.xTile = xTile;
         this.yTile = yTile;
-        tiles = new Tile[xTile*yTile];
-        tileLayer = new Tile[yTile][xTile];
-        mapObjectLayer = new MapObject[yTile][xTile];
-        coinLayer = new Coin[yTile][xTile];
-        layers = new MapObject[][][]{tileLayer, mapObjectLayer, coinLayer};
+        this.player = player;
+        tiles = new Tile[yTile][xTile];
+        mapObjects = new MapObject[yTile][xTile];
+        coins = new Coin[yTile][xTile];
+        layers = new MapObject[][][]{tiles, mapObjects, coins};
         mapFile = new File(("misc/maps/%d%d.txt").formatted(worldIndex, levelIndex));
     }
 
@@ -113,50 +105,6 @@ points can have the indicator B for big displays, special to the selection scree
 
     public MapObject[][][] getLayers() {
         return layers;
-    }
-
-    public Tile[] getTiles() {
-        return tiles;
-    }
-
-    public Set<Button> getButtons() {
-        return buttons;
-    }
-
-    public Set<Chest> getChests() {
-        return chests;
-    }
-
-    public Set<Door> getDoors() {
-        return doors;
-    }
-
-    public Set<Coin> getCoins() {
-        return coins;
-    }
-
-    public Set<Sign> getSigns() {
-        return signs;
-    }
-
-    public Set<Mine> getMines() {
-        return mines;
-    }
-
-    public Set<Mortar> getMortars() {
-        return mortars;
-    }
-
-    public Set<Shooter> getShooters() {
-        return shooters;
-    }
-
-    public Set<Point.WinPoint> getWinPoints() {
-        return winPoints;
-    }
-
-    public Point.CheckPoint[] getCheckPoints() {
-        return checkPoints;
     }
 
     //MAIN METHOD
@@ -187,16 +135,16 @@ points can have the indicator B for big displays, special to the selection scree
         // hold the D37 codes here with their locations to later wire them to buttons
         Map<Door, Integer> doorsToWire = new HashMap<>();
         Map<String, Button> buttonMap = new HashMap<>();
+
         for (int y = 1; y <= yTile; y++) {
             for (int x = 1; x <= xTile; x++) {
 
-                Tile initializedTile = null;
-                MapObject initializedMapObject = null;
-                Coin initializedCoin = null;
+                Tile initializedTile;
+                MapObject initializedMapObject;
+                Coin initializedCoin;
 
                 boolean isApproachable = approachability[y - 1][x - 1];
                 String tileCode = mapData[y - 1][x - 1];
-                Tile tile;
                 char char0 = tileCode.charAt(0);
 
                 Blueprint blueprint = new Blueprint(worldIndex, x, y);
@@ -204,31 +152,41 @@ points can have the indicator B for big displays, special to the selection scree
                 if (BASIC_CHARACTERS.contains(char0)) { // quick codes
 
                     char char1 = tileCode.charAt(1), char2 = tileCode.charAt(2);
-                    tile = blueprint.mutateToTile(char0, isApproachable);
+                    initializedTile = blueprint.mutateToTile(char0, isApproachable);
 
-                    initializeCoin(char1, blueprint);
+                    initializedCoin = initializeCoin(char1, blueprint);
 
-                    switch (char1) {
-                        case '@' -> mines.add(blueprint.mutateToMine());
-                        case '%' -> mortars.add(blueprint.mutateToMortar(tiles, xTile));
+                    initializedMapObject = switch (char1) {
+                        case '@' -> blueprint.mutateToMine();
+                        case '%' -> blueprint.mutateToMortar(tiles, xTile);
                         case ':' -> {
                             Button button = blueprint.mutateToBigButton();
                             buttonMap.put("%d:%d".formatted(x, y), button);
-                            buttons.add(button);
+                            yield button;
                         }
                         case '.' -> {
                             Button button = blueprint.mutateToLittleButton();
                             buttonMap.put("%d:%d".formatted(x, y), button);
-                            buttons.add(button);
+                            yield button;
                         }
-                        case '0' -> checkPoints[0] = blueprint.mutateToSpawnPoint(char2 == 'B');
-                        case '1', '2', '3', '4' -> checkPoints[char1 - '0'] = blueprint.mutateToCheckPoint(char1 - '0', char2 == 'B');
-                        case '5', '6', '7', '8', '9' -> winPoints.add(blueprint.mutateToWinPoint(char1 - '5', char2 == 'B'));
-                        case '~' -> chests.add(blueprint.mutateToWoodenChest(new char[]{char2}));
-                        case '≈' -> chests.add(blueprint.mutateToSilverChest(new char[]{char2}));
-                        case '=' -> chests.add(blueprint.mutateToGoldenChest(new char[]{char2}));
-                        case 'D' -> doors.add(blueprint.mutateToDoor(char2));
-                    }
+                        case '0' -> {
+                            Point.SpawnPoint spawnPoint = blueprint.mutateToSpawnPoint(char2 == 'B');
+                            checkPoints[0] = spawnPoint;
+                            player.setSpawnPoint(spawnPoint.getCenterCoordinates());
+                            yield spawnPoint;
+                        }
+                        case '1', '2', '3', '4' -> {
+                            Point.CheckPoint checkPoint = blueprint.mutateToCheckPoint(char1 - '0', char2 == 'B');
+                            checkPoints[char1 - '0'] = checkPoint;
+                            yield checkPoint;
+                        }
+                        case '5', '6', '7', '8', '9' -> blueprint.mutateToWinPoint(char1 - '5', char2 == 'B');
+                        case '~' -> blueprint.mutateToWoodenChest(new char[]{char2});
+                        case '≈' -> blueprint.mutateToSilverChest(new char[]{char2});
+                        case '=' -> blueprint.mutateToGoldenChest(new char[]{char2});
+                        case 'D' -> blueprint.mutateToDoor(char2);
+                        default -> null;
+                    };
 
                 } else { // A37 initializer, coins on top too
 
@@ -237,28 +195,33 @@ points can have the indicator B for big displays, special to the selection scree
 
                     String onTileCode = details[0];
 
-                    tile = blueprint.mutateToTile(onTileCode.charAt(0), isApproachable);
+                    initializedTile = blueprint.mutateToTile(onTileCode.charAt(0), isApproachable);
 
-                    initializeCoin(onTileCode.charAt(1), blueprint);
+                    initializedCoin = initializeCoin(onTileCode.charAt(1), blueprint);
 
-                    switch (char0) {
+                    initializedMapObject = switch (char0) {
+
                         case 'C' -> {
                             String[] buffs = details[2].split(", ");
-                            switch (details[1].charAt(0)) {
-                                case '~' -> chests.add(blueprint.mutateToWoodenChest(toCharArray(buffs)));
-                                case '≈' -> chests.add(blueprint.mutateToSilverChest(toCharArray(buffs)));
-                                case '=' -> chests.add(blueprint.mutateToGoldenChest(toCharArray(buffs)));
-                            }
+                            yield switch (details[1].charAt(0)) {
+                                case '~' -> blueprint.mutateToWoodenChest(toCharArray(buffs));
+                                case '≈' -> blueprint.mutateToSilverChest(toCharArray(buffs));
+                                case '=' -> blueprint.mutateToGoldenChest(toCharArray(buffs));
+                                default -> {
+                                    System.out.println("error at C37");
+                                    yield null;
+                                }
+                            };
                         }
                         case 'D' -> {
                             int length = (details.length == 4) ? Integer.parseInt(details[3]) : 4;
                             Door door = blueprint.mutateToDoor(details[1].charAt(0), length);
-                            doors.add(door);
                             doorsToWire.put(door, lineIndex);
+                            yield door;
                         }
                         case 'S' -> {
                             String[] messages = details[2].split(", ");
-                            Sign sign = switch (details[1].charAt(0)) {
+                            yield switch (details[1].charAt(0)) {
                                 case '\'' -> blueprint.mutateToSign(messages);
                                 case '"' -> {
                                     for (int i = 0; i < messages.length; i++) {
@@ -267,20 +230,21 @@ points can have the indicator B for big displays, special to the selection scree
                                     yield blueprint.mutateToSign(messages);
                                 }
                                 default -> {
-                                    System.out.println("default message for sign initialization, an error occurred");
-                                    yield blueprint.mutateToSign(new String[0]);
+                                    System.out.println("error at S37");
+                                    yield null;
                                 }
                             };
-                            signs.add(sign);
                         }
-                        default -> System.out.println("default message for A37, an error occurred.");
-                    }
+                        default -> {
+                            System.out.println("default message for A37, an error occurred.");
+                            yield null;
+                        }
+                    };
                 }
 
-                tiles[(y - 1) * xTile + (x - 1)] = tile;
-                tileLayer[y-1][x-1] = initializedTile;
-                mapObjectLayer[y-1][x-1] = initializedMapObject;
-                coinLayer[y-1][x-1] = initializedCoin;
+                tiles[y-1][x-1] = initializedTile;
+                mapObjects[y-1][x-1] = initializedMapObject;
+                coins[y-1][x-1] = initializedCoin;
             }
         }
 
@@ -289,12 +253,13 @@ points can have the indicator B for big displays, special to the selection scree
     }
 
 
-    private void initializeCoin(char type, Blueprint blueprint) {
-        switch (type) {
-            case 'o' -> coins.add(blueprint.mutateToSingleCoin());
-            case '*' -> coins.add(blueprint.mutateToTripleCoin());
-            case '$' -> coins.add(blueprint.mutateToCoinBag());
-        }
+    private Coin initializeCoin(char type, Blueprint blueprint) {
+        return switch (type) {
+            case 'o' -> blueprint.mutateToSingleCoin();
+            case '*' -> blueprint.mutateToTripleCoin();
+            case '$' -> blueprint.mutateToCoinBag();
+            default -> null;
+        };
     }
 
     private void setPrevToCheckPoints() {

@@ -20,14 +20,14 @@ public class Mortar extends MapObject implements Ranged, Timed {
     private static final double PERIOD = Double.MAX_VALUE, DEFAULT_COOLDOWN = 3000;
     private final int mineNum;
     private final Mine[] mines;
-    private final Tile[] tiles;
+    private final Tile[][] tiles;
     private final int xTile;
 
-    public Mortar(int worldIndex, int xNum, int yNum, Tile[] tiles, int xTile) {
+    public Mortar(int worldIndex, int xNum, int yNum, Tile[][] tiles, int xTile) {
         this(worldIndex, xNum, yNum, tiles, xTile, BASE_MINE_NUM*worldIndex);
     }
 
-    public Mortar(int worldIndex, int xNum, int yNum, Tile[] tiles, int xTile, int mineNum) {
+    public Mortar(int worldIndex, int xNum, int yNum, Tile[][] tiles, int xTile, int mineNum) {
         super(worldIndex, xNum, yNum, 2, 2, "misc/misc/mortar.png", true);
         this.mineNum = mineNum;
         this.tiles = tiles;
@@ -127,8 +127,7 @@ public class Mortar extends MapObject implements Ranged, Timed {
                     break;
                 }
             }
-            int tileIndex = (y-1)*xTile + x - 1;
-            if (tiles[tileIndex].isSolid()) {valid = false;}
+            if (tiles[y-1][x-1].isSolid()) {valid = false;}
             if (valid) {
                 holder.add(new int[]{x, y});
             }
