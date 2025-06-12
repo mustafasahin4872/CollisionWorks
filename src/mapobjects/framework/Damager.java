@@ -1,4 +1,5 @@
 package mapobjects.framework;
 
-public class SpawnerComponent {
+public interface Damager {
+
 }

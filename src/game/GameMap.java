@@ -129,14 +129,14 @@ public class GameMap {
                 }
             }
         }
-        checkPlayerIsOn(buttons);
-        checkPlayerIsOn(chests);
-        checkPlayerIsOn(coins);
-        checkPlayerIsOn(signs);
-        checkPlayerIsOn(mines);
-        checkPlayerIsOn(mortars);
-        checkPlayerIsOn(winPoints);
-        checkPlayerIsOn(checkPoints);
+        callMapObjects(buttons);
+        callMapObjects(chests);
+        callMapObjects(coins);
+        callMapObjects(signs);
+        callMapObjects(mines);
+        callMapObjects(mortars);
+        callMapObjects(winPoints);
+        callMapObjects(checkPoints);
 
         if (doors != null) {
             for (Door door : doors) {
@@ -145,22 +145,15 @@ public class GameMap {
             }
         }
 
-        for (Mine mine : mines) {
-            mine.countDown(player);
-        }
-
         for (Mortar mortar : mortars) {
             checkCollision(mortar.getCoordinates());
-            for (Mine mine : mortar.getMines()) {
-                mine.countDown(player);
-            }
         }
 
         for (Shooter shooter : shooters) {
             checkCollision(shooter.getCoordinates());
             shooter.shoot();
             ArrayList<Projectile> projectiles = shooter.getProjectiles();
-            checkPlayerIsOn(projectiles.toArray(new Projectile[0]));
+            callMapObjects(projectiles.toArray(new Projectile[0]));
             for (Projectile projectile : projectiles) {
                 projectile.checkWallCollision(tiles, xTile);
             }
@@ -215,9 +208,9 @@ public class GameMap {
         }
     }
 
-    private void checkPlayerIsOn(MapObject[] mapObjects) {
+    private void callMapObjects(MapObject[] mapObjects) {
         for (MapObject mapObject : mapObjects) {
-            mapObject.checkPlayerIsOn(player);
+            mapObject.call(player);
         }
     }
 

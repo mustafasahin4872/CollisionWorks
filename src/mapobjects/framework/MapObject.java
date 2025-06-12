@@ -63,7 +63,11 @@ public abstract class MapObject extends Blueprint {
         setCollisionBoxToCoordinates();
     }
 
-    public void checkPlayerIsOn(Player player) {
+    public void call(Player player) {
+        checkPlayerIsOn(player);
+    }
+
+    protected void checkPlayerIsOn(Player player) {
         if (playerIsIn(player, collisionBox)) {
             playerIsOn(player);
         }

@@ -2,62 +2,77 @@ package mapobjects.initialized;
 
 import game.Player;
 import lib.StdDraw;
-import mapobjects.framework.MapObject;
-import mapobjects.framework.RangeComponent;
+import mapobjects.framework.*;
 
-import static helperobjects.CollisionMethods.playerIsIn;
-
-public class Mine extends MapObject {
+public class Mine extends MapObject implements Ranged, Timed {
 
     private final RangeComponent rangeComponent;
+    private final TimeComponent timer;
 
     private static final double RANGE = 2; //in tiles
-    private boolean active, complete;
     private static final double DEFAULT_DAMAGE = 30;
     private final double damage;
-    private static final double DEFAULT_FULL_TIME = 3000; //in milliseconds
-    private final double fullTime;
-    private double timePassed;
-    private long startTime;
+    private static final double DEFAULT_PERIOD = 3000; //in milliseconds
 
     public Mine(int worldIndex, int xNum, int yNum) {
         super(worldIndex, xNum, yNum);
         rangeComponent = new RangeComponent(this, RANGE);
+        timer = new TimeComponent(DEFAULT_PERIOD / worldIndex, -1);
         damage = worldIndex* DEFAULT_DAMAGE;
-        fullTime = DEFAULT_FULL_TIME/worldIndex;
-        collisionBox[0] -= RANGE*TILE_SIDE;
-        collisionBox[1] -= RANGE*TILE_SIDE;
-        collisionBox[2] += RANGE*TILE_SIDE;
-        collisionBox[3] += RANGE*TILE_SIDE;
+    }
+
+    public boolean isActive() {
+        return timer.isActive();
     }
 
     public boolean isComplete() {
-        return complete;
+        return timer.isCompleted();
     }
 
     @Override
+    public double[] getRangeBox() {
+        return rangeComponent.getRangeBox();
+    }
+
+    @Override
+    public void call(Player player) {
+        if (isComplete()) return; //no need to search if complete
+        updateTimer(); //update timer (might set complete)
+        if (!isActive() && !isComplete()) {checkPlayerInRange(player);} //trigger the timer
+        if (isComplete()) {timeIsUp(player);} //if set complete, call time is up effect
+    }
+
+    //triggers only if time is up!
+    @Override
     public void playerIsOn(Player player) {
-        if (active) return;
-        active = true;
-        startTime = System.currentTimeMillis();
+        player.damage(damage);
+    }
+
+    @Override
+    public void playerInRange(Player player) {
+        activateTimer();
+    }
+
+    @Override
+    public void activateTimer() {
+        timer.activate();
+    }
+
+    @Override
+    public void updateTimer() {
+        timer.tick();
+    }
+
+    @Override
+    public void timeIsUp(Player player) {
+        checkPlayerIsOn(player);
     }
 
     @Override
     public void draw() {
-        if (!active || complete) return;
+        if (timer.isCompleted() || !timer.isActive()) return;
         StdDraw.setPenColor(StdDraw.BOOK_RED);
-        StdDraw.filledCircle(centerCoordinates[0], centerCoordinates[1], (timePassed/ fullTime)*HALF_SIDE);
-    }
-
-    public void countDown(Player player) {
-        if (!active || complete) return;
-        timePassed = System.currentTimeMillis()-startTime;
-        if (timePassed >= fullTime) {
-            complete = true;
-            if (playerIsIn(player, coordinates)) {
-                player.damage(damage);
-            }
-        }
+        StdDraw.filledCircle(centerCoordinates[0], centerCoordinates[1], timer.progressRatio()*HALF_SIDE);
     }
 
 }

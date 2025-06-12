@@ -1,20 +1,23 @@
 package mapobjects.initialized;
 
 import game.Player;
-import mapobjects.framework.MapObject;
+import mapobjects.framework.*;
 
 import java.util.Arrays;
-import java.util.Random;
 
 import java.util.ArrayList;
 
-public class Mortar extends MapObject {
+public class Mortar extends MapObject implements Ranged, Timed {
+
+    private final TimeComponent timer;
+    private final RangeComponent rangeComponent;
 
     private static final int RANGE = 4;
     private static final int BASE_MINE_NUM = 3;
+    //period is max because the time of cooldown is determined by the mines
+    private static final double PERIOD = Double.MAX_VALUE, DEFAULT_COOLDOWN = 3000;
     private final int mineNum;
     private final Mine[] mines;
-    private boolean active;
     private final Tile[] tiles;
     private final int xTile;
 
@@ -27,42 +30,44 @@ public class Mortar extends MapObject {
         this.mineNum = mineNum;
         this.tiles = tiles;
         this.xTile = xTile;
+        rangeComponent = new RangeComponent(this, RANGE);
+        timer = new TimeComponent(PERIOD, DEFAULT_COOLDOWN/worldIndex);
         mines = new Mine[mineNum];
-        Arrays.fill(mines, new Mine(worldIndex, xNum, yNum));
-        collisionBox[0] -= (RANGE)*TILE_SIDE;
-        collisionBox[1] -= (RANGE)*TILE_SIDE;
-        collisionBox[2] += (RANGE+1)*TILE_SIDE;
-        collisionBox[3] += (RANGE+1)*TILE_SIDE;
-    }
-
-    public Mine[] getMines() {
-        return mines;
+        Arrays.fill(mines, null);
     }
 
     @Override
-    public void playerIsOn(Player player) {
+    public void playerIsOn(Player player) {} //not possible
 
-        if (!active) {
-            active = true;
-            renewMines();
-        }
+    @Override
+    public void call(Player player) {
+        updateTimer();
+        if (isComplete()) return; //in cooldown
+        if (isActive()) {
+            for (Mine mine : mines) {mine.call(player);} //call all mines
+            if (areMinesComplete()) {timeIsUp(player);} //start cooldown
+        } else {checkPlayerInRange(player);}
+    }
 
-        boolean allComplete = true;
-        for (Mine mine : mines) {
-            mine.playerIsOn(player);
-            if (!mine.isComplete()) {
-                allComplete = false;
-            }
-        }
-        if (allComplete) {
-            active = false;
-        }
+    private boolean isActive() {
+        return timer.isActive();
+    }
+
+    private boolean areMinesComplete() {
+        for (Mine mine : mines) {if (!mine.isComplete()) {return false;}}
+        return true;
+    }
+
+    private boolean isComplete() {
+        return timer.isCompleted();
     }
 
     @Override
     public void draw() {
         super.draw();
-        for (Mine mine : mines) {mine.draw();}
+        for (Mine mine : mines) {
+            if (mine!=null) mine.draw();
+        }
     }
 
     private void renewMines() {
@@ -73,9 +78,35 @@ public class Mortar extends MapObject {
         }
     }
 
-    //returns n unique coordinate pair
+    @Override
+    public double[] getRangeBox() {
+        return rangeComponent.getRangeBox();
+    }
+
+    @Override
+    public void playerInRange(Player player) {
+        activateTimer();
+        renewMines();
+        for (Mine mine : mines) mine.activateTimer();
+    }
+
+    @Override
+    public void activateTimer() {
+        timer.activate();
+    }
+
+    @Override
+    public void updateTimer() {
+        timer.tick();
+    }
+
+    @Override
+    public void timeIsUp(Player player) {
+        timer.startCooldown();
+    }
+
+    //returns n unique coordinate pair, checks for not being impassable as well
     private int[][] getValidCoordinates(int n) {
-        Random random = new Random();
         ArrayList<int[]> holder = new ArrayList<>();
         holder.add(new int[]{xNum, yNum});
         holder.add(new int[]{xNum+1, yNum});
@@ -103,4 +134,5 @@ public class Mortar extends MapObject {
 
         return holder.toArray(new int[0][]);
     }
+
 }

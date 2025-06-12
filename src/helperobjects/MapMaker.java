@@ -170,7 +170,7 @@ points can have the indicator B for big displays, special to the selection scree
     private void initializeObjects(String[][] mapData, boolean[][] approachability, ArrayList<String> objectDetails) {
 
         // hold the D37 codes here with their locations to later wire them to buttons
-        Map<Integer, int[]> doorsToWire = new HashMap<>();
+        Map<Door, Integer> doorsToWire = new HashMap<>();
         Map<String, Button> buttonMap = new HashMap<>();
         for (int y = 1; y <= yTile; y++) {
             for (int x = 1; x <= xTile; x++) {
@@ -236,7 +236,12 @@ points can have the indicator B for big displays, special to the selection scree
                                 case '=' -> chests.add(blueprint.mutateToGoldenChest(toCharArray(buffs)));
                             }
                         }
-                        case 'D' -> doorsToWire.put(lineIndex, new int[]{x - 1, y - 1});
+                        case 'D' -> {
+                            int length = (details.length == 4) ? Integer.parseInt(details[3]) : 4;
+                            Door door = blueprint.mutateToDoor(details[1].charAt(0), length);
+                            doors.add(door);
+                            doorsToWire.put(door, lineIndex);
+                        }
                         case 'S' -> {
                             String[] messages = details[2].split(", ");
                             Sign sign = switch (details[1].charAt(0)) {
@@ -275,10 +280,11 @@ points can have the indicator B for big displays, special to the selection scree
         }
     }
 
-    private void wireDoorsToButtons(ArrayList<String> objectDetails, Map<Integer, int[]> doorsToWire, Map<String, Button> buttonMap) {
+    private void wireDoorsToButtons(ArrayList<String> objectDetails, Map<Door, Integer> doorsToWire, Map<String, Button> buttonMap) {
         //wire doors to buttons:
-        for (Map.Entry<Integer, int[]> pair : doorsToWire.entrySet()) {
-            String[] items = objectDetails.get(pair.getKey()).split("; ");
+        for (Map.Entry<Door, Integer> pair : doorsToWire.entrySet()) {
+            Door door = pair.getKey();
+            String[] items = objectDetails.get(pair.getValue()).split("; ");
 //items[0] is the tile on top, already initialized. items[1] is the type of door.
 //items[2] is the door coordinates as x1:y1, x2:y2, ... and if there exists, items[3] is the length of the door
 //careful! the button coordinates entered in txt file has starting index 1, while mapData has 0!
@@ -291,19 +297,10 @@ points can have the indicator B for big displays, special to the selection scree
                 buttonsToWire.add(buttonMap.get(s));
             }
 
-            // x-y coordinates in mapData
-            int x = pair.getValue()[0];
-            int y = pair.getValue()[1];
-
             int l = 4; //length of door is 4 by default
             if (items.length==4) {l = Integer.parseInt(items[3]);} //change length if specified
 
-            //initialize door
-            char alignment = items[1].charAt(0);
-            switch (alignment) {
-                case '|', '—' -> doors.add(new Door(worldIndex, x+1, y+1, alignment, l, buttonsToWire.toArray(new Button[0])));
-                default -> System.out.println("default message for initializing door, an error occurred");
-            }
+            door.setButtons(buttonsToWire.toArray(new Button[0]));
         }
     }
 

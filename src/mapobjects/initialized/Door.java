@@ -13,7 +13,7 @@ import static helperobjects.DrawMethods.drawRectangle;
 public class Door extends MapObject {
 
     private final char alignment;
-    private final Button[] buttons;
+    private Button[] buttons;
     private boolean isOpen;
     private final double doorFloor;
     private final Color color = new Color((int) (Math.random() * 255), 0, (int) (Math.random() * 255));
@@ -22,26 +22,13 @@ public class Door extends MapObject {
 
 
     public Door(int worldIndex, int xNum, int yNum, char alignment) {
-        this(worldIndex, xNum, yNum, alignment, 4, null);
+        this(worldIndex, xNum, yNum, alignment, 4);
     }
 
     public Door(int worldIndex, int xNum, int yNum, char alignment, int length) {
-        this(worldIndex, xNum, yNum, alignment, length, null);
-    }
-
-    public Door(int worldIndex, int xNum, int yNum, char alignment, Button[] buttons) {
-        this(worldIndex, xNum, yNum, alignment, 4, buttons);
-    }
-
-    public Door(int worldIndex, int xNum, int yNum, char alignment, int length, Button[] buttons) {
         super(worldIndex, xNum, yNum, getWidth(alignment, length), getHeight(alignment, length), true);
         this.alignment = alignment;
-        this.buttons = buttons;
         this.doorFloor = (alignment == VERTICAL) ? coordinates[1] : coordinates[0];
-
-        if (buttons != null) {
-            Arrays.stream(buttons).forEach(button -> button.setUnpressedColor(color));
-        }
     }
 
     private static double getWidth(char alignment, int length) {
@@ -50,6 +37,14 @@ public class Door extends MapObject {
 
     private static double getHeight(char alignment, int length) {
         return (alignment == VERTICAL) ? length : THICKNESS;
+    }
+
+
+    public void setButtons(Button[] buttons) {
+        this.buttons = buttons;
+        if (buttons != null) {
+            Arrays.stream(buttons).forEach(button -> button.setUnpressedColor(color));
+        }
     }
 
     public void checkOpen() {

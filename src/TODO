@@ -28,9 +28,11 @@ boss
 
 
 INCREASE FLEXIBILITY
+general interfaces and component classes holding important information
+tracking component?
 
 NEW CLASS IDEAS //BELA ARAMAK
-opponent class: icicles, mortar, monster
+opponent class: monster
 
 OBJECT INITIALIZATION //HAMALLIK
 add stages

@@ -67,6 +67,10 @@ public class Blueprint {
         return new Door(worldIndex, xNum, yNum, alignment);
     }
 
+    public Door mutateToDoor(char alignment, int length) {
+        return new Door(worldIndex, xNum, yNum, alignment, length);
+    }
+
     public Sign mutateToSign(String[] messages) {
         return new Sign(worldIndex, xNum, yNum, messages);
     }
