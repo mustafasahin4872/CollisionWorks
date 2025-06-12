@@ -1,6 +1,7 @@
 package helperobjects;
 
 import mapobjects.framework.Blueprint;
+import mapobjects.framework.MapObject;
 import mapobjects.initialized.*;
 
 import java.io.File;
@@ -14,7 +15,13 @@ public class MapMaker {
     private final File mapFile;
     private final int xTile, yTile;
 
+    private final MapObject[][][] layers;
+    private final Tile[][] tileLayer;
+    private final MapObject[][] mapObjectLayer;
+    private final Coin[][] coinLayer;
+
     private final Tile[] tiles;
+
     private final Set<Button> buttons = new HashSet<>();
     private final Set<Chest> chests = new HashSet<>();
     private final Set<Door> doors = new HashSet<>();
@@ -95,6 +102,10 @@ points can have the indicator B for big displays, special to the selection scree
         this.xTile = xTile;
         this.yTile = yTile;
         tiles = new Tile[xTile*yTile];
+        tileLayer = new Tile[yTile][xTile];
+        mapObjectLayer = new MapObject[yTile][xTile];
+        coinLayer = new Coin[yTile][xTile];
+        layers = new MapObject[][][]{tileLayer, mapObjectLayer, coinLayer};
         mapFile = new File(("misc/maps/%d%d.txt").formatted(worldIndex, levelIndex));
     }
 
@@ -175,6 +186,10 @@ points can have the indicator B for big displays, special to the selection scree
         for (int y = 1; y <= yTile; y++) {
             for (int x = 1; x <= xTile; x++) {
 
+                Tile initializedTile = null;
+                MapObject initializedMapObject = null;
+                Coin initializedCoin = null;
+
                 boolean isApproachable = approachability[y - 1][x - 1];
                 String tileCode = mapData[y - 1][x - 1];
                 Tile tile;
@@ -187,10 +202,9 @@ points can have the indicator B for big displays, special to the selection scree
                     char char1 = tileCode.charAt(1), char2 = tileCode.charAt(2);
                     tile = blueprint.mutateToTile(char0, isApproachable);
 
+                    initializeCoin(char1, blueprint);
+
                     switch (char1) {
-                        case 'o' -> coins.add(blueprint.mutateToSingleCoin());
-                        case '*' -> coins.add(blueprint.mutateToTripleCoin());
-                        case '$' -> coins.add(blueprint.mutateToCoinBag());
                         case '@' -> mines.add(blueprint.mutateToMine());
                         case '%' -> mortars.add(blueprint.mutateToMortar(tiles, xTile));
                         case ':' -> {
@@ -221,11 +235,7 @@ points can have the indicator B for big displays, special to the selection scree
 
                     tile = blueprint.mutateToTile(onTileCode.charAt(0), isApproachable);
 
-                    switch (onTileCode.charAt(1)) {
-                        case 'o' -> coins.add(blueprint.mutateToSingleCoin());
-                        case '*' -> coins.add(blueprint.mutateToTripleCoin());
-                        case '$' -> coins.add(blueprint.mutateToCoinBag());
-                    }
+                    initializeCoin(onTileCode.charAt(1), blueprint);
 
                     switch (char0) {
                         case 'C' -> {
@@ -264,11 +274,23 @@ points can have the indicator B for big displays, special to the selection scree
                 }
 
                 tiles[(y - 1) * xTile + (x - 1)] = tile;
+                tileLayer[y-1][x-1] = initializedTile;
+                mapObjectLayer[y-1][x-1] = initializedMapObject;
+                coinLayer[y-1][x-1] = initializedCoin;
             }
         }
 
         wireDoorsToButtons(objectDetails, doorsToWire, buttonMap);
         setPrevToCheckPoints();
+    }
+
+
+    private void initializeCoin(char type, Blueprint blueprint) {
+        switch (type) {
+            case 'o' -> coins.add(blueprint.mutateToSingleCoin());
+            case '*' -> coins.add(blueprint.mutateToTripleCoin());
+            case '$' -> coins.add(blueprint.mutateToCoinBag());
+        }
     }
 
     private void setPrevToCheckPoints() {
