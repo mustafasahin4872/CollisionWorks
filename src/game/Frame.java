@@ -45,10 +45,11 @@ public class Frame {
             //takes input and sets moveDirection variables
             handleInput(player);
             //uses moveDirection to update velocities
-            player.update();
-
+            player.updateVelocity();
+            //checks for collisions with player and the on tile effects, also updates the map objects
             gameMap.mapObjectCalls();
-
+            //updates player position and other attributes at last
+            player.update();
 
             if (player.isPlayerDead()) {
                 player.die();

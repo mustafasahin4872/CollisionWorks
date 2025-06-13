@@ -58,7 +58,6 @@ public class Player {
     }
 
     public void update() {
-        updateVelocity();
 
         if (!isXCollided()) {
             setX(getX()+ getXVelocity() * Frame.DT);
