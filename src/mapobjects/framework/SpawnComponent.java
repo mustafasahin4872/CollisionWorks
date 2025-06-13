@@ -1,5 +1,6 @@
 package mapobjects.framework;
 
+import helperobjects.Blueprint;
 import mapobjects.initialized.Tile;
 
 import java.util.ArrayList;

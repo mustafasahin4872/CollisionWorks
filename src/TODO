@@ -1,10 +1,6 @@
 NEEDED AS FIRST
 
-new layer approach
-add specific call methods to tiles and other objects: door call should check for collisions
-add xCollided and yCollided to player as data field
 make player file more beautiful
-
 door coordinates need a shift, it should be corner aligned in one axis only
 
 design the shop, first design the crystal palace

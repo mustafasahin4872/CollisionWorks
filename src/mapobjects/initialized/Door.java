@@ -30,6 +30,7 @@ public class Door extends MapObject {
         super(worldIndex, xNum, yNum, getWidth(alignment, length), getHeight(alignment, length), true);
         this.alignment = alignment;
         this.doorFloor = (alignment == VERTICAL) ? coordinates[1] : coordinates[0];
+
     }
 
     private static double getWidth(char alignment, int length) {

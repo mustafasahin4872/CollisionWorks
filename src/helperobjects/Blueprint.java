@@ -1,9 +1,9 @@
-package mapobjects.framework;
+package helperobjects;
 
 import mapobjects.initialized.*;
 
 public class Blueprint {
-    protected final int worldIndex, xNum, yNum;
+    private final int worldIndex, xNum, yNum;
 
     public Blueprint(int worldIndex, int xNum, int yNum) {
         this.worldIndex = worldIndex;

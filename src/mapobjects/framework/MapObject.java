@@ -4,13 +4,14 @@ import lib.StdDraw;
 
 import static helperobjects.CollisionMethods.playerIsIn;
 
-public abstract class MapObject extends Blueprint {
+public abstract class MapObject {
 
     protected static final char VERTICAL = '|', HORIZONTAL = '—',
             RIGHT = '>', LEFT = '<', UP = '^', DOWN = 'v';
 
     protected final boolean cornerAligned;
     //if cornerAligned, the object's coordinates box's upper left corner is fixed in the upper left corner of the initializing box
+    protected final int worldIndex, xNum, yNum;
     protected String fileName; //null if object is not drawn with picture
     protected final double width, height, halfWidth, halfHeight; //in tiles
     protected final double[] centerCoordinates, coordinates, collisionBox; //in pixels
@@ -42,7 +43,9 @@ public abstract class MapObject extends Blueprint {
     }
 
     public MapObject(int worldIndex, int xNum, int yNum, double width, double height, String fileName, boolean cornerAligned) {
-        super(worldIndex, xNum, yNum);
+        this.worldIndex = worldIndex;
+        this.xNum = xNum;
+        this.yNum = yNum;
         this.width = width;
         this.height = height;
         halfWidth = width/2;
@@ -61,6 +64,10 @@ public abstract class MapObject extends Blueprint {
                 };
         collisionBox = new double[4];
         setCollisionBoxToCoordinates();
+    }
+
+    public int getWorldIndex() {
+        return worldIndex;
     }
 
     public void call(Player player) {

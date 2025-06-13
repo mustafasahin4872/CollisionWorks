@@ -1,9 +1,7 @@
 package helperobjects;
 
 import game.Player;
-import mapobjects.framework.Blueprint;
 import mapobjects.framework.MapObject;
-import mapobjects.framework.SpawnComponent;
 import mapobjects.initialized.*;
 
 import java.io.File;
@@ -13,7 +11,7 @@ import java.util.Map;
 
 public class MapMaker {
 
-    private final int worldIndex, levelIndex;
+    private final int worldIndex;
     private final File mapFile;
     private final int xTile, yTile;
     private final Player player;
@@ -22,13 +20,6 @@ public class MapMaker {
     private final Tile[][] tiles;
     private final MapObject[][] mapObjects;
     private final Coin[][] coins;
-
-    private Point.CheckPoint[] checkPoints = {new Point.SpawnPoint(0,0,0),
-                                              new Point.CheckPoint(0,0,0,1),
-                                              new Point.CheckPoint(0,0,0,2),
-                                              new Point.CheckPoint(0,0,0,3),
-                                              new Point.CheckPoint(0,0,0,4),
-                                              };
 
     private static final Set<String> IMPASSABLE_CODES = new HashSet<>(Set.of("XXX", "###", "%%%"));
     private static final Set<Character>
@@ -90,7 +81,6 @@ points can have the indicator B for big displays, special to the selection scree
 
     public MapMaker(int worldIndex, int levelIndex, int xTile, int yTile, Player player) {
         this.worldIndex = worldIndex;
-        this.levelIndex = levelIndex;
         this.xTile = xTile;
         this.yTile = yTile;
         this.player = player;
@@ -135,20 +125,27 @@ points can have the indicator B for big displays, special to the selection scree
         // hold the D37 codes here with their locations to later wire them to buttons
         Map<Door, Integer> doorsToWire = new HashMap<>();
         Map<String, Button> buttonMap = new HashMap<>();
+        Point.CheckPoint[] checkPoints = {new Point.SpawnPoint(0,0,0),
+                                          new Point.CheckPoint(0,0,0,1),
+                                          new Point.CheckPoint(0,0,0,2),
+                                          new Point.CheckPoint(0,0,0,3),
+                                          new Point.CheckPoint(0,0,0,4),
+                                          };
 
-        for (int y = 1; y <= yTile; y++) {
-            for (int x = 1; x <= xTile; x++) {
+        for (int y = 0; y < yTile; y++) {
+            for (int x = 0; x < xTile; x++) {
+
+                int xNum = x+1, yNum = y+1;
+                Blueprint blueprint = new Blueprint(worldIndex, xNum, yNum);
 
                 Tile initializedTile;
                 MapObject initializedMapObject;
                 Coin initializedCoin;
 
-                boolean isApproachable = approachability[y - 1][x - 1];
-                String tileCode = mapData[y - 1][x - 1];
+                boolean isApproachable = approachability[y][x];
+                String tileCode = mapData[y][x];
+
                 char char0 = tileCode.charAt(0);
-
-                Blueprint blueprint = new Blueprint(worldIndex, x, y);
-
                 if (BASIC_CHARACTERS.contains(char0)) { // quick codes
 
                     char char1 = tileCode.charAt(1), char2 = tileCode.charAt(2);
@@ -161,12 +158,12 @@ points can have the indicator B for big displays, special to the selection scree
                         case '%' -> blueprint.mutateToMortar(tiles, xTile);
                         case ':' -> {
                             Button button = blueprint.mutateToBigButton();
-                            buttonMap.put("%d:%d".formatted(x, y), button);
+                            buttonMap.put("%d:%d".formatted(xNum, yNum), button);
                             yield button;
                         }
                         case '.' -> {
                             Button button = blueprint.mutateToLittleButton();
-                            buttonMap.put("%d:%d".formatted(x, y), button);
+                            buttonMap.put("%d:%d".formatted(xNum, yNum), button);
                             yield button;
                         }
                         case '0' -> {
@@ -241,14 +238,14 @@ points can have the indicator B for big displays, special to the selection scree
                     };
                 }
 
-                tiles[y-1][x-1] = initializedTile;
-                mapObjects[y-1][x-1] = initializedMapObject;
-                coins[y-1][x-1] = initializedCoin;
+                tiles[y][x] = initializedTile;
+                mapObjects[y][x] = initializedMapObject;
+                coins[y][x] = initializedCoin;
             }
         }
 
         wireDoorsToButtons(objectDetails, doorsToWire, buttonMap);
-        setPrevToCheckPoints();
+        setPrevToCheckPoints(checkPoints);
     }
 
 
@@ -261,7 +258,7 @@ points can have the indicator B for big displays, special to the selection scree
         };
     }
 
-    private void setPrevToCheckPoints() {
+    private void setPrevToCheckPoints(Point.CheckPoint[] checkPoints) {
         for (int i = 0; i<5; i++) {
             Point.CheckPoint currentCheckPoint = checkPoints[i];
             if (i!=0) {
@@ -278,9 +275,6 @@ points can have the indicator B for big displays, special to the selection scree
         for (Map.Entry<Door, Integer> pair : doorsToWire.entrySet()) {
             Door door = pair.getKey();
             String[] items = objectDetails.get(pair.getValue()).split("; ");
-//items[0] is the tile on top, already initialized. items[1] is the type of door.
-//items[2] is the door coordinates as x1:y1, x2:y2, ... and if there exists, items[3] is the length of the door
-//careful! the button coordinates entered in txt file has starting index 1, while mapData has 0!
 
             //hold the buttons to wire to the door in here
             ArrayList<Button> buttonsToWire = new ArrayList<>();
@@ -290,15 +284,9 @@ points can have the indicator B for big displays, special to the selection scree
                 buttonsToWire.add(buttonMap.get(s));
             }
 
-            int l = 4; //length of door is 4 by default
-            if (items.length==4) {l = Integer.parseInt(items[3]);} //change length if specified
-
             door.setButtons(buttonsToWire.toArray(new Button[0]));
         }
     }
-
-
-
 
     //EXTRACT
 

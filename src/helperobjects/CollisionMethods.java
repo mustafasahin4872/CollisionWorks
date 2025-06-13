@@ -19,7 +19,6 @@ public class CollisionMethods {
                 isIn(x, y - halfSide, obstacle);
     }
 
-
     public static boolean isIn(double x, double y, double[] obstacle) {
         return ((x > obstacle[0]) && (x < obstacle[2]) && (y > obstacle[1]) && (y < obstacle[3]));
     }
@@ -29,35 +28,18 @@ public class CollisionMethods {
         return ((x > obstacle[0]) && (x < obstacle[2]) && (y > obstacle[1]) && (y < obstacle[3]));
     }
 
-
-    public static void xShiftBox(double delta, double[] box) {
-        shiftBoxCoordinate(delta, box, 0);
-        shiftBoxCoordinate(delta, box, 2);
-    }
-
-    public static void yShiftBox(double delta, double[] box) {
-        shiftBoxCoordinate(delta, box, 1);
-        shiftBoxCoordinate(delta, box, 3);
-    }
-
-    public static void shiftBoxCoordinate(double delta, double[] box, int index) {
-        box[index] += delta;
-    }
-
-
-
     //updates position and velocity if player collides to a wall
     public static void checkCollision(Player player, double[] coordinates) {
         // X-axis collision
         if (!player.isXCollided()) {
             if (player.getXVelocity() > 0) {
-                if (checkLineCollision(player, coordinates, Side.LEFT)) {
+                if (lineCollision(player, coordinates, Side.LEFT)) {
                     player.xCollide();
                     player.setX(coordinates[0] - player.getSide() / 2);
                     player.setXVelocity(0);
                 }
             } else if (player.getXVelocity() < 0) {
-                if (checkLineCollision(player, coordinates, Side.RIGHT)) {
+                if (lineCollision(player, coordinates, Side.RIGHT)) {
                     player.xCollide();
                     player.setX(coordinates[2] + player.getSide() / 2);
                     player.setXVelocity(0);
@@ -67,13 +49,13 @@ public class CollisionMethods {
         // Y-axis collision
         if (!player.isYCollided()) {
             if (player.getYVelocity() > 0) {
-                if (checkLineCollision(player, coordinates, Side.BOTTOM)) {
+                if (lineCollision(player, coordinates, Side.BOTTOM)) {
                     player.yCollide();
                     player.setY(coordinates[1] - player.getSide() / 2);
                     player.setYVelocity(0);
                 }
             } else if (player.getYVelocity() < 0) {
-                if (checkLineCollision(player, coordinates, Side.TOP)) {
+                if (lineCollision(player, coordinates, Side.TOP)) {
                     player.yCollide();
                     player.setY(coordinates[3] + player.getSide() / 2);
                     player.setYVelocity(0);
@@ -87,7 +69,7 @@ public class CollisionMethods {
     //COLLISIONS
 
     public enum Side {TOP, BOTTOM, RIGHT, LEFT}
-    private static boolean checkLineCollision(Player player, double[] obstacle, Side side) {
+    private static boolean lineCollision(Player player, double[] obstacle, Side side) {
         double x0 = obstacle[0], y0 = obstacle[1], x1 = obstacle[2], y1 = obstacle[3];
 
         double x = player.getX();
@@ -118,7 +100,6 @@ public class CollisionMethods {
     private static boolean xLineCollision(double x, double y, double nextY, double x0, double x1, double y0) {
         // Check if y0 is between y and nextY, or if both y and nextY are equal to y0
         if (y <= y0 && y0 <= nextY || y >= y0 && y0 >= nextY) {
-
             // Handle the case where the line is exactly horizontal (y == nextY == y0)
             if (y == nextY && y != y0) {
                 return false;
@@ -127,10 +108,10 @@ public class CollisionMethods {
         }
         return false;
     }
+
     private static boolean yLineCollision(double x, double y, double nextX, double y0, double y1, double x0) {
         // Check if x0 is between x and nextX, or if both x and nextX are equal to x0
         if (x <= x0 && x0 <= nextX || x >= x0 && x0 >= nextX) {
-
             // Handle the case where the line is exactly vertical (x == nextX == x0)
             if (x == nextX && x != x0) {
                 return false;
@@ -138,7 +119,20 @@ public class CollisionMethods {
             return y0<y && y<y1;
         }
         return false;
+    }
 
+    public static void xShiftBox(double delta, double[] box) {
+        shiftBoxCoordinate(delta, box, 0);
+        shiftBoxCoordinate(delta, box, 2);
+    }
+
+    public static void yShiftBox(double delta, double[] box) {
+        shiftBoxCoordinate(delta, box, 1);
+        shiftBoxCoordinate(delta, box, 3);
+    }
+
+    public static void shiftBoxCoordinate(double delta, double[] box, int index) {
+        box[index] += delta;
     }
 
 }
