@@ -17,9 +17,11 @@ public class RangeComponent {
         rangeBox[3] = coordinates[3] + range*TILE_SIDE;
     }
 
+
     public double[] getRangeBox() {
         return rangeBox;
     }
+
 
     public void xShiftRangeBox(double deltaX) {
         rangeBox[0] += deltaX;

@@ -66,24 +66,9 @@ public abstract class MapObject {
         setCollisionBoxToCoordinates();
     }
 
+
     public int getWorldIndex() {
         return worldIndex;
-    }
-
-    public void call(Player player) {
-        checkPlayerIsOn(player);
-    }
-
-    protected void checkPlayerIsOn(Player player) {
-        if (playerIsIn(player, collisionBox)) {
-            playerIsOn(player);
-        }
-    }
-
-    public abstract void playerIsOn(Player player);
-
-    public void draw() {
-        StdDraw.picture(centerCoordinates[0], centerCoordinates[1], fileName, width*TILE_SIDE, height*TILE_SIDE);
     }
 
     protected void setFileName(String fileName) {
@@ -112,6 +97,24 @@ public abstract class MapObject {
     protected void setCollisionBoxToCoordinates() {
         System.arraycopy(coordinates, 0, collisionBox, 0, 4);
     }
+
+
+    public void call(Player player) {
+        checkPlayerIsOn(player);
+    }
+
+    protected void checkPlayerIsOn(Player player) {
+        if (playerIsIn(player, collisionBox)) {
+            playerIsOn(player);
+        }
+    }
+
+    public abstract void playerIsOn(Player player);
+
+    public void draw() {
+        StdDraw.picture(centerCoordinates[0], centerCoordinates[1], fileName, width*TILE_SIDE, height*TILE_SIDE);
+    }
+
 
     //shift methods
     protected void shiftPosition(double deltaX, double deltaY) {

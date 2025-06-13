@@ -15,4 +15,5 @@ public interface Ranged {
             playerInRange(player);
         }
     }
+
 }

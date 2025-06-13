@@ -13,19 +13,11 @@ public abstract class Coin extends MapObject {
         this.value = value;
     }
 
-    public boolean isCollected() {
-        return collected;
-    }
 
     public int getValue() {
         return value;
     }
 
-    public void collect(Player player) {
-        if (collected) return;
-        player.collectCoin(value);
-        collected = true;
-    }
 
     @Override
     public void playerIsOn(Player player) {
@@ -37,6 +29,14 @@ public abstract class Coin extends MapObject {
         if (collected) return;
         super.draw();
     }
+
+
+    private void collect(Player player) {
+        if (collected) return;
+        player.collectCoin(value);
+        collected = true;
+    }
+
 
     public static class SingleCoin extends Coin {
         private static final double SIZE = 0.6;

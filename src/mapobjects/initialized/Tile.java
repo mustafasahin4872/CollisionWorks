@@ -2,7 +2,6 @@ package mapobjects.initialized;
 
 import game.Player;
 import mapobjects.framework.MapObject;
-
 import static helperobjects.CollisionMethods.*;
 
 public abstract class Tile extends MapObject {
@@ -16,10 +15,6 @@ public abstract class Tile extends MapObject {
         this.isSolid = isSolid;
     }
 
-    @Override
-    public void call(Player player) {
-        if (isIn(player, collisionBox)) {playerIsOn(player);}
-    }
 
     public boolean isSolid() {
         return isSolid;
@@ -35,9 +30,54 @@ public abstract class Tile extends MapObject {
         player.resetMaxSpeed();
     }
 
+
+    //check for player center instead of corners and sides
+    @Override
+    public void call(Player player) {
+        if (playerCenterIsIn(player, collisionBox)) {playerIsOn(player);}
+    }
+
     public abstract void playerIsOn(Player player);
 
+
+    public static class WallTile extends Tile {
+
+        public WallTile(int worldIndex, int xNum, int yNum, boolean isApproachable) {
+            super(worldIndex, xNum, yNum, isApproachable, true, "WallTile");
+        }
+
+        //check for collision instead of on tile effect
+        @Override
+        public void call(Player player) {
+            if (isApproachable()) checkPlayerLineCollision(player, collisionBox);
+        }
+
+        @Override
+        public void playerIsOn(Player player) {} // Impossible
+
+    }
+
+
+    public static class RiverTile extends Tile {
+
+        public RiverTile(int worldIndex, int xNum, int yNum, boolean isApproachable) {
+            super(worldIndex, xNum, yNum, isApproachable, true, "RiverTile");
+        }
+
+        //check for collision instead of on tile effect
+        @Override
+        public void call(Player player) {
+            if (isApproachable()) checkPlayerLineCollision(player, collisionBox);
+        }
+
+        @Override
+        public void playerIsOn(Player player) {} // Impossible
+
+    }
+
+
     public static class SpaceTile extends Tile {
+
         public SpaceTile(int worldIndex, int xNum, int yNum) {
             super(worldIndex, xNum, yNum, true, false, "SpaceTile");
         }
@@ -46,35 +86,9 @@ public abstract class Tile extends MapObject {
         public void playerIsOn(Player player) {
             resetPlayerStats(player);
         }
+
     }
 
-    public static class WallTile extends Tile {
-        public WallTile(int worldIndex, int xNum, int yNum, boolean isApproachable) {
-            super(worldIndex, xNum, yNum, isApproachable, true, "WallTile");
-        }
-
-        @Override
-        public void call(Player player) {
-            if (isApproachable()) checkCollision(player, collisionBox);
-        }
-
-        @Override
-        public void playerIsOn(Player player) {} // Impossible
-    }
-
-    public static class RiverTile extends Tile {
-        public RiverTile(int worldIndex, int xNum, int yNum, boolean isApproachable) {
-            super(worldIndex, xNum, yNum, isApproachable, true, "RiverTile");
-        }
-
-        @Override
-        public void call(Player player) {
-            if (isApproachable()) checkCollision(player, collisionBox);
-        }
-
-        @Override
-        public void playerIsOn(Player player) {} // Impossible
-    }
 
     public static class SlowTile extends Tile {
 
@@ -86,7 +100,9 @@ public abstract class Tile extends MapObject {
         public void playerIsOn(Player player) {
             player.slow();
         }
+
     }
+
 
     public static class SpecialTile extends Tile {
 
@@ -98,9 +114,12 @@ public abstract class Tile extends MapObject {
         public void playerIsOn(Player player) {
             player.slip();
         }
+
     }
 
+
     public static class DamageTile extends Tile {
+
         public DamageTile(int worldIndex, int xNum, int yNum) {
             super(worldIndex, xNum, yNum, true, false, "DamageTile");
         }
@@ -113,7 +132,9 @@ public abstract class Tile extends MapObject {
 
     }
 
+
     public static class HealTile extends Tile {
+
         public HealTile(int worldIndex, int xNum, int yNum) { // Golden yellow tile, draw a + in it
             super(worldIndex, xNum, yNum, true, false, "HealTile");
         }
@@ -123,5 +144,7 @@ public abstract class Tile extends MapObject {
             resetPlayerStats(player);
             player.heal(3.0 / worldIndex);
         }
+
     }
+
 }

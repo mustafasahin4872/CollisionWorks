@@ -7,7 +7,7 @@ import java.util.Arrays;
 
 import java.util.ArrayList;
 
-import static helperobjects.CollisionMethods.checkCollision;
+import static helperobjects.CollisionMethods.checkPlayerLineCollision;
 
 public class Mortar extends MapObject implements Ranged, Timed {
 
@@ -38,19 +38,6 @@ public class Mortar extends MapObject implements Ranged, Timed {
         Arrays.fill(mines, null);
     }
 
-    @Override
-    public void playerIsOn(Player player) {} //not possible
-
-    @Override
-    public void call(Player player) {
-        checkCollision(player, collisionBox);
-        updateTimer();
-        if (isComplete()) return; //in cooldown
-        if (isActive()) {
-            for (Mine mine : mines) {mine.call(player);} //call all mines
-            if (areMinesComplete()) {timeIsUp(player);} //start cooldown
-        } else {checkPlayerInRange(player);}
-    }
 
     private boolean isActive() {
         return timer.isActive();
@@ -65,19 +52,28 @@ public class Mortar extends MapObject implements Ranged, Timed {
         return timer.isCompleted();
     }
 
+
+    @Override
+    public void playerIsOn(Player player) {} //not possible
+
+    @Override
+    public void call(Player player) {
+
+        checkPlayerLineCollision(player, collisionBox);
+        updateTimer();
+        if (isComplete()) return; //in cooldown
+        if (isActive()) {
+            for (Mine mine : mines) {mine.call(player);} //call all mines
+            if (areMinesComplete()) {timeIsUp(player);} //start cooldown
+        } else {checkPlayerInRange(player);}
+
+    }
+
     @Override
     public void draw() {
         super.draw();
         for (Mine mine : mines) {
             if (mine!=null) mine.draw();
-        }
-    }
-
-    private void renewMines() {
-        int[][] coordinates = getValidCoordinates(mineNum);
-        for (int i = 0; i<mineNum; i++) {
-            int[] coordinate = coordinates[i];
-            mines[i] = new Mine(worldIndex, coordinate[0], coordinate[1]);
         }
     }
 
@@ -106,6 +102,15 @@ public class Mortar extends MapObject implements Ranged, Timed {
     @Override
     public void timeIsUp(Player player) {
         timer.startCooldown();
+    }
+
+
+    private void renewMines() {
+        int[][] coordinates = getValidCoordinates(mineNum);
+        for (int i = 0; i<mineNum; i++) {
+            int[] coordinate = coordinates[i];
+            mines[i] = new Mine(worldIndex, coordinate[0], coordinate[1]);
+        }
     }
 
     //returns n unique coordinate pair, checks for not being impassable as well

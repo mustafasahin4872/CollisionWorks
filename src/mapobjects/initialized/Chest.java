@@ -23,9 +23,17 @@ public abstract class Chest extends MapObject {
         });
     }
 
+
     public int getCoinNum() {
         return coinNum;
     }
+
+
+    @Override
+    public void playerIsOn(Player player) {
+        openChest(player);
+    }
+
 
     public void openChest(Player player) {
         if (isOpen) return;
@@ -35,10 +43,6 @@ public abstract class Chest extends MapObject {
         player.collectCoin(coinNum);
     }
 
-    @Override
-    public void playerIsOn(Player player) {
-        openChest(player);
-    }
 
     public static class WoodenChest extends Chest {
         private static final String TYPE = "WoodenChest";
@@ -69,4 +73,5 @@ public abstract class Chest extends MapObject {
             super(worldIndex, xNum, yNum, TYPE, buff, BUFF_TIME, COIN_NUM);
         }
     }
+
 }

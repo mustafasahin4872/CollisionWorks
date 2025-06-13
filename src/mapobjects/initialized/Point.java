@@ -4,6 +4,8 @@ import game.Player;
 import lib.StdDraw;
 import mapobjects.framework.MapObject;
 
+import static helperobjects.CollisionMethods.playerCenterIsIn;
+
 public abstract class Point extends MapObject {
 
     protected final int index;
@@ -71,7 +73,10 @@ public abstract class Point extends MapObject {
         @Override
         public void call(Player player) {
             if (visited) return;
-            checkPlayerIsOn(player);
+            if (playerCenterIsIn(player, collisionBox)) {
+                playerIsOn(player);
+            }
+            ERROR_SIGN.call(player);
         }
 
         @Override
@@ -81,7 +86,7 @@ public abstract class Point extends MapObject {
             if (index == lastCheckPointIndex + 1) {
                 markVisited(player);
             } else if (index > lastCheckPointIndex) {
-                ERROR_SIGN.playerIsOn(player);
+                ERROR_SIGN.setDisplay();
             }
         }
 
@@ -89,7 +94,7 @@ public abstract class Point extends MapObject {
             visited = true;
             setFileName("misc/checkPointImages/0.png");
             if (prev != null) prev.setFileName("misc/checkPointImages/-1.png");
-            player.updateLastCheckPoint();
+            player.updateLastCheckPointIndex();
             player.setSpawnPoint(centerCoordinates);
         }
 

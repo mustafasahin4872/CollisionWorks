@@ -8,7 +8,7 @@ import game.Player;
 import game.Frame;
 import mapobjects.framework.MapObject;
 
-import static helperobjects.CollisionMethods.checkCollision;
+import static helperobjects.CollisionMethods.checkPlayerLineCollision;
 import static helperobjects.DrawMethods.drawRectangle;
 
 public class Door extends MapObject {
@@ -51,7 +51,7 @@ public class Door extends MapObject {
 
     @Override
     public void call(Player player) {
-        checkCollision(player, collisionBox);
+        checkPlayerLineCollision(player, collisionBox);
         checkOpen();
     }
 

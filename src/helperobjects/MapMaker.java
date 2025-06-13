@@ -9,6 +9,7 @@ import java.io.FileNotFoundException;
 import java.util.*;
 import java.util.Map;
 
+//creates all the map objects from map file
 public class MapMaker {
 
     private final int worldIndex;
@@ -74,7 +75,6 @@ doors and signs cannot be initialized this way, chests initialized cant have buf
 2) ABC where B is the object type, C is one property of that object
 chests can have 1 buff, doors have alignment indicator,
 points can have the indicator B for big displays, special to the selection screen
-
 */
 
     //CONSTRUCTOR
@@ -97,6 +97,7 @@ points can have the indicator B for big displays, special to the selection scree
         return layers;
     }
 
+
     //MAIN METHOD
 
     public void mapMaker() {
@@ -113,7 +114,7 @@ points can have the indicator B for big displays, special to the selection scree
         // initialize all objects parsing through mapData and objectDetails
         initializeObjects(mapData, approachability, objectDetails);
 
-        // all objects are ready to be processed. use getters to access them
+        // all objects are ready to be processed, stored in layers
     }
 
 
@@ -150,10 +151,9 @@ points can have the indicator B for big displays, special to the selection scree
                 if (BASIC_CHARACTERS.contains(char0)) { // quick codes
 
                     char char1 = tileCode.charAt(1), char2 = tileCode.charAt(2);
+
                     initializedTile = blueprint.mutateToTile(char0, isApproachable);
-
                     initializedCoin = initializeCoin(char1, blueprint);
-
                     initializedMapObject = switch (char1) {
                         case '@' -> blueprint.mutateToMine();
                         case '%' -> blueprint.mutateToMortar(tiles, xTile);
@@ -186,18 +186,13 @@ points can have the indicator B for big displays, special to the selection scree
                     };
 
                 } else { // A37 initializer, coins on top too
-
                     int lineIndex = Integer.parseInt(tileCode.substring(1, 3)) - 37;
                     String[] details = objectDetails.get(lineIndex).split("; ");
-
                     String onTileCode = details[0];
 
                     initializedTile = blueprint.mutateToTile(onTileCode.charAt(0), isApproachable);
-
                     initializedCoin = initializeCoin(onTileCode.charAt(1), blueprint);
-
                     initializedMapObject = switch (char0) {
-
                         case 'C' -> {
                             String[] buffs = details[2].split(", ");
                             yield switch (details[1].charAt(0)) {
@@ -238,13 +233,11 @@ points can have the indicator B for big displays, special to the selection scree
                         }
                     };
                 }
-
                 tiles[y][x] = initializedTile;
                 mapObjects[y][x] = initializedMapObject;
                 coins[y][x] = initializedCoin;
             }
         }
-
         wireDoorsToButtons(objectDetails, doorsToWire, buttonMap);
         setPrevToCheckPoints(checkPointsToSetPrev);
     }
@@ -259,6 +252,9 @@ points can have the indicator B for big displays, special to the selection scree
         };
     }
 
+
+    //LAST WIRING METHODS
+
     private void setPrevToCheckPoints(Point.CheckPoint[] checkPoints) {
         for (int i = 0; i<5; i++) {
             Point.CheckPoint currentCheckPoint = checkPoints[i];
@@ -266,6 +262,7 @@ points can have the indicator B for big displays, special to the selection scree
                 currentCheckPoint.setPrev(checkPoints[i-1]);
             } else {
                 player.setSpawnPoint(currentCheckPoint.getCenterCoordinates());
+                player.resetLastCheckPointIndex();
                 player.respawn();
             }
         }
@@ -288,6 +285,7 @@ points can have the indicator B for big displays, special to the selection scree
             door.setButtons(buttonsToWire.toArray(new Button[0]));
         }
     }
+
 
     //EXTRACT
 

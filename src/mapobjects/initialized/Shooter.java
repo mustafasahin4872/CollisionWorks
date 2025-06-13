@@ -5,7 +5,7 @@ import mapobjects.framework.MapObject;
 
 import java.util.ArrayList;
 
-import static helperobjects.CollisionMethods.checkCollision;
+import static helperobjects.CollisionMethods.checkPlayerLineCollision;
 
 //can move?
 public class Shooter extends MapObject {
@@ -31,7 +31,7 @@ public class Shooter extends MapObject {
 
     @Override
     public void call(Player player) {
-        checkCollision(player, collisionBox);
+        checkPlayerLineCollision(player, collisionBox);
         shoot();
         for (Projectile projectile : projectiles) {
             projectile.call(player);

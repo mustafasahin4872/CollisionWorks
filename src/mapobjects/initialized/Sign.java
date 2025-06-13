@@ -7,6 +7,7 @@ import java.awt.*;
 import game.Frame;
 import mapobjects.framework.MapObject;
 
+import static helperobjects.CollisionMethods.playerCenterIsIn;
 import static helperobjects.DrawMethods.*;
 
 public class Sign extends MapObject {
@@ -35,6 +36,7 @@ public class Sign extends MapObject {
         this.displayHalfHeight = dimensions[1];
     }
 
+
     private static double[] calculateDimensions(String[] messages) {
         int maxLength = 0;
         for (String message : messages) {
@@ -47,19 +49,41 @@ public class Sign extends MapObject {
         return new double[]{halfWidth, halfHeight};
     }
 
+    public void setDisplay() {
+        displayMessage = true;
+    }
+
+
+    @Override
+    public void call(Player player) {
+        if (playerCenterIsIn(player, collisionBox)) {
+            playerIsOn(player);
+        }
+        if (displayMessage) {
+            updateDisplayCoordinates();
+        }
+    }
+
     @Override
     public void draw() {
         if (displaySign) {
             super.draw();
         }
         if (displayMessage) {
-            display();
+
+            StdDraw.setPenColor(COLOR);
+            drawRectangle(displayCoordinates);
+            StdDraw.setPenColor(StdDraw.BLACK);
+            drawRectangleOutline(displayCoordinates);
+            StdDraw.setFont(FONT);
+
+            double baseHeight = DISPLAY_CENTER[1] - displayHalfHeight + SPACE_ON_SIDE + CHAR_HEIGHT / 2;
+            for (int i = 0; i < messages.length; i++) {
+                StdDraw.text(DISPLAY_CENTER[0], baseHeight + i * CHAR_HEIGHT, messages[i]);
+            }
+
             displayMessage = false;
         }
-    }
-
-    public void setDisplay() {
-        displayMessage = true;
     }
 
     @Override
@@ -67,19 +91,6 @@ public class Sign extends MapObject {
         setDisplay();
     }
 
-    private void display() {
-        updateDisplayCoordinates();
-        StdDraw.setPenColor(COLOR);
-        drawRectangle(displayCoordinates);
-        StdDraw.setPenColor(StdDraw.BLACK);
-        drawRectangleOutline(displayCoordinates);
-        StdDraw.setFont(FONT);
-
-        double baseHeight = DISPLAY_CENTER[1] - displayHalfHeight + SPACE_ON_SIDE + CHAR_HEIGHT / 2;
-        for (int i = 0; i < messages.length; i++) {
-            StdDraw.text(DISPLAY_CENTER[0], baseHeight + i * CHAR_HEIGHT, messages[i]);
-        }
-    }
 
     public static void updateDisplayCenter(double frameX, double frameY) {
         DISPLAY_CENTER[0] = frameX;

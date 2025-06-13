@@ -6,40 +6,20 @@ import game.Player;
 //static methods for collisions
 public class CollisionMethods {
 
-    public static boolean playerIsIn(Player player, double[] obstacle) {
-        double halfSide = player.getSide()/2;
-        double x = player.getX(), y = player.getY();
-        return isIn(x + halfSide, y + halfSide, obstacle) ||
-                isIn(x + halfSide, y - halfSide, obstacle) ||
-                isIn(x - halfSide, y + halfSide, obstacle) ||
-                isIn(x - halfSide, y - halfSide, obstacle) ||
-                isIn(x + halfSide, y, obstacle) ||
-                isIn(x - halfSide, y, obstacle) ||
-                isIn(x, y + halfSide, obstacle) ||
-                isIn(x, y - halfSide, obstacle);
-    }
-
-    public static boolean isIn(double x, double y, double[] obstacle) {
-        return ((x > obstacle[0]) && (x < obstacle[2]) && (y > obstacle[1]) && (y < obstacle[3]));
-    }
-
-    public static boolean isIn(Player player, double[] obstacle) {
-        double x = player.getX(), y = player.getY();
-        return ((x > obstacle[0]) && (x < obstacle[2]) && (y > obstacle[1]) && (y < obstacle[3]));
-    }
+    //LINE COLLISION METHODS
 
     //updates position and velocity if player collides to a wall
-    public static void checkCollision(Player player, double[] coordinates) {
+    public static void checkPlayerLineCollision(Player player, double[] coordinates) {
         // X-axis collision
         if (!player.isXCollided()) {
             if (player.getXVelocity() > 0) {
-                if (lineCollision(player, coordinates, Side.LEFT)) {
+                if (playerLineCollision(player, coordinates, Side.LEFT)) {
                     player.xCollide();
                     player.setX(coordinates[0] - player.getSide() / 2);
                     player.setXVelocity(0);
                 }
             } else if (player.getXVelocity() < 0) {
-                if (lineCollision(player, coordinates, Side.RIGHT)) {
+                if (playerLineCollision(player, coordinates, Side.RIGHT)) {
                     player.xCollide();
                     player.setX(coordinates[2] + player.getSide() / 2);
                     player.setXVelocity(0);
@@ -49,13 +29,13 @@ public class CollisionMethods {
         // Y-axis collision
         if (!player.isYCollided()) {
             if (player.getYVelocity() > 0) {
-                if (lineCollision(player, coordinates, Side.BOTTOM)) {
+                if (playerLineCollision(player, coordinates, Side.BOTTOM)) {
                     player.yCollide();
                     player.setY(coordinates[1] - player.getSide() / 2);
                     player.setYVelocity(0);
                 }
             } else if (player.getYVelocity() < 0) {
-                if (lineCollision(player, coordinates, Side.TOP)) {
+                if (playerLineCollision(player, coordinates, Side.TOP)) {
                     player.yCollide();
                     player.setY(coordinates[3] + player.getSide() / 2);
                     player.setYVelocity(0);
@@ -64,12 +44,8 @@ public class CollisionMethods {
         }
     }
 
-
-    //----------------------------------------------------------------------------------------------
-    //COLLISIONS
-
-    public enum Side {TOP, BOTTOM, RIGHT, LEFT}
-    private static boolean lineCollision(Player player, double[] obstacle, Side side) {
+    private enum Side {TOP, BOTTOM, RIGHT, LEFT}
+    private static boolean playerLineCollision(Player player, double[] obstacle, Side side) {
         double x0 = obstacle[0], y0 = obstacle[1], x1 = obstacle[2], y1 = obstacle[3];
 
         double x = player.getX();
@@ -120,6 +96,34 @@ public class CollisionMethods {
         }
         return false;
     }
+
+
+    //IS IN METHODS
+
+    public static boolean playerIsIn(Player player, double[] obstacle) {
+        double halfSide = player.getSide()/2;
+        double x = player.getX(), y = player.getY();
+        return isIn(x + halfSide, y + halfSide, obstacle) ||
+                isIn(x + halfSide, y - halfSide, obstacle) ||
+                isIn(x - halfSide, y + halfSide, obstacle) ||
+                isIn(x - halfSide, y - halfSide, obstacle) ||
+                isIn(x + halfSide, y, obstacle) ||
+                isIn(x - halfSide, y, obstacle) ||
+                isIn(x, y + halfSide, obstacle) ||
+                isIn(x, y - halfSide, obstacle);
+    }
+
+    public static boolean playerCenterIsIn(Player player, double[] obstacle) {
+        double x = player.getX(), y = player.getY();
+        return ((x > obstacle[0]) && (x < obstacle[2]) && (y > obstacle[1]) && (y < obstacle[3]));
+    }
+
+    public static boolean isIn(double x, double y, double[] obstacle) {
+        return ((x > obstacle[0]) && (x < obstacle[2]) && (y > obstacle[1]) && (y < obstacle[3]));
+    }
+
+
+    //SHIFT METHODS
 
     public static void xShiftBox(double delta, double[] box) {
         shiftBoxCoordinate(delta, box, 0);

@@ -16,6 +16,27 @@ public class TimeComponent {
         recurring = !(cooldown == -1);
     }
 
+
+    public boolean isCompleted() {
+        return completed;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+
+    public void tick() {
+        long timePassed = System.currentTimeMillis() - startTime;
+        if (active && !completed && timePassed >= period) {
+            if (recurring) {startCooldown();}
+            else {complete();}
+        } else if (recurring && completed && timePassed >= cooldown) {
+            finishCooldown();
+        }
+    }
+
+
     public void activate() {
         active = true;
         completed = false;
@@ -37,13 +58,6 @@ public class TimeComponent {
         active = false;
     }
 
-    public boolean isCompleted() {
-        return completed;
-    }
-
-    public boolean isActive() {
-        return active;
-    }
 
     public double progressRatio() {
         if (!active) {
@@ -53,16 +67,6 @@ public class TimeComponent {
         } else {
             double timePassed = System.currentTimeMillis() - startTime;
             return timePassed/period;
-        }
-    }
-
-    public void tick() {
-        long timePassed = System.currentTimeMillis() - startTime;
-        if (active && !completed && timePassed >= period) {
-            if (recurring) {startCooldown();}
-            else {complete();}
-        } else if (recurring && completed && timePassed >= cooldown) {
-            finishCooldown();
         }
     }
 

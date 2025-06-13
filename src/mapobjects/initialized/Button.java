@@ -19,6 +19,7 @@ public abstract class Button extends MapObject {
         super(worldIndex, xNum, yNum, width, height, cornerAligned);
     }
 
+
     public boolean isPressed() {
         return pressed;
     }
@@ -32,6 +33,12 @@ public abstract class Button extends MapObject {
         color = PRESSED_COLOR;
     }
 
+
+    @Override
+    public void playerIsOn(Player player) {
+        press();
+    }
+
     @Override
     public void draw() {
         StdDraw.setPenColor(color);
@@ -40,10 +47,6 @@ public abstract class Button extends MapObject {
         drawRectangleOutline(coordinates);
     }
 
-    @Override
-    public void playerIsOn(Player player) {
-        press();
-    }
 
     public static class LittleButton extends Button {
         public LittleButton(int worldIndex, int xNum, int yNum) {

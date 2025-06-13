@@ -1,5 +1,10 @@
 NEEDED AS FIRST
-make player class more beautiful
+
+add a done data field to map objects, which can be set to true, and if so, that object will become null in layers
+
+when approaching from right, the doors are not drawn as they are not in frame
+(their x and y nums are taken in consideration)
+
 fix the selection's world index gimmick, change the 13-14 indexed levels, make them make sense
 add signal handling: next, shop, selection, death...
 generalize mud and special tile to the 4 worlds

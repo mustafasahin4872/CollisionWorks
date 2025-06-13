@@ -3,6 +3,7 @@ package helperobjects;
 import mapobjects.initialized.*;
 
 public class Blueprint {
+
     private final int worldIndex, xNum, yNum;
 
     public Blueprint(int worldIndex, int xNum, int yNum) {
@@ -10,6 +11,7 @@ public class Blueprint {
         this.xNum = xNum;
         this.yNum = yNum;
     }
+
 
     public Coin.SingleCoin mutateToSingleCoin() {
         return new Coin.SingleCoin(worldIndex, xNum, yNum);
@@ -90,4 +92,5 @@ public class Blueprint {
             }
         };
     }
+
 }

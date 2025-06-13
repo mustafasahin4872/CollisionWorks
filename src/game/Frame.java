@@ -42,7 +42,7 @@ public class Frame {
         while (player.getPassCode() == Player.PASSCODE.ZERO) {
             long startTime = System.currentTimeMillis();
 
-            //takes input and sets moveDirection variables
+            //takes input and sets regarding player data fields
             handleInput(player);
             //uses moveDirection to update velocities
             player.updateVelocity();
@@ -50,11 +50,8 @@ public class Frame {
             gameMap.mapObjectCalls();
             //updates player position and other attributes at last
             player.update();
-
-            if (player.isPlayerDead()) {
-                player.die();
-                //add a death animation?
-            }
+            //checks if player died, and calls corresponding methods for the situation
+            player.checkPlayerDied();
 
             //sets the frame to center player if it is not in the edges of gameMap
             //if the frame would get out of the gameMap, set frame to show up to edge

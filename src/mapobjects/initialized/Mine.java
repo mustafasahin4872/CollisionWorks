@@ -21,6 +21,7 @@ public class Mine extends MapObject implements Ranged, Timed {
         damage = worldIndex* DEFAULT_DAMAGE;
     }
 
+
     public boolean isActive() {
         return timer.isActive();
     }
@@ -29,10 +30,6 @@ public class Mine extends MapObject implements Ranged, Timed {
         return timer.isCompleted();
     }
 
-    @Override
-    public double[] getRangeBox() {
-        return rangeComponent.getRangeBox();
-    }
 
     @Override
     public void call(Player player) {
@@ -46,6 +43,11 @@ public class Mine extends MapObject implements Ranged, Timed {
     @Override
     public void playerIsOn(Player player) {
         player.damage(damage);
+    }
+
+    @Override
+    public double[] getRangeBox() {
+        return rangeComponent.getRangeBox();
     }
 
     @Override

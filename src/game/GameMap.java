@@ -14,7 +14,6 @@ public class GameMap {
     private final double width, height; //default 3200x1800
     private final int xTile, yTile; //default 64x34
 
-    private static final int RANGE = 15; //the tiles to be included in calculations
     private int[] tileRange;
 
     //all the elements in map is rectangular. The format of each rectangular region coordinates is
@@ -87,7 +86,7 @@ public class GameMap {
                 for (int x = tileRange[0]; x <= tileRange[2]; x++) {
                     MapObject mapObject = layer[y - 1][x - 1];
                     if (mapObject != null) {
-                        action.accept(mapObject); // 💅 do the thing
+                        action.accept(mapObject);
                     }
                 }
             }
@@ -105,32 +104,34 @@ public class GameMap {
     //--------------------------------------------------------------------------------------------------
 
     public void setFrameTileRange() {
+        //normally ranges should be 9 and 6, but for guarantee, set them higher
+        final int X_RANGE = 12, Y_RANGE = 10;
+
         int xNum = (int) (player.getX() / MapObject.TILE_SIDE);
         int yNum = (int) (player.getY() / MapObject.TILE_SIDE);
 
-        int minX = xNum - RANGE;
-        int maxX = xNum + RANGE;
+        int minX = xNum - X_RANGE;
+        int maxX = xNum + X_RANGE + 1;
 
         if (minX<1) {
             minX = 1;
-            maxX = Math.min(minX + RANGE * 2, xTile);
+            maxX = Math.min(minX + X_RANGE * 2, xTile);
 
-        } else if (maxX> xTile) {
+        } else if (maxX > xTile) {
             maxX = xTile;
-            minX = Math.max(maxX - RANGE * 2, 1);
-
+            minX = Math.max(maxX - X_RANGE * 2, 1);
         }
 
-        int minY = yNum - RANGE;
-        int maxY = yNum + RANGE;
+        int minY = yNum - Y_RANGE;
+        int maxY = yNum + Y_RANGE + 1;
 
         if (minY<1) {
             minY = 1;
-            maxY = Math.min(minY + RANGE * 2, yTile);
+            maxY = Math.min(minY + Y_RANGE * 2, yTile);
         }
         else if (maxY > yTile) {
             maxY = yTile;
-            minY = Math.max(maxY - RANGE *2, 1);
+            minY = Math.max(maxY - Y_RANGE *2, 1);
         }
 
         tileRange = new int[]{minX, minY, maxX, maxY};

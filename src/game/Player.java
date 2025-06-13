@@ -26,7 +26,7 @@ public class Player {
     private int lives = 3;
     private static final double MAX_HP = 200;
     private double hitPoints = MAX_HP;
-    private int lastCheckPoint;
+    private int lastCheckPointIndex;
 
     private char onTileType = ' ';
 
@@ -38,6 +38,7 @@ public class Player {
     //fast, small, immune, magnetic, eagle eye
 
     private Accessory[] accessories;
+
 
     //CONSTRUCTORS
 
@@ -57,6 +58,9 @@ public class Player {
         respawn();
     }
 
+
+    //UPDATES
+
     public void update() {
 
         if (!isXCollided()) {
@@ -65,70 +69,13 @@ public class Player {
         if (!isYCollided()) {
             setY(getY() + getYVelocity() * Frame.DT);
         }
-        resetXCollided();
-        resetYCollided();
+        xCollided = false;
+        yCollided = false;
 
         for (Accessory accessory : accessories) {
             accessory.setCoordinates();
         }
     }
-
-    //GENERAL GETTERS AND SETTERS
-
-    public String getName() {
-        return name;
-    }
-
-    public char getOnTileType() {
-        return onTileType;
-    }
-
-    public void setOnTileType(char onTileType) {
-        this.onTileType = onTileType;
-    }
-
-    public void setAccessories(Accessory[] accessories) {
-        this.accessories = accessories;
-        for (Accessory accessory : accessories) {
-            accessory.resize(defaultSide/50);
-        }
-    }
-
-    public long getPlayerTime() {
-        return playerTime;
-    }
-
-    public void setPlayerTime() {
-        playerTime = System.currentTimeMillis();
-    }
-
-    //COLLISION
-
-    public void resetXCollided() {
-        xCollided = false;
-    }
-
-    public void resetYCollided() {
-        yCollided = false;
-    }
-
-    public void xCollide() {
-        xCollided = true;
-    }
-
-    public void yCollide() {
-        yCollided = true;
-    }
-
-    public boolean isXCollided() {
-        return xCollided;
-    }
-
-    public boolean isYCollided() {
-        return yCollided;
-    }
-
-    //MOVEMENTS
 
     public void updateVelocity() {
 
@@ -184,16 +131,68 @@ public class Player {
 
     }
 
+
+    //GETTERS, SETTERS, RESETTERS
+
+    //NAME
+
+    public String getName() {
+        return name;
+    }
+
+
+    //ON TILE TYPE
+
+    public char getOnTileType() {
+        return onTileType;
+    }
+
+    public void setOnTileType(char onTileType) {
+        this.onTileType = onTileType;
+    }
+
+
+    //ACCESSORY
+
+    public void setAccessories(Accessory[] accessories) {
+        this.accessories = accessories;
+        for (Accessory accessory : accessories) {
+            accessory.resize(defaultSide/50);
+        }
+    }
+
+
+    //COLLISION
+
+    public void xCollide() {
+        xCollided = true;
+    }
+
+    public void yCollide() {
+        yCollided = true;
+    }
+
+    public boolean isXCollided() {
+        return xCollided;
+    }
+
+    public boolean isYCollided() {
+        return yCollided;
+    }
+
+
+    //MOVEMENTS
+
     public void slip() {
-        acceleration = A1;
-        deceleration = A1;
-        maxSpeed = MAX_SPEED3;
+        setAcceleration(A1);
+        setDeceleration(A1);
+        setMaxSpeed(MAX_SPEED3);
     }
 
     public void slow() {
-        acceleration = A1;
-        deceleration = A3;
-        maxSpeed = MAX_SPEED1;
+        setAcceleration(A1);
+        setDeceleration(A3);
+        setMaxSpeed(MAX_SPEED1);
     }
 
     public double getX() {
@@ -228,10 +227,6 @@ public class Player {
         this.yVelocity = yVelocity;
     }
 
-    public double getMaxSpeed() {
-        return maxSpeed;
-    }
-
     public void setMaxSpeed(double maxSpeed) {
         this.maxSpeed = maxSpeed;
     }
@@ -240,20 +235,12 @@ public class Player {
         maxSpeed = MAX_SPEED2;
     }
 
-    public double getDeceleration() {
-        return deceleration;
-    }
-
     public void setDeceleration(double deceleration) {
         this.deceleration = deceleration;
     }
 
     public void resetDeceleration() {
         deceleration = A2;
-    }
-
-    public double getAcceleration() {
-        return acceleration;
     }
 
     public void setAcceleration(double acceleration) {
@@ -280,6 +267,7 @@ public class Player {
         this.yDirection = yDirection;
     }
 
+
     //SIZE
 
     public double getSide() {
@@ -298,7 +286,8 @@ public class Player {
         side = defaultSide;
     }
 
-    //HP
+
+    //LIVES AND HP
 
     public void heal(double healAmount) {
         if (hitPoints + healAmount > MAX_HP) {
@@ -316,8 +305,8 @@ public class Player {
         }
     }
 
-    public boolean isPlayerDead() {
-        return hitPoints == 0;
+    public void checkPlayerDied() {
+        if (hitPoints == 0) die();
     }
 
     public void respawn() {
@@ -339,13 +328,10 @@ public class Player {
         respawn();
     }
 
-    public void addLives(int n) {
-        lives+=n;
-    }
-
     public void addLife() {
         lives++;
     }
+
 
     //BUFFS
 
@@ -383,36 +369,43 @@ public class Player {
         }
     }
 
+    public long getPlayerTime() {
+        return playerTime;
+    }
+
+    public void setPlayerTime() {
+        playerTime = System.currentTimeMillis();
+    }
+
+
+    //COIN
+
     public void collectCoin(int n) {
         coinsCollected += n;
     }
 
 
-    //CHECKPOINT AND SPAWNPOINT
+    //CHECKPOINT AND SPAWN POINT
 
     public double[] getSpawnPoint() {
         return new double[]{spawnX, spawnY};
     }
 
     public void setSpawnPoint(double[] spawnPoint) {
-        setSpawnX(spawnPoint[0]);
-        setSpawnY(spawnPoint[1]);
+        spawnX = spawnPoint[0];
+        spawnY = spawnPoint[1];
     }
 
-    public void setSpawnX(double spawnX) {
-        this.spawnX = spawnX;
-    }
-
-    public void setSpawnY(double spawnY) {
-        this.spawnY = spawnY;
-    }
-
-    public void updateLastCheckPoint() {
-        lastCheckPoint++;
+    public void updateLastCheckPointIndex() {
+        lastCheckPointIndex++;
     }
 
     public int getLastCheckPointIndex() {
-        return lastCheckPoint;
+        return lastCheckPointIndex;
+    }
+
+    public void resetLastCheckPointIndex() {
+        lastCheckPointIndex = 0;
     }
 
 
@@ -430,7 +423,8 @@ public class Player {
         passCode = PASSCODE.ZERO;
     }
 
-    //DRAW
+
+    //DRAW METHODS
 
     public void draw() {
 
