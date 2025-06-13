@@ -3,12 +3,12 @@ package mapobjects.framework;
 import static mapobjects.framework.MapObject.TILE_SIDE;
 
 //contains a rangeBox
-public class RangeComponent {
+public class RangeBox {
 
     protected final double range;
     protected final double[] rangeBox = new double[4];
 
-    public RangeComponent(MapObject mapObject, double range) {
+    public RangeBox(MapObject mapObject, double range) {
         this.range = range;
         double[] coordinates = mapObject.getCoordinates();
         rangeBox[0] = coordinates[0] - range*TILE_SIDE;

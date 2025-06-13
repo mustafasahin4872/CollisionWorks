@@ -25,13 +25,16 @@ public class GameMap {
     //private final int totalCoinOnMap;
 
     //------------------------------------------------------------------------------------------------------------
-    //CONSTRUCTOR
 
     public GameMap(int worldIndex, int levelIndex, Player player) {
         this(worldIndex, levelIndex, 64, 36, player);
     }
 
     public GameMap(int worldIndex, int levelIndex, int xTile, int yTile, Player player) {
+        this(worldIndex, levelIndex, xTile, yTile, player, false);
+    }
+
+    public GameMap(int worldIndex, int levelIndex, int xTile, int yTile, Player player, boolean isSelectionMap) {
         this.worldIndex = worldIndex;
         this.levelIndex = levelIndex;
         this.xTile = xTile;
@@ -41,7 +44,7 @@ public class GameMap {
         width = xTile*Tile.HALF_SIDE*2;
         height = yTile*Tile.HALF_SIDE*2;
 
-        MapMaker mapMaker = new MapMaker(worldIndex, levelIndex, xTile, yTile, player);
+        MapMaker mapMaker = new MapMaker(worldIndex, levelIndex, xTile, yTile, player, isSelectionMap);
         mapMaker.mapMaker();
         layers = mapMaker.getLayers();
 
@@ -49,7 +52,6 @@ public class GameMap {
     }
 
     //------------------------------------------------------------------------------------------------------------
-    //GETTERS AND SETTERS
 
     public int getWorldIndex() {
         return worldIndex;
@@ -73,32 +75,37 @@ public class GameMap {
 
     //------------------------------------------------------------------------------------------------------------
 
-    public void mapObjectCalls() {
-
-        iterateCurrentFrameObjects(mapObject -> mapObject.call(player));
-
-
-    }
-
-    private void iterateCurrentFrameObjects(Consumer<MapObject> action) {
+    public void callMapObjects() {
         for (MapObject[][] layer : layers) {
             for (int y = tileRange[1]; y <= tileRange[3]; y++) {
                 for (int x = tileRange[0]; x <= tileRange[2]; x++) {
-                    MapObject mapObject = layer[y - 1][x - 1];
+                    MapObject mapObject = layer[y-1][x-1];
                     if (mapObject != null) {
-                        action.accept(mapObject);
+                        mapObject.call(player);
+                        if (mapObject.isExpired()) {
+                            layer[y-1][x-1] = null;
+                        }
                     }
                 }
             }
         }
     }
 
-
-    //---------------------------------------------------------------------------------------------
-    //DRAW
-
     public void draw() {
         iterateCurrentFrameObjects(MapObject::draw);
+    }
+
+    private void iterateCurrentFrameObjects(Consumer<MapObject> action) {
+        for (MapObject[][] layer : layers) {
+            for (int y = tileRange[1]; y <= tileRange[3]; y++) {
+                for (int x = tileRange[0]; x <= tileRange[2]; x++) {
+                    MapObject mapObject = layer[y-1][x-1];
+                    if (mapObject != null) {
+                        action.accept(mapObject);
+                    }
+                }
+            }
+        }
     }
 
     //--------------------------------------------------------------------------------------------------

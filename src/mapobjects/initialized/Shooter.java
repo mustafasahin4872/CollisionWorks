@@ -1,6 +1,9 @@
 package mapobjects.initialized;
 
 import game.Player;
+import mapobjects.framework.Collidable;
+import mapobjects.framework.CollisionBox;
+import mapobjects.framework.Effector;
 import mapobjects.framework.MapObject;
 
 import java.util.ArrayList;
@@ -8,8 +11,9 @@ import java.util.ArrayList;
 import static helperobjects.CollisionMethods.checkPlayerLineCollision;
 
 //can move?
-public class Shooter extends MapObject {
+public class Shooter extends MapObject implements Collidable {
 
+    private final CollisionBox collisionBox;
     private final char alignment, direction;
     private final ArrayList<Projectile> projectiles = new ArrayList<>();
     private static final double DEFAULT_PERIOD = 12000; //in milliseconds
@@ -27,11 +31,18 @@ public class Shooter extends MapObject {
         this.xTile = xTile;
         period = DEFAULT_PERIOD/worldIndex;
         startTime = System.currentTimeMillis();
+        collisionBox = new CollisionBox(this);
+    }
+
+
+    @Override
+    public double[] getCollisionBox() {
+        return collisionBox.getCollisionBox();
     }
 
     @Override
     public void call(Player player) {
-        checkPlayerLineCollision(player, collisionBox);
+        checkCollision(player);
         shoot();
         for (Projectile projectile : projectiles) {
             projectile.call(player);
@@ -50,8 +61,5 @@ public class Shooter extends MapObject {
             shotProjectilesNumber++;
         }
     }
-
-    @Override
-    public void playerIsOn(Player player) {} //impossible
 
 }

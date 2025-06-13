@@ -4,10 +4,11 @@ import game.Player;
 import lib.StdDraw;
 import mapobjects.framework.*;
 
-public class Mine extends MapObject implements Ranged, Timed {
+public class Mine extends MapObject implements Effector, Ranged, Timed {
 
-    private final RangeComponent rangeComponent;
-    private final TimeComponent timer;
+    private final RangeBox rangeBox;
+    private final EffectBox effectBox;
+    private final Timer timer;
 
     private static final double RANGE = 2; //in tiles
     private static final double DEFAULT_DAMAGE = 30;
@@ -16,8 +17,9 @@ public class Mine extends MapObject implements Ranged, Timed {
 
     public Mine(int worldIndex, int xNum, int yNum) {
         super(worldIndex, xNum, yNum);
-        rangeComponent = new RangeComponent(this, RANGE);
-        timer = new TimeComponent(DEFAULT_PERIOD / worldIndex, -1);
+        rangeBox = new RangeBox(this, RANGE);
+        effectBox = new EffectBox(this);
+        timer = new Timer(DEFAULT_PERIOD / worldIndex, -1);
         damage = worldIndex* DEFAULT_DAMAGE;
     }
 
@@ -30,10 +32,14 @@ public class Mine extends MapObject implements Ranged, Timed {
         return timer.isCompleted();
     }
 
+    @Override
+    public double[] getEffectBox() {
+        return effectBox.getEffectBox();
+    }
+
 
     @Override
     public void call(Player player) {
-        if (isComplete()) return; //no need to search if complete
         updateTimer(); //update timer (might set complete)
         if (!isActive() && !isComplete()) {checkPlayerInRange(player);} //trigger the timer
         if (isComplete()) {timeIsUp(player);} //if set complete, call time is up effect
@@ -47,7 +53,7 @@ public class Mine extends MapObject implements Ranged, Timed {
 
     @Override
     public double[] getRangeBox() {
-        return rangeComponent.getRangeBox();
+        return rangeBox.getRangeBox();
     }
 
     @Override
@@ -68,6 +74,7 @@ public class Mine extends MapObject implements Ranged, Timed {
     @Override
     public void timeIsUp(Player player) {
         checkPlayerIsOn(player);
+        expire();
     }
 
     @Override

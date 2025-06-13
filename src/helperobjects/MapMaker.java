@@ -16,6 +16,7 @@ public class MapMaker {
     private final File mapFile;
     private final int xTile, yTile;
     private final Player player;
+    private final boolean isSelectionMap;
 
     private final MapObject[][][] layers;
     private final Tile[][] tiles;
@@ -80,15 +81,25 @@ points can have the indicator B for big displays, special to the selection scree
     //CONSTRUCTOR
 
     public MapMaker(int worldIndex, int levelIndex, int xTile, int yTile, Player player) {
+        this(worldIndex, levelIndex, xTile, yTile, player, false);
+    }
+
+    public MapMaker(int worldIndex, int levelIndex, int xTile, int yTile, Player player, boolean isSelectionMap) {
         this.worldIndex = worldIndex;
         this.xTile = xTile;
         this.yTile = yTile;
         this.player = player;
+        this.isSelectionMap = isSelectionMap;
         tiles = new Tile[yTile][xTile];
         mapObjects = new MapObject[yTile][xTile];
         coins = new Coin[yTile][xTile];
         layers = new MapObject[][][]{tiles, mapObjects, coins};
-        mapFile = new File(("misc/maps/%d%d.txt").formatted(worldIndex, levelIndex));
+        if (isSelectionMap) {
+            mapFile = new File(("misc/maps/selectionMaps/%d%d.txt").formatted(worldIndex, levelIndex));
+        } else {
+            mapFile = new File(("misc/maps/gameMaps/%d%d.txt").formatted(worldIndex, levelIndex));
+        }
+
     }
 
     //GETTERS

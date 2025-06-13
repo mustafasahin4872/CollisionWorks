@@ -9,10 +9,11 @@ import java.util.ArrayList;
 
 import static helperobjects.CollisionMethods.checkPlayerLineCollision;
 
-public class Mortar extends MapObject implements Ranged, Timed {
+public class Mortar extends MapObject implements Collidable, Ranged, Timed {
 
-    private final TimeComponent timer;
-    private final RangeComponent rangeComponent;
+    private final CollisionBox collisionBox;
+    private final Timer timer;
+    private final RangeBox rangeBox;
 
     private static final int RANGE = 4;
     private static final int BASE_MINE_NUM = 3;
@@ -32,8 +33,9 @@ public class Mortar extends MapObject implements Ranged, Timed {
         this.mineNum = mineNum;
         this.tiles = tiles;
         this.xTile = xTile;
-        rangeComponent = new RangeComponent(this, RANGE);
-        timer = new TimeComponent(PERIOD, DEFAULT_COOLDOWN/worldIndex);
+        collisionBox = new CollisionBox(this);
+        rangeBox = new RangeBox(this, RANGE);
+        timer = new Timer(PERIOD, DEFAULT_COOLDOWN/worldIndex);
         mines = new Mine[mineNum];
         Arrays.fill(mines, null);
     }
@@ -54,12 +56,9 @@ public class Mortar extends MapObject implements Ranged, Timed {
 
 
     @Override
-    public void playerIsOn(Player player) {} //not possible
-
-    @Override
     public void call(Player player) {
 
-        checkPlayerLineCollision(player, collisionBox);
+        checkCollision(player);
         updateTimer();
         if (isComplete()) return; //in cooldown
         if (isActive()) {
@@ -78,8 +77,13 @@ public class Mortar extends MapObject implements Ranged, Timed {
     }
 
     @Override
+    public double[] getCollisionBox() {
+        return collisionBox.getCollisionBox();
+    }
+
+    @Override
     public double[] getRangeBox() {
-        return rangeComponent.getRangeBox();
+        return rangeBox.getRangeBox();
     }
 
     @Override

@@ -2,13 +2,16 @@ package mapobjects.initialized;
 
 import game.Player;
 import lib.StdDraw;
+import mapobjects.framework.EffectBox;
+import mapobjects.framework.Effector;
 import mapobjects.framework.MapObject;
 
 import java.awt.*;
 import static helperobjects.DrawMethods.*;
 
-public abstract class Button extends MapObject {
+public abstract class Button extends MapObject implements Effector {
 
+    private final EffectBox effectBox;
     private boolean pressed;
     private Color unpressedColor = new Color(178, 23, 23); // Default color;
     private Color color = unpressedColor;
@@ -17,8 +20,12 @@ public abstract class Button extends MapObject {
 
     public Button(int worldIndex, int xNum, int yNum, double width, double height, boolean cornerAligned) {
         super(worldIndex, xNum, yNum, width, height, cornerAligned);
+        effectBox = new EffectBox(this);
     }
 
+    public double[] getEffectBox() {
+        return effectBox.getEffectBox();
+    }
 
     public boolean isPressed() {
         return pressed;
@@ -33,6 +40,11 @@ public abstract class Button extends MapObject {
         color = PRESSED_COLOR;
     }
 
+
+    @Override
+    public void call(Player player) {
+        checkPlayerIsOn(player);
+    }
 
     @Override
     public void playerIsOn(Player player) {

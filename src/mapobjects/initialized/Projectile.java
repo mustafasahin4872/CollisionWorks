@@ -3,10 +3,13 @@ package mapobjects.initialized;
 import game.Frame;
 import game.Player;
 import lib.StdDraw;
+import mapobjects.framework.EffectBox;
+import mapobjects.framework.Effector;
 import mapobjects.framework.MapObject;
 
-public class Projectile extends MapObject {
+public class Projectile extends MapObject implements Effector {
 
+    private final EffectBox effectBox;
     private boolean crashed;
     private final char direction;
     private static final double DEFAULT_SPEED = 1;
@@ -25,7 +28,11 @@ public class Projectile extends MapObject {
             speed = -1*DEFAULT_SPEED*worldIndex;
         }
         delta = speed* Frame.DT;
+        effectBox = new EffectBox(this);
     }
+
+
+    public void call(Player player) {}
 
     public void move() {
         if (direction == DOWN || direction == UP) {
@@ -49,6 +56,11 @@ public class Projectile extends MapObject {
         if (tiles[tileIndex] instanceof Tile.WallTile) {
             crashed = true;
         }
+    }
+
+    @Override
+    public double[] getEffectBox() {
+        return effectBox.getEffectBox();
     }
 
     @Override

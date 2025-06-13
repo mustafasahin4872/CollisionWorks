@@ -6,13 +6,17 @@ import java.util.Arrays;
 import lib.StdDraw;
 import game.Player;
 import game.Frame;
+import mapobjects.framework.Collidable;
+import mapobjects.framework.CollisionBox;
+import mapobjects.framework.Effector;
 import mapobjects.framework.MapObject;
 
 import static helperobjects.CollisionMethods.checkPlayerLineCollision;
 import static helperobjects.DrawMethods.drawRectangle;
 
-public class Door extends MapObject {
+public class Door extends MapObject implements Collidable {
 
+    private final CollisionBox collisionBox;
     private final char alignment;
     private Button[] buttons;
     private boolean isOpen;
@@ -30,7 +34,6 @@ public class Door extends MapObject {
     public Door(int worldIndex, int xNum, int yNum, char alignment, int length) {
         super(worldIndex, xNum, yNum, getWidth(alignment, length), getHeight(alignment, length), true);
         this.alignment = alignment;
-
         if (alignment == VERTICAL) {
             doorFloor = coordinates[1];
             xShiftPosition(SPACE_ON_SIDE*TILE_SIDE);
@@ -38,6 +41,7 @@ public class Door extends MapObject {
             doorFloor = coordinates[0];
             yShiftPosition(SPACE_ON_SIDE*TILE_SIDE);
         }
+        collisionBox = new CollisionBox(this);
 
     }
 
@@ -51,7 +55,7 @@ public class Door extends MapObject {
 
     @Override
     public void call(Player player) {
-        checkPlayerLineCollision(player, collisionBox);
+        checkCollision(player);
         checkOpen();
     }
 
@@ -77,7 +81,12 @@ public class Door extends MapObject {
     private void adjustCoordinate() {
         int index = (alignment == VERTICAL) ? 3 : 2;
         coordinates[index] = Math.max(coordinates[index] - DELTA, doorFloor);
-        collisionBox[index] = Math.max(collisionBox[index] - DELTA, doorFloor);
+        collisionBox.setCollisionIndex(index, Math.max(collisionBox.getCollisionIndex(index) - DELTA, doorFloor));
+    }
+
+    @Override
+    public double[] getCollisionBox() {
+        return collisionBox.getCollisionBox();
     }
 
     @Override
@@ -87,6 +96,4 @@ public class Door extends MapObject {
         drawRectangle(coordinates);
     }
 
-    @Override
-    public void playerIsOn(Player player) {} // not applicable
 }

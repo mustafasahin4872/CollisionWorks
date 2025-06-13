@@ -1,15 +1,18 @@
 package mapobjects.initialized;
 
 import game.Player;
+import mapobjects.framework.EffectBox;
+import mapobjects.framework.Effector;
 import mapobjects.framework.MapObject;
 
-public abstract class Coin extends MapObject {
+public abstract class Coin extends MapObject implements Effector {
 
-    private boolean collected;
+    private final EffectBox effectBox;
     private final int value;
 
     public Coin(int worldIndex, int xNum, int yNum, double size, int value, String fileName) {
         super(worldIndex, xNum, yNum, size, size, fileName);
+        effectBox = new EffectBox(this);
         this.value = value;
     }
 
@@ -18,23 +21,25 @@ public abstract class Coin extends MapObject {
         return value;
     }
 
+    @Override
+    public double[] getEffectBox() {
+        return effectBox.getEffectBox();
+    }
+
+
+    @Override
+    public void call(Player player) {
+        checkPlayerIsOn(player);
+    }
 
     @Override
     public void playerIsOn(Player player) {
         collect(player);
     }
 
-    @Override
-    public void draw() {
-        if (collected) return;
-        super.draw();
-    }
-
-
     private void collect(Player player) {
-        if (collected) return;
         player.collectCoin(value);
-        collected = true;
+        expire();
     }
 
 

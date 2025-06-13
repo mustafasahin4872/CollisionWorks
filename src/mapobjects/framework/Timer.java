@@ -3,14 +3,14 @@ package mapobjects.framework;
 //imitates a timer
 //when activated, starts ticking, after period is over,
 //gets deactivated and goes to cooldown if recurring.
-public class TimeComponent {
+public class Timer {
 
     protected boolean active, completed;
     protected long startTime;
     protected final boolean recurring;
     protected final double period, cooldown;
 
-    public TimeComponent(double period, double cooldown) {
+    public Timer(double period, double cooldown) {
         this.period = period;
         this.cooldown = cooldown;
         recurring = !(cooldown == -1);

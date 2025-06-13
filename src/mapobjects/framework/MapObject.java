@@ -9,12 +9,14 @@ public abstract class MapObject {
     protected static final char ZERO = '0', VERTICAL = '|', HORIZONTAL = '—',
             RIGHT = '>', LEFT = '<', UP = '^', DOWN = 'v';
 
-    protected final boolean cornerAligned;
-    //if cornerAligned, the object's coordinates box's upper left corner is fixed in the upper left corner of the initializing box
+
     protected final int worldIndex, xNum, yNum;
     protected String fileName; //null if object is not drawn with picture
+    protected final boolean cornerAligned; //if cornerAligned,
+    //the object's coordinates box's upper left corner is fixed in the upper left corner of the initializing box
+    protected boolean expired;
     protected final double width, height, halfWidth, halfHeight; //in tiles
-    protected final double[] centerCoordinates, coordinates, collisionBox; //in pixels
+    protected final double[] centerCoordinates, coordinates; //in pixels
     public static final double HALF_SIDE = 25, TILE_SIDE = HALF_SIDE*2; //one tile's dimensions
 
 
@@ -60,10 +62,8 @@ public abstract class MapObject {
         }
         coordinates = new double[]{
                 centerCoordinates[0]-halfWidth*TILE_SIDE, centerCoordinates[1]-halfHeight*TILE_SIDE,
-                centerCoordinates[0]+halfWidth*TILE_SIDE,centerCoordinates[1]+halfHeight*TILE_SIDE,
+                centerCoordinates[0]+halfWidth*TILE_SIDE, centerCoordinates[1]+halfHeight*TILE_SIDE,
                 };
-        collisionBox = new double[4];
-        setCollisionBoxToCoordinates();
     }
 
 
@@ -75,6 +75,14 @@ public abstract class MapObject {
         this.fileName = fileName;
     }
 
+    protected void expire() {
+        expired = true;
+    }
+
+    public boolean isExpired() {
+        return expired;
+    }
+
     public double[] getCenterCoordinates() {
         return centerCoordinates;
     }
@@ -83,37 +91,12 @@ public abstract class MapObject {
         return coordinates;
     }
 
-    public double[] getCollisionBox() {
-        return collisionBox;
-    }
-
-    protected void setCollisionBox(double[] collisionBox) {
-        this.collisionBox[0] = collisionBox[0];
-        this.collisionBox[1] = collisionBox[1];
-        this.collisionBox[2] = collisionBox[2];
-        this.collisionBox[3] = collisionBox[3];
-    }
-
-    protected void setCollisionBoxToCoordinates() {
-        System.arraycopy(coordinates, 0, collisionBox, 0, 4);
-    }
-
-
-    public void call(Player player) {
-        checkPlayerIsOn(player);
-    }
-
-    protected void checkPlayerIsOn(Player player) {
-        if (playerIsIn(player, collisionBox)) {
-            playerIsOn(player);
-        }
-    }
-
-    public abstract void playerIsOn(Player player);
 
     public void draw() {
         StdDraw.picture(centerCoordinates[0], centerCoordinates[1], fileName, width*TILE_SIDE, height*TILE_SIDE);
     }
+
+    public abstract void call(Player player);
 
 
     //shift methods
@@ -126,16 +109,12 @@ public abstract class MapObject {
         centerCoordinates[0] += deltaX;
         coordinates[0] += deltaX;
         coordinates[2] += deltaX;
-        collisionBox[0] += deltaX;
-        collisionBox[2] += deltaX;
     }
 
     protected void yShiftPosition(double deltaY) {
         centerCoordinates[1] += deltaY;
         coordinates[1] += deltaY;
         coordinates[3] += deltaY;
-        collisionBox[1] += deltaY;
-        collisionBox[3] += deltaY;
     }
 
 }

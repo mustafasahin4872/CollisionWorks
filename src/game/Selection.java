@@ -25,11 +25,11 @@ public class Selection {
 
     //the selection screens
     private static final GameMap[] WORLDS = {
-            new GameMap(1, 14, X_TILE, Y_TILE, new Player()),
-            new GameMap(1, 13, X_TILE, Y_TILE, new Player()),
-            new GameMap(2, 13, X_TILE, Y_TILE, new Player()),
-            new GameMap(3, 13, X_TILE, Y_TILE, new Player()),
-            new GameMap(4, 13, X_TILE, Y_TILE, new Player())
+            new GameMap(1, -1, X_TILE, Y_TILE, new Player(), true),
+            new GameMap(1, 0, X_TILE, Y_TILE, new Player(), true),
+            new GameMap(2, 0, X_TILE, Y_TILE, new Player(), true),
+            new GameMap(3, 0, X_TILE, Y_TILE, new Player(), true),
+            new GameMap(4, 0, X_TILE, Y_TILE, new Player(), true)
     };
 
     private static final Player[] SKINS = {

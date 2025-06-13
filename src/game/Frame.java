@@ -47,7 +47,7 @@ public class Frame {
             //uses moveDirection to update velocities
             player.updateVelocity();
             //checks for collisions with player and the on tile effects, also updates the map objects
-            gameMap.mapObjectCalls();
+            gameMap.callMapObjects();
             //updates player position and other attributes at last
             player.update();
             //checks if player died, and calls corresponding methods for the situation

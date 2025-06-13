@@ -1,10 +1,13 @@
 package mapobjects.initialized;
 
 import game.Player;
+import mapobjects.framework.EffectBox;
+import mapobjects.framework.Effector;
 import mapobjects.framework.MapObject;
 
-public abstract class Chest extends MapObject {
+public abstract class Chest extends MapObject implements Effector {
 
+    private final EffectBox effectBox;
     private boolean isOpen;
     private final String type;
     private final double buffTime;
@@ -17,7 +20,8 @@ public abstract class Chest extends MapObject {
         this.buffs = buffs;
         this.buffTime = buffTime;
         this.coinNum = coinNum;
-        setCollisionBox(new double[]{
+        effectBox = new EffectBox(this);
+        effectBox.setEffectBox(new double[]{
                 coordinates[0], (coordinates[1] + coordinates[3]) / 2,
                 coordinates[2], coordinates[3]
         });
@@ -28,6 +32,16 @@ public abstract class Chest extends MapObject {
         return coinNum;
     }
 
+    @Override
+    public double[] getEffectBox() {
+        return effectBox.getEffectBox();
+    }
+
+
+    @Override
+    public void call(Player player) {
+        checkPlayerIsOn(player);
+    }
 
     @Override
     public void playerIsOn(Player player) {

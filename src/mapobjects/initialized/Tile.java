@@ -1,7 +1,8 @@
 package mapobjects.initialized;
 
 import game.Player;
-import mapobjects.framework.MapObject;
+import mapobjects.framework.*;
+
 import static helperobjects.CollisionMethods.*;
 
 public abstract class Tile extends MapObject {
@@ -31,55 +32,77 @@ public abstract class Tile extends MapObject {
     }
 
 
-    //check for player center instead of corners and sides
-    @Override
-    public void call(Player player) {
-        if (playerCenterIsIn(player, collisionBox)) {playerIsOn(player);}
+    public static abstract class ImpassableTile extends Tile implements Collidable {
+
+        protected final CollisionBox collisionBox;
+        public ImpassableTile(int worldIndex, int xNum, int yNum, boolean isApproachable, String type) {
+            super(worldIndex, xNum, yNum, isApproachable, true, type);
+            collisionBox = new CollisionBox(this);
+        }
+
+        @Override
+        public double[] getCollisionBox() {
+            return collisionBox.getCollisionBox();
+        }
+
     }
 
-    public abstract void playerIsOn(Player player);
-
-
-    public static class WallTile extends Tile {
+    public static class WallTile extends ImpassableTile {
 
         public WallTile(int worldIndex, int xNum, int yNum, boolean isApproachable) {
-            super(worldIndex, xNum, yNum, isApproachable, true, "WallTile");
+            super(worldIndex, xNum, yNum, isApproachable, "WallTile");
         }
 
         //check for collision instead of on tile effect
         @Override
         public void call(Player player) {
-            if (isApproachable()) checkPlayerLineCollision(player, collisionBox);
+            if (isApproachable()) checkCollision(player);
         }
-
-        @Override
-        public void playerIsOn(Player player) {} // Impossible
 
     }
 
 
-    public static class RiverTile extends Tile {
+    public static class RiverTile extends ImpassableTile {
 
         public RiverTile(int worldIndex, int xNum, int yNum, boolean isApproachable) {
-            super(worldIndex, xNum, yNum, isApproachable, true, "RiverTile");
+            super(worldIndex, xNum, yNum, isApproachable, "RiverTile");
         }
 
         //check for collision instead of on tile effect
         @Override
         public void call(Player player) {
-            if (isApproachable()) checkPlayerLineCollision(player, collisionBox);
+            if (isApproachable()) checkCollision(player);
         }
-
-        @Override
-        public void playerIsOn(Player player) {} // Impossible
 
     }
 
 
-    public static class SpaceTile extends Tile {
+    public static abstract class PassableTile extends Tile implements Effector {
+
+        private EffectBox effectBox;
+        public PassableTile(int worldIndex, int xNum, int yNum, String type) {
+            super(worldIndex, xNum, yNum, true, false, type);
+            effectBox = new EffectBox(this);
+        }
+
+        @Override
+        public double[] getEffectBox() {
+            return effectBox.getEffectBox();
+        }
+
+    }
+
+
+    public static class SpaceTile extends PassableTile{
 
         public SpaceTile(int worldIndex, int xNum, int yNum) {
-            super(worldIndex, xNum, yNum, true, false, "SpaceTile");
+            super(worldIndex, xNum, yNum, "SpaceTile");
+        }
+
+        //check for player center instead of corners and sides
+        @Override
+        public void call(Player player) {
+            checkPlayerCenterIsOn(player);
         }
 
         @Override
@@ -90,10 +113,16 @@ public abstract class Tile extends MapObject {
     }
 
 
-    public static class SlowTile extends Tile {
+    public static class SlowTile extends PassableTile {
 
         public SlowTile(int worldIndex, int xNum, int yNum) {
-            super(worldIndex, xNum, yNum, true, false, "SlowTile"); // Earthy brown
+            super(worldIndex, xNum, yNum, "SlowTile"); // Earthy brown
+        }
+
+        //check for player center instead of corners and sides
+        @Override
+        public void call(Player player) {
+            checkPlayerCenterIsOn(player);
         }
 
         @Override
@@ -104,10 +133,16 @@ public abstract class Tile extends MapObject {
     }
 
 
-    public static class SpecialTile extends Tile {
+    public static class SpecialTile extends PassableTile {
 
         public SpecialTile(int worldIndex, int xNum, int yNum) {
-            super(worldIndex, xNum, yNum, true, false, "SpecialTile"); // Icy blue
+            super(worldIndex, xNum, yNum, "SpecialTile"); // Icy blue
+        }
+
+        //check for player center instead of corners and sides
+        @Override
+        public void call(Player player) {
+            checkPlayerCenterIsOn(player);
         }
 
         @Override
@@ -118,10 +153,16 @@ public abstract class Tile extends MapObject {
     }
 
 
-    public static class DamageTile extends Tile {
+    public static class DamageTile extends PassableTile {
 
         public DamageTile(int worldIndex, int xNum, int yNum) {
-            super(worldIndex, xNum, yNum, true, false, "DamageTile");
+            super(worldIndex, xNum, yNum, "DamageTile");
+        }
+
+        //check for player center instead of corners and sides
+        @Override
+        public void call(Player player) {
+            checkPlayerCenterIsOn(player);
         }
 
         @Override
@@ -133,10 +174,16 @@ public abstract class Tile extends MapObject {
     }
 
 
-    public static class HealTile extends Tile {
+    public static class HealTile extends PassableTile {
 
         public HealTile(int worldIndex, int xNum, int yNum) { // Golden yellow tile, draw a + in it
-            super(worldIndex, xNum, yNum, true, false, "HealTile");
+            super(worldIndex, xNum, yNum, "HealTile");
+        }
+
+        //check for player center instead of corners and sides
+        @Override
+        public void call(Player player) {
+            checkPlayerCenterIsOn(player);
         }
 
         @Override
