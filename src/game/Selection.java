@@ -193,13 +193,14 @@ public class Selection {
         currentWorld.draw();
         if (currentWorldIndex==0) {
             currentSkin.drawBig(2.5);
+            if (currentAccessory!=null) {
+                currentAccessory.setPlayer(currentSkin);
+                currentAccessory.drawBig(2.5);
+            }
             for (int i = 0; i<ACCESSORY_CHOSEN.length; i++) {
                 if (ACCESSORY_CHOSEN[i]) {
                     ACCESSORIES[i].drawBig(2.5);
                 }
-            }
-            if (currentAccessory!=null) {
-                currentAccessory.drawBig(2.5);
             }
         }
         StdDraw.setXscale(0, X_TILE);

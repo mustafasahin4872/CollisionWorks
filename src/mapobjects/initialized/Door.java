@@ -18,8 +18,9 @@ public class Door extends MapObject {
     private boolean isOpen;
     private final double doorFloor;
     private final Color color = new Color((int) (Math.random() * 255), 0, (int) (Math.random() * 255));
-    private static final double THICKNESS = 0.8, // in tiles
-            SPEED = 2, DELTA = SPEED * Frame.DT; // in pixels
+    private static final double
+            THICKNESS = 0.8, SPACE_ON_SIDE = (1-THICKNESS)/2, SPEED = 2,  // in tiles
+            DELTA = SPEED * Frame.DT; // in pixels
 
 
     public Door(int worldIndex, int xNum, int yNum, char alignment) {
@@ -29,7 +30,14 @@ public class Door extends MapObject {
     public Door(int worldIndex, int xNum, int yNum, char alignment, int length) {
         super(worldIndex, xNum, yNum, getWidth(alignment, length), getHeight(alignment, length), true);
         this.alignment = alignment;
-        this.doorFloor = (alignment == VERTICAL) ? coordinates[1] : coordinates[0];
+
+        if (alignment == VERTICAL) {
+            doorFloor = coordinates[1];
+            xShiftPosition(SPACE_ON_SIDE*TILE_SIDE);
+        } else {
+            doorFloor = coordinates[0];
+            yShiftPosition(SPACE_ON_SIDE*TILE_SIDE);
+        }
 
     }
 

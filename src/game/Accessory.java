@@ -2,7 +2,7 @@ package game;
 
 import lib.StdDraw;
 
-import mapobjects.initialized.Tile;
+import static mapobjects.framework.MapObject.TILE_SIDE;
 
 public abstract class Accessory {
 
@@ -55,7 +55,7 @@ public abstract class Accessory {
 
     public void drawBig(double multiplier) {
         resize(multiplier);
-        resize(player.getDefaultSide()/(Tile.HALF_SIDE*2));
+        resize(player.getDefaultSide()/(TILE_SIDE));
         player.resize(multiplier);
         setCoordinates();
         draw();

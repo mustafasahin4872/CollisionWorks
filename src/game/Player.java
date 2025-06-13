@@ -7,31 +7,37 @@ public class Player {
     public enum PASSCODE {
         ZERO, DEAD, NEXT, ALTERNATE1, ALTERNATE2, ALTERNATE3, SHOP
     }
-
     private PASSCODE passCode = PASSCODE.ZERO;
     private final String name, fileRoot;
+
     private final double defaultSide;
     private double side;
+
     private static final double
             MAX_SPEED1 = 10, MAX_SPEED2 = 20, MAX_SPEED3 = 40,
             A1 = 0.2, A2 = 0.4, A3 = 0.8;
+
     private double spawnX, spawnY, x, y, xVelocity, yVelocity,
             maxSpeed = MAX_SPEED2, acceleration = A2, deceleration = A2;
+
     private int xDirection, yDirection;
     private boolean xCollided, yCollided;
+
     private int lives = 3;
     private static final double MAX_HP = 200;
     private double hitPoints = MAX_HP;
-    private int coinsCollected = 0;
     private int lastCheckPoint;
+
+    private char onTileType = ' ';
+
+    private int coinsCollected = 0;
     private long playerTime;
     private final double[] effectTimer = new double[3];
-    private char onTileType = ' ';
-    private Accessory[] accessories;
 
     //there are 5 possible buffs, all are false at first and set true if buffed
     //fast, small, immune, magnetic, eagle eye
 
+    private Accessory[] accessories;
 
     //CONSTRUCTORS
 
@@ -42,14 +48,30 @@ public class Player {
     public Player(String name) {
         this.name = name;
         fileRoot = "misc/playerImages/" + name + "/";
-        x = spawnX;
-        y = spawnY;
         defaultSide = switch (name) {
             case "Bob", "Mike" -> 50;
             case "Zahit" -> 70;
             default -> 50;
         };
         side = defaultSide;
+        respawn();
+    }
+
+    public void update() {
+        updateVelocity();
+
+        if (!isXCollided()) {
+            setX(getX()+ getXVelocity() * Frame.DT);
+        }
+        if (!isYCollided()) {
+            setY(getY() + getYVelocity() * Frame.DT);
+        }
+        resetXCollided();
+        resetYCollided();
+
+        for (Accessory accessory : accessories) {
+            accessory.setCoordinates();
+        }
     }
 
     //GENERAL GETTERS AND SETTERS
@@ -437,7 +459,6 @@ public class Player {
 
         if (accessories == null) return;
         for (Accessory accessory : accessories) {
-            accessory.setCoordinates();
             accessory.draw();
         }
     }
@@ -467,7 +488,6 @@ public class Player {
 
         if (accessories == null) return;
         for (Accessory accessory : accessories) {
-            accessory.setCoordinates();
             accessory.drawBig(multiplier);
         }
     }
@@ -494,19 +514,15 @@ public class Player {
     }
 
     public void drawCoinAmount(double frameX, double frameY) {
-
         StdDraw.picture(frameX + Frame.X_SCALE/2.0 - 30, frameY - Frame.Y_SCALE/2.0 + 30, "misc/coinImages/coin.png", 40, 40);
         StdDraw.setFont(); StdDraw.setPenColor();
         StdDraw.text(frameX + Frame.X_SCALE/2.0 - 30, frameY - Frame.Y_SCALE/2.0 + 30, "%d".formatted(coinsCollected));
-
     }
 
     public void drawLifeAmount(double frameX, double frameY) {
-
         StdDraw.picture(frameX + Frame.X_SCALE/2.0 - 80, frameY - Frame.Y_SCALE/2.0 + 30, "misc/misc/heart.png", 40, 40);
         StdDraw.setFont(); StdDraw.setPenColor();
         StdDraw.text(frameX + Frame.X_SCALE/2.0 - 80, frameY - Frame.Y_SCALE/2.0 + 30, "%d".formatted(lives));
-
     }
 
 }

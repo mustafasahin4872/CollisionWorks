@@ -6,7 +6,7 @@ import static helperobjects.CollisionMethods.playerIsIn;
 
 public abstract class MapObject {
 
-    protected static final char VERTICAL = '|', HORIZONTAL = '—',
+    protected static final char ZERO = '0', VERTICAL = '|', HORIZONTAL = '—',
             RIGHT = '>', LEFT = '<', UP = '^', DOWN = 'v';
 
     protected final boolean cornerAligned;

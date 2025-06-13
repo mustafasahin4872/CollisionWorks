@@ -1,19 +1,14 @@
 NEEDED AS FIRST
-
-make player file more beautiful
-door coordinates need a shift, it should be corner aligned in one axis only
-
-design the shop, first design the crystal palace
+make player class more beautiful
 fix the selection's world index gimmick, change the 13-14 indexed levels, make them make sense
 add signal handling: next, shop, selection, death...
-add random rewards to the in between every x levels
-
-make the buff symbols, and add the buff mechanics.
 generalize mud and special tile to the 4 worlds
-
-add skin to test
+add random rewards to the in between every x levels
+design the shop, first design the crystal palace
+make the buff symbols, and add the buff mechanics.
+add more skins to test
 add skin with default size big and small to test
-accessories size and coordinate changes are needed!
+accessories default size and coordinate changes are needed!
 
 
 NEW MECHANICS, FUTURE IDEAS
@@ -33,6 +28,7 @@ tracking component?
 NEW CLASS IDEAS //BELA ARAMAK
 opponent class: monster
 
+
 OBJECT INITIALIZATION //HAMALLIK
 add stages
 world4
@@ -40,7 +36,7 @@ world4
 ADD NEW SKINS, WORLDS ETC-IMAGE CREATION //İNTERNETTEN GÖRSEL ÇARPMA
 mike
 sakura
-sherrif
+sheriff
 tie
 world 4
 

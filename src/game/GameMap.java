@@ -78,15 +78,6 @@ public class GameMap {
 
         iterateCurrentFrameObjects(mapObject -> mapObject.call(player));
 
-        if (!player.isXCollided()) {
-            player.setX(player.getX()+ player.getXVelocity() * Frame.DT);
-        }
-        if (!player.isYCollided()) {
-            player.setY(player.getY() + player.getYVelocity() * Frame.DT);
-        }
-
-        player.resetXCollided();
-        player.resetYCollided();
 
     }
 

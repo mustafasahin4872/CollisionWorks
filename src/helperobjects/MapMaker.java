@@ -125,12 +125,13 @@ points can have the indicator B for big displays, special to the selection scree
         // hold the D37 codes here with their locations to later wire them to buttons
         Map<Door, Integer> doorsToWire = new HashMap<>();
         Map<String, Button> buttonMap = new HashMap<>();
-        Point.CheckPoint[] checkPoints = {new Point.SpawnPoint(0,0,0),
-                                          new Point.CheckPoint(0,0,0,1),
-                                          new Point.CheckPoint(0,0,0,2),
-                                          new Point.CheckPoint(0,0,0,3),
-                                          new Point.CheckPoint(0,0,0,4),
-                                          };
+        Point.CheckPoint[] checkPointsToSetPrev = {
+                new Point.SpawnPoint(0,0,0),
+                new Point.CheckPoint(0,0,0,1),
+                new Point.CheckPoint(0,0,0,2),
+                new Point.CheckPoint(0,0,0,3),
+                new Point.CheckPoint(0,0,0,4),
+                };
 
         for (int y = 0; y < yTile; y++) {
             for (int x = 0; x < xTile; x++) {
@@ -168,12 +169,12 @@ points can have the indicator B for big displays, special to the selection scree
                         }
                         case '0' -> {
                             Point.SpawnPoint spawnPoint = blueprint.mutateToSpawnPoint(char2 == 'B');
-                            checkPoints[0] = spawnPoint;
+                            checkPointsToSetPrev[0] = spawnPoint;
                             yield spawnPoint;
                         }
                         case '1', '2', '3', '4' -> {
                             Point.CheckPoint checkPoint = blueprint.mutateToCheckPoint(char1 - '0', char2 == 'B');
-                            checkPoints[char1 - '0'] = checkPoint;
+                            checkPointsToSetPrev[char1 - '0'] = checkPoint;
                             yield checkPoint;
                         }
                         case '5', '6', '7', '8', '9' -> blueprint.mutateToWinPoint(char1 - '5', char2 == 'B');
@@ -245,7 +246,7 @@ points can have the indicator B for big displays, special to the selection scree
         }
 
         wireDoorsToButtons(objectDetails, doorsToWire, buttonMap);
-        setPrevToCheckPoints(checkPoints);
+        setPrevToCheckPoints(checkPointsToSetPrev);
     }
 
 
