@@ -46,7 +46,7 @@ public class Frame {
             handleInput(player);
             //uses moveDirection to update velocities
             player.updateVelocity();
-            //with the updated velocities, sets player's x and y coordinates
+
             gameMap.mapObjectCalls();
 
             if (player.isPlayerDead()) {

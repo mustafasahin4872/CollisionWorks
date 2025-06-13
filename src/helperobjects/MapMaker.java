@@ -172,7 +172,6 @@ points can have the indicator B for big displays, special to the selection scree
                         case '0' -> {
                             Point.SpawnPoint spawnPoint = blueprint.mutateToSpawnPoint(char2 == 'B');
                             checkPoints[0] = spawnPoint;
-                            player.setSpawnPoint(spawnPoint.getCenterCoordinates());
                             yield spawnPoint;
                         }
                         case '1', '2', '3', '4' -> {
@@ -267,6 +266,9 @@ points can have the indicator B for big displays, special to the selection scree
             Point.CheckPoint currentCheckPoint = checkPoints[i];
             if (i!=0) {
                 currentCheckPoint.setPrev(checkPoints[i-1]);
+            } else {
+                player.setSpawnPoint(currentCheckPoint.getCenterCoordinates());
+                player.respawn();
             }
         }
     }

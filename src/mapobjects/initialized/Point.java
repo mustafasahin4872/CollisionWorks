@@ -9,10 +9,6 @@ public abstract class Point extends MapObject {
     protected final int index;
     protected boolean isBig;
 
-    public Point(int worldIndex, int xNum, int yNum, int index, String type) {
-        this(worldIndex, xNum, yNum, index, type, false);
-    }
-
     public Point(int worldIndex, int xNum, int yNum, int index, String type, boolean isBig) {
         super(worldIndex, xNum, yNum, getSize(isBig), getSize(isBig), "misc/" + type + "Images/" + index + ".png", isBig);
         this.index = index;
@@ -73,10 +69,14 @@ public abstract class Point extends MapObject {
         }
 
         @Override
-        public void playerIsOn(Player player) {
+        public void call(Player player) {
             if (visited) return;
+            checkPlayerIsOn(player);
+        }
 
-            int lastCheckPointIndex = player.getLastCheckPoint();
+        @Override
+        public void playerIsOn(Player player) {
+            int lastCheckPointIndex = player.getLastCheckPointIndex();
 
             if (index == lastCheckPointIndex + 1) {
                 markVisited(player);
@@ -93,8 +93,10 @@ public abstract class Point extends MapObject {
             player.setSpawnPoint(centerCoordinates);
         }
 
-        public Sign getErrorSign() {
-            return ERROR_SIGN;
+        @Override
+        public void draw() {
+            super.draw();
+            ERROR_SIGN.draw();
         }
 
         public void setPrev(CheckPoint prev) {
@@ -113,6 +115,11 @@ public abstract class Point extends MapObject {
             super(worldIndex, xNum, yNum, 0, isBig);
             visited = true;
         }
+
+        @Override
+        public void call(Player player) {
+
+        } //no need to call
 
         @Override
         public void playerIsOn(Player player) {} //no action needed

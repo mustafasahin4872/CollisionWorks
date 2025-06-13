@@ -11,8 +11,9 @@ public abstract class Button extends MapObject {
 
     private boolean pressed;
     private Color unpressedColor = new Color(178, 23, 23); // Default color;
-    private final Color pressedColor = new Color(106, 192, 45);
-    private final Color frameColor = new Color(71, 21, 21);
+    private Color color = unpressedColor;
+    private static final Color PRESSED_COLOR = new Color(106, 192, 45),
+            FRAME_COLOR = new Color(71, 21, 21);
 
     public Button(int worldIndex, int xNum, int yNum, double width, double height, boolean cornerAligned) {
         super(worldIndex, xNum, yNum, width, height, cornerAligned);
@@ -27,14 +28,15 @@ public abstract class Button extends MapObject {
     }
 
     public void press() {
-        this.pressed = true;
+        pressed = true;
+        color = PRESSED_COLOR;
     }
 
     @Override
     public void draw() {
-        StdDraw.setPenColor(pressed ? pressedColor : unpressedColor);
+        StdDraw.setPenColor(color);
         drawRectangle(coordinates);
-        StdDraw.setPenColor(frameColor);
+        StdDraw.setPenColor(FRAME_COLOR);
         drawRectangleOutline(coordinates);
     }
 

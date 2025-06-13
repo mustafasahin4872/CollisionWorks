@@ -390,7 +390,7 @@ public class Player {
         lastCheckPoint++;
     }
 
-    public int getLastCheckPoint() {
+    public int getLastCheckPointIndex() {
         return lastCheckPoint;
     }
 

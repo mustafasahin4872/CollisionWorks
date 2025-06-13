@@ -28,7 +28,6 @@ public class GameMap {
     //------------------------------------------------------------------------------------------------------------
     //CONSTRUCTOR
 
-
     public GameMap(int worldIndex, int levelIndex, Player player) {
         this(worldIndex, levelIndex, 64, 36, player);
     }
@@ -74,8 +73,6 @@ public class GameMap {
     }
 
     //------------------------------------------------------------------------------------------------------------
-    //POSITION AND VELOCITY UPDATES
-
 
     public void mapObjectCalls() {
 
@@ -94,9 +91,9 @@ public class GameMap {
     }
 
     private void iterateCurrentFrameObjects(Consumer<MapObject> action) {
-        for (int y = tileRange[1]; y <= tileRange[3]; y++) {
-            for (int x = tileRange[0]; x <= tileRange[2]; x++) {
-                for (MapObject[][] layer : layers) {
+        for (MapObject[][] layer : layers) {
+            for (int y = tileRange[1]; y <= tileRange[3]; y++) {
+                for (int x = tileRange[0]; x <= tileRange[2]; x++) {
                     MapObject mapObject = layer[y - 1][x - 1];
                     if (mapObject != null) {
                         action.accept(mapObject); // 💅 do the thing

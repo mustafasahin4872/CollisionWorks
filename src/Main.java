@@ -37,7 +37,7 @@ public class Main {
 
     }
 
-    //creates Map and frameobjects.Frame objects by creating FrameObjects.Selection
+    //creates Map and game.Frame objects by creating game.Selection
     private static Frame createFrame() {
         //the level choosing screen
         Selection selection = new Selection();

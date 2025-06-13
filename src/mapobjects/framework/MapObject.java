@@ -76,7 +76,7 @@ public abstract class MapObject extends Blueprint {
     public abstract void playerIsOn(Player player);
 
     public void draw() {
-        StdDraw.picture(centerCoordinates[0], centerCoordinates[1], fileName, coordinates[2]-coordinates[0], coordinates[3]-coordinates[1]);
+        StdDraw.picture(centerCoordinates[0], centerCoordinates[1], fileName, width*TILE_SIDE, height*TILE_SIDE);
     }
 
     protected void setFileName(String fileName) {
