@@ -4,12 +4,12 @@ import game.Player;
 import lib.StdDraw;
 import mapobjects.framework.Box;
 import mapobjects.framework.OnEffector;
-import mapobjects.framework.MapObject;
+import mapobjects.framework.GridObject;
 
 import java.awt.*;
 import static helperobjects.DrawMethods.*;
 
-public abstract class Button extends MapObject implements OnEffector {
+public abstract class Button extends GridObject implements OnEffector {
 
     private final Box effectBox;
     private boolean pressed;

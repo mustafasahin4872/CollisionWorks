@@ -1,7 +1,7 @@
 package helperobjects;
 
 import game.Player;
-import mapobjects.framework.MapObject;
+import mapobjects.framework.GridObject;
 import mapobjects.initialized.*;
 
 import java.io.File;
@@ -18,9 +18,9 @@ public class MapMaker {
     private final Player player;
     private final boolean isSelectionMap;
 
-    private final MapObject[][][] layers;
+    private final GridObject[][][] layers;
     private final Tile[][] tiles;
-    private final MapObject[][] mapObjects;
+    private final GridObject[][] gridObjects;
     private final Coin[][] coins;
 
     private static final Set<String> IMPASSABLE_CODES = new HashSet<>(Set.of("XXX", "###", "%%%"));
@@ -91,9 +91,9 @@ points can have the indicator B for big displays, special to the selection scree
         this.player = player;
         this.isSelectionMap = isSelectionMap;
         tiles = new Tile[yTile][xTile];
-        mapObjects = new MapObject[yTile][xTile];
+        gridObjects = new GridObject[yTile][xTile];
         coins = new Coin[yTile][xTile];
-        layers = new MapObject[][][]{tiles, mapObjects, coins};
+        layers = new GridObject[][][]{tiles, gridObjects, coins};
         if (isSelectionMap) {
             mapFile = new File(("misc/maps/selectionMaps/%d%d.txt").formatted(worldIndex, levelIndex));
         } else {
@@ -104,7 +104,7 @@ points can have the indicator B for big displays, special to the selection scree
 
     //GETTERS
 
-    public MapObject[][][] getLayers() {
+    public GridObject[][][] getLayers() {
         return layers;
     }
 
@@ -152,7 +152,7 @@ points can have the indicator B for big displays, special to the selection scree
                 Blueprint blueprint = new Blueprint(worldIndex, xNum, yNum);
 
                 Tile initializedTile;
-                MapObject initializedMapObject;
+                GridObject initializedGridObject;
                 Coin initializedCoin;
 
                 boolean isApproachable = approachability[y][x];
@@ -165,7 +165,7 @@ points can have the indicator B for big displays, special to the selection scree
 
                     initializedTile = blueprint.mutateToTile(char0, isApproachable);
                     initializedCoin = initializeCoin(char1, blueprint);
-                    initializedMapObject = switch (char1) {
+                    initializedGridObject = switch (char1) {
                         case '@' -> blueprint.mutateToMine();
                         case '%' -> blueprint.mutateToMortar(tiles);
                         case ':' -> {
@@ -203,7 +203,7 @@ points can have the indicator B for big displays, special to the selection scree
 
                     initializedTile = blueprint.mutateToTile(onTileCode.charAt(0), isApproachable);
                     initializedCoin = initializeCoin(onTileCode.charAt(1), blueprint);
-                    initializedMapObject = switch (char0) {
+                    initializedGridObject = switch (char0) {
                         case 'C' -> {
                             String[] buffs = details[2].split(", ");
                             yield switch (details[1].charAt(0)) {
@@ -245,7 +245,7 @@ points can have the indicator B for big displays, special to the selection scree
                     };
                 }
                 tiles[y][x] = initializedTile;
-                mapObjects[y][x] = initializedMapObject;
+                gridObjects[y][x] = initializedGridObject;
                 coins[y][x] = initializedCoin;
             }
         }

@@ -6,12 +6,12 @@ import lib.StdDraw;
 import java.awt.*;
 import game.Frame;
 import mapobjects.framework.Box;
+import mapobjects.framework.GridObject;
 import mapobjects.framework.OnEffector;
-import mapobjects.framework.MapObject;
 
 import static helperobjects.DrawMethods.*;
 
-public class Sign extends MapObject implements OnEffector {
+public class Sign extends GridObject implements OnEffector {
 
     private final Box effectBox;
     private final String[] messages;

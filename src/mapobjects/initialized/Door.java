@@ -8,11 +8,11 @@ import game.Player;
 import game.Frame;
 import mapobjects.framework.Box;
 import mapobjects.framework.Collidable;
-import mapobjects.framework.MapObject;
+import mapobjects.framework.GridObject;
 
 import static helperobjects.DrawMethods.drawRectangle;
 
-public class Door extends MapObject implements Collidable {
+public class Door extends GridObject implements Collidable {
 
     private final Box collisionBox;
     private final char alignment;
@@ -83,8 +83,8 @@ public class Door extends MapObject implements Collidable {
     }
 
     @Override
-    public double[] getCollisionBox() {
-        return collisionBox.getBox();
+    public Box getCollisionBox() {
+        return collisionBox;
     }
 
     @Override

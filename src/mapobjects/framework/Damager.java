@@ -3,6 +3,7 @@ package mapobjects.framework;
 import game.Player;
 
 public class Damager {
+
     private final Player player;
     private double damage;
 

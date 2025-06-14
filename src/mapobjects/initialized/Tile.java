@@ -3,7 +3,7 @@ package mapobjects.initialized;
 import game.Player;
 import mapobjects.framework.*;
 
-public abstract class Tile extends MapObject {
+public abstract class Tile extends GridObject {
 
     private static final String ROOT = "misc/tileImages/";
     private final boolean isSolid, isApproachable;
@@ -39,8 +39,8 @@ public abstract class Tile extends MapObject {
         }
 
         @Override
-        public double[] getCollisionBox() {
-            return collisionBox.getBox();
+        public Box getCollisionBox() {
+            return collisionBox;
         }
 
     }

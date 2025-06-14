@@ -1,8 +1,13 @@
 package game;
 
 import lib.StdDraw;
+import mapobjects.framework.Box;
+import mapobjects.framework.MapObject;
+import mapobjects.framework.MovingCollidable;
 
-public class Player {
+public class Player extends MapObject implements MovingCollidable {
+
+    private final Box collisionBox;
 
     public enum PASSCODE {
         ZERO, DEAD, NEXT, ALTERNATE1, ALTERNATE2, ALTERNATE3, SHOP
@@ -17,7 +22,7 @@ public class Player {
             MAX_SPEED1 = 10, MAX_SPEED2 = 20, MAX_SPEED3 = 40,
             A1 = 0.2, A2 = 0.4, A3 = 0.8;
 
-    private double spawnX, spawnY, x, y, xVelocity, yVelocity,
+    private double spawnX, spawnY, xVelocity, yVelocity,
             maxSpeed = MAX_SPEED2, acceleration = A2, deceleration = A2;
 
     private int xDirection, yDirection;
@@ -54,8 +59,9 @@ public class Player {
             case "Zahit" -> 70;
             default -> 50;
         };
-        side = defaultSide;
+        setSide(defaultSide);
         respawn();
+        collisionBox = new Box(this);
     }
 
 
@@ -164,6 +170,11 @@ public class Player {
 
     //COLLISION
 
+    @Override
+    public Box getCollisionBox() {
+        return collisionBox;
+    }
+
     public void xCollide() {
         xCollided = true;
     }
@@ -193,22 +204,6 @@ public class Player {
         setAcceleration(A1);
         setDeceleration(A3);
         setMaxSpeed(MAX_SPEED1);
-    }
-
-    public double getX() {
-        return x;
-    }
-
-    public void setX(double x) {
-        this.x = x;
-    }
-
-    public double getY() {
-        return y;
-    }
-
-    public void setY(double y) {
-        this.y = y;
     }
 
     public double getXVelocity() {
@@ -270,6 +265,13 @@ public class Player {
 
     //SIZE
 
+
+    public void setSide(double side) {
+        this.side = side;
+        setWidth(side);
+        setHeight(side);
+    }
+
     public double getSide() {
         return side;
     }
@@ -310,8 +312,7 @@ public class Player {
     }
 
     public void respawn() {
-        x = spawnX;
-        y = spawnY;
+        setCenterCoordinates(spawnX, spawnY);
         xVelocity = 0;
         yVelocity = 0;
         acceleration = 0;
@@ -427,6 +428,7 @@ public class Player {
     //DRAW METHODS
 
     public void draw() {
+        double x = getX(), y = getY();
 
         if (xDirection == 1 && yDirection == -1) {
             StdDraw.picture(x, y, fileRoot+"UR.jpg", side, side);
@@ -457,7 +459,7 @@ public class Player {
     }
 
     public void drawBig(double multiplier) {
-
+        double x = getX(), y = getY();
         double sideResized = side*multiplier;
         if (xDirection == 1 && yDirection == 1) {
             StdDraw.picture(x, y, fileRoot+"UR.jpg", sideResized, sideResized);

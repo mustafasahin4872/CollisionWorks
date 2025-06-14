@@ -5,9 +5,9 @@ import game.Player;
 import lib.StdDraw;
 import mapobjects.framework.Box;
 import mapobjects.framework.OnEffector;
-import mapobjects.framework.MapObject;
+import mapobjects.framework.GridObject;
 
-public class Projectile extends MapObject implements OnEffector {
+public class Projectile extends GridObject implements OnEffector {
 
     private final Box effectBox;
     private boolean crashed;

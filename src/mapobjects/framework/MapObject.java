@@ -1,86 +1,60 @@
 package mapobjects.framework;
-import game.Player;
-import lib.StdDraw;
-
-import static helperobjects.CollisionMethods.playerIsIn;
 
 public abstract class MapObject {
 
-    protected static final char ZERO = '0', VERTICAL = '|', HORIZONTAL = '—',
-            RIGHT = '>', LEFT = '<', UP = '^', DOWN = 'v';
+    protected final double[] centerCoordinates = new double[2], coordinates = new double[4];
+    protected double width, height, halfWidth, halfHeight;
 
-
-    protected final int worldIndex, xNum, yNum;
-    protected String fileName; //null if object is not drawn with picture
-    protected final boolean cornerAligned; //if cornerAligned,
-    //the object's coordinates box's upper left corner is fixed in the upper left corner of the initializing box
-    protected boolean expired;
-    protected final double width, height, halfWidth, halfHeight; //in tiles
-    protected final double[] centerCoordinates, coordinates; //in pixels
-    public static final double HALF_SIDE = 25, TILE_SIDE = HALF_SIDE*2; //one tile's dimensions
-
-
-    public MapObject(int worldIndex, int xNum, int yNum) {
-        this(worldIndex, xNum, yNum, 1, 1, null, false);
+    //for setting everything up later
+    public MapObject() {
+        this(0, 0, 0, 0);
     }
 
-    public MapObject(int worldIndex, int xNum, int yNum, double width, double height) {
-        this(worldIndex, xNum, yNum, width, height, null, false);
-    }
-
-    public MapObject(int worldIndex, int xNum, int yNum, String fileName) {
-        this(worldIndex, xNum, yNum, 1, 1, fileName, false);
-    }
-
-    public MapObject(int worldIndex, int xNum, int yNum, boolean cornerAligned) {
-        this(worldIndex, xNum, yNum, 1, 1, null, cornerAligned);
-    }
-
-    public MapObject(int worldIndex, int xNum, int yNum, double width, double height, boolean cornerAligned) {
-        this(worldIndex, xNum, yNum, width, height, null, cornerAligned);
-    }
-
-    public MapObject(int worldIndex, int xNum, int yNum, double width, double height, String fileName) {
-        this(worldIndex, xNum, yNum, width, height, fileName, false);
-    }
-
-    public MapObject(int worldIndex, int xNum, int yNum, double width, double height, String fileName, boolean cornerAligned) {
-        this.worldIndex = worldIndex;
-        this.xNum = xNum;
-        this.yNum = yNum;
+    public MapObject(double x, double y, double width, double height) {
         this.width = width;
         this.height = height;
         halfWidth = width/2;
         halfHeight = height/2;
-        this.fileName = fileName;
-        this.cornerAligned = cornerAligned;
-
-        if (cornerAligned) {
-            centerCoordinates = new double[]{(xNum-1+halfWidth)*TILE_SIDE, (yNum-1+halfHeight)*TILE_SIDE};
-        } else {
-            centerCoordinates = new double[]{(xNum-0.5)*TILE_SIDE, (yNum-0.5)*TILE_SIDE};
-        }
-        coordinates = new double[]{
-                centerCoordinates[0]-halfWidth*TILE_SIDE, centerCoordinates[1]-halfHeight*TILE_SIDE,
-                centerCoordinates[0]+halfWidth*TILE_SIDE, centerCoordinates[1]+halfHeight*TILE_SIDE,
-                };
+        setCenterCoordinates(x, y);
+        updateCoordinates();
     }
 
-
-    public int getWorldIndex() {
-        return worldIndex;
+    public double getX() {
+        return centerCoordinates[0];
     }
 
-    protected void setFileName(String fileName) {
-        this.fileName = fileName;
+    public double getY() {
+        return centerCoordinates[1];
     }
 
-    protected void expire() {
-        expired = true;
+    public void setX(double x) {
+        centerCoordinates[0] = x;
+        updateCoordinates();
     }
 
-    public boolean isExpired() {
-        return expired;
+    public void setY(double y) {
+        centerCoordinates[1] = y;
+        updateCoordinates();
+    }
+
+    public double getWidth() {
+        return width;
+    }
+
+    public void setWidth(double width) {
+        this.width = width;
+        halfWidth = width/2;
+        updateCoordinates();
+    }
+
+    public double getHeight() {
+        return height;
+    }
+
+    public void setHeight(double height) {
+        this.height = height;
+        halfHeight = height/2;
+        updateCoordinates();
     }
 
     public double[] getCenterCoordinates() {
@@ -91,13 +65,18 @@ public abstract class MapObject {
         return coordinates;
     }
 
-
-    public void draw() {
-        StdDraw.picture(centerCoordinates[0], centerCoordinates[1], fileName, width*TILE_SIDE, height*TILE_SIDE);
+    public void setCenterCoordinates(double x, double y) {
+        centerCoordinates[0] = x;
+        centerCoordinates[1] = y;
+        updateCoordinates();
     }
 
-    public abstract void call(Player player);
-
+    public void updateCoordinates() {
+        coordinates[0] = centerCoordinates[0] - halfWidth;
+        coordinates[1] = centerCoordinates[1] - halfHeight;
+        coordinates[2] = centerCoordinates[0] + halfWidth;
+        coordinates[3] = centerCoordinates[1] + halfHeight;
+    }
 
     //shift methods
     protected void shiftPosition(double deltaX, double deltaY) {

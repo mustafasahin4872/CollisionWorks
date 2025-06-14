@@ -1,7 +1,7 @@
 package game;
 
 import lib.StdDraw;
-import mapobjects.framework.MapObject;
+import mapobjects.framework.GridObject;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -18,8 +18,8 @@ public class Selection {
     private Player currentSkin;
     private Accessory currentAccessory;
     private static final int
-            X_TILE = (int)(Frame.X_SCALE/ MapObject.TILE_SIDE),
-            Y_TILE = (int)(Frame.Y_SCALE/MapObject.TILE_SIDE);
+            X_TILE = (int)(Frame.X_SCALE/ GridObject.TILE_SIDE),
+            Y_TILE = (int)(Frame.Y_SCALE/ GridObject.TILE_SIDE);
 
     private final ArrayList<Accessory> selectedAccessories = new ArrayList<>();
 

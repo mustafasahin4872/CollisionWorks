@@ -2,10 +2,10 @@ package mapobjects.initialized;
 
 import game.Player;
 import mapobjects.framework.Box;
+import mapobjects.framework.GridObject;
 import mapobjects.framework.OnEffector;
-import mapobjects.framework.MapObject;
 
-public abstract class Chest extends MapObject implements OnEffector {
+public abstract class Chest extends GridObject implements OnEffector {
 
     private final Box effectBox;
     private boolean isOpen;

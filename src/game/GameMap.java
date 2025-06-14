@@ -1,7 +1,7 @@
 package game;
 
 import helperobjects.MapMaker;
-import mapobjects.framework.MapObject;
+import mapobjects.framework.GridObject;
 import mapobjects.initialized.*;
 
 import java.util.function.Consumer;
@@ -20,7 +20,7 @@ public class GameMap {
     //{x0, y0, x1, y1} unless stated otherwise.
     //(x0, y0) and (x1, y1) are the rectangle's bottom left and top right corners.
 
-    private final MapObject[][][] layers;
+    private final GridObject[][][] layers;
 
     //private final int totalCoinOnMap;
 
@@ -76,13 +76,13 @@ public class GameMap {
     //------------------------------------------------------------------------------------------------------------
 
     public void callMapObjects() {
-        for (MapObject[][] layer : layers) {
+        for (GridObject[][] layer : layers) {
             for (int y = tileRange[1]; y <= tileRange[3]; y++) {
                 for (int x = tileRange[0]; x <= tileRange[2]; x++) {
-                    MapObject mapObject = layer[y-1][x-1];
-                    if (mapObject != null) {
-                        mapObject.call(player);
-                        if (mapObject.isExpired()) {
+                    GridObject gridObject = layer[y-1][x-1];
+                    if (gridObject != null) {
+                        gridObject.call(player);
+                        if (gridObject.isExpired()) {
                             layer[y-1][x-1] = null;
                         }
                     }
@@ -92,16 +92,16 @@ public class GameMap {
     }
 
     public void draw() {
-        iterateCurrentFrameObjects(MapObject::draw);
+        iterateCurrentFrameObjects(GridObject::draw);
     }
 
-    private void iterateCurrentFrameObjects(Consumer<MapObject> action) {
-        for (MapObject[][] layer : layers) {
+    private void iterateCurrentFrameObjects(Consumer<GridObject> action) {
+        for (GridObject[][] layer : layers) {
             for (int y = tileRange[1]; y <= tileRange[3]; y++) {
                 for (int x = tileRange[0]; x <= tileRange[2]; x++) {
-                    MapObject mapObject = layer[y-1][x-1];
-                    if (mapObject != null) {
-                        action.accept(mapObject);
+                    GridObject gridObject = layer[y-1][x-1];
+                    if (gridObject != null) {
+                        action.accept(gridObject);
                     }
                 }
             }
@@ -114,8 +114,8 @@ public class GameMap {
         //normally ranges should be 9 and 6, but for guarantee, set them higher
         final int X_RANGE = 12, Y_RANGE = 10;
 
-        int xNum = (int) (player.getX() / MapObject.TILE_SIDE);
-        int yNum = (int) (player.getY() / MapObject.TILE_SIDE);
+        int xNum = (int) (player.getX() / GridObject.TILE_SIDE);
+        int yNum = (int) (player.getY() / GridObject.TILE_SIDE);
 
         int minX = xNum - X_RANGE;
         int maxX = xNum + X_RANGE + 1;

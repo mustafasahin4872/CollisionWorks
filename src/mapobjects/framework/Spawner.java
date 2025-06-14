@@ -6,7 +6,7 @@ import mapobjects.initialized.Tile;
 
 import java.util.ArrayList;
 
-import static mapobjects.framework.MapObject.TILE_SIDE;
+import static mapobjects.framework.GridObject.TILE_SIDE;
 
 //creates and stores blueprints for the linked object. has different spawn styles
 public class Spawner {
@@ -15,15 +15,15 @@ public class Spawner {
     private final Blueprint[] spawnObjects;
     private final int worldIndex, xNum, yNum;
 
-    public Spawner(MapObject mapObject) {
-        this(mapObject, 1);
+    public Spawner(GridObject gridObject) {
+        this(gridObject, 1);
     }
 
-    public Spawner(MapObject mapObject, int spawnNum) {
+    public Spawner(GridObject gridObject, int spawnNum) {
         this.spawnNum = spawnNum;
-        this.worldIndex = mapObject.worldIndex;
-        this.xNum = mapObject.xNum;
-        this.yNum = mapObject.yNum;
+        this.worldIndex = gridObject.worldIndex;
+        this.xNum = gridObject.xNum;
+        this.yNum = gridObject.yNum;
         spawnObjects = new Blueprint[spawnNum];
     }
 

@@ -4,7 +4,7 @@ import game.Player;
 import helperobjects.Blueprint;
 import mapobjects.framework.*;
 
-public class Mortar extends MapObject implements Collidable, Ranged, Timed, Spawnable {
+public class Mortar extends GridObject implements Collidable, Ranged, Timed, Spawnable {
 
     private final Box collisionBox;
     private final Timer timer;
@@ -70,8 +70,8 @@ public class Mortar extends MapObject implements Collidable, Ranged, Timed, Spaw
     }
 
     @Override
-    public double[] getCollisionBox() {
-        return collisionBox.getBox();
+    public Box getCollisionBox() {
+        return collisionBox;
     }
 
     @Override

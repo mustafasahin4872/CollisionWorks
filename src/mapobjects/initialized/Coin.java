@@ -3,9 +3,9 @@ package mapobjects.initialized;
 import game.Player;
 import mapobjects.framework.Box;
 import mapobjects.framework.OnEffector;
-import mapobjects.framework.MapObject;
+import mapobjects.framework.GridObject;
 
-public abstract class Coin extends MapObject implements OnEffector {
+public abstract class Coin extends GridObject implements OnEffector {
 
     private final Box effectBox;
     private final int value;

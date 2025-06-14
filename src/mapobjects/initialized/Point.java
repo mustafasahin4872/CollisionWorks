@@ -4,9 +4,9 @@ import game.Player;
 import lib.StdDraw;
 import mapobjects.framework.Box;
 import mapobjects.framework.OnEffector;
-import mapobjects.framework.MapObject;
+import mapobjects.framework.GridObject;
 
-public abstract class Point extends MapObject implements OnEffector {
+public abstract class Point extends GridObject implements OnEffector {
 
     protected final int index;
     protected boolean isBig;

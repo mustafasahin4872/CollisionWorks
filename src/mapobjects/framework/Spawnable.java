@@ -4,14 +4,14 @@ import game.Player;
 
 public interface Spawnable {
 
-    MapObject[] getSpawnObjects();
+    GridObject[] getSpawnObjects();
 
-    MapObject mutate(int index);
-    MapObject[] mutateAll();
+    GridObject mutate(int index);
+    GridObject[] mutateAll();
 
     default void callSpawnObjects(Player player) {
-        for (MapObject mapObject : getSpawnObjects()) {
-            mapObject.call(player);
+        for (GridObject gridObject : getSpawnObjects()) {
+            gridObject.call(player);
         }
     }
 

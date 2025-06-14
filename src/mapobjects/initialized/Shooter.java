@@ -3,12 +3,12 @@ package mapobjects.initialized;
 import game.Player;
 import mapobjects.framework.Collidable;
 import mapobjects.framework.Box;
-import mapobjects.framework.MapObject;
+import mapobjects.framework.GridObject;
 
 import java.util.ArrayList;
 
 //can move?
-public class Shooter extends MapObject implements Collidable {
+public class Shooter extends GridObject implements Collidable {
 
     private final Box collisionBox;
     private final char alignment, direction;
@@ -33,8 +33,8 @@ public class Shooter extends MapObject implements Collidable {
 
 
     @Override
-    public double[] getCollisionBox() {
-        return collisionBox.getBox();
+    public Box getCollisionBox() {
+        return collisionBox;
     }
 
     @Override

@@ -10,4 +10,7 @@ public class HealthBar {
         this.maxHP = maxHP;
         this.defense = defense;
     }
+
+    //draw hp bar
+
 }

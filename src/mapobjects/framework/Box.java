@@ -1,14 +1,12 @@
 package mapobjects.framework;
 
-import static mapobjects.framework.MapObject.TILE_SIDE;
-
 public class Box {
 
     protected final double[] centerCoordinates, box = new double[4];
     private final double width, height, halfWidth, halfHeight;
 
-    public Box(MapObject mapObject) {
-        this(mapObject.centerCoordinates, mapObject.width*TILE_SIDE, mapObject.height*TILE_SIDE);
+    public Box(MapObject gridObject) {
+        this(gridObject.centerCoordinates, gridObject.width, gridObject.height);
     }
 
     public Box(double[] centerCoordinates, double width, double height) {

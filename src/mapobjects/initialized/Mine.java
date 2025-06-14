@@ -4,7 +4,7 @@ import game.Player;
 import lib.StdDraw;
 import mapobjects.framework.*;
 
-public class Mine extends MapObject implements OnEffector, Ranged, Timed {
+public class Mine extends GridObject implements OnEffector, Ranged, Timed {
 
     private final Box rangeBox;
     private final Box effectBox;

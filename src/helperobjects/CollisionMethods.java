@@ -2,57 +2,59 @@ package helperobjects;
 
 import game.Frame;
 import game.Player;
+import mapobjects.framework.Box;
+import mapobjects.framework.MovingCollidable;
 
 //static methods for collisions
 public class CollisionMethods {
 
     //LINE COLLISION METHODS
 
-    //updates position and velocity if player collides to a wall
-    public static void checkPlayerLineCollision(Player player, double[] coordinates) {
+    //updates position and velocity if movingCollidable collides to a wall
+    public static void checkMovingCollidableLineCollision(MovingCollidable movingCollidable, double[] coordinates) {
         // X-axis collision
-        if (!player.isXCollided()) {
-            if (player.getXVelocity() > 0) {
-                if (playerLineCollision(player, coordinates, Side.LEFT)) {
-                    player.xCollide();
-                    player.setX(coordinates[0] - player.getSide() / 2);
-                    player.setXVelocity(0);
+        if (!movingCollidable.isXCollided()) {
+            if (movingCollidable.getXVelocity() > 0) {
+                if (movingCollidableLineCollision(movingCollidable, coordinates, Side.LEFT)) {
+                    movingCollidable.xCollide();
+                    movingCollidable.setX(coordinates[0] - movingCollidable.getWidth() / 2);
+                    movingCollidable.setXVelocity(0);
                 }
-            } else if (player.getXVelocity() < 0) {
-                if (playerLineCollision(player, coordinates, Side.RIGHT)) {
-                    player.xCollide();
-                    player.setX(coordinates[2] + player.getSide() / 2);
-                    player.setXVelocity(0);
+            } else if (movingCollidable.getXVelocity() < 0) {
+                if (movingCollidableLineCollision(movingCollidable, coordinates, Side.RIGHT)) {
+                    movingCollidable.xCollide();
+                    movingCollidable.setX(coordinates[2] + movingCollidable.getWidth() / 2);
+                    movingCollidable.setXVelocity(0);
                 }
             }
         }
         // Y-axis collision
-        if (!player.isYCollided()) {
-            if (player.getYVelocity() > 0) {
-                if (playerLineCollision(player, coordinates, Side.BOTTOM)) {
-                    player.yCollide();
-                    player.setY(coordinates[1] - player.getSide() / 2);
-                    player.setYVelocity(0);
+        if (!movingCollidable.isYCollided()) {
+            if (movingCollidable.getYVelocity() > 0) {
+                if (movingCollidableLineCollision(movingCollidable, coordinates, Side.BOTTOM)) {
+                    movingCollidable.yCollide();
+                    movingCollidable.setY(coordinates[1] - movingCollidable.getHeight() / 2);
+                    movingCollidable.setYVelocity(0);
                 }
-            } else if (player.getYVelocity() < 0) {
-                if (playerLineCollision(player, coordinates, Side.TOP)) {
-                    player.yCollide();
-                    player.setY(coordinates[3] + player.getSide() / 2);
-                    player.setYVelocity(0);
+            } else if (movingCollidable.getYVelocity() < 0) {
+                if (movingCollidableLineCollision(movingCollidable, coordinates, Side.TOP)) {
+                    movingCollidable.yCollide();
+                    movingCollidable.setY(coordinates[3] + movingCollidable.getHeight() / 2);
+                    movingCollidable.setYVelocity(0);
                 }
             }
         }
     }
 
     private enum Side {TOP, BOTTOM, RIGHT, LEFT}
-    private static boolean playerLineCollision(Player player, double[] obstacle, Side side) {
+    private static boolean movingCollidableLineCollision(MovingCollidable player, double[] obstacle, Side side) {
         double x0 = obstacle[0], y0 = obstacle[1], x1 = obstacle[2], y1 = obstacle[3];
 
         double x = player.getX();
         double y = player.getY();
         double nextX = x + player.getXVelocity() * Frame.DT;
         double nextY = y + player.getYVelocity() * Frame.DT;
-        double halfSide = player.getSide() / 2;
+        double halfSide = player.getWidth() / 2;
 
         if (side == Side.TOP) {
             return xLineCollision(x - halfSide, y - halfSide, nextY - halfSide, x0, x1, y1) ||
@@ -99,6 +101,19 @@ public class CollisionMethods {
 
 
     //IS IN METHODS
+
+    public static boolean centerIsIn(Box a, Box b) {
+        return isIn(a.getBoxIndex(0), a.getBoxIndex(1), b.getBox());
+    }
+
+    public static boolean intersects(Box a, Box b) {
+        double[] A = a.getBox(), B = b.getBox();
+        double ax0 = A[0], ay0 = A[1], ax1 = A[2], ay1 = A[3];
+        double bx0 = B[0], by0 = B[1], bx1 = B[2], by1 = B[3];
+
+        return ax0 < bx1 && ax1 > bx0 &&
+                ay0 < by1 && ay1 > by0;
+    }
 
     public static boolean playerIsIn(Player player, double[] obstacle) {
         double halfSide = player.getSide()/2;
