@@ -5,7 +5,7 @@ import game.Player;
 import static helperobjects.CollisionMethods.playerCenterIsIn;
 import static helperobjects.CollisionMethods.playerIsIn;
 
-public interface Effector {
+public interface OnEffector {
 
     double[] getEffectBox();
 

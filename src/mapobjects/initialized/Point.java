@@ -2,13 +2,11 @@ package mapobjects.initialized;
 
 import game.Player;
 import lib.StdDraw;
-import mapobjects.framework.EffectBox;
-import mapobjects.framework.Effector;
+import mapobjects.framework.Box;
+import mapobjects.framework.OnEffector;
 import mapobjects.framework.MapObject;
 
-import static helperobjects.CollisionMethods.playerCenterIsIn;
-
-public abstract class Point extends MapObject implements Effector {
+public abstract class Point extends MapObject implements OnEffector {
 
     protected final int index;
     protected boolean isBig;
@@ -31,9 +29,9 @@ public abstract class Point extends MapObject implements Effector {
         StdDraw.picture(centerCoordinates[0], centerCoordinates[1], fileName, TILE_SIDE, TILE_SIDE);
     }
 
-    public static class WinPoint extends Point implements Effector {
+    public static class WinPoint extends Point implements OnEffector {
 
-        private final EffectBox effectBox;
+        private final Box effectBox;
         private final Player.PASSCODE passcode;
 
         public WinPoint(int worldIndex, int xNum, int yNum, int index) {
@@ -42,7 +40,7 @@ public abstract class Point extends MapObject implements Effector {
 
         public WinPoint(int worldIndex, int xNum, int yNum, int index, boolean isBig) {
             super(worldIndex, xNum, yNum, index, "winPoint", isBig);
-            effectBox = new EffectBox(this);
+            effectBox = new Box(this);
             passcode = switch (index) {
                 case 0 -> Player.PASSCODE.NEXT;
                 case 1 -> Player.PASSCODE.ALTERNATE1;
@@ -56,7 +54,7 @@ public abstract class Point extends MapObject implements Effector {
 
         @Override
         public double[] getEffectBox() {
-            return effectBox.getEffectBox();
+            return effectBox.getBox();
         }
 
         @Override
@@ -71,9 +69,9 @@ public abstract class Point extends MapObject implements Effector {
 
     }
 
-    public static class CheckPoint extends Point implements Effector {
+    public static class CheckPoint extends Point implements OnEffector {
 
-        private final EffectBox effectBox;
+        private final Box effectBox;
         private CheckPoint prev;
         protected boolean visited;
         private static final Sign ERROR_SIGN = new Sign(0, 0, 0, new String[]{"first unlock the previous checkpoint"}, false);
@@ -84,13 +82,13 @@ public abstract class Point extends MapObject implements Effector {
 
         public CheckPoint(int worldIndex, int xNum, int yNum, int index, boolean isBig) {
             super(worldIndex, xNum, yNum, index, "checkPoint", isBig);
-            effectBox = new EffectBox(this);
+            effectBox = new Box(this);
         }
 
 
         @Override
         public double[] getEffectBox() {
-            return effectBox.getEffectBox();
+            return effectBox.getBox();
         }
 
         @Override

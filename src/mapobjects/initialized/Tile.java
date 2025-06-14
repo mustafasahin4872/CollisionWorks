@@ -3,8 +3,6 @@ package mapobjects.initialized;
 import game.Player;
 import mapobjects.framework.*;
 
-import static helperobjects.CollisionMethods.*;
-
 public abstract class Tile extends MapObject {
 
     private static final String ROOT = "misc/tileImages/";
@@ -34,15 +32,15 @@ public abstract class Tile extends MapObject {
 
     public static abstract class ImpassableTile extends Tile implements Collidable {
 
-        protected final CollisionBox collisionBox;
+        protected final Box collisionBox;
         public ImpassableTile(int worldIndex, int xNum, int yNum, boolean isApproachable, String type) {
             super(worldIndex, xNum, yNum, isApproachable, true, type);
-            collisionBox = new CollisionBox(this);
+            collisionBox = new Box(this);
         }
 
         @Override
         public double[] getCollisionBox() {
-            return collisionBox.getCollisionBox();
+            return collisionBox.getBox();
         }
 
     }
@@ -77,17 +75,17 @@ public abstract class Tile extends MapObject {
     }
 
 
-    public static abstract class PassableTile extends Tile implements Effector {
+    public static abstract class PassableTile extends Tile implements OnEffector {
 
-        private EffectBox effectBox;
+        private Box effectBox;
         public PassableTile(int worldIndex, int xNum, int yNum, String type) {
             super(worldIndex, xNum, yNum, true, false, type);
-            effectBox = new EffectBox(this);
+            effectBox = new Box(this);
         }
 
         @Override
         public double[] getEffectBox() {
-            return effectBox.getEffectBox();
+            return effectBox.getBox();
         }
 
     }

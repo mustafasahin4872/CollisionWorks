@@ -5,16 +5,15 @@ import lib.StdDraw;
 
 import java.awt.*;
 import game.Frame;
-import mapobjects.framework.EffectBox;
-import mapobjects.framework.Effector;
+import mapobjects.framework.Box;
+import mapobjects.framework.OnEffector;
 import mapobjects.framework.MapObject;
 
-import static helperobjects.CollisionMethods.playerCenterIsIn;
 import static helperobjects.DrawMethods.*;
 
-public class Sign extends MapObject implements Effector {
+public class Sign extends MapObject implements OnEffector {
 
-    private final EffectBox effectBox;
+    private final Box effectBox;
     private final String[] messages;
     private final boolean displaySign;
     private boolean displayMessage;
@@ -37,7 +36,7 @@ public class Sign extends MapObject implements Effector {
         double[] dimensions = calculateDimensions(messages);
         this.displayHalfWidth = dimensions[0];
         this.displayHalfHeight = dimensions[1];
-        effectBox = new EffectBox(this);
+        effectBox = new Box(this);
     }
 
 
@@ -59,7 +58,7 @@ public class Sign extends MapObject implements Effector {
 
     @Override
     public double[] getEffectBox() {
-        return effectBox.getEffectBox();
+        return effectBox.getBox();
     }
 
 

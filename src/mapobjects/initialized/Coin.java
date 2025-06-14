@@ -1,18 +1,18 @@
 package mapobjects.initialized;
 
 import game.Player;
-import mapobjects.framework.EffectBox;
-import mapobjects.framework.Effector;
+import mapobjects.framework.Box;
+import mapobjects.framework.OnEffector;
 import mapobjects.framework.MapObject;
 
-public abstract class Coin extends MapObject implements Effector {
+public abstract class Coin extends MapObject implements OnEffector {
 
-    private final EffectBox effectBox;
+    private final Box effectBox;
     private final int value;
 
     public Coin(int worldIndex, int xNum, int yNum, double size, int value, String fileName) {
         super(worldIndex, xNum, yNum, size, size, fileName);
-        effectBox = new EffectBox(this);
+        effectBox = new Box(this);
         this.value = value;
     }
 
@@ -23,7 +23,7 @@ public abstract class Coin extends MapObject implements Effector {
 
     @Override
     public double[] getEffectBox() {
-        return effectBox.getEffectBox();
+        return effectBox.getBox();
     }
 
 

@@ -3,15 +3,15 @@ package mapobjects.initialized;
 import game.Frame;
 import game.Player;
 import lib.StdDraw;
-import mapobjects.framework.EffectBox;
-import mapobjects.framework.Effector;
+import mapobjects.framework.Box;
+import mapobjects.framework.OnEffector;
 import mapobjects.framework.MapObject;
 
-public class Projectile extends MapObject implements Effector {
+public class Projectile extends MapObject implements OnEffector {
 
-    private final EffectBox effectBox;
+    private final Box effectBox;
     private boolean crashed;
-    private final char direction;
+    private char direction;
     private static final double DEFAULT_SPEED = 1;
     private final double speed, delta;
     private static final double DEFAULT_DAMAGE = 20;
@@ -28,7 +28,7 @@ public class Projectile extends MapObject implements Effector {
             speed = -1*DEFAULT_SPEED*worldIndex;
         }
         delta = speed* Frame.DT;
-        effectBox = new EffectBox(this);
+        effectBox = new Box(this);
     }
 
 
@@ -60,7 +60,7 @@ public class Projectile extends MapObject implements Effector {
 
     @Override
     public double[] getEffectBox() {
-        return effectBox.getEffectBox();
+        return effectBox.getBox();
     }
 
     @Override

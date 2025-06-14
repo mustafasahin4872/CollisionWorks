@@ -2,18 +2,15 @@ package mapobjects.initialized;
 
 import game.Player;
 import mapobjects.framework.Collidable;
-import mapobjects.framework.CollisionBox;
-import mapobjects.framework.Effector;
+import mapobjects.framework.Box;
 import mapobjects.framework.MapObject;
 
 import java.util.ArrayList;
 
-import static helperobjects.CollisionMethods.checkPlayerLineCollision;
-
 //can move?
 public class Shooter extends MapObject implements Collidable {
 
-    private final CollisionBox collisionBox;
+    private final Box collisionBox;
     private final char alignment, direction;
     private final ArrayList<Projectile> projectiles = new ArrayList<>();
     private static final double DEFAULT_PERIOD = 12000; //in milliseconds
@@ -31,13 +28,13 @@ public class Shooter extends MapObject implements Collidable {
         this.xTile = xTile;
         period = DEFAULT_PERIOD/worldIndex;
         startTime = System.currentTimeMillis();
-        collisionBox = new CollisionBox(this);
+        collisionBox = new Box(this);
     }
 
 
     @Override
     public double[] getCollisionBox() {
-        return collisionBox.getCollisionBox();
+        return collisionBox.getBox();
     }
 
     @Override

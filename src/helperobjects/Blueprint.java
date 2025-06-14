@@ -29,8 +29,8 @@ public class Blueprint {
         return new Mine(worldIndex, xNum, yNum);
     }
 
-    public Mortar mutateToMortar(Tile[][] tiles, int xTile) {
-        return new Mortar(worldIndex, xNum, yNum, tiles, xTile);
+    public Mortar mutateToMortar(Tile[][] tiles) {
+        return new Mortar(worldIndex, xNum, yNum, tiles);
     }
 
     public Button.BigButton mutateToBigButton() {

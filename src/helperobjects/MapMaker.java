@@ -167,7 +167,7 @@ points can have the indicator B for big displays, special to the selection scree
                     initializedCoin = initializeCoin(char1, blueprint);
                     initializedMapObject = switch (char1) {
                         case '@' -> blueprint.mutateToMine();
-                        case '%' -> blueprint.mutateToMortar(tiles, xTile);
+                        case '%' -> blueprint.mutateToMortar(tiles);
                         case ':' -> {
                             Button button = blueprint.mutateToBigButton();
                             buttonMap.put("%d:%d".formatted(xNum, yNum), button);

@@ -6,17 +6,15 @@ import java.util.Arrays;
 import lib.StdDraw;
 import game.Player;
 import game.Frame;
+import mapobjects.framework.Box;
 import mapobjects.framework.Collidable;
-import mapobjects.framework.CollisionBox;
-import mapobjects.framework.Effector;
 import mapobjects.framework.MapObject;
 
-import static helperobjects.CollisionMethods.checkPlayerLineCollision;
 import static helperobjects.DrawMethods.drawRectangle;
 
 public class Door extends MapObject implements Collidable {
 
-    private final CollisionBox collisionBox;
+    private final Box collisionBox;
     private final char alignment;
     private Button[] buttons;
     private boolean isOpen;
@@ -41,7 +39,7 @@ public class Door extends MapObject implements Collidable {
             doorFloor = coordinates[0];
             yShiftPosition(SPACE_ON_SIDE*TILE_SIDE);
         }
-        collisionBox = new CollisionBox(this);
+        collisionBox = new Box(this);
 
     }
 
@@ -81,12 +79,12 @@ public class Door extends MapObject implements Collidable {
     private void adjustCoordinate() {
         int index = (alignment == VERTICAL) ? 3 : 2;
         coordinates[index] = Math.max(coordinates[index] - DELTA, doorFloor);
-        collisionBox.setCollisionIndex(index, Math.max(collisionBox.getCollisionIndex(index) - DELTA, doorFloor));
+        collisionBox.setBoxIndex(index, Math.max(collisionBox.getBoxIndex(index) - DELTA, doorFloor));
     }
 
     @Override
     public double[] getCollisionBox() {
-        return collisionBox.getCollisionBox();
+        return collisionBox.getBox();
     }
 
     @Override

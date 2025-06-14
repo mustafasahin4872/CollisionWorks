@@ -4,10 +4,10 @@ import game.Player;
 import lib.StdDraw;
 import mapobjects.framework.*;
 
-public class Mine extends MapObject implements Effector, Ranged, Timed {
+public class Mine extends MapObject implements OnEffector, Ranged, Timed {
 
-    private final RangeBox rangeBox;
-    private final EffectBox effectBox;
+    private final Box rangeBox;
+    private final Box effectBox;
     private final Timer timer;
 
     private static final double RANGE = 2; //in tiles
@@ -17,8 +17,8 @@ public class Mine extends MapObject implements Effector, Ranged, Timed {
 
     public Mine(int worldIndex, int xNum, int yNum) {
         super(worldIndex, xNum, yNum);
-        rangeBox = new RangeBox(this, RANGE);
-        effectBox = new EffectBox(this);
+        rangeBox = new Box(centerCoordinates, RANGE*TILE_SIDE, RANGE*TILE_SIDE);
+        effectBox = new Box(this);
         timer = new Timer(DEFAULT_PERIOD / worldIndex, -1);
         damage = worldIndex* DEFAULT_DAMAGE;
     }
@@ -34,7 +34,7 @@ public class Mine extends MapObject implements Effector, Ranged, Timed {
 
     @Override
     public double[] getEffectBox() {
-        return effectBox.getEffectBox();
+        return effectBox.getBox();
     }
 
 
@@ -53,7 +53,7 @@ public class Mine extends MapObject implements Effector, Ranged, Timed {
 
     @Override
     public double[] getRangeBox() {
-        return rangeBox.getRangeBox();
+        return rangeBox.getBox();
     }
 
     @Override

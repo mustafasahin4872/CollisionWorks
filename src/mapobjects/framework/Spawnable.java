@@ -5,9 +5,11 @@ import game.Player;
 public interface Spawnable {
 
     MapObject[] getSpawnObjects();
-    void mutate();
 
-    default void callSpawned(Player player) {
+    MapObject mutate(int index);
+    MapObject[] mutateAll();
+
+    default void callSpawnObjects(Player player) {
         for (MapObject mapObject : getSpawnObjects()) {
             mapObject.call(player);
         }
