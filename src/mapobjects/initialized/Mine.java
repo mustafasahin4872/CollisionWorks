@@ -1,8 +1,11 @@
 package mapobjects.initialized;
 
+import game.Accessory;
 import game.Player;
 import lib.StdDraw;
 import mapobjects.framework.*;
+
+import java.awt.*;
 
 public class Mine extends GridObject implements OnEffector, Ranged, Timed {
 
@@ -10,15 +13,15 @@ public class Mine extends GridObject implements OnEffector, Ranged, Timed {
     private final Box effectBox;
     private final Timer timer;
 
-    private static final double RANGE = 2; //in tiles
+    private static final double RANGE = 6; //in tiles
     private static final double DEFAULT_DAMAGE = 30;
     private final double damage;
     private static final double DEFAULT_PERIOD = 3000; //in milliseconds
 
     public Mine(int worldIndex, int xNum, int yNum) {
         super(worldIndex, xNum, yNum);
-        rangeBox = new Box(centerCoordinates, RANGE*TILE_SIDE, RANGE*TILE_SIDE);
-        effectBox = new Box(this);
+        rangeBox = new Box(getCenterCoordinates(), RANGE*TILE_SIDE, RANGE*TILE_SIDE);
+        effectBox = positionBox.clone();
         timer = new Timer(DEFAULT_PERIOD / worldIndex, -1);
         damage = worldIndex* DEFAULT_DAMAGE;
     }
@@ -32,17 +35,25 @@ public class Mine extends GridObject implements OnEffector, Ranged, Timed {
         return timer.isCompleted();
     }
 
-    @Override
-    public double[] getEffectBox() {
-        return effectBox.getBox();
-    }
 
+    @Override
+    public Box getEffectBox() {
+        return effectBox;
+    }
 
     @Override
     public void call(Player player) {
         updateTimer(); //update timer (might set complete)
         if (!isActive() && !isComplete()) {checkPlayerInRange(player);} //trigger the timer
-        if (isComplete()) {timeIsUp(player);} //if set complete, call time is up effect
+        if (isComplete()) {timeIsUp(player);}
+    }
+
+    @Override
+    public void checkPlayerIsOn(Player player) {
+        if (isComplete()) {
+            checkPlayerCornerIsOn(player);
+            expire();
+        }
     }
 
     //triggers only if time is up!
@@ -52,8 +63,8 @@ public class Mine extends GridObject implements OnEffector, Ranged, Timed {
     }
 
     @Override
-    public double[] getRangeBox() {
-        return rangeBox.getBox();
+    public Box getRangeBox() {
+        return rangeBox;
     }
 
     @Override
@@ -74,14 +85,18 @@ public class Mine extends GridObject implements OnEffector, Ranged, Timed {
     @Override
     public void timeIsUp(Player player) {
         checkPlayerIsOn(player);
-        expire();
+        expire(); //this object is set null and never called again
     }
 
     @Override
     public void draw() {
-        if (timer.isCompleted() || !timer.isActive()) return;
-        StdDraw.setPenColor(StdDraw.BOOK_RED);
-        StdDraw.filledCircle(centerCoordinates[0], centerCoordinates[1], timer.progressRatio()*HALF_SIDE);
+        if (!timer.isActive()) return;
+        StdDraw.setPenRadius();
+        StdDraw.setPenColor(new Color(255, 150, 30, 200));
+        StdDraw.circle(getX(), getY(), HALF_SIDE);
+        StdDraw.setPenColor(new Color(255, 0, 0, 100));
+        StdDraw.filledCircle(getX(), getY(), timer.progressRatio()*HALF_SIDE);
+
     }
 
 }

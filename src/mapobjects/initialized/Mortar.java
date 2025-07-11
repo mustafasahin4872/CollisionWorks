@@ -11,24 +11,24 @@ public class Mortar extends GridObject implements Collidable, Ranged, Timed, Spa
     private final Box rangeBox;
     private final Spawner spawner;
 
-    private static final int RANGE = 4;
+    private static final int RANGE = 8;
     private static final int BASE_MINE_NUM = 3;
     //period is max because the time of cooldown is determined by the mines
     private static final double PERIOD = Double.MAX_VALUE, DEFAULT_COOLDOWN = 3000;
     private final int mineNum;
     private final Mine[] mines;
-    private final Tile[][] tiles;
+    private final GridObject[][][] layers;
 
-    public Mortar(int worldIndex, int xNum, int yNum, Tile[][] tiles) {
-        this(worldIndex, xNum, yNum, tiles, BASE_MINE_NUM*worldIndex);
+    public Mortar(int worldIndex, int xNum, int yNum, GridObject[][][] layers) {
+        this(worldIndex, xNum, yNum, layers, BASE_MINE_NUM*worldIndex);
     }
 
-    public Mortar(int worldIndex, int xNum, int yNum, Tile[][] tiles, int mineNum) {
+    public Mortar(int worldIndex, int xNum, int yNum, GridObject[][][] layers, int mineNum) {
         super(worldIndex, xNum, yNum, 2, 2, "misc/misc/mortar.png", true);
         this.mineNum = mineNum;
-        this.tiles = tiles;
-        collisionBox = new Box(this);
-        rangeBox = new Box(centerCoordinates, RANGE*TILE_SIDE, RANGE*TILE_SIDE);
+        this.layers = layers;
+        collisionBox = positionBox.clone();
+        rangeBox = new Box(positionBox.getCenterCoordinates(), RANGE*TILE_SIDE, RANGE*TILE_SIDE);
         timer = new Timer(PERIOD, DEFAULT_COOLDOWN/worldIndex);
         spawner = new Spawner(this, mineNum);
         mines = new Mine[mineNum];
@@ -75,8 +75,8 @@ public class Mortar extends GridObject implements Collidable, Ranged, Timed, Spa
     }
 
     @Override
-    public double[] getRangeBox() {
-        return rangeBox.getBox();
+    public Box getRangeBox() {
+        return rangeBox;
     }
 
     @Override
@@ -123,7 +123,7 @@ public class Mortar extends GridObject implements Collidable, Ranged, Timed, Spa
 
     @Override
     public void spawn() {
-        spawner.replaceAll(spawner.randomSpawn(RANGE, tiles));
+        spawner.replaceAll(spawner.randomSpawn(RANGE/2, layers));
         Mine[] newMines = mutateAll();
         System.arraycopy(newMines, 0, mines, 0, mineNum);
     }

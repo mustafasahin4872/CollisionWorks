@@ -33,13 +33,13 @@ public class Door extends GridObject implements Collidable {
         super(worldIndex, xNum, yNum, getWidth(alignment, length), getHeight(alignment, length), true);
         this.alignment = alignment;
         if (alignment == VERTICAL) {
-            doorFloor = coordinates[1];
+            doorFloor = positionBox.getCorner(1);
             xShiftPosition(SPACE_ON_SIDE*TILE_SIDE);
         } else {
-            doorFloor = coordinates[0];
+            doorFloor = positionBox.getCorner(0);
             yShiftPosition(SPACE_ON_SIDE*TILE_SIDE);
         }
-        collisionBox = new Box(this);
+        collisionBox = positionBox.clone();
 
     }
 
@@ -53,8 +53,9 @@ public class Door extends GridObject implements Collidable {
 
     @Override
     public void call(Player player) {
-        checkCollision(player);
         checkOpen();
+        slideDoor();
+        if (fullyOpened()) {expire();}
     }
 
     public void setButtons(Button[] buttons) {
@@ -70,16 +71,20 @@ public class Door extends GridObject implements Collidable {
         }
     }
 
+    private boolean fullyOpened() {
+        int index = (alignment == VERTICAL) ? 3 : 2;
+        return (positionBox.getCorner(index) <= doorFloor);
+    }
+
     private void slideDoor() {
         if (!isOpen) return;
         adjustCoordinate();
-
     }
 
     private void adjustCoordinate() {
         int index = (alignment == VERTICAL) ? 3 : 2;
-        coordinates[index] = Math.max(coordinates[index] - DELTA, doorFloor);
-        collisionBox.setBoxIndex(index, Math.max(collisionBox.getBoxIndex(index) - DELTA, doorFloor));
+        positionBox.setCorner(index, Math.max(positionBox.getCorner(index) - DELTA, doorFloor));
+        collisionBox.setCorner(index, Math.max(collisionBox.getCorner(index) - DELTA, doorFloor));
     }
 
     @Override
@@ -89,9 +94,8 @@ public class Door extends GridObject implements Collidable {
 
     @Override
     public void draw() {
-        slideDoor();
         StdDraw.setPenColor(color);
-        drawRectangle(coordinates);
+        drawRectangle(positionBox.getCorners());
     }
 
 }

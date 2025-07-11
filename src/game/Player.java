@@ -1,9 +1,8 @@
 package game;
 
 import lib.StdDraw;
-import mapobjects.framework.Box;
-import mapobjects.framework.MapObject;
-import mapobjects.framework.MovingCollidable;
+import mapobjects.framework.*;
+import mapobjects.initialized.EmptyGridObject;
 
 public class Player extends MapObject implements MovingCollidable {
 
@@ -19,12 +18,10 @@ public class Player extends MapObject implements MovingCollidable {
     private double side;
 
     private static final double
-            MAX_SPEED1 = 10, MAX_SPEED2 = 20, MAX_SPEED3 = 40,
-            A1 = 0.2, A2 = 0.4, A3 = 0.8;
+            MAX_SPEED1 = 7.5, MAX_SPEED2 = 15, MAX_SPEED3 = 40,
+            A1 = 0.1, A2 = 0.4, A3 = 0.8, A4 = 1.6;
 
-    private double spawnX, spawnY, xVelocity, yVelocity,
-            maxSpeed = MAX_SPEED2, acceleration = A2, deceleration = A2;
-
+    private double spawnX, spawnY, xVelocity, yVelocity, maxSpeed, acceleration, deceleration;
     private int xDirection, yDirection;
     private boolean xCollided, yCollided;
 
@@ -60,12 +57,41 @@ public class Player extends MapObject implements MovingCollidable {
             default -> 50;
         };
         setSide(defaultSide);
+        collisionBox = positionBox.clone();
         respawn();
-        collisionBox = new Box(this);
     }
 
 
     //UPDATES
+
+    @Override
+    public void call(Player player) {
+
+    }
+
+    //prototype collision and on tile effect checker, will simplify call methods on the other object types
+    public void call(GridObject[][][] layers) {
+        int range = 2; //the checking range
+        int[] gridNumbers = getGridNumbers();
+        for (GridObject[][] layer : layers) {
+            for (int i = gridNumbers[1]-range; i<gridNumbers[1]+range; i++) {
+                for (int j = gridNumbers[0]-range; j<gridNumbers[0]+range; j++) {
+                    GridObject currentGridObject = layer[i][j];
+                    checkMapObjectEffects(currentGridObject);
+                }
+            }
+        }
+    }
+
+    private void checkMapObjectEffects(GridObject currentGridObject) {
+        if (currentGridObject instanceof Collidable c) {
+            c.checkCollision(this);
+        } else if (currentGridObject instanceof OnEffector e) {
+            e.checkPlayerIsOn(this);
+        } else if (currentGridObject instanceof EmptyGridObject e) {
+            checkMapObjectEffects(e.getLinkedObject());
+        }
+    }
 
     public void update() {
 
@@ -88,19 +114,30 @@ public class Player extends MapObject implements MovingCollidable {
         final double DT = Frame.DT;
         final double SQRT2 = Math.sqrt(2);
 
-        double nextVx;
-        double nextVy;
+        double effectiveAccelX = acceleration;
+        double effectiveAccelY = acceleration;
 
-        if (xDirection != 0 && yDirection != 0) {
-            nextVx = xVelocity + xDirection * acceleration / SQRT2 * DT;
-            nextVy = yVelocity + yDirection * acceleration / SQRT2 * DT;
-        }  else {
-            nextVx = xVelocity + xDirection * acceleration * DT;
-            nextVy = yVelocity + yDirection * acceleration * DT;
+        if (xDirection != 0 && Math.signum(xDirection) != Math.signum(xVelocity)) {
+            effectiveAccelX += deceleration;
         }
 
-        double nextVSquared = Math.pow(nextVx, 2) + Math.pow(nextVy, 2);
+        if (yDirection != 0 && Math.signum(yDirection) != Math.signum(yVelocity)) {
+            effectiveAccelY += deceleration;
+        }
+
+        double nextVx, nextVy;
+
+        if (xDirection != 0 && yDirection != 0) {
+            nextVx = xVelocity + xDirection * effectiveAccelX / SQRT2 * DT;
+            nextVy = yVelocity + yDirection * effectiveAccelY / SQRT2 * DT;
+        } else {
+            nextVx = xVelocity + xDirection * effectiveAccelX * DT;
+            nextVy = yVelocity + yDirection * effectiveAccelY * DT;
+        }
+
+        double nextVSquared = nextVx * nextVx + nextVy * nextVy;
         double nextSpeed = Math.sqrt(nextVSquared);
+
         if (nextVSquared > maxSpeed * maxSpeed) {
             double scale = maxSpeed / nextSpeed;
             setXVelocity(nextVx * scale);
@@ -110,28 +147,23 @@ public class Player extends MapObject implements MovingCollidable {
             setYVelocity(nextVy);
         }
 
+        // X friction (no input)
         if (xDirection == 0) {
-            if ((xVelocity >= 0 && xVelocity - deceleration * DT < 0) || (xVelocity <= 0 && xVelocity + deceleration * DT > 0)) {
+            if ((xVelocity >= 0 && xVelocity - deceleration * DT < 0) ||
+                    (xVelocity <= 0 && xVelocity + deceleration * DT > 0)) {
                 setXVelocity(0);
             } else {
-                if (xVelocity > 0) {
-                    setXVelocity(xVelocity - deceleration * DT);
-                } else {
-                    setXVelocity(xVelocity + deceleration * DT);
-                }
+                setXVelocity(xVelocity + (xVelocity > 0 ? -1 : 1) * deceleration * DT);
             }
         }
 
+        // Y friction (no input)
         if (yDirection == 0) {
-
-            if ((yVelocity >= 0 && yVelocity - deceleration * DT < 0) || (yVelocity <= 0 && yVelocity + deceleration * DT > 0)) {
+            if ((yVelocity >= 0 && yVelocity - deceleration * DT < 0) ||
+                    (yVelocity <= 0 && yVelocity + deceleration * DT > 0)) {
                 setYVelocity(0);
             } else {
-                if (yVelocity > 0) {
-                    setYVelocity(yVelocity - deceleration * DT);
-                } else {
-                    setYVelocity(yVelocity + deceleration * DT);
-                }
+                setYVelocity(yVelocity + (yVelocity > 0 ? -1 : 1) * deceleration * DT);
             }
         }
 
@@ -177,10 +209,12 @@ public class Player extends MapObject implements MovingCollidable {
 
     public void xCollide() {
         xCollided = true;
+        xVelocity = 0;
     }
 
     public void yCollide() {
         yCollided = true;
+        yVelocity = 0;
     }
 
     public boolean isXCollided() {
@@ -202,8 +236,20 @@ public class Player extends MapObject implements MovingCollidable {
 
     public void slow() {
         setAcceleration(A1);
-        setDeceleration(A3);
+        setDeceleration(A4);
         setMaxSpeed(MAX_SPEED1);
+    }
+
+    @Override
+    public void setX(double x) {
+        super.setX(x);
+        collisionBox.setCenterX(x);
+    }
+
+    @Override
+    public void setY(double y) {
+        super.setY(y);
+        collisionBox.setCenterY(y);
     }
 
     public double getXVelocity() {
@@ -235,7 +281,7 @@ public class Player extends MapObject implements MovingCollidable {
     }
 
     public void resetDeceleration() {
-        deceleration = A2;
+        deceleration = A3;
     }
 
     public void setAcceleration(double acceleration) {
@@ -312,7 +358,8 @@ public class Player extends MapObject implements MovingCollidable {
     }
 
     public void respawn() {
-        setCenterCoordinates(spawnX, spawnY);
+        setX(spawnX);
+        setY(spawnY);
         xVelocity = 0;
         yVelocity = 0;
         acceleration = 0;

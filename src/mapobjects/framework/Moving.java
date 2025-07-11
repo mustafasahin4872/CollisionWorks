@@ -10,8 +10,6 @@ public interface Moving {
     void setY(double y);
     double getXVelocity();
     double getYVelocity();
-    void setXVelocity(double xVelocity);
-    void setYVelocity(double yVelocity);
 
     default double getNextX() {
         return getX() + getXVelocity() * Frame.DT;

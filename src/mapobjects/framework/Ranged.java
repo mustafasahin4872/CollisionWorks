@@ -2,18 +2,18 @@ package mapobjects.framework;
 
 import game.Player;
 
-import static helperobjects.CollisionMethods.playerIsIn;
+import static helperobjects.CollisionMethods.intersects;
 
 public interface Ranged {
 
-    double[] getRangeBox();
-
-    void playerInRange(Player player);
+    Box getRangeBox();
 
     default void checkPlayerInRange(Player player) {
-        if (playerIsIn(player, getRangeBox())) {
+        if (intersects(player.getCollisionBox(), getRangeBox())) {
             playerInRange(player);
         }
     }
+
+    void playerInRange(Player player);
 
 }

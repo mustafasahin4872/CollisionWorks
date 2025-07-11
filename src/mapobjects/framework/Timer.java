@@ -59,6 +59,7 @@ public class Timer {
     }
 
 
+    //for a more realistic effect, the ratio will be 1 when 95% is completed
     public double progressRatio() {
         if (!active) {
             return 0;
@@ -66,7 +67,7 @@ public class Timer {
             return 1;
         } else {
             double timePassed = System.currentTimeMillis() - startTime;
-            return timePassed/period;
+            return Math.min((timePassed/period) * 100/85, 1);
         }
     }
 

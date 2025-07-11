@@ -36,7 +36,7 @@ public class Sign extends GridObject implements OnEffector {
         double[] dimensions = calculateDimensions(messages);
         this.displayHalfWidth = dimensions[0];
         this.displayHalfHeight = dimensions[1];
-        effectBox = new Box(this);
+        effectBox = positionBox.clone();
     }
 
 
@@ -57,14 +57,17 @@ public class Sign extends GridObject implements OnEffector {
     }
 
     @Override
-    public double[] getEffectBox() {
-        return effectBox.getBox();
+    public Box getEffectBox() {
+        return effectBox;
     }
 
+    @Override
+    public void checkPlayerIsOn(Player player) {
+        checkPlayerCenterIsOn(player);
+    }
 
     @Override
     public void call(Player player) {
-        checkPlayerCenterIsOn(player);
         if (displayMessage) {
             updateDisplayCoordinates();
         }

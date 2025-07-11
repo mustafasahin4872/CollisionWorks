@@ -1,5 +1,6 @@
 package game;
 
+import helperobjects.Helpers;
 import helperobjects.MapMaker;
 import mapobjects.framework.GridObject;
 import mapobjects.initialized.*;
@@ -76,19 +77,20 @@ public class GameMap {
     //------------------------------------------------------------------------------------------------------------
 
     public void callMapObjects() {
+        player.call(layers);
         for (GridObject[][] layer : layers) {
             for (int y = tileRange[1]; y <= tileRange[3]; y++) {
                 for (int x = tileRange[0]; x <= tileRange[2]; x++) {
                     GridObject gridObject = layer[y-1][x-1];
-                    if (gridObject != null) {
-                        gridObject.call(player);
-                        if (gridObject.isExpired()) {
-                            layer[y-1][x-1] = null;
-                        }
+                    if (gridObject == null) continue;
+                    gridObject.call(player);
+                    if (gridObject.isExpired()) {
+                        layer[y-1][x-1] = null;
                     }
                 }
             }
         }
+
     }
 
     public void draw() {
@@ -96,16 +98,7 @@ public class GameMap {
     }
 
     private void iterateCurrentFrameObjects(Consumer<GridObject> action) {
-        for (GridObject[][] layer : layers) {
-            for (int y = tileRange[1]; y <= tileRange[3]; y++) {
-                for (int x = tileRange[0]; x <= tileRange[2]; x++) {
-                    GridObject gridObject = layer[y-1][x-1];
-                    if (gridObject != null) {
-                        action.accept(gridObject);
-                    }
-                }
-            }
-        }
+        Helpers.iterateThroughLayers(layers, tileRange[0], tileRange[1], tileRange[2], tileRange[3], action);
     }
 
     //--------------------------------------------------------------------------------------------------

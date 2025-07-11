@@ -1,14 +1,68 @@
 package helperobjects;
 
-import game.Frame;
-import game.Player;
 import mapobjects.framework.Box;
-import mapobjects.framework.MovingCollidable;
 
 //static methods for collisions
 public class CollisionMethods {
 
-    //LINE COLLISION METHODS
+    //IS IN METHODS
+
+    public static boolean intersects(Box a, Box b) {
+        double[] A = a.getCorners(), B = b.getCorners();
+        double ax0 = A[0], ay0 = A[1], ax1 = A[2], ay1 = A[3];
+        double bx0 = B[0], by0 = B[1], bx1 = B[2], by1 = B[3];
+
+        return ax0 < bx1 && ax1 > bx0 &&
+                ay0 < by1 && ay1 > by0;
+    }
+
+    public static boolean isIn(double x, double y, Box box) {
+        return isIn(x, y, box.getCorners());
+    }
+
+    public static boolean isIn(double x, double y, double[] obstacle) {
+        return ((x > obstacle[0]) && (x < obstacle[2]) && (y > obstacle[1]) && (y < obstacle[3]));
+    }
+
+
+    //SHIFT METHODS
+
+    public static void xShiftBox(double delta, double[] box) {
+        shiftBoxCoordinate(delta, box, 0);
+        shiftBoxCoordinate(delta, box, 2);
+    }
+
+    public static void yShiftBox(double delta, double[] box) {
+        shiftBoxCoordinate(delta, box, 1);
+        shiftBoxCoordinate(delta, box, 3);
+    }
+
+    public static void shiftBoxCoordinate(double delta, double[] box, int index) {
+        box[index] += delta;
+    }
+
+
+/*
+
+    public static boolean playerIsIn(Player player, double[] obstacle) {
+        double halfSide = player.getSide()/2;
+        double x = player.getX(), y = player.getY();
+        return isIn(x + halfSide, y + halfSide, obstacle) ||
+                isIn(x + halfSide, y - halfSide, obstacle) ||
+                isIn(x - halfSide, y + halfSide, obstacle) ||
+                isIn(x - halfSide, y - halfSide, obstacle) ||
+                isIn(x + halfSide, y, obstacle) ||
+                isIn(x - halfSide, y, obstacle) ||
+                isIn(x, y + halfSide, obstacle) ||
+                isIn(x, y - halfSide, obstacle);
+    }
+
+    public static boolean playerCenterIsIn(Player player, double[] obstacle) {
+        double x = player.getX(), y = player.getY();
+        return ((x > obstacle[0]) && (x < obstacle[2]) && (y > obstacle[1]) && (y < obstacle[3]));
+    }
+
+    //OLD LINE COLLISION METHODS
 
     //updates position and velocity if movingCollidable collides to a wall
     public static void checkMovingCollidableLineCollision(MovingCollidable movingCollidable, double[] coordinates) {
@@ -100,58 +154,6 @@ public class CollisionMethods {
     }
 
 
-    //IS IN METHODS
-
-    public static boolean centerIsIn(Box a, Box b) {
-        return isIn(a.getBoxIndex(0), a.getBoxIndex(1), b.getBox());
-    }
-
-    public static boolean intersects(Box a, Box b) {
-        double[] A = a.getBox(), B = b.getBox();
-        double ax0 = A[0], ay0 = A[1], ax1 = A[2], ay1 = A[3];
-        double bx0 = B[0], by0 = B[1], bx1 = B[2], by1 = B[3];
-
-        return ax0 < bx1 && ax1 > bx0 &&
-                ay0 < by1 && ay1 > by0;
-    }
-
-    public static boolean playerIsIn(Player player, double[] obstacle) {
-        double halfSide = player.getSide()/2;
-        double x = player.getX(), y = player.getY();
-        return isIn(x + halfSide, y + halfSide, obstacle) ||
-                isIn(x + halfSide, y - halfSide, obstacle) ||
-                isIn(x - halfSide, y + halfSide, obstacle) ||
-                isIn(x - halfSide, y - halfSide, obstacle) ||
-                isIn(x + halfSide, y, obstacle) ||
-                isIn(x - halfSide, y, obstacle) ||
-                isIn(x, y + halfSide, obstacle) ||
-                isIn(x, y - halfSide, obstacle);
-    }
-
-    public static boolean playerCenterIsIn(Player player, double[] obstacle) {
-        double x = player.getX(), y = player.getY();
-        return ((x > obstacle[0]) && (x < obstacle[2]) && (y > obstacle[1]) && (y < obstacle[3]));
-    }
-
-    public static boolean isIn(double x, double y, double[] obstacle) {
-        return ((x > obstacle[0]) && (x < obstacle[2]) && (y > obstacle[1]) && (y < obstacle[3]));
-    }
-
-
-    //SHIFT METHODS
-
-    public static void xShiftBox(double delta, double[] box) {
-        shiftBoxCoordinate(delta, box, 0);
-        shiftBoxCoordinate(delta, box, 2);
-    }
-
-    public static void yShiftBox(double delta, double[] box) {
-        shiftBoxCoordinate(delta, box, 1);
-        shiftBoxCoordinate(delta, box, 3);
-    }
-
-    public static void shiftBoxCoordinate(double delta, double[] box, int index) {
-        box[index] += delta;
-    }
+ */
 
 }

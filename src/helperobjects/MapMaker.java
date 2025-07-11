@@ -1,6 +1,7 @@
 package helperobjects;
 
 import game.Player;
+import mapobjects.framework.Collidable;
 import mapobjects.framework.GridObject;
 import mapobjects.initialized.*;
 
@@ -16,7 +17,6 @@ public class MapMaker {
     private final File mapFile;
     private final int xTile, yTile;
     private final Player player;
-    private final boolean isSelectionMap;
 
     private final GridObject[][][] layers;
     private final Tile[][] tiles;
@@ -89,7 +89,6 @@ points can have the indicator B for big displays, special to the selection scree
         this.xTile = xTile;
         this.yTile = yTile;
         this.player = player;
-        this.isSelectionMap = isSelectionMap;
         tiles = new Tile[yTile][xTile];
         gridObjects = new GridObject[yTile][xTile];
         coins = new Coin[yTile][xTile];
@@ -114,16 +113,12 @@ points can have the indicator B for big displays, special to the selection scree
     public void mapMaker() {
         String[][] mapData = new String[yTile][xTile];
         ArrayList<String> objectDetails = new ArrayList<>();
-        boolean[][] approachability = new boolean[yTile][xTile];
 
         // fill the mapData and objectDetails storages
         extractMapData(mapData, objectDetails);
 
-        // assign approachability to tiles
-        extractApproachability(mapData, approachability);
-
         // initialize all objects parsing through mapData and objectDetails
-        initializeObjects(mapData, approachability, objectDetails);
+        initializeObjects(mapData, objectDetails);
 
         // all objects are ready to be processed, stored in layers
     }
@@ -132,7 +127,7 @@ points can have the indicator B for big displays, special to the selection scree
     //INITIALIZERS
 
     //creates all objects
-    private void initializeObjects(String[][] mapData, boolean[][] approachability, ArrayList<String> objectDetails) {
+    private void initializeObjects(String[][] mapData, ArrayList<String> objectDetails) {
 
         // hold the D37 codes here with their locations to later wire them to buttons
         Map<Door, Integer> doorsToWire = new HashMap<>();
@@ -155,7 +150,6 @@ points can have the indicator B for big displays, special to the selection scree
                 GridObject initializedGridObject;
                 Coin initializedCoin;
 
-                boolean isApproachable = approachability[y][x];
                 String tileCode = mapData[y][x];
 
                 char char0 = tileCode.charAt(0);
@@ -163,11 +157,11 @@ points can have the indicator B for big displays, special to the selection scree
 
                     char char1 = tileCode.charAt(1), char2 = tileCode.charAt(2);
 
-                    initializedTile = blueprint.mutateToTile(char0, isApproachable);
+                    initializedTile = blueprint.mutateToTile(char0);
                     initializedCoin = initializeCoin(char1, blueprint);
                     initializedGridObject = switch (char1) {
                         case '@' -> blueprint.mutateToMine();
-                        case '%' -> blueprint.mutateToMortar(tiles);
+                        case '%' -> blueprint.mutateToMortar(layers);
                         case ':' -> {
                             Button button = blueprint.mutateToBigButton();
                             buttonMap.put("%d:%d".formatted(xNum, yNum), button);
@@ -201,7 +195,7 @@ points can have the indicator B for big displays, special to the selection scree
                     String[] details = objectDetails.get(lineIndex).split("; ");
                     String onTileCode = details[0];
 
-                    initializedTile = blueprint.mutateToTile(onTileCode.charAt(0), isApproachable);
+                    initializedTile = blueprint.mutateToTile(onTileCode.charAt(0));
                     initializedCoin = initializeCoin(onTileCode.charAt(1), blueprint);
                     initializedGridObject = switch (char0) {
                         case 'C' -> {
@@ -244,8 +238,11 @@ points can have the indicator B for big displays, special to the selection scree
                         }
                     };
                 }
+                addEmptyGridObjects(initializedGridObject, gridObjects);
                 tiles[y][x] = initializedTile;
-                gridObjects[y][x] = initializedGridObject;
+                if (initializedGridObject != null) {
+                    gridObjects[y][x] = initializedGridObject;
+                }
                 coins[y][x] = initializedCoin;
             }
         }
@@ -294,6 +291,32 @@ points can have the indicator B for big displays, special to the selection scree
             }
 
             door.setButtons(buttonsToWire.toArray(new Button[0]));
+        }
+    }
+
+    private void addEmptyGridObjects(GridObject gridObject, GridObject[][] gridObjects) {
+        if (gridObject == null) return;
+        int xNum = gridObject.getXNum();
+        int yNum = gridObject.getYNum();
+        int x = xNum - 1, y = yNum - 1;
+        double tileSide = GridObject.TILE_SIDE;
+
+        if (gridObject.isCornerAligned()) {
+            int xSpan = (int)Math.ceil(gridObject.getWidth() / tileSide);
+            int ySpan = (int)Math.ceil(gridObject.getHeight() / tileSide);
+            for (int i = 0; i < ySpan; i++) {
+                for (int j = 0; j < xSpan; j++) {
+                    gridObjects[y + i][x + j] = new EmptyGridObject(worldIndex, xNum + j, yNum + i, gridObject);
+                }
+            }
+        } else {
+            int xSpan = (int)Math.ceil((gridObject.getWidth() / tileSide - 1) / 2);
+            int ySpan = (int)Math.ceil((gridObject.getHeight() / tileSide - 1) / 2);
+            for (int i = -ySpan; i <= ySpan; i++) {
+                for (int j = -xSpan; j <= xSpan; j++) {
+                    gridObjects[y + i][x + j] = new EmptyGridObject(worldIndex, xNum + j, yNum + i, gridObject);
+                }
+            }
         }
     }
 

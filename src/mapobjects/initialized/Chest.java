@@ -20,10 +20,10 @@ public abstract class Chest extends GridObject implements OnEffector {
         this.buffs = buffs;
         this.buffTime = buffTime;
         this.coinNum = coinNum;
-        effectBox = new Box(this);
-        effectBox.setBox(new double[]{
-                coordinates[0], (coordinates[1] + coordinates[3]) / 2,
-                coordinates[2], coordinates[3]
+        effectBox = positionBox.clone();
+        effectBox.setCorners(new double[]{
+                positionBox.getCorner(0), (positionBox.getCorner(1) + positionBox.getCorner(3)) / 2,
+                positionBox.getCorner(2), positionBox.getCorner(3)
         });
     }
 
@@ -33,14 +33,13 @@ public abstract class Chest extends GridObject implements OnEffector {
     }
 
     @Override
-    public double[] getEffectBox() {
-        return effectBox.getBox();
+    public Box getEffectBox() {
+        return effectBox;
     }
 
-
     @Override
-    public void call(Player player) {
-        checkPlayerIsOn(player);
+    public void checkPlayerIsOn(Player player) {
+        checkPlayerCornerIsOn(player);
     }
 
     @Override

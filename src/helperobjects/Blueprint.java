@@ -1,5 +1,6 @@
 package helperobjects;
 
+import mapobjects.framework.GridObject;
 import mapobjects.initialized.*;
 
 public class Blueprint {
@@ -12,6 +13,14 @@ public class Blueprint {
         this.yNum = yNum;
     }
 
+    public Blueprint(int worldIndex, double x, double y) {
+        this.worldIndex = worldIndex;
+        xNum = 0; yNum = 0;
+    }
+
+    public Projectile mutateToProjectile() {
+        return new Projectile(worldIndex, 0, 0, 0,0,0);
+    }
 
     public Coin.SingleCoin mutateToSingleCoin() {
         return new Coin.SingleCoin(worldIndex, xNum, yNum);
@@ -29,8 +38,8 @@ public class Blueprint {
         return new Mine(worldIndex, xNum, yNum);
     }
 
-    public Mortar mutateToMortar(Tile[][] tiles) {
-        return new Mortar(worldIndex, xNum, yNum, tiles);
+    public Mortar mutateToMortar(GridObject[][][] layers) {
+        return new Mortar(worldIndex, xNum, yNum, layers);
     }
 
     public Button.BigButton mutateToBigButton() {
@@ -77,15 +86,15 @@ public class Blueprint {
         return new Sign(worldIndex, xNum, yNum, messages);
     }
 
-    public Tile mutateToTile(char type, boolean isApproachable) {
+    public Tile mutateToTile(char type) {
         return switch (type) {
             case ' ', '_' -> new Tile.SpaceTile(worldIndex, xNum, yNum);
             case 'w' -> new Tile.SlowTile(worldIndex, xNum, yNum);
             case '!' -> new Tile.SpecialTile(worldIndex, xNum, yNum);
             case '-' -> new Tile.DamageTile(worldIndex, xNum, yNum);
             case '+' -> new Tile.HealTile(worldIndex, xNum, yNum);
-            case 'X' -> new Tile.WallTile(worldIndex, xNum, yNum, isApproachable);
-            case '#' -> new Tile.RiverTile(worldIndex, xNum, yNum, isApproachable);
+            case 'X' -> new Tile.WallTile(worldIndex, xNum, yNum);
+            case '#' -> new Tile.RiverTile(worldIndex, xNum, yNum);
             default -> {
                 System.out.println("default message for basic tiles, an error occurred");
                 yield new Tile.SpaceTile(worldIndex, xNum, yNum);

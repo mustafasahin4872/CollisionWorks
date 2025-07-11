@@ -2,7 +2,6 @@ package mapobjects.framework;
 
 import game.Player;
 import helperobjects.Blueprint;
-import mapobjects.initialized.Tile;
 
 import java.util.ArrayList;
 
@@ -13,7 +12,18 @@ public class Spawner {
 
     private final int spawnNum;
     private final Blueprint[] spawnObjects;
+    private final double centerX, centerY;
     private final int worldIndex, xNum, yNum;
+
+    public Spawner(int worldIndex, double x, double y, int spawnNum) {
+        this.spawnNum = spawnNum;
+        this.worldIndex = worldIndex;
+        centerX = x;
+        centerY = y;
+        xNum = 0;
+        yNum = 0;
+        spawnObjects = new Blueprint[spawnNum];
+    }
 
     public Spawner(GridObject gridObject) {
         this(gridObject, 1);
@@ -24,6 +34,9 @@ public class Spawner {
         this.worldIndex = gridObject.worldIndex;
         this.xNum = gridObject.xNum;
         this.yNum = gridObject.yNum;
+        double[] centerCoordinates = gridObject.getCenterCoordinates();
+        centerX = centerCoordinates[0];
+        centerY = centerCoordinates[1];
         spawnObjects = new Blueprint[spawnNum];
     }
 
@@ -58,19 +71,25 @@ public class Spawner {
     }
 
     public Blueprint onTopPlayerSpawn(Player player) {
-        int xNum = (int)(player.getX()/TILE_SIDE) + 1;
-        int yNum = (int)(player.getY()/TILE_SIDE) + 1;
-        return new Blueprint(worldIndex, xNum, yNum);
+        int[] gridNumbers = player.getGridNumbers();
+        return new Blueprint(worldIndex, gridNumbers[0], gridNumbers[1]);
     }
 
     //spawns in the direction of player's current position
-    public void directionSpawn() {
+    public void directionSpawn(Player player) {
+
+    }
+
+    //spawns in the direction of player's next position
+    public void aimDirectionSpawn(Player player) {
 
     }
 
     //spawns towards next position of the player
-    public void aimSpawn(Player player) {
-
+    public Blueprint aimSpawn(Player player) {
+        int nextXNum = (int) (player.getNextX() / TILE_SIDE) + 1;
+        int nextYNum = (int) (player.getNextY() / TILE_SIDE) + 1;
+        return new Blueprint(worldIndex, nextXNum, nextYNum);
     }
 
     //spawns the object at the given location with respect to the spawner object
@@ -80,9 +99,9 @@ public class Spawner {
 
 
     //spawns in random places(notices the wall tiles)
-    public Blueprint[] randomSpawn(int range, Tile[][] tiles) {
+    public Blueprint[] randomSpawn(int range, GridObject[][][] layers) {
         Blueprint[] spawned = new Blueprint[spawnNum];
-        int[][] coordinates = getValidCoordinates(range, tiles);
+        int[][] coordinates = getRandomCoordinates(range, layers);
         for (int i = 0; i<spawnNum; i++) {
             int[] coordinate = coordinates[i];
             spawned[i] = new Blueprint(worldIndex, coordinate[0], coordinate[1]);
@@ -90,17 +109,12 @@ public class Spawner {
         return spawned;
     }
 
-
-    //returns spawnNum unique coordinate pair, checks for not being impassable as well
-    private int[][] getValidCoordinates(int range, Tile[][] tiles) {
+    //returns spawnNum unique coordinate pair, checks for not spawning on solid objects
+    private int[][] getRandomCoordinates(int range, GridObject[][][] layers) {
         ArrayList<int[]> holder = new ArrayList<>();
-        holder.add(new int[]{xNum, yNum});
-        holder.add(new int[]{xNum+1, yNum});
-        holder.add(new int[]{xNum, yNum+1});
-        holder.add(new int[]{xNum+1, yNum+1});
         int xBound = xNum - range, yBound = yNum - range;
         int SIDE = range*2+2;
-        while (holder.size()<4+spawnNum) {
+        while (holder.size() < spawnNum) {
             int x = xBound + (int) (Math.random()*SIDE);
             int y = yBound + (int) (Math.random()*SIDE);
             boolean valid = true;
@@ -110,12 +124,15 @@ public class Spawner {
                     break;
                 }
             }
-            if (tiles[y-1][x-1].isSolid()) {valid = false;}
+            for (GridObject[][] layer : layers) {
+                GridObject gridObject = layer[y-1][x-1];
+                if (gridObject != null && gridObject.isSolid()) {valid = false;}
+            }
+
             if (valid) {
                 holder.add(new int[]{x, y});
             }
         }
-        holder.subList(0, 4).clear();
 
         return holder.toArray(new int[0][]);
     }

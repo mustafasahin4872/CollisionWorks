@@ -12,7 +12,7 @@ public abstract class Coin extends GridObject implements OnEffector {
 
     public Coin(int worldIndex, int xNum, int yNum, double size, int value, String fileName) {
         super(worldIndex, xNum, yNum, size, size, fileName);
-        effectBox = new Box(this);
+        effectBox = positionBox.clone();
         this.value = value;
     }
 
@@ -22,14 +22,13 @@ public abstract class Coin extends GridObject implements OnEffector {
     }
 
     @Override
-    public double[] getEffectBox() {
-        return effectBox.getBox();
+    public Box getEffectBox() {
+        return effectBox;
     }
 
-
     @Override
-    public void call(Player player) {
-        checkPlayerIsOn(player);
+    public void checkPlayerIsOn(Player player) {
+        checkPlayerCornerIsOn(player);
     }
 
     @Override

@@ -6,21 +6,9 @@ import mapobjects.framework.*;
 public abstract class Tile extends GridObject {
 
     private static final String ROOT = "misc/tileImages/";
-    private final boolean isSolid, isApproachable;
 
-    public Tile(int worldIndex, int xNum, int yNum, boolean isApproachable, boolean isSolid, String type) {
+    public Tile(int worldIndex, int xNum, int yNum, String type) {
         super(worldIndex, xNum, yNum, ROOT + type + worldIndex + ".jpg");
-        this.isApproachable = isApproachable;
-        this.isSolid = isSolid;
-    }
-
-
-    public boolean isSolid() {
-        return isSolid;
-    }
-
-    public boolean isApproachable() {
-        return isApproachable;
     }
 
     protected void resetPlayerStats(Player player) {
@@ -33,9 +21,9 @@ public abstract class Tile extends GridObject {
     public static abstract class ImpassableTile extends Tile implements Collidable {
 
         protected final Box collisionBox;
-        public ImpassableTile(int worldIndex, int xNum, int yNum, boolean isApproachable, String type) {
-            super(worldIndex, xNum, yNum, isApproachable, true, type);
-            collisionBox = new Box(this);
+        public ImpassableTile(int worldIndex, int xNum, int yNum, String type) {
+            super(worldIndex, xNum, yNum, type);
+            collisionBox = positionBox.clone();
         }
 
         @Override
@@ -47,14 +35,8 @@ public abstract class Tile extends GridObject {
 
     public static class WallTile extends ImpassableTile {
 
-        public WallTile(int worldIndex, int xNum, int yNum, boolean isApproachable) {
-            super(worldIndex, xNum, yNum, isApproachable, "WallTile");
-        }
-
-        //check for collision instead of on tile effect
-        @Override
-        public void call(Player player) {
-            if (isApproachable()) checkCollision(player);
+        public WallTile(int worldIndex, int xNum, int yNum) {
+            super(worldIndex, xNum, yNum, "WallTile");
         }
 
     }
@@ -62,14 +44,8 @@ public abstract class Tile extends GridObject {
 
     public static class RiverTile extends ImpassableTile {
 
-        public RiverTile(int worldIndex, int xNum, int yNum, boolean isApproachable) {
-            super(worldIndex, xNum, yNum, isApproachable, "RiverTile");
-        }
-
-        //check for collision instead of on tile effect
-        @Override
-        public void call(Player player) {
-            if (isApproachable()) checkCollision(player);
+        public RiverTile(int worldIndex, int xNum, int yNum) {
+            super(worldIndex, xNum, yNum, "RiverTile");
         }
 
     }
@@ -77,15 +53,20 @@ public abstract class Tile extends GridObject {
 
     public static abstract class PassableTile extends Tile implements OnEffector {
 
-        private Box effectBox;
+        private final Box effectBox;
         public PassableTile(int worldIndex, int xNum, int yNum, String type) {
-            super(worldIndex, xNum, yNum, true, false, type);
-            effectBox = new Box(this);
+            super(worldIndex, xNum, yNum, type);
+            effectBox = positionBox.clone();
         }
 
         @Override
-        public double[] getEffectBox() {
-            return effectBox.getBox();
+        public Box getEffectBox() {
+            return effectBox;
+        }
+
+        @Override
+        public void checkPlayerIsOn(Player player) {
+            checkPlayerCenterIsOn(player);
         }
 
     }
@@ -95,12 +76,6 @@ public abstract class Tile extends GridObject {
 
         public SpaceTile(int worldIndex, int xNum, int yNum) {
             super(worldIndex, xNum, yNum, "SpaceTile");
-        }
-
-        //check for player center instead of corners and sides
-        @Override
-        public void call(Player player) {
-            checkPlayerCenterIsOn(player);
         }
 
         @Override
@@ -117,12 +92,6 @@ public abstract class Tile extends GridObject {
             super(worldIndex, xNum, yNum, "SlowTile"); // Earthy brown
         }
 
-        //check for player center instead of corners and sides
-        @Override
-        public void call(Player player) {
-            checkPlayerCenterIsOn(player);
-        }
-
         @Override
         public void playerIsOn(Player player) {
             player.slow();
@@ -135,12 +104,6 @@ public abstract class Tile extends GridObject {
 
         public SpecialTile(int worldIndex, int xNum, int yNum) {
             super(worldIndex, xNum, yNum, "SpecialTile"); // Icy blue
-        }
-
-        //check for player center instead of corners and sides
-        @Override
-        public void call(Player player) {
-            checkPlayerCenterIsOn(player);
         }
 
         @Override
@@ -157,12 +120,6 @@ public abstract class Tile extends GridObject {
             super(worldIndex, xNum, yNum, "DamageTile");
         }
 
-        //check for player center instead of corners and sides
-        @Override
-        public void call(Player player) {
-            checkPlayerCenterIsOn(player);
-        }
-
         @Override
         public void playerIsOn(Player player) {
             resetPlayerStats(player);
@@ -176,12 +133,6 @@ public abstract class Tile extends GridObject {
 
         public HealTile(int worldIndex, int xNum, int yNum) { // Golden yellow tile, draw a + in it
             super(worldIndex, xNum, yNum, "HealTile");
-        }
-
-        //check for player center instead of corners and sides
-        @Override
-        public void call(Player player) {
-            checkPlayerCenterIsOn(player);
         }
 
         @Override

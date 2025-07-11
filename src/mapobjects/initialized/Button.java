@@ -13,18 +13,19 @@ public abstract class Button extends GridObject implements OnEffector {
 
     private final Box effectBox;
     private boolean pressed;
-    private Color unpressedColor = new Color(178, 23, 23); // Default color;
+    private Color unpressedColor = new Color(178, 23, 23); // Default color
     private Color color = unpressedColor;
     private static final Color PRESSED_COLOR = new Color(106, 192, 45),
-            FRAME_COLOR = new Color(71, 21, 21);
+            FRAME_COLOR = new Color(226, 125, 125);
 
     public Button(int worldIndex, int xNum, int yNum, double width, double height, boolean cornerAligned) {
         super(worldIndex, xNum, yNum, width, height, cornerAligned);
-        effectBox = new Box(this);
+        effectBox = positionBox.clone();
     }
 
-    public double[] getEffectBox() {
-        return effectBox.getBox();
+    @Override
+    public Box getEffectBox() {
+        return effectBox;
     }
 
     public boolean isPressed() {
@@ -40,10 +41,9 @@ public abstract class Button extends GridObject implements OnEffector {
         color = PRESSED_COLOR;
     }
 
-
     @Override
-    public void call(Player player) {
-        checkPlayerIsOn(player);
+    public void checkPlayerIsOn(Player player) {
+        checkPlayerCornerIsOn(player);
     }
 
     @Override
@@ -54,9 +54,9 @@ public abstract class Button extends GridObject implements OnEffector {
     @Override
     public void draw() {
         StdDraw.setPenColor(color);
-        drawRectangle(coordinates);
+        drawRectangle(positionBox);
         StdDraw.setPenColor(FRAME_COLOR);
-        drawRectangleOutline(coordinates);
+        drawRectangleOutline(positionBox);
     }
 
 

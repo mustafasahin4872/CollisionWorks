@@ -2,21 +2,23 @@ package mapobjects.framework;
 
 import game.Player;
 
-import static helperobjects.CollisionMethods.playerCenterIsIn;
-import static helperobjects.CollisionMethods.playerIsIn;
+import static helperobjects.CollisionMethods.*;
 
+//casts custom effects to Player objects
 public interface OnEffector {
 
-    double[] getEffectBox();
+    Box getEffectBox();
 
-    default void checkPlayerIsOn(Player player) {
-        if (playerIsIn(player, getEffectBox())) {
+    void checkPlayerIsOn(Player player);
+
+    default void checkPlayerCornerIsOn(Player player) {
+        if (intersects(player.getCollisionBox(), getEffectBox())) {
             playerIsOn(player);
         }
     }
 
     default void checkPlayerCenterIsOn(Player player) {
-        if (playerCenterIsIn(player, getEffectBox())) {
+        if (isIn(player.getX(), player.getY(), getEffectBox())) {
             playerIsOn(player);
         }
     }

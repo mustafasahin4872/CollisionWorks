@@ -22,11 +22,14 @@ public abstract class Point extends GridObject implements OnEffector {
     }
 
     @Override
-    public abstract void playerIsOn(Player player);
+    public void checkPlayerIsOn(Player player) {
+        checkPlayerCornerIsOn(player);
+    }
 
+    //special override for the selection screen
     @Override
     public void draw() {
-        StdDraw.picture(centerCoordinates[0], centerCoordinates[1], fileName, TILE_SIDE, TILE_SIDE);
+        StdDraw.picture(getX(), getY(), fileName, TILE_SIDE, TILE_SIDE);
     }
 
     public static class WinPoint extends Point implements OnEffector {
@@ -40,7 +43,7 @@ public abstract class Point extends GridObject implements OnEffector {
 
         public WinPoint(int worldIndex, int xNum, int yNum, int index, boolean isBig) {
             super(worldIndex, xNum, yNum, index, "winPoint", isBig);
-            effectBox = new Box(this);
+            effectBox = positionBox.clone();
             passcode = switch (index) {
                 case 0 -> Player.PASSCODE.NEXT;
                 case 1 -> Player.PASSCODE.ALTERNATE1;
@@ -53,13 +56,8 @@ public abstract class Point extends GridObject implements OnEffector {
 
 
         @Override
-        public double[] getEffectBox() {
-            return effectBox.getBox();
-        }
-
-        @Override
-        public void call(Player player) {
-            checkPlayerIsOn(player);
+        public Box getEffectBox() {
+            return effectBox;
         }
 
         @Override
@@ -82,19 +80,18 @@ public abstract class Point extends GridObject implements OnEffector {
 
         public CheckPoint(int worldIndex, int xNum, int yNum, int index, boolean isBig) {
             super(worldIndex, xNum, yNum, index, "checkPoint", isBig);
-            effectBox = new Box(this);
+            effectBox = positionBox.clone();
         }
 
 
         @Override
-        public double[] getEffectBox() {
-            return effectBox.getBox();
+        public Box getEffectBox() {
+            return effectBox;
         }
 
         @Override
         public void call(Player player) {
             if (visited) return;
-            checkPlayerCenterIsOn(player);
             ERROR_SIGN.call(player);
         }
 
@@ -114,7 +111,7 @@ public abstract class Point extends GridObject implements OnEffector {
             setFileName("misc/checkPointImages/0.png");
             if (prev != null) prev.setFileName("misc/checkPointImages/-1.png");
             player.updateLastCheckPointIndex();
-            player.setSpawnPoint(centerCoordinates);
+            player.setSpawnPoint(getCenterCoordinates());
         }
 
         @Override
@@ -139,10 +136,6 @@ public abstract class Point extends GridObject implements OnEffector {
             super(worldIndex, xNum, yNum, 0, isBig);
             visited = true;
         }
-
-
-        @Override
-        public void call(Player player) {} //no need to call
 
         @Override
         public void playerIsOn(Player player) {} //no action needed

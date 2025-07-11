@@ -28,7 +28,7 @@ public class Shooter extends GridObject implements Collidable {
         this.xTile = xTile;
         period = DEFAULT_PERIOD/worldIndex;
         startTime = System.currentTimeMillis();
-        collisionBox = new Box(this);
+        collisionBox = positionBox.clone();
     }
 
 
@@ -39,11 +39,9 @@ public class Shooter extends GridObject implements Collidable {
 
     @Override
     public void call(Player player) {
-        checkCollision(player);
         shoot();
         for (Projectile projectile : projectiles) {
             projectile.call(player);
-            projectile.checkWallCollision(tiles, xTile);
         }
     }
 
@@ -54,7 +52,7 @@ public class Shooter extends GridObject implements Collidable {
     public void shoot() {
         int timePassed = (int)(System.currentTimeMillis() - startTime);
         if (timePassed/period>shotProjectilesNumber) {
-            projectiles.add(new Projectile(worldIndex, xNum, yNum, direction, 50, 25));
+            //projectiles.add(new Projectile(worldIndex, xNum, yNum, direction, 50, 25));
             shotProjectilesNumber++;
         }
     }

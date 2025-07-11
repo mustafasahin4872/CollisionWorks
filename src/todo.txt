@@ -1,6 +1,8 @@
 NEEDED AS FIRST
+when trying to go to the direction opposite of the current one, the accel should be accel + decel until velocity zeroes
 objects are not called while out of screen, but doors dont open and big objects are not drawn is a problem
 add player to the layers, make better layering mechanics
+
 dont forget projectile collision with collidables
 maybe make a class called moveable, and generalize collision methods for all movables
 fill component classes/interfaces
