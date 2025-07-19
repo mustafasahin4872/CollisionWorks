@@ -24,7 +24,7 @@ public class Ghost extends GridObject implements OnEffector, MovingCollidable, D
     private final GridObject[][][] layers;
 
     public Ghost(int worldIndex, int xNum, int yNum, char alignment, GridObject[][][] layers) {
-        super(worldIndex, xNum, yNum, "misc/ghostImages/ghost"+worldIndex+".png");
+        super(worldIndex, xNum, yNum, "src/main/resources/ghostImages/ghost"+worldIndex+".png");
         fileRoot = rollForGhostType(worldIndex);
         collisionBox = positionBox.clone();
         effectBox = positionBox.clone();
@@ -47,7 +47,7 @@ public class Ghost extends GridObject implements OnEffector, MovingCollidable, D
             extra = "_";
             speed *= 2;
         }
-        fileRoot = "misc/ghostImages/ghost"+ worldIndex +extra;
+        fileRoot = "src/main/resources/ghostImages/ghost"+ worldIndex +extra;
         return fileRoot;
     }
 

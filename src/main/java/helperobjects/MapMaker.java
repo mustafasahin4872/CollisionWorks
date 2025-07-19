@@ -97,9 +97,9 @@ points can have the indicator B for big displays, special to the selection scree
         coins = new Coin[yTile][xTile];
         layers = new GridObject[][][]{tiles, gridObjects, emptyGridObjects, coins};
         if (isSelectionMap) {
-            mapFile = new File(("misc/maps/selectionMaps/%d%d.txt").formatted(worldIndex, levelIndex));
+            mapFile = new File(("src/main/resources/maps/selectionMaps/%d%d.txt").formatted(worldIndex, levelIndex));
         } else {
-            mapFile = new File(("misc/maps/gameMaps/%d%d.txt").formatted(worldIndex, levelIndex));
+            mapFile = new File(("src/main/resources/maps/gameMaps/%d%d.txt").formatted(worldIndex, levelIndex));
         }
 
     }

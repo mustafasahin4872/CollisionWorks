@@ -15,7 +15,7 @@ public abstract class Chest extends GridObject implements OnEffector {
     private final int coinNum;
 
     public Chest(int worldIndex, int xNum, int yNum, String type, char[] buffs, double buffTime, int coinNum) {
-        super(worldIndex, xNum, yNum, 2, 2, "misc/chestImages/closed" + type + ".png", true);
+        super(worldIndex, xNum, yNum, 2, 2, "src/main/resources/chestImages/closed" + type + ".png", true);
         this.type = type;
         this.buffs = buffs;
         this.buffTime = buffTime;
@@ -51,7 +51,7 @@ public abstract class Chest extends GridObject implements OnEffector {
     public void openChest(Player player) {
         if (isOpen) return;
         isOpen = true;
-        setFileName("misc/chestImages/opened" + type + ".png");
+        setFileName("src/main/resources/chestImages/opened" + type + ".png");
         player.buff(buffs, buffTime);
         player.collectCoin(coinNum);
     }

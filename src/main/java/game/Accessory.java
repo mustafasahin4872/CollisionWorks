@@ -86,7 +86,7 @@ public abstract class Accessory {
         }
 
         protected void setFileNames() {
-            fileNames[0] = "misc/accessoryImages/Hats/%s/U.png".formatted(name);
+            fileNames[0] = "src/main/resources/accessoryImages/Hats/%s/U.png".formatted(name);
         }
 
         @Override
@@ -112,7 +112,7 @@ public abstract class Accessory {
         }
 
         protected void setFileNames() {
-            fileNames[0] = "misc/accessoryImages/Necklaces/%s/U.png".formatted(name);
+            fileNames[0] = "src/main/resources/accessoryImages/Necklaces/%s/U.png".formatted(name);
         }
 
         @Override
@@ -138,9 +138,9 @@ public abstract class Accessory {
         }
 
         protected void setFileNames() {
-            fileNames[0] = "misc/accessoryImages/Headpieces/%s/UL.png".formatted(name);
-            fileNames[1] = "misc/accessoryImages/Headpieces/%s/U.png".formatted(name);
-            fileNames[2] = "misc/accessoryImages/Headpieces/%s/UR.png".formatted(name);
+            fileNames[0] = "src/main/resources/accessoryImages/Headpieces/%s/UL.png".formatted(name);
+            fileNames[1] = "src/main/resources/accessoryImages/Headpieces/%s/U.png".formatted(name);
+            fileNames[2] = "src/main/resources/accessoryImages/Headpieces/%s/UR.png".formatted(name);
         }
 
 
@@ -180,9 +180,9 @@ public abstract class Accessory {
         }
 
         protected void setFileNames() {
-            fileNames[0] = "misc/accessoryImages/Pins/%s/L.png".formatted(name);
-            fileNames[1] = "misc/accessoryImages/Pins/%s/0.png".formatted(name);
-            fileNames[2] = "misc/accessoryImages/Pins/%s/R.png".formatted(name);
+            fileNames[0] = "src/main/resources/accessoryImages/Pins/%s/L.png".formatted(name);
+            fileNames[1] = "src/main/resources/accessoryImages/Pins/%s/0.png".formatted(name);
+            fileNames[2] = "src/main/resources/accessoryImages/Pins/%s/R.png".formatted(name);
         }
 
 

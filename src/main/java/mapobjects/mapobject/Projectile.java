@@ -33,7 +33,7 @@ public class Projectile extends MapObject implements MovingCollidable, Timed, Da
     }
 
     public Projectile(int worldIndex, double x, double y, double width, double height, int direction, double speed) {
-        super(worldIndex, x, y, width, height, "misc/misc/projectile.png");
+        super(worldIndex, x, y, width, height, "src/main/resources/misc/projectile.png");
         this.direction = new Direction(direction);
         collisionBox = new Box(x, y, height, height);
         damager = new Damager(20);
@@ -157,7 +157,7 @@ public class Projectile extends MapObject implements MovingCollidable, Timed, Da
         public HomingProjectile(int worldIndex, double x, double y, int direction, double I) {
             super(worldIndex, x, y, direction);
             this.I = I;
-            setFileName("misc/misc/homingProjectile.png");
+            setFileName("src/main/resources/misc/homingProjectile.png");
         }
 
         @Override

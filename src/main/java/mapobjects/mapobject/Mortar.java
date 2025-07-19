@@ -30,7 +30,7 @@ public class Mortar extends GridObject implements Collidable, Ranged, Timed, Spa
     }
 
     public Mortar(int worldIndex, int xNum, int yNum, GridObject[][][] layers, int mineNum) {
-        super(worldIndex, xNum, yNum, 2, 2, "misc/misc/mortar.png", true);
+        super(worldIndex, xNum, yNum, 2, 2, "src/main/resources/misc/mortar.png", true);
         this.mineNum = mineNum;
         this.layers = layers;
         collisionBox = positionBox.clone();
@@ -95,7 +95,7 @@ public class Mortar extends GridObject implements Collidable, Ranged, Timed, Spa
     @Override
     public void ifNoLivesLeft() {
         broken = true;
-        setFileName("misc/misc/brokenMortar.png");
+        setFileName("src/main/resources/misc/brokenMortar.png");
     }
 
     @Override

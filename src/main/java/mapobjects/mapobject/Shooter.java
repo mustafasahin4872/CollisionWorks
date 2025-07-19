@@ -28,7 +28,7 @@ public abstract class Shooter extends GridObject implements Collidable, Timed, S
     protected boolean broken;
 
     public Shooter(int worldIndex, int xNum, int yNum, char type, GridObject[][][] layers) {
-        super(worldIndex, xNum, yNum, "misc/misc/shooter.png");
+        super(worldIndex, xNum, yNum, "src/main/resources/misc/shooter.png");
         this.type = type;
         this.layers = layers;
         collisionBox = positionBox.clone();
@@ -65,7 +65,7 @@ public abstract class Shooter extends GridObject implements Collidable, Timed, S
     @Override
     public void ifNoLivesLeft() {
         broken = true;
-        setFileName("misc/misc/brokenShooter.png");
+        setFileName("src/main/resources/misc/brokenShooter.png");
     }
 
     @Override

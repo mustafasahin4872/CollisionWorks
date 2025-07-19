@@ -1,5 +1,7 @@
 NEEDED AS FIRST
-
+fix player resize not changing width and heigjht
+fix the file naming convention and generalize all draw methods, player draw fix
+make accessory a mapobject
 add sound effects to: worlds, player damaged, player shooting, coin collection, different backg sound when critical health
 the always called objects should be called in collision checks of projectiles as well
 the empty grid object collision trigger for projectile and else addition

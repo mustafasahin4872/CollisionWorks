@@ -12,7 +12,7 @@ public abstract class Point extends GridObject implements OnEffector {
     protected boolean isBig;
 
     public Point(int worldIndex, int xNum, int yNum, int index, String type, boolean isBig) {
-        super(worldIndex, xNum, yNum, getSize(isBig), getSize(isBig), "misc/" + type + "Images/" + index + ".png", isBig);
+        super(worldIndex, xNum, yNum, getSize(isBig), getSize(isBig), "src/main/resources/" + type + "Images/" + index + ".png", isBig);
         this.index = index;
         this.isBig = isBig;
     }
@@ -108,8 +108,8 @@ public abstract class Point extends GridObject implements OnEffector {
 
         private void markVisited(Player player) {
             visited = true;
-            setFileName("misc/checkPointImages/0.png");
-            if (prev != null) prev.setFileName("misc/checkPointImages/-1.png");
+            setFileName("src/main/resources/checkPointImages/0.png");
+            if (prev != null) prev.setFileName("src/main/resources/checkPointImages/-1.png");
             player.updateLastCheckPointIndex();
             player.setSpawnPoint(getCenterCoordinates());
         }

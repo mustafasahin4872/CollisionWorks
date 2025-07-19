@@ -65,7 +65,7 @@ public class Player extends MapObject implements MovingCollidable, Spawnable, He
 
     public Player(String name) {
         this.name = name;
-        fileRoot = "misc/playerImages/" + name + "/";
+        fileRoot = "src/main/resources/playerImages/" + name + "/";
         defaultSide = switch (name) {
             case "Bob", "Mike" -> 50;
             case "Zahit" -> 70;
@@ -627,13 +627,13 @@ public class Player extends MapObject implements MovingCollidable, Spawnable, He
     }
 
     public void drawCoinAmount(double frameX, double frameY) {
-        StdDraw.picture(frameX + Frame.X_SCALE/2.0 - 30, frameY - Frame.Y_SCALE/2.0 + 30, "misc/coinImages/coin.png", 40, 40);
+        StdDraw.picture(frameX + Frame.X_SCALE/2.0 - 30, frameY - Frame.Y_SCALE/2.0 + 30, "src/main/resources/coinImages/coin.png", 40, 40);
         StdDraw.setFont(); StdDraw.setPenColor();
         StdDraw.text(frameX + Frame.X_SCALE/2.0 - 30, frameY - Frame.Y_SCALE/2.0 + 30, "%d".formatted(coinsCollected));
     }
 
     public void drawLifeAmount(double frameX, double frameY) {
-        StdDraw.picture(frameX + Frame.X_SCALE/2.0 - 80, frameY - Frame.Y_SCALE/2.0 + 30, "misc/misc/heart.png", 40, 40);
+        StdDraw.picture(frameX + Frame.X_SCALE/2.0 - 80, frameY - Frame.Y_SCALE/2.0 + 30, "src/main/resources/misc/heart.png", 40, 40);
         StdDraw.setFont(); StdDraw.setPenColor();
         StdDraw.text(frameX + Frame.X_SCALE/2.0 - 80, frameY - Frame.Y_SCALE/2.0 + 30, "%d".formatted(hpBar.getLives()));
     }
@@ -642,7 +642,7 @@ public class Player extends MapObject implements MovingCollidable, Spawnable, He
         double baseX = frameX - Frame.X_SCALE/2.0 + 15 + hpBar.getMaxHP() + 4*halfHeight;
         double baseY = frameY - Frame.Y_SCALE / 2.0 + 15 + 16;
         for (int i = 0; i<ammo; i++) {
-            StdDraw.picture(baseX + halfHeight*4*i, baseY, "misc/misc/projectile.png", halfHeight*4, halfHeight*2, 45);
+            StdDraw.picture(baseX + halfHeight*4*i, baseY, "src/main/resources/misc/projectile.png", halfHeight*4, halfHeight*2, 45);
         }
     }
 

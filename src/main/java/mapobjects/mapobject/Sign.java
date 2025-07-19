@@ -29,7 +29,7 @@ public class Sign extends GridObject implements OnEffector {
     }
 
     public Sign(int worldIndex, int xNum, int yNum, String[] messages, boolean displaySign) {
-        super(worldIndex, xNum, yNum, "misc/signImages/sign.png");
+        super(worldIndex, xNum, yNum, "src/main/resources/signImages/sign.png");
         this.messages = messages;
         this.displaySign = displaySign;
 

@@ -6,7 +6,7 @@ import mapobjects.category.*;
 
 public abstract class Tile extends GridObject {
 
-    private static final String ROOT = "misc/tileImages/";
+    private static final String ROOT = "src/main/resources/tileImages/";
 
     public Tile(int worldIndex, int xNum, int yNum, String type) {
         super(worldIndex, xNum, yNum, ROOT + type + worldIndex + ".jpg");
