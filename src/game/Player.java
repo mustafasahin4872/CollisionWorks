@@ -1,12 +1,26 @@
 package game;
 
+import helperobjects.Blueprint;
 import lib.StdDraw;
-import mapobjects.framework.*;
-import mapobjects.initialized.EmptyGridObject;
+import mapobjects.component.Box;
+import mapobjects.component.HPBar;
+import mapobjects.component.Spawner;
+import mapobjects.component.Timer;
+import mapobjects.category.*;
+import mapobjects.mapobject.EmptyGridObject;
+import mapobjects.mapobject.Projectile;
 
-public class Player extends MapObject implements MovingCollidable {
+import java.awt.*;
+import java.util.HashSet;
+import java.util.Set;
+
+public class Player extends MapObject implements MovingCollidable, Spawnable, HealthBearer, Timed {
 
     private final Box collisionBox;
+    private final Spawner spawner;
+    private final Set<Projectile> projectiles = new HashSet<>();
+    private final HPBar hpBar;
+    private final Timer timer, shootingCooldown;
 
     public enum PASSCODE {
         ZERO, DEAD, NEXT, ALTERNATE1, ALTERNATE2, ALTERNATE3, SHOP
@@ -23,11 +37,12 @@ public class Player extends MapObject implements MovingCollidable {
 
     private double spawnX, spawnY, xVelocity, yVelocity, maxSpeed, acceleration, deceleration;
     private int xDirection, yDirection;
+    private boolean shoot;
     private boolean xCollided, yCollided;
 
-    private int lives = 3;
-    private static final double MAX_HP = 200;
-    private double hitPoints = MAX_HP;
+    private final int maxAmmo = 5;
+    private int ammo = maxAmmo;
+
     private int lastCheckPointIndex;
 
     private char onTileType = ' ';
@@ -58,29 +73,51 @@ public class Player extends MapObject implements MovingCollidable {
         };
         setSide(defaultSide);
         collisionBox = positionBox.clone();
+        spawner = new Spawner(worldIndex, getX(), getY());
+        hpBar = new HPBar(side*4, 3, 0);
+        timer = new Timer(0, 1000);
+        shootingCooldown = new Timer(0, 100);
+        timer.activate();
         respawn();
     }
 
 
     //UPDATES
 
-    @Override
-    public void call(Player player) {
-
-    }
-
     //prototype collision and on tile effect checker, will simplify call methods on the other object types
     public void call(GridObject[][][] layers) {
+        checkDead();
+
+        if (!isComplete()) {timeIsUp(this);}
+        if (isActive()) {reload();}
+        updateTimer();
+        shootingCooldown.tick();
+
+        if (shoot) {
+            if (ammo > 0 && !shootingCooldown.isCompleted()) {
+                shootingCooldown.activate();
+                spawn();
+                ammo--;
+            }
+            shoot = false;
+        }
+
         int range = 2; //the checking range
         int[] gridNumbers = getGridNumbers();
         for (GridObject[][] layer : layers) {
             for (int i = gridNumbers[1]-range; i<gridNumbers[1]+range; i++) {
                 for (int j = gridNumbers[0]-range; j<gridNumbers[0]+range; j++) {
+                    if (i<0 || j<0 || i>=layer.length || j>=layer[0].length) continue;
                     GridObject currentGridObject = layer[i][j];
                     checkMapObjectEffects(currentGridObject);
                 }
             }
         }
+        //player's projectiles are not checking player collisions
+        for (Projectile projectile : projectiles) {
+            projectile.call(new Player(), layers);
+        }
+        projectiles.removeIf(Projectile::isExpired);
     }
 
     private void checkMapObjectEffects(GridObject currentGridObject) {
@@ -200,6 +237,36 @@ public class Player extends MapObject implements MovingCollidable {
     }
 
 
+    //SPAWNING PROJECTILES
+
+    @Override
+    public MapObject[] getSpawnObjects() {
+        return projectiles.toArray(new Projectile[0]);
+    }
+
+    @Override
+    public void spawn() {
+        Blueprint blueprint = spawner.directionSpawn(getNextCenterCoordinates(), 30);
+        int direction = ((int) Math.toDegrees(Math.atan2(yVelocity, xVelocity)) + 360) % 360;
+        double speed = Math.sqrt(xVelocity * xVelocity + yVelocity * yVelocity);
+        Projectile projectile = blueprint.mutateToProjectile(20, 10, direction, speed + Projectile.DEFAULT_INITIAL_SPEED);
+        projectiles.add(projectile);
+    }
+
+    @Override
+    public Timer getTimer() {
+        return timer;
+    }
+
+    @Override
+    public void timeIsUp(Player player) {
+        activateTimer();
+    }
+
+    private void reload() {
+        if (ammo+1<=maxAmmo) ammo++;
+    }
+
     //COLLISION
 
     @Override
@@ -244,12 +311,14 @@ public class Player extends MapObject implements MovingCollidable {
     public void setX(double x) {
         super.setX(x);
         collisionBox.setCenterX(x);
+        spawner.setCenterX(x);
     }
 
     @Override
     public void setY(double y) {
         super.setY(y);
         collisionBox.setCenterY(y);
+        spawner.setCenterY(y);
     }
 
     public double getXVelocity() {
@@ -289,8 +358,10 @@ public class Player extends MapObject implements MovingCollidable {
     }
 
     public void resetAcceleration() {
-        acceleration = A2;
+        acceleration = A3;
     }
+
+    //INPUT
 
     public int getXDirection() {
         return xDirection;
@@ -308,6 +379,9 @@ public class Player extends MapObject implements MovingCollidable {
         this.yDirection = yDirection;
     }
 
+    public void shoot() {
+        shoot = true;
+    }
 
     //SIZE
 
@@ -337,24 +411,10 @@ public class Player extends MapObject implements MovingCollidable {
 
     //LIVES AND HP
 
-    public void heal(double healAmount) {
-        if (hitPoints + healAmount > MAX_HP) {
-            hitPoints = MAX_HP;
-        } else {
-            hitPoints += healAmount;
-        }
-    }
 
-    public void damage(double damageAmount) {
-        if (hitPoints - damageAmount < 0) {
-            hitPoints = 0;
-        } else {
-            hitPoints -= damageAmount;
-        }
-    }
-
-    public void checkPlayerDied() {
-        if (hitPoints == 0) die();
+    @Override
+    public HPBar getHealthBar() {
+        return hpBar;
     }
 
     public void respawn() {
@@ -364,22 +424,23 @@ public class Player extends MapObject implements MovingCollidable {
         yVelocity = 0;
         acceleration = 0;
         deceleration = 0;
+        ammo = maxAmmo;
+        hpBar.revive();
     }
 
-    public void die() {
-        lives--;
-        if (lives == 0) {
-            passCode = PASSCODE.DEAD;
-            return;
-        }
-        hitPoints = MAX_HP;
+    @Override
+    public void ifDied() {
         respawn();
     }
 
-    public void addLife() {
-        lives++;
+    @Override
+    public void ifNoLivesLeft() {
+        passCode = PASSCODE.DEAD;
     }
 
+    public void addLife() {
+        hpBar.addLife();
+    }
 
     //BUFFS
 
@@ -474,7 +535,10 @@ public class Player extends MapObject implements MovingCollidable {
 
     //DRAW METHODS
 
-    public void draw() {
+    public void draw(double frameX, double frameY) {
+
+        for (Projectile projectile : projectiles) projectile.draw();
+
         double x = getX(), y = getY();
 
         if (xDirection == 1 && yDirection == -1) {
@@ -503,6 +567,12 @@ public class Player extends MapObject implements MovingCollidable {
         for (Accessory accessory : accessories) {
             accessory.draw();
         }
+
+        drawCriticalHealthEffect(frameX, frameY, hpBar);
+        drawHPBar(frameX, frameY, 12);
+        drawAmmo(frameX, frameY, 7);
+        drawCoinAmount(frameX, frameY);
+        drawLifeAmount(frameX, frameY);
     }
 
     public void drawBig(double multiplier) {
@@ -534,24 +604,25 @@ public class Player extends MapObject implements MovingCollidable {
         }
     }
 
-    public void drawHPBar(double frameX, double frameY) {
+    public void drawHPBar(double frameX, double frameY, double halfHeight) {
         //the outline of hp bar
+        double max_HP = hpBar.getMaxHP();
+        double HP = hpBar.getHP();
         double thickness = 2;
-        double barHalfheight = 12;
         StdDraw.setPenColor(StdDraw.BLACK);
         StdDraw.filledRectangle(
-                frameX - Frame.X_SCALE/2.0 + 15 + (MAX_HP/2.0 + thickness),
-                frameY - Frame.Y_SCALE/2.0 + 15 + (barHalfheight + thickness),
-                MAX_HP/2.0 + thickness,
-                barHalfheight + thickness);
+                frameX - Frame.X_SCALE/2.0 + 15 + (max_HP/2.0 + thickness),
+                frameY - Frame.Y_SCALE/2.0 + 15 + (halfHeight + thickness),
+                max_HP/2.0 + thickness,
+                halfHeight + thickness);
 
-        //the hp in side the outline
+        //the hp inside the outline
         StdDraw.setPenColor(StdDraw.GREEN);
         StdDraw.filledRectangle(
-                frameX - Frame.X_SCALE/2.0 + 15 + thickness + hitPoints/2.0,
-                frameY - Frame.Y_SCALE/2.0 + 15 + (barHalfheight + thickness),
-                hitPoints/2.0,
-                barHalfheight
+                frameX - Frame.X_SCALE/2.0 + 15 + thickness + HP/2.0,
+                frameY - Frame.Y_SCALE/2.0 + 15 + (halfHeight + thickness),
+                HP/2.0,
+                halfHeight
         );
     }
 
@@ -564,7 +635,59 @@ public class Player extends MapObject implements MovingCollidable {
     public void drawLifeAmount(double frameX, double frameY) {
         StdDraw.picture(frameX + Frame.X_SCALE/2.0 - 80, frameY - Frame.Y_SCALE/2.0 + 30, "misc/misc/heart.png", 40, 40);
         StdDraw.setFont(); StdDraw.setPenColor();
-        StdDraw.text(frameX + Frame.X_SCALE/2.0 - 80, frameY - Frame.Y_SCALE/2.0 + 30, "%d".formatted(lives));
+        StdDraw.text(frameX + Frame.X_SCALE/2.0 - 80, frameY - Frame.Y_SCALE/2.0 + 30, "%d".formatted(hpBar.getLives()));
     }
+
+    public void drawAmmo(double frameX, double frameY, double halfHeight) {
+        double baseX = frameX - Frame.X_SCALE/2.0 + 15 + hpBar.getMaxHP() + 4*halfHeight;
+        double baseY = frameY - Frame.Y_SCALE / 2.0 + 15 + 16;
+        for (int i = 0; i<ammo; i++) {
+            StdDraw.picture(baseX + halfHeight*4*i, baseY, "misc/misc/projectile.png", halfHeight*4, halfHeight*2, 45);
+        }
+    }
+
+    public void drawCriticalHealthEffect(double frameX, double frameY, HPBar HPBar) {
+        double halfThickness = 5;
+        int rectangleCount = (int) (10- HPBar.getRemainingHPPercentage()/3);
+
+        for (int i = 0; i < rectangleCount; i++) {
+            double fadeFactor = 1 - (i / (double) rectangleCount); // linear fade
+            int alpha = (int) (fadeFactor * 255);
+            StdDraw.setPenColor(new Color(123, 9, 9, alpha));
+
+            // LEFT side
+            StdDraw.filledRectangle(
+                    frameX - Frame.X_SCALE / 2.0 + (2 * i + 1) * halfThickness,
+                    frameY,
+                    halfThickness,
+                    Frame.Y_SCALE / 2.0
+            );
+
+            // RIGHT side
+            StdDraw.filledRectangle(
+                    frameX + Frame.X_SCALE / 2.0 - (2 * i + 1) * halfThickness,
+                    frameY,
+                    halfThickness,
+                    Frame.Y_SCALE / 2.0
+            );
+
+            // BOTTOM side
+            StdDraw.filledRectangle(
+                    frameX,
+                    frameY + Frame.Y_SCALE / 2.0 - (2 * i + 1) * halfThickness,
+                    Frame.X_SCALE / 2.0,
+                    halfThickness
+            );
+
+            // TOP side
+            StdDraw.filledRectangle(
+                    frameX,
+                    frameY - Frame.Y_SCALE / 2.0 + (2 * i + 1) * halfThickness,
+                    Frame.X_SCALE / 2.0,
+                    halfThickness
+            );
+        }
+    }
+
 
 }

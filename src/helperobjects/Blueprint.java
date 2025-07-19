@@ -1,25 +1,41 @@
 package helperobjects;
 
-import mapobjects.framework.GridObject;
-import mapobjects.initialized.*;
+import game.Player;
+import mapobjects.category.GridObject;
+import mapobjects.mapobject.*;
+
+import static mapobjects.category.GridObject.TILE_SIDE;
 
 public class Blueprint {
 
     private final int worldIndex, xNum, yNum;
+    private final double centerX, centerY;
 
     public Blueprint(int worldIndex, int xNum, int yNum) {
         this.worldIndex = worldIndex;
         this.xNum = xNum;
         this.yNum = yNum;
+        centerX = (xNum - 0.5) * TILE_SIDE;
+        centerY = (yNum - 0.5) * TILE_SIDE;
     }
 
     public Blueprint(int worldIndex, double x, double y) {
         this.worldIndex = worldIndex;
-        xNum = 0; yNum = 0;
+        xNum = (int) (x/TILE_SIDE) + 1; yNum = (int) (y/TILE_SIDE) + 1;
+        centerX = x;
+        centerY = y;
     }
 
-    public Projectile mutateToProjectile() {
-        return new Projectile(worldIndex, 0, 0, 0,0,0);
+    public Projectile mutateToProjectile(int direction) {
+        return new Projectile(worldIndex, centerX, centerY, direction);
+    }
+
+    public Projectile mutateToProjectile(double width, double height, int direction, double speed) {
+        return new Projectile(worldIndex, centerX, centerY, width, height, direction, speed);
+    }
+
+    public Projectile mutateToHomingProjectile(int direction, double I) {
+        return new Projectile.HomingProjectile(worldIndex, centerX, centerY, direction, I);
     }
 
     public Coin.SingleCoin mutateToSingleCoin() {
@@ -84,6 +100,18 @@ public class Blueprint {
 
     public Sign mutateToSign(String[] messages) {
         return new Sign(worldIndex, xNum, yNum, messages);
+    }
+
+    public Shooter mutateToRegularShooter(char direction, GridObject[][][] layers) {return new Shooter.RegularShooter(worldIndex, xNum, yNum, direction, layers);}
+
+    public Shooter mutateToDirectionShooter(GridObject[][][] layers, Player player) {return new Shooter.DirectionShooter(worldIndex, xNum, yNum, layers, player);}
+
+    public Shooter mutateToHomingShooter(GridObject[][][] layers, Player player) {return new Shooter.HomingShooter(worldIndex, xNum, yNum, layers, player);}
+
+    public Shooter mutateToMovingShooter(char direction, char alignment, GridObject[][][] layers) {return new Shooter.MovingShooter(worldIndex, xNum, yNum, direction, alignment, layers);}
+
+    public Ghost mutateToGhost(char alignment, GridObject[][][] layers) {
+        return new Ghost(worldIndex, xNum, yNum, alignment, layers);
     }
 
     public Tile mutateToTile(char type) {

@@ -1,6 +1,6 @@
 package game;
 
-import mapobjects.initialized.Sign;
+import mapobjects.mapobject.Sign;
 import lib.StdDraw;
 
 import java.awt.event.KeyEvent;
@@ -22,6 +22,8 @@ public class Frame {
     private static final int[] UP_CODES = {KeyEvent.VK_UP, KeyEvent.VK_W};
     private static final int[] LEFT_CODES = {KeyEvent.VK_LEFT, KeyEvent.VK_A};
     private static final int[] DOWN_CODES = {KeyEvent.VK_DOWN, KeyEvent.VK_S};
+    private static final int[] SHOOT_CODES = {KeyEvent.VK_SPACE};
+
 
     public Frame(GameMap gameMap, Player player) {
         this.gameMap = gameMap;
@@ -50,8 +52,6 @@ public class Frame {
             gameMap.callMapObjects();
             //updates player position and other attributes at last
             player.update();
-            //checks if player died, and calls corresponding methods for the situation
-            player.checkPlayerDied();
 
             //sets the frame to center player if it is not in the edges of gameMap
             //if the frame would get out of the gameMap, set frame to show up to edge
@@ -98,10 +98,7 @@ public class Frame {
         StdDraw.textLeft(frameX - X_SCALE/2 + 10, frameY + Y_SCALE/2 - 10, "x-y: %.1f %.1f".formatted(player.getX(), player.getY()));
         StdDraw.textLeft(frameX - X_SCALE/2 + 10, frameY + Y_SCALE/2 - 30, "vx: %.1f".formatted(player.getXVelocity()));
         StdDraw.textLeft(frameX - X_SCALE/2 + 10, frameY + Y_SCALE/2 - 50, "vy: %.1f".formatted(player.getYVelocity()));
-        player.draw();
-        player.drawHPBar(frameX, frameY);
-        player.drawCoinAmount(frameX, frameY);
-        player.drawLifeAmount(frameX, frameY);
+        player.draw(frameX, frameY);
     }
 
     public void handleInput(Player player) {
@@ -124,6 +121,11 @@ public class Frame {
         for (int DOWN_CODE : DOWN_CODES) {
             if (StdDraw.isKeyPressed(DOWN_CODE)) {
                 player.setYDirection(1);
+            }
+        }
+        for (int SHOOT_CODE : SHOOT_CODES) {
+            if (StdDraw.isKeyPressed(SHOOT_CODE)) {
+                player.shoot();
             }
         }
 

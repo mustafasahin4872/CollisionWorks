@@ -1,14 +1,15 @@
 package helperobjects;
 
 import game.Player;
-import mapobjects.framework.Collidable;
-import mapobjects.framework.GridObject;
-import mapobjects.initialized.*;
+import mapobjects.category.GridObject;
+import mapobjects.mapobject.*;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.*;
 import java.util.Map;
+
+import static helperobjects.Helpers.toCharArray;
 
 //creates all the map objects from map file
 public class MapMaker {
@@ -21,6 +22,7 @@ public class MapMaker {
     private final GridObject[][][] layers;
     private final Tile[][] tiles;
     private final GridObject[][] gridObjects;
+    private final EmptyGridObject[][] emptyGridObjects;
     private final Coin[][] coins;
 
     private static final Set<String> IMPASSABLE_CODES = new HashSet<>(Set.of("XXX", "###", "%%%"));
@@ -39,7 +41,7 @@ public class MapMaker {
 
                     'o', '*', '$', // single/triple/bag coins
                     ':', '.', // big/little button
-                    '@', '%', // mine and mortar
+                    '@', '%', '+', ';',// mine, mortar, shooter, ghost
 
                     '0', '1', '2', '3', '4', // spawn/check points
                     '5', '6', '7', '8', '9', // win points
@@ -91,8 +93,9 @@ points can have the indicator B for big displays, special to the selection scree
         this.player = player;
         tiles = new Tile[yTile][xTile];
         gridObjects = new GridObject[yTile][xTile];
+        emptyGridObjects = new EmptyGridObject[yTile][xTile];
         coins = new Coin[yTile][xTile];
-        layers = new GridObject[][][]{tiles, gridObjects, coins};
+        layers = new GridObject[][][]{tiles, gridObjects, emptyGridObjects, coins};
         if (isSelectionMap) {
             mapFile = new File(("misc/maps/selectionMaps/%d%d.txt").formatted(worldIndex, levelIndex));
         } else {
@@ -132,6 +135,7 @@ points can have the indicator B for big displays, special to the selection scree
         // hold the D37 codes here with their locations to later wire them to buttons
         Map<Door, Integer> doorsToWire = new HashMap<>();
         Map<String, Button> buttonMap = new HashMap<>();
+
         Point.CheckPoint[] checkPointsToSetPrev = {
                 new Point.SpawnPoint(0,0,0),
                 new Point.CheckPoint(0,0,0,1),
@@ -162,6 +166,13 @@ points can have the indicator B for big displays, special to the selection scree
                     initializedGridObject = switch (char1) {
                         case '@' -> blueprint.mutateToMine();
                         case '%' -> blueprint.mutateToMortar(layers);
+                        case '+' -> {
+                            if (char2 == 'x') yield blueprint.mutateToDirectionShooter(layers, player);
+                            else if (char2 == 'h') {
+                                yield blueprint.mutateToHomingShooter(layers, player);
+                            } else yield blueprint.mutateToRegularShooter(char2, layers);
+                        }
+                        case ';' -> blueprint.mutateToGhost(char2, layers);
                         case ':' -> {
                             Button button = blueprint.mutateToBigButton();
                             buttonMap.put("%d:%d".formatted(xNum, yNum), button);
@@ -232,6 +243,7 @@ points can have the indicator B for big displays, special to the selection scree
                                 }
                             };
                         }
+                        case 'O' -> blueprint.mutateToMovingShooter(details[1].charAt(0), details[2].charAt(0), layers);
                         default -> {
                             System.out.println("default message for A37, an error occurred.");
                             yield null;
@@ -240,9 +252,7 @@ points can have the indicator B for big displays, special to the selection scree
                 }
                 addEmptyGridObjects(initializedGridObject, gridObjects);
                 tiles[y][x] = initializedTile;
-                if (initializedGridObject != null) {
-                    gridObjects[y][x] = initializedGridObject;
-                }
+                gridObjects[y][x] = initializedGridObject;
                 coins[y][x] = initializedCoin;
             }
         }
@@ -294,6 +304,11 @@ points can have the indicator B for big displays, special to the selection scree
         }
     }
 
+    //calls all wiring methods
+    private void wireAll() {
+
+    }
+
     private void addEmptyGridObjects(GridObject gridObject, GridObject[][] gridObjects) {
         if (gridObject == null) return;
         int xNum = gridObject.getXNum();
@@ -306,7 +321,7 @@ points can have the indicator B for big displays, special to the selection scree
             int ySpan = (int)Math.ceil(gridObject.getHeight() / tileSide);
             for (int i = 0; i < ySpan; i++) {
                 for (int j = 0; j < xSpan; j++) {
-                    gridObjects[y + i][x + j] = new EmptyGridObject(worldIndex, xNum + j, yNum + i, gridObject);
+                    emptyGridObjects[y + i][x + j] = new EmptyGridObject(worldIndex, xNum + j, yNum + i, gridObject);
                 }
             }
         } else {
@@ -314,7 +329,7 @@ points can have the indicator B for big displays, special to the selection scree
             int ySpan = (int)Math.ceil((gridObject.getHeight() / tileSide - 1) / 2);
             for (int i = -ySpan; i <= ySpan; i++) {
                 for (int j = -xSpan; j <= xSpan; j++) {
-                    gridObjects[y + i][x + j] = new EmptyGridObject(worldIndex, xNum + j, yNum + i, gridObject);
+                    emptyGridObjects[y + i][x + j] = new EmptyGridObject(worldIndex, xNum + j, yNum + i, gridObject);
                 }
             }
         }
@@ -322,25 +337,6 @@ points can have the indicator B for big displays, special to the selection scree
 
 
     //EXTRACT
-
-    private void extractApproachability(String[][] mapData, boolean[][] approachability) {
-        for (int y = 0; y < yTile; y++) {
-            for (int x = 0; x < xTile; x++) {
-                String tileCode = mapData[y][x];
-
-                if (isPassable(tileCode)) {
-                    approachability[y][x] = true;
-                } else {
-                    String up = y > 0 ? mapData[y - 1][x] : "%%%";
-                    String down = y < yTile - 1 ? mapData[y + 1][x] : "%%%";
-                    String left = x > 0 ? mapData[y][x - 1] : "%%%";
-                    String right = x < xTile - 1 ? mapData[y][x + 1] : "%%%";
-
-                    approachability[y][x] = isApproachable(up, down, left, right);
-                }
-            }
-        }
-    }
 
     private void extractMapData(String[][] mapData, ArrayList<String> objectDetails) {
         try (Scanner scanner = new Scanner(mapFile)) {
@@ -362,29 +358,6 @@ points can have the indicator B for big displays, special to the selection scree
         } catch (FileNotFoundException e) {
             System.out.println("File couldn't be opened: " + mapFile.getAbsolutePath());
         }
-    }
-
-
-    //MINI HELPERS
-
-    private boolean isApproachable(String charUp, String charDown, String charLeft, String charRight) {
-        return isPassable(charUp) || isPassable(charDown) || isPassable(charLeft) || isPassable(charRight);
-    }
-
-    private boolean isPassable(String tileCode) {
-        return !IMPASSABLE_CODES.contains(tileCode);
-    }
-
-    private char[] toCharArray(String[] stringArray) {
-
-        int l = stringArray.length;
-        char[] returnArray = new char[l];
-
-        for (int i = 0; i<l; i++) {
-            returnArray[i] = stringArray[i].charAt(0);
-        }
-        return returnArray;
-
     }
 
 }

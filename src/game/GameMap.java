@@ -2,10 +2,15 @@ package game;
 
 import helperobjects.Helpers;
 import helperobjects.MapMaker;
-import mapobjects.framework.GridObject;
-import mapobjects.initialized.*;
+import mapobjects.category.GridObject;
+import mapobjects.category.MapObject;
+import mapobjects.mapobject.*;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.function.Consumer;
+
+import static helperobjects.CollisionMethods.isIn;
 
 public class GameMap {
 
@@ -22,6 +27,7 @@ public class GameMap {
     //(x0, y0) and (x1, y1) are the rectangle's bottom left and top right corners.
 
     private final GridObject[][][] layers;
+    private final Set<MapObject> alwaysCalledObjects = new HashSet<>();
 
     //private final int totalCoinOnMap;
 
@@ -48,6 +54,18 @@ public class GameMap {
         MapMaker mapMaker = new MapMaker(worldIndex, levelIndex, xTile, yTile, player, isSelectionMap);
         mapMaker.mapMaker();
         layers = mapMaker.getLayers();
+
+        for (GridObject[][] layer : layers) {
+            for (int i = 0; i<yTile; i++) {
+                for (int j = 0; j<xTile; j++) {
+                    GridObject gridObject = layer[i][j];
+                    if (gridObject instanceof Door || gridObject instanceof Shooter) {
+                        alwaysCalledObjects.add(gridObject);
+                    }
+                }
+            }
+        }
+
 
         setFrameTileRange();
     }
@@ -83,7 +101,9 @@ public class GameMap {
                 for (int x = tileRange[0]; x <= tileRange[2]; x++) {
                     GridObject gridObject = layer[y-1][x-1];
                     if (gridObject == null) continue;
-                    gridObject.call(player);
+                    if (!alwaysCalledObjects.contains(gridObject)) {
+                        gridObject.call(player);
+                    }
                     if (gridObject.isExpired()) {
                         layer[y-1][x-1] = null;
                     }
@@ -91,14 +111,28 @@ public class GameMap {
             }
         }
 
+        for (MapObject mapObject : alwaysCalledObjects) {
+            mapObject.call(player);
+        }
+
+        alwaysCalledObjects.removeIf(MapObject::isExpired);
+
     }
 
     public void draw() {
         iterateCurrentFrameObjects(GridObject::draw);
+        iterateAlwaysCalledObjects(MapObject::draw);
     }
 
     private void iterateCurrentFrameObjects(Consumer<GridObject> action) {
         Helpers.iterateThroughLayers(layers, tileRange[0], tileRange[1], tileRange[2], tileRange[3], action);
+    }
+
+    private void iterateAlwaysCalledObjects(Consumer<MapObject> action) {
+        for (MapObject mapObject : alwaysCalledObjects) {
+            action.accept(mapObject);
+        }
+
     }
 
     //--------------------------------------------------------------------------------------------------

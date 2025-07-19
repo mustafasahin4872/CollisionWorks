@@ -1,7 +1,7 @@
 package helperobjects;
 
 import lib.StdDraw;
-import mapobjects.framework.Box;
+import mapobjects.component.Box;
 
 //static methods for drawing
 public class DrawMethods {

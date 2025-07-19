@@ -1,38 +1,43 @@
 NEEDED AS FIRST
-when trying to go to the direction opposite of the current one, the accel should be accel + decel until velocity zeroes
-objects are not called while out of screen, but doors dont open and big objects are not drawn is a problem
-add player to the layers, make better layering mechanics
 
-dont forget projectile collision with collidables
+add sound effects to: worlds, player damaged, player shooting, coin collection, different backg sound when critical health
+the always called objects should be called in collision checks of projectiles as well
+the empty grid object collision trigger for projectile and else addition
+renew always called mechanic and fix the moving entity check problems
+mines dont have to be gridObjects
+buttons that needs to be held to stay pushed(triggered by monsters as wll)
+movable boxes to block projectiles or keep buttons pushed
+player shooting mechanism fşxxx
+when item expires its spawnobjects stop getting calls
+check 2 projectiles collision
+when 2 movingcollidables, 1 squeeze the other from the left or up, case of teleportation. theories:
+better naming on shooter mapmaker
+visualise mapmaker
 maybe make a class called moveable, and generalize collision methods for all movables
-fill component classes/interfaces
+fix collisions, better collision mechanics
+maybe ditch the alwayscalledobjects idea
+
+make the buff symbols, and add the buff mechanics.
 
 design the shop, first design the crystal palace
 fix the selection's world index gimmick, change the 13-14 indexed levels, make them make sense
 add signal handling: next, shop, selection, death...
 add random rewards to the in between every x levels
 
-make the buff symbols, and add the buff mechanics.
 generalize mud and special tile to the 4 worlds
 
 add skin to test
 add skin with default size big and small to test
-accessories size and coordinate changes are needed!
 
 
 NEW MECHANICS, FUTURE IDEAS
-generalize projectile direction to 360
-homing missiles, aiming monsters
-fake wall
 moving monsters
-shooting monsters
+fake wall
 in game currency, shop
 boss
 
 
 INCREASE FLEXIBILITY
-general interfaces and component classes holding important information
-tracking component?
 
 NEW CLASS IDEAS //BELA ARAMAK
 opponent class: monster

@@ -1,7 +1,7 @@
 package game;
 
 import lib.StdDraw;
-import mapobjects.framework.GridObject;
+import mapobjects.category.GridObject;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;

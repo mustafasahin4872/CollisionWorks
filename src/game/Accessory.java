@@ -2,7 +2,7 @@ package game;
 
 import lib.StdDraw;
 
-import static mapobjects.framework.GridObject.TILE_SIDE;
+import static mapobjects.category.GridObject.TILE_SIDE;
 
 public abstract class Accessory {
 
