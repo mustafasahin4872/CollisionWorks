@@ -1,31 +1,38 @@
 package mapobjects.mapobject;
 
 import game.Frame;
-import game.Player;
 import mapobjects.category.*;
 import mapobjects.component.Box;
 import mapobjects.component.Damager;
 import mapobjects.component.Timer;
 
-import static helperobjects.Helpers.outOfMapBounds;
+import static helpers.HelperMethods.*;
+
 
 //passable ticking damager, moves
 //collides with everything except player and other ghosts
-public class Ghost extends GridObject implements OnEffector, MovingCollidable, Damaging, Timed{
+public class Ghost extends GridObject implements OnEffector, MovingCollidable, Damaging, Timed {
 
-    private final String fileRoot;
+    public enum ghostTypes {
+        DEMON, ANGEL, BLUE, WHITE, GOLD, SAKURA, RANDOM,
+        DEFAULT1, DEFAULT2, DEFAULT3, DEFAULT4,
+        SPECIAL1, SPECIAL2, SPECIAL3, SPECIAL4
+    }
+
+    private final ghostTypes type;
     private final Box collisionBox;
     private final Box effectBox;
     private final Damager damager;
     private final Timer timer;
-    private char alignment;
-    private double speed = 10, xVelocity, yVelocity;
+    private final char alignment;
+    private double speed = 3, xVelocity, yVelocity;
     private boolean xCollided, yCollided;
     private final GridObject[][][] layers;
 
     public Ghost(int worldIndex, int xNum, int yNum, char alignment, GridObject[][][] layers) {
-        super(worldIndex, xNum, yNum, "src/main/resources/ghostImages/ghost"+worldIndex+".png");
-        fileRoot = rollForGhostType(worldIndex);
+        super(worldIndex, xNum, yNum);
+        this.alignment = alignment;
+        type = rollForGhostType();
         collisionBox = positionBox.clone();
         effectBox = positionBox.clone();
         damager = new Damager(worldIndex * 10);
@@ -33,45 +40,61 @@ public class Ghost extends GridObject implements OnEffector, MovingCollidable, D
         this.layers = layers;
         if (alignment == HORIZONTAL) {
             xVelocity = speed;
+
         } else {
             yVelocity = speed;
+
+        }
+
+    }
+
+    private ghostTypes rollForGhostType() {
+        int roll = (int)(Math.random() * 1000); // Use 0–999 for 0.1% granularity
+
+        if (roll < 400) { // 40% → world default
+            return switch (worldIndex) {
+                case 1 -> ghostTypes.DEFAULT1;
+                case 2 -> ghostTypes.DEFAULT2;
+                case 3 -> ghostTypes.DEFAULT3;
+                default -> ghostTypes.DEFAULT4;
+            };
+        } else if (roll < 550) { // 15% → other world defaults
+            return switch (worldIndex) {
+                case 1 -> ghostTypes.DEFAULT2;
+                case 2 -> ghostTypes.DEFAULT3;
+                case 3 -> ghostTypes.DEFAULT4;
+                default -> ghostTypes.DEFAULT1;
+            };
+        } else if (roll < 650) { // 10% → rare for world
+            return switch (worldIndex) {
+                case 1 -> ghostTypes.SPECIAL1;
+                case 2 -> ghostTypes.SPECIAL2;
+                case 3 -> ghostTypes.SPECIAL3;
+                default -> ghostTypes.SPECIAL4;
+            };
+        } else if (roll < 725) { // 7.5% → blue
+            return ghostTypes.BLUE;
+        }  else if (roll < 800) { // 7.5% → sakura
+            return ghostTypes.SAKURA;
+        } else if (roll < 850) { // 5% → gold
+            return ghostTypes.GOLD;
+        } else if (roll < 900) { // 5% → white
+            return ghostTypes.WHITE;
+        } else if (roll < 950) { // 5% → random
+            return ghostTypes.RANDOM;
+        } else if (roll < 975) { // 2.5% → demon
+            return ghostTypes.DEMON;
+        } else { // 2.5% → angel
+            return ghostTypes.ANGEL;
         }
     }
 
-    //rare ghost image!!!
-    private String rollForGhostType(int worldIndex) {
-        final String fileRoot;
-        String extra = "";
-        double roll = Math.random();
-        if (roll>0.9) {
-            extra = "_";
-            speed *= 2;
-        }
-        fileRoot = "src/main/resources/ghostImages/ghost"+ worldIndex +extra;
-        return fileRoot;
-    }
-
-    @Override
-    public void draw() {
-        String direction = switch (alignment) {
-            case HORIZONTAL -> {
-                if (xVelocity<0) yield "L";
-                else yield "R";
-            }
-            case VERTICAL -> {
-                if (yVelocity>0) yield "U";
-                else yield "D";
-            }
-            default -> "";
-        };
-        setFileName(fileRoot + direction + ".png");
-        super.draw();
-    }
 
     @Override
     public void call(Player player) {
         updateTimer();
         if (cooldownOver()) timeIsUp(player);
+
         move();
 
         int[] gridNumbers = getGridNumbers();
@@ -79,9 +102,9 @@ public class Ghost extends GridObject implements OnEffector, MovingCollidable, D
         boolean collided = false;
         for (GridObject[][] layer : layers) {
             if (collided) break;
-            for (int i = gridNumbers[1]-range; i<gridNumbers[1]+range; i++) {
+            for (int i = gridNumbers[1] - range; i < gridNumbers[1] + range; i++) {
                 if (collided) break;
-                for (int j = gridNumbers[0]-range; j<gridNumbers[0]+range; j++) {
+                for (int j = gridNumbers[0] - range; j < gridNumbers[0] + range; j++) {
                     if (alignment == HORIZONTAL && xCollided) {
                         collided = true;
                         xVelocity *= -1;
@@ -98,22 +121,31 @@ public class Ghost extends GridObject implements OnEffector, MovingCollidable, D
 
                     GridObject currentGridObject = layer[i][j];
                     if (currentGridObject == this) continue;
-                    if (currentGridObject instanceof Collidable c) {
+                    if (currentGridObject instanceof Collidable c && !(c instanceof Ghost)) {
                         c.checkCollision(this);
                     }
                 }
             }
         }
-        move();
-
-
+        String direction = switch (alignment) {
+            case HORIZONTAL -> {
+                if (xVelocity < 0) yield "L";
+                else yield "R";
+            }
+            case VERTICAL -> {
+                if (yVelocity > 0) yield "D";
+                else yield "U";
+            }
+            default -> "";
+        };
+        setName(type.name() + direction);
     }
 
     public void move() {
         positionBox.xShift(xVelocity * Frame.DT);
         positionBox.yShift(yVelocity * Frame.DT);
-        effectBox.xShift(xVelocity*Frame.DT);
-        effectBox.yShift(yVelocity*Frame.DT);
+        effectBox.xShift(xVelocity * Frame.DT);
+        effectBox.yShift(yVelocity * Frame.DT);
         collisionBox.xShift(xVelocity * Frame.DT);
         collisionBox.yShift(yVelocity * Frame.DT);
     }
@@ -183,4 +215,5 @@ public class Ghost extends GridObject implements OnEffector, MovingCollidable, D
     public void yCollide() {
         yCollided = true;
     }
+
 }

@@ -1,11 +1,14 @@
 package mapobjects.category;
 
-import game.Player;
+import mapobjects.mapobject.Player;
 import mapobjects.component.Timer;
 
 public interface Timed {
 
     Timer getTimer();
+
+    void timeIsUp(Player player);
+
     default void activateTimer() {
         getTimer().activate();
     }
@@ -18,14 +21,11 @@ public interface Timed {
     default boolean isActive() {
         return getTimer().isActive();
     }
-    void timeIsUp(Player player);
-
     default boolean inCooldown() {
-        return isComplete() && !isActive();
+        return getTimer().inCooldown();
     }
-
     default boolean cooldownOver() {
-        return !isActive() && !isComplete();
+        return getTimer().cooldownOver();
     }
 
 }

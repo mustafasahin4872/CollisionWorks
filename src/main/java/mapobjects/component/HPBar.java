@@ -5,6 +5,7 @@ import mapobjects.category.MapObject;
 
 public class HPBar {
 
+    private final int maxLives;
     private int lives;
     private final double maxHP;
     private double HP;
@@ -22,13 +23,14 @@ public class HPBar {
         this(maxHP, 1, 0);
     }
 
-    public HPBar(double maxHP, int lives) {
-        this(maxHP, lives, 0);
+    public HPBar(double maxHP, int maxLives) {
+        this(maxHP, maxLives, 0);
     }
 
-    public HPBar(double maxHP, int lives, double defense) {
+    public HPBar(double maxHP, int maxLives, double defense) {
         this.maxHP = maxHP;
-        this.lives = lives;
+        this.maxLives = maxLives;
+        lives = maxLives;
         this.defense = defense;
         HP=maxHP;
     }
@@ -43,7 +45,7 @@ public class HPBar {
     }
 
     public void addLife() {
-        lives++;
+        this.lives++;
     }
 
     public void addLives(int lives) {
@@ -93,6 +95,12 @@ public class HPBar {
     public void revive() {
         HP = maxHP;
     }
+
+    public void restart() {
+        lives = maxLives;
+        revive();
+    }
+
 
     //draws the HP bar with respect to the mapObject
     public void drawHPBar(MapObject mapObject) {

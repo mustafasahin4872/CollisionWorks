@@ -1,9 +1,9 @@
 package mapobjects.category;
 
-import game.Player;
+import mapobjects.mapobject.Player;
 import mapobjects.component.Box;
 
-import static helperobjects.CollisionMethods.intersects;
+import static helpers.CollisionMethods.intersects;
 
 public interface Ranged {
 

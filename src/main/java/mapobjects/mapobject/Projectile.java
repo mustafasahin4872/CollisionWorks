@@ -1,7 +1,6 @@
 package mapobjects.mapobject;
 
 import game.Frame;
-import game.Player;
 import lib.StdDraw;
 import mapobjects.component.Box;
 import mapobjects.component.Damager;
@@ -10,7 +9,7 @@ import mapobjects.component.Timer;
 import mapobjects.category.*;
 
 //projectiles are not grid objects, they are bullets that crash to collidables and pass through water and other tiles
-public class Projectile extends MapObject implements MovingCollidable, Timed, Damaging {
+public abstract class Projectile extends MapObject implements MovingCollidable, Timed, Damaging {
 
     private final Box collisionBox;
     private final Damager damager;
@@ -33,7 +32,7 @@ public class Projectile extends MapObject implements MovingCollidable, Timed, Da
     }
 
     public Projectile(int worldIndex, double x, double y, double width, double height, int direction, double speed) {
-        super(worldIndex, x, y, width, height, "src/main/resources/misc/projectile.png");
+        super(worldIndex, x, y, width, height);
         this.direction = new Direction(direction);
         collisionBox = new Box(x, y, height, height);
         damager = new Damager(20);
@@ -137,7 +136,7 @@ public class Projectile extends MapObject implements MovingCollidable, Timed, Da
 
     @Override
     public void draw() {
-        StdDraw.picture(getX(), getY(), fileName, getWidth(), getHeight(), direction.getDegreeDirection());
+        StdDraw.picture(getX(), getY(), imageFileName, getWidth(), getHeight(), direction.getDegreeDirection());
     }
 
     @Override
@@ -150,6 +149,22 @@ public class Projectile extends MapObject implements MovingCollidable, Timed, Da
         expire();
     }
 
+
+    public static class RegularProjectile extends Projectile {
+
+        public RegularProjectile(int worldIndex, double x, double y, int direction) {
+            super(worldIndex, x, y, direction);
+        }
+
+        public RegularProjectile(int worldIndex, double x, double y, double width, double height, int direction) {
+            super(worldIndex, x, y, width, height, direction);
+        }
+
+        public RegularProjectile(int worldIndex, double x, double y, double width, double height, int direction, double speed) {
+            super(worldIndex, x, y, width, height, direction, speed);
+        }
+    }
+
     public static class HomingProjectile extends Projectile {
 
         private final double I;
@@ -157,7 +172,6 @@ public class Projectile extends MapObject implements MovingCollidable, Timed, Da
         public HomingProjectile(int worldIndex, double x, double y, int direction, double I) {
             super(worldIndex, x, y, direction);
             this.I = I;
-            setFileName("src/main/resources/misc/homingProjectile.png");
         }
 
         @Override

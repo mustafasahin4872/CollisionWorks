@@ -1,6 +1,6 @@
 package mapobjects.category;
 
-import game.Player;
+import mapobjects.mapobject.Player;
 
 public interface Spawnable {
 

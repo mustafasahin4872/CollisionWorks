@@ -1,6 +1,5 @@
 package mapobjects.mapobject;
 
-import game.Player;
 import lib.StdDraw;
 import mapobjects.component.Box;
 import mapobjects.component.Damager;
@@ -98,7 +97,8 @@ public class Mine extends GridObject implements OnEffector, Ranged, Timed, Damag
         StdDraw.setPenColor(new Color(255, 150, 30, 200));
         StdDraw.circle(getX(), getY(), HALF_SIDE);
         StdDraw.setPenColor(new Color(255, 0, 0, 100));
-        StdDraw.filledCircle(getX(), getY(), timer.progressRatio()*HALF_SIDE);
+        //for a more realistic effect, the ratio will be 1 when 85% is completed
+        StdDraw.filledCircle(getX(), getY(), Math.min(timer.progressRatio()*100/85, 1)*HALF_SIDE);
 
     }
 

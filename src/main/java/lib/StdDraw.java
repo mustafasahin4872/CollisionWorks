@@ -1895,7 +1895,7 @@ public final class StdDraw implements ActionListener, MouseListener, MouseMotion
     }
 
     // draw onscreen if defer is false
-    private static void draw() {
+    public static void draw() {
         if (!defer) show();
     }
 
@@ -2230,7 +2230,7 @@ public final class StdDraw implements ActionListener, MouseListener, MouseMotion
 
 
     /**
-     * Test client.
+     * game.Test client.
      *
      * @param args the command-line arguments
      */

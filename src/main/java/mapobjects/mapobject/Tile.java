@@ -1,15 +1,12 @@
 package mapobjects.mapobject;
 
-import game.Player;
 import mapobjects.component.Box;
 import mapobjects.category.*;
 
 public abstract class Tile extends GridObject {
 
-    private static final String ROOT = "src/main/resources/tileImages/";
-
-    public Tile(int worldIndex, int xNum, int yNum, String type) {
-        super(worldIndex, xNum, yNum, ROOT + type + worldIndex + ".jpg");
+    public Tile(int worldIndex, int xNum, int yNum) {
+        super(worldIndex, xNum, yNum, worldIndex+"", "jpg");
     }
 
     protected void resetPlayerStats(Player player) {
@@ -22,8 +19,8 @@ public abstract class Tile extends GridObject {
     public static abstract class ImpassableTile extends Tile implements Collidable {
 
         protected final Box collisionBox;
-        public ImpassableTile(int worldIndex, int xNum, int yNum, String type) {
-            super(worldIndex, xNum, yNum, type);
+        public ImpassableTile(int worldIndex, int xNum, int yNum) {
+            super(worldIndex, xNum, yNum);
             collisionBox = positionBox.clone();
         }
 
@@ -37,7 +34,7 @@ public abstract class Tile extends GridObject {
     public static class WallTile extends ImpassableTile {
 
         public WallTile(int worldIndex, int xNum, int yNum) {
-            super(worldIndex, xNum, yNum, "WallTile");
+            super(worldIndex, xNum, yNum);
         }
 
     }
@@ -46,7 +43,7 @@ public abstract class Tile extends GridObject {
     public static class RiverTile extends ImpassableTile {
 
         public RiverTile(int worldIndex, int xNum, int yNum) {
-            super(worldIndex, xNum, yNum, "RiverTile");
+            super(worldIndex, xNum, yNum);
         }
 
     }
@@ -55,8 +52,8 @@ public abstract class Tile extends GridObject {
     public static abstract class PassableTile extends Tile implements OnEffector {
 
         private final Box effectBox;
-        public PassableTile(int worldIndex, int xNum, int yNum, String type) {
-            super(worldIndex, xNum, yNum, type);
+        public PassableTile(int worldIndex, int xNum, int yNum) {
+            super(worldIndex, xNum, yNum);
             effectBox = positionBox.clone();
         }
 
@@ -76,7 +73,7 @@ public abstract class Tile extends GridObject {
     public static class SpaceTile extends PassableTile{
 
         public SpaceTile(int worldIndex, int xNum, int yNum) {
-            super(worldIndex, xNum, yNum, "SpaceTile");
+            super(worldIndex, xNum, yNum);
         }
 
         @Override
@@ -90,7 +87,7 @@ public abstract class Tile extends GridObject {
     public static class SlowTile extends PassableTile {
 
         public SlowTile(int worldIndex, int xNum, int yNum) {
-            super(worldIndex, xNum, yNum, "SlowTile"); // Earthy brown
+            super(worldIndex, xNum, yNum); // Earthy brown
         }
 
         @Override
@@ -104,7 +101,7 @@ public abstract class Tile extends GridObject {
     public static class SpecialTile extends PassableTile {
 
         public SpecialTile(int worldIndex, int xNum, int yNum) {
-            super(worldIndex, xNum, yNum, "SpecialTile");
+            super(worldIndex, xNum, yNum);
         }
 
         @Override
@@ -118,7 +115,7 @@ public abstract class Tile extends GridObject {
     public static class DamageTile extends PassableTile {
 
         public DamageTile(int worldIndex, int xNum, int yNum) {
-            super(worldIndex, xNum, yNum, "DamageTile");
+            super(worldIndex, xNum, yNum);
         }
 
         @Override
@@ -138,7 +135,7 @@ public abstract class Tile extends GridObject {
     public static class HealTile extends PassableTile {
 
         public HealTile(int worldIndex, int xNum, int yNum) { // Golden yellow tile, draw a + in it
-            super(worldIndex, xNum, yNum, "HealTile");
+            super(worldIndex, xNum, yNum);
         }
 
         @Override

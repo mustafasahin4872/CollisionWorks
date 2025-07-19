@@ -1,6 +1,8 @@
 package mapobjects.mapobject;
 
-import game.Player;
+import game.GameState;
+import game.GameState.STATE;
+import game.Main;
 import lib.StdDraw;
 import mapobjects.component.Box;
 import mapobjects.category.OnEffector;
@@ -11,8 +13,8 @@ public abstract class Point extends GridObject implements OnEffector {
     protected final int index;
     protected boolean isBig;
 
-    public Point(int worldIndex, int xNum, int yNum, int index, String type, boolean isBig) {
-        super(worldIndex, xNum, yNum, getSize(isBig), getSize(isBig), "src/main/resources/" + type + "Images/" + index + ".png", isBig);
+    public Point(int worldIndex, int xNum, int yNum, int index, boolean isBig) {
+        super(worldIndex, xNum, yNum, getSize(isBig), getSize(isBig), index+"", isBig);
         this.index = index;
         this.isBig = isBig;
     }
@@ -29,28 +31,28 @@ public abstract class Point extends GridObject implements OnEffector {
     //special override for the selection screen
     @Override
     public void draw() {
-        StdDraw.picture(getX(), getY(), fileName, TILE_SIDE, TILE_SIDE);
+        StdDraw.picture(getX(), getY(), imageFileName, TILE_SIDE, TILE_SIDE);
     }
 
     public static class WinPoint extends Point implements OnEffector {
 
         private final Box effectBox;
-        private final Player.PASSCODE passcode;
+        private final GameState.STATE state;
 
         public WinPoint(int worldIndex, int xNum, int yNum, int index) {
             this(worldIndex, xNum, yNum, index, false);
         }
 
         public WinPoint(int worldIndex, int xNum, int yNum, int index, boolean isBig) {
-            super(worldIndex, xNum, yNum, index, "winPoint", isBig);
+            super(worldIndex, xNum, yNum, index, isBig);
             effectBox = positionBox.clone();
-            passcode = switch (index) {
-                case 0 -> Player.PASSCODE.NEXT;
-                case 1 -> Player.PASSCODE.ALTERNATE1;
-                case 2 -> Player.PASSCODE.ALTERNATE2;
-                case 3 -> Player.PASSCODE.ALTERNATE3;
-                case 4 -> Player.PASSCODE.SHOP;
-                default -> Player.PASSCODE.ZERO;
+            state = switch (index) {
+                case 0 -> STATE.PASSED;
+                case 1 -> STATE.ALTERNATE1;
+                case 2 -> STATE.ALTERNATE2;
+                case 3 -> STATE.NEXT;
+                case 4 -> STATE.SHOP;
+                default -> STATE.GAME;
             };
         }
 
@@ -62,7 +64,7 @@ public abstract class Point extends GridObject implements OnEffector {
 
         @Override
         public void playerIsOn(Player player) {
-            player.setPassCode(passcode);
+            Main.gameState.setState(state);
         }
 
     }
@@ -79,7 +81,7 @@ public abstract class Point extends GridObject implements OnEffector {
         }
 
         public CheckPoint(int worldIndex, int xNum, int yNum, int index, boolean isBig) {
-            super(worldIndex, xNum, yNum, index, "checkPoint", isBig);
+            super(worldIndex, xNum, yNum, index, isBig);
             effectBox = positionBox.clone();
         }
 
@@ -108,8 +110,8 @@ public abstract class Point extends GridObject implements OnEffector {
 
         private void markVisited(Player player) {
             visited = true;
-            setFileName("src/main/resources/checkPointImages/0.png");
-            if (prev != null) prev.setFileName("src/main/resources/checkPointImages/-1.png");
+            setName("0");
+            if (prev != null) prev.setName("-1");
             player.updateLastCheckPointIndex();
             player.setSpawnPoint(getCenterCoordinates());
         }

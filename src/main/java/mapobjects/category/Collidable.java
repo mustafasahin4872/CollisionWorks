@@ -2,7 +2,7 @@ package mapobjects.category;
 
 import mapobjects.component.Box;
 
-import static helperobjects.CollisionMethods.intersects;
+import static helpers.CollisionMethods.intersects;
 
 public interface Collidable {
 

@@ -1,13 +1,12 @@
 package mapobjects.mapobject;
 
-import game.Player;
 import lib.StdDraw;
 import mapobjects.component.Box;
 import mapobjects.category.OnEffector;
 import mapobjects.category.GridObject;
 
 import java.awt.*;
-import static helperobjects.DrawMethods.*;
+import static helpers.DrawMethods.*;
 
 public abstract class Button extends GridObject implements OnEffector {
 

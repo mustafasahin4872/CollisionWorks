@@ -1,8 +1,33 @@
-NEEDED AS FIRST
-fix player resize not changing width and heigjht
-fix the file naming convention and generalize all draw methods, player draw fix
-make accessory a mapobject
-add sound effects to: worlds, player damaged, player shooting, coin collection, different backg sound when critical health
+COLLISIONWORKS V2 - WHAT HAS BEEN DONE:
+- ADDED GAMESTATE - EASIER ACCESS TO PLAYER, BETTER GAME LOOP
+- SEPARATED ENTANGLED LOGIC
+    INPUT HANDLING VS FRAME MANAGEMENT
+    GAMESTATE AND PLAYER STATS
+    DRAWING OF UI VS DRAWING OF MAP
+- ADDED HELPER CLASSES FOR ENCAPSULATION, BETTER SCOPING AND SEPARATION
+
+WHAT IS NEEDED AS FIRST
+
+.ADD DOCUMENTATION, START BETTER GIT TRACKING
+.TIDY UP CODE - MOST IMPORTANT ONES:
+ - PLAYER
+ - SELECTION
+
+.PLAYER DRAWS EVERYTHING?????
+ -will move projectile drawing into alwayscalled objects later
+ -moved drawing of hp bars and other effects to game loop.
+
+
+SOME ISSUES
+.RESTART LOGIC AND EXIT LOGIC
+ when restarting a game, the player's hp is restarted but the map data is not.
+ some player stats(e.g. coinamount) and map enemies are as left.
+
+.THE WIN POINTS ARE A MESS
+    WHICH WIN POINT TO USE FOR WHICH STATE? -> unclear logic, document.
+
+OLD ISSUES THAT STILL EXIST
+
 the always called objects should be called in collision checks of projectiles as well
 the empty grid object collision trigger for projectile and else addition
 renew always called mechanic and fix the moving entity check problems
@@ -14,12 +39,15 @@ when item expires its spawnobjects stop getting calls
 check 2 projectiles collision
 when 2 movingcollidables, 1 squeeze the other from the left or up, case of teleportation. theories:
 better naming on shooter mapmaker
-visualise mapmaker
+visualize mapmaker
 maybe make a class called moveable, and generalize collision methods for all movables
 fix collisions, better collision mechanics
 maybe ditch the alwayscalledobjects idea
 
 make the buff symbols, and add the buff mechanics.
+    //there are 5 possible buffs, all are false at first and set true if buffed
+    //fast, small, immune, magnetic, eagle eye
+add sound effects to: worlds, player damaged, player shooting, coin collection, different backg sound when critical health
 
 design the shop, first design the crystal palace
 fix the selection's world index gimmick, change the 13-14 indexed levels, make them make sense
@@ -32,23 +60,24 @@ add skin to test
 add skin with default size big and small to test
 
 
+
+
+
+
 NEW MECHANICS, FUTURE IDEAS
 moving monsters
 fake wall
 in game currency, shop
 boss
 
-
-INCREASE FLEXIBILITY
-
-NEW CLASS IDEAS //BELA ARAMAK
+NEW CLASS IDEAS
 opponent class: monster
 
-OBJECT INITIALIZATION //HAMALLIK
+OBJECT INITIALIZATION
 add stages
 world4
 
-ADD NEW SKINS, WORLDS ETC-IMAGE CREATION //İNTERNETTEN GÖRSEL ÇARPMA
+ADD NEW SKINS, WORLDS ETC-IMAGE CREATION
 mike
 sakura
 sherrif

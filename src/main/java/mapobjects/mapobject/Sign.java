@@ -1,6 +1,5 @@
 package mapobjects.mapobject;
 
-import game.Player;
 import lib.StdDraw;
 
 import java.awt.*;
@@ -9,7 +8,7 @@ import mapobjects.component.Box;
 import mapobjects.category.GridObject;
 import mapobjects.category.OnEffector;
 
-import static helperobjects.DrawMethods.*;
+import static helpers.DrawMethods.*;
 
 public class Sign extends GridObject implements OnEffector {
 
@@ -29,7 +28,7 @@ public class Sign extends GridObject implements OnEffector {
     }
 
     public Sign(int worldIndex, int xNum, int yNum, String[] messages, boolean displaySign) {
-        super(worldIndex, xNum, yNum, "src/main/resources/signImages/sign.png");
+        super(worldIndex, xNum, yNum);
         this.messages = messages;
         this.displaySign = displaySign;
 

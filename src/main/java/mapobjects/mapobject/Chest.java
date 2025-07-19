@@ -1,6 +1,5 @@
 package mapobjects.mapobject;
 
-import game.Player;
 import mapobjects.component.Box;
 import mapobjects.category.GridObject;
 import mapobjects.category.OnEffector;
@@ -9,14 +8,12 @@ public abstract class Chest extends GridObject implements OnEffector {
 
     private final Box effectBox;
     private boolean isOpen;
-    private final String type;
     private final double buffTime;
     private final char[] buffs;
     private final int coinNum;
 
-    public Chest(int worldIndex, int xNum, int yNum, String type, char[] buffs, double buffTime, int coinNum) {
-        super(worldIndex, xNum, yNum, 2, 2, "src/main/resources/chestImages/closed" + type + ".png", true);
-        this.type = type;
+    public Chest(int worldIndex, int xNum, int yNum, char[] buffs, double buffTime, int coinNum) {
+        super(worldIndex, xNum, yNum, 2, 2, true);
         this.buffs = buffs;
         this.buffTime = buffTime;
         this.coinNum = coinNum;
@@ -51,39 +48,35 @@ public abstract class Chest extends GridObject implements OnEffector {
     public void openChest(Player player) {
         if (isOpen) return;
         isOpen = true;
-        setFileName("src/main/resources/chestImages/opened" + type + ".png");
-        player.buff(buffs, buffTime);
+        setName("1");
         player.collectCoin(coinNum);
     }
 
 
     public static class WoodenChest extends Chest {
-        private static final String TYPE = "WoodenChest";
         private static final double BUFF_TIME = 10;
         private static final int COIN_NUM = 5;
 
         public WoodenChest(int worldIndex, int xNum, int yNum, char[] buff) {
-            super(worldIndex, xNum, yNum, TYPE, buff, BUFF_TIME, COIN_NUM);
+            super(worldIndex, xNum, yNum, buff, BUFF_TIME, COIN_NUM);
         }
     }
 
     public static class SilverChest extends Chest {
-        private static final String TYPE = "SilverChest";
         private static final double BUFF_TIME = 20;
         private static final int COIN_NUM = 10;
 
         public SilverChest(int worldIndex, int xNum, int yNum, char[] buff) {
-            super(worldIndex, xNum, yNum, TYPE, buff, BUFF_TIME, COIN_NUM);
+            super(worldIndex, xNum, yNum, buff, BUFF_TIME, COIN_NUM);
         }
     }
 
     public static class GoldenChest extends Chest {
-        private static final String TYPE = "GoldenChest";
         private static final double BUFF_TIME = 30;
         private static final int COIN_NUM = 20;
 
         public GoldenChest(int worldIndex, int xNum, int yNum, char[] buff) {
-            super(worldIndex, xNum, yNum, TYPE, buff, BUFF_TIME, COIN_NUM);
+            super(worldIndex, xNum, yNum, buff, BUFF_TIME, COIN_NUM);
         }
     }
 

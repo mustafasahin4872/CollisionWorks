@@ -4,13 +4,12 @@ import java.awt.*;
 import java.util.Arrays;
 
 import lib.StdDraw;
-import game.Player;
 import game.Frame;
 import mapobjects.component.Box;
 import mapobjects.category.Collidable;
 import mapobjects.category.GridObject;
 
-import static helperobjects.DrawMethods.drawRectangle;
+import static helpers.DrawMethods.drawRectangle;
 
 public class Door extends GridObject implements Collidable {
 

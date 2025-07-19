@@ -19,4 +19,10 @@ public interface MovingCollidable extends Moving, Collidable{
         return new Box(getNextYCenterCoordinates(), collisionBox.getWidth(), collisionBox.getHeight());
     }
 
+    //need to update collision box as well
+    @Override
+    void setX(double x);
+    @Override
+    void setY(double y);
+
 }

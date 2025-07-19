@@ -1,40 +1,46 @@
 package game;
 
+import helpers.MapType;
 import lib.StdDraw;
 import mapobjects.category.GridObject;
+import mapobjects.mapobject.Accessory;
+import mapobjects.mapobject.Player;
 
 import java.awt.*;
-import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
+import game.InputHandler.MouseData;
+import game.InputHandler.ArrowData;
+import game.GameState.STATE;
 
-import static helperobjects.CollisionMethods.isIn;
+import static helpers.CollisionMethods.isIn;
 
 public class Selection {
+
+    private final GameState gameState;
+    private final InputHandler inputHandler;
 
     private int currentWorldIndex = 0, currentLevelIndex = 1,
             currentAccessoryIndex = 0, currentSkinIndex = 0;
 
     private Player currentSkin;
     private Accessory currentAccessory;
-    private static final int
-            X_TILE = (int)(Frame.X_SCALE/ GridObject.TILE_SIDE),
-            Y_TILE = (int)(Frame.Y_SCALE/ GridObject.TILE_SIDE);
 
     private final ArrayList<Accessory> selectedAccessories = new ArrayList<>();
 
     //the selection screens
     private static final GameMap[] WORLDS = {
-            new GameMap(1, -1, X_TILE, Y_TILE, new Player(), true),
-            new GameMap(1, 0, X_TILE, Y_TILE, new Player(), true),
-            new GameMap(2, 0, X_TILE, Y_TILE, new Player(), true),
-            new GameMap(3, 0, X_TILE, Y_TILE, new Player(), true),
-            new GameMap(4, 0, X_TILE, Y_TILE, new Player(), true)
+            new GameMap(1, -1, new Player.RegularPlayer(), MapType.SELECTION),
+            new GameMap(1, 0, new Player.RegularPlayer(), MapType.SELECTION),
+            new GameMap(2, 0, new Player.RegularPlayer(), MapType.SELECTION),
+            new GameMap(3, 0, new Player.RegularPlayer(), MapType.SELECTION),
+            new GameMap(4, 0, new Player.RegularPlayer(), MapType.SELECTION)
     };
 
     private static final Player[] SKINS = {
-            new Player(),
-            new Player("Zahit"),
+            new Player.RegularPlayer(),
+            new Player.AnimatedPlayer("Mike", 6),
+            new Player.RegularPlayer("Zahit")
     };
 
     private static final Accessory[] ACCESSORIES = {
@@ -42,6 +48,7 @@ public class Selection {
             new Accessory.Hat("fedora", 65, 25, WORLDS[0].getPlayer()),
             new Accessory.Headpiece("coquette", 20, 20, WORLDS[0].getPlayer())
     };
+
     private static final boolean[] ACCESSORY_CHOSEN = new boolean[ACCESSORIES.length];
 
     public static final Color[] WORLD_COLORS = {
@@ -56,6 +63,14 @@ public class Selection {
             null, "THE SPRING FESTIVAL", "INTO THE ICE CAVE", "TO THE TOP OF THE VOLCANO", "CRYSTAL PALACE"
     };
 
+    //----------------------------------------------------------------------------------------------------------
+    //----------------------------------------------------------------------------------------------------------
+    //----------------------------------------------------------------------------------------------------------
+    //----------------------------------------------------------------------------------------------------------
+
+    private static final int
+        X_TILE = (int)(Frame.X_SCALE/ GridObject.TILE_SIDE),
+        Y_TILE = (int)(Frame.Y_SCALE/ GridObject.TILE_SIDE);
 
     //centers of buttons
     private final double[][]
@@ -77,8 +92,16 @@ public class Selection {
             accessoryLeftBox = new double[4], accessoryRightBox = new double[4],
             accessoryChooseBox = new double[4], shopBox = new double[4];
 
+    //----------------------------------------------------------------------------------------------------------
+    //----------------------------------------------------------------------------------------------------------
+    //----------------------------------------------------------------------------------------------------------
+    //----------------------------------------------------------------------------------------------------------
 
-    public Selection() {
+
+    // keep the current gameState
+    public Selection(InputHandler inputHandler, GameState gameState) {
+        this.inputHandler = inputHandler;
+        this.gameState = gameState;
 
         fillArrowBoxes();
         fillLevelBoxes();
@@ -88,61 +111,91 @@ public class Selection {
             skin.respawn();
         }
 
-    }
-
-    private boolean levelChosen(){
-        return currentWorldIndex!=0 && StdDraw.isKeyPressed(KeyEvent.VK_SPACE);
-    }
-
-    public GameMap chooseLevel() {
-        while (!levelChosen()) {
-            handleInput();
-            StdDraw.clear();
-            draw();
-            StdDraw.show();
-            StdDraw.pause(10* Frame.PAUSE);
+        for (Accessory accessory : ACCESSORIES) {
+            if (accessory!=null) accessory.update();
         }
 
+    }
+
+    //----------------------------------------------------------------------------------------------------------
+    //----------------------------------------------------------------------------------------------------------
+    //----------------------------------------------------------------------------------------------------------
+    //----------------------------------------------------------------------------------------------------------
+
+    public void selectionLoop() {
+
+        while (gameState.getState() == STATE.SELECTION) {
+            inputHandler.takeInput();
+            MouseData mouseData = inputHandler.getMouseData();
+            ArrowData arrowData = inputHandler.getArrowData();
+            processInput(mouseData, arrowData);
+            draw();
+        }
+
+        wireAccessoriesWithPlayer();
+        currentSkin.setWorldIndex(currentWorldIndex);
+
+        gameState.worldIndex = currentWorldIndex;
+        gameState.levelIndex = currentLevelIndex;
+        gameState.player = currentSkin;
+        gameState.setState(STATE.NEXT);
+
+    }
+
+    private void wireAccessoriesWithPlayer() {
         for (int i = 0; i<ACCESSORY_CHOSEN.length; i++) {
             if (ACCESSORY_CHOSEN[i]) {
-                ACCESSORIES[i].setPlayer(currentSkin);
+                Accessory accessory = ACCESSORIES[i];
+                accessory.setPlayer(currentSkin);
                 selectedAccessories.add(ACCESSORIES[i]);
             }
         }
-
         currentSkin.setAccessories(selectedAccessories.toArray(new Accessory[0]));
-        return new GameMap(currentWorldIndex, currentLevelIndex, currentSkin);
     }
 
-    private void handleInput() {
+    //----------------------------------------------------------------------------------------------------------
+    //----------------------------------------------------------------------------------------------------------
+    //----------------------------------------------------------------------------------------------------------
+    //----------------------------------------------------------------------------------------------------------
 
-        double mouseX = StdDraw.mouseX();
-        double mouseY = StdDraw.mouseY();
 
+    private void processInput(MouseData mouseData, ArrowData arrowData) {
 
-        if (StdDraw.isKeyPressed(KeyEvent.VK_RIGHT)) {
+        double mouseX = mouseData.mouseX;
+        double mouseY = mouseData.mouseY;
+        boolean mousePressed = mouseData.pressed;
+        boolean rightArrowPressed = arrowData.xDirection == 1;
+        boolean leftArrowPressed = arrowData.xDirection == -1;
+        boolean upArrowPressed = arrowData.yDirection == -1;
+        boolean downArrowPressed = arrowData.yDirection == 1;
+        boolean spacePressed = arrowData.space;
+
+        if (currentWorldIndex!=0 && spacePressed) {
+            gameState.setState(STATE.NEXT);
+        }
+
+        if (rightArrowPressed) {
             currentLevelIndex++;
             if (currentWorldIndex==0) {
                 currentSkinIndex++;
             }
         }
-        if (StdDraw.isKeyPressed(KeyEvent.VK_LEFT)) {
+        if (leftArrowPressed) {
             currentLevelIndex--;
             if (currentWorldIndex==0) {
                 currentSkinIndex--;
             }
         }
-        if (StdDraw.isKeyPressed(KeyEvent.VK_DOWN)) {
-            currentLevelIndex+=5;
+        if (downArrowPressed) {
+            currentLevelIndex+=4;
         }
-        if (StdDraw.isKeyPressed(KeyEvent.VK_UP)) {
-            currentLevelIndex-=5;
+        if (upArrowPressed) {
+            currentLevelIndex-=4;
         }
         currentSkinIndex = (currentSkinIndex + SKINS.length) % SKINS.length;
         currentLevelIndex = ((currentLevelIndex - 1) % 12 + 12) % 12 + 1;
 
-
-        if (StdDraw.isMousePressed()) {
+        if (mousePressed) {
             if (currentWorldIndex!=0) {
                 if (isIn(mouseX, mouseY, leftArrowBox[currentWorldIndex])) {
                     currentWorldIndex--;
@@ -183,23 +236,32 @@ public class Selection {
 
     }
 
+    //----------------------------------------------------------------------------------------------------------
+    //----------------------------------------------------------------------------------------------------------
+    //----------------------------------------------------------------------------------------------------------
+    //----------------------------------------------------------------------------------------------------------
+
+
     public void draw() {
+        StdDraw.clear();
 
         GameMap currentWorld = WORLDS[currentWorldIndex];
         currentSkin = SKINS[(currentSkinIndex)%SKINS.length];
         currentAccessory = ACCESSORIES[currentAccessoryIndex];
+
         StdDraw.setXscale(0, Frame.X_SCALE);
         StdDraw.setYscale(Frame.Y_SCALE, 0);
         currentWorld.draw();
         if (currentWorldIndex==0) {
-            currentSkin.drawBig(2.5);
+            double multiplier = 2.5;
+            currentSkin.drawBig(multiplier);
             if (currentAccessory!=null) {
                 currentAccessory.setPlayer(currentSkin);
-                currentAccessory.drawBig(2.5);
+                currentAccessory.drawBig(multiplier);
             }
             for (int i = 0; i<ACCESSORY_CHOSEN.length; i++) {
                 if (ACCESSORY_CHOSEN[i]) {
-                    ACCESSORIES[i].drawBig(2.5);
+                    ACCESSORIES[i].drawBig(multiplier);
                 }
             }
         }
@@ -210,10 +272,10 @@ public class Selection {
 
         if (currentWorldIndex == 0) {
             StdDraw.setFont(new Font("Monospaced", Font.BOLD, 50));
-            StdDraw.text(X_TILE/2.0-1, Y_TILE-1.5-0.5-0.15, currentSkin.getName());
+            StdDraw.text(X_TILE/2.0-1, Y_TILE-1.5-0.5-0.15, currentSkin.getPlayerName());
             StdDraw.setFont(new Font("Monospaced", Font.BOLD, 30));
             if (currentAccessory!=null) {
-                StdDraw.text(X_TILE/2.0-1, Y_TILE-6.5-0.5, currentAccessory.getName());
+                StdDraw.text(X_TILE/2.0-1, Y_TILE-6.5-0.5, currentAccessory.getAccessoryName());
             } else {
                 StdDraw.text(X_TILE/2.0-1, Y_TILE-6.5-0.5, "no accessory");
             }
@@ -235,6 +297,8 @@ public class Selection {
             drawLevelButtons();
         }
 
+        StdDraw.show();
+        StdDraw.pause(10* Frame.PAUSE);
     }
 
     private void drawLevelButtons() {
@@ -251,6 +315,13 @@ public class Selection {
             }
         }
     }
+
+
+    //----------------------------------------------------------------------------------------------------------
+    //----------------------------------------------------------------------------------------------------------
+    //----------------------------------------------------------------------------------------------------------
+    //----------------------------------------------------------------------------------------------------------
+
 
     private void fillLevelBoxes() {
         for (int i = 0; i<3; i++) {
@@ -279,7 +350,7 @@ public class Selection {
 
     }
 
-    private void fillBoxes(double[] coordinates, double[] fillBox, double side) {
+    private static void fillBoxes(double[] coordinates, double[] fillBox, double side) {
 
         fillBox[0] = coordinates[0] - side;
         fillBox[1] = coordinates[1] - side;

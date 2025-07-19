@@ -1,0 +1,26 @@
+1) selection screen
+- multiple maps and players are created for selection screen
+- player, accessories, world index, level index are chosen
+- Player is created
+- gameState is created as output (carries player and indexes)
+
+2) map is created
+3) frame is created
+
+4) play loop
+- gameState is edited and checked each loop
+- loop broken when gameState triggered
+
+5) next level or main menu depending on the gameState
+
+
+MAIN CLASSES:
+
+- Player: holds player stats
+- GameState: holds Player, worldIndex, levelIndex
+- Frame: handles input and frame
+- GameMap:
+    keeps map data
+    calls mapmaker to create a map
+    inputs: world and level indexes, player, and either map type or map dimensions.
+

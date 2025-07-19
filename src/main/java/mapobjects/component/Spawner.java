@@ -1,7 +1,7 @@
 package mapobjects.component;
 
-import game.Player;
-import helperobjects.Blueprint;
+import mapobjects.mapobject.Player;
+import helpers.MapObjectGenerator;
 import mapobjects.category.GridObject;
 
 import java.util.ArrayList;
@@ -14,7 +14,7 @@ import static mapobjects.category.GridObject.TILE_SIDE;
 //creates and stores blueprints for the linked object. has different spawn styles
 public class Spawner {
 
-    private final Set<Blueprint> spawnObjects;
+    private final Set<MapObjectGenerator> spawnObjects;
     private double centerX;
     private double centerY;
     private final int worldIndex, xNum, yNum;
@@ -39,26 +39,26 @@ public class Spawner {
     }
 
 
-    public Blueprint[] getSpawnObjects() {
-        return spawnObjects.toArray(new Blueprint[0]);
+    public MapObjectGenerator[] getSpawnObjects() {
+        return spawnObjects.toArray(new MapObjectGenerator[0]);
     }
 
 
-    public void replaceAll(Blueprint[] blueprints) {
+    public void replaceAll(MapObjectGenerator[] mapObjectGenerators) {
         spawnObjects.clear();
-        Collections.addAll(spawnObjects, blueprints);
+        Collections.addAll(spawnObjects, mapObjectGenerators);
     }
 
 
     //spawns in the adjacent tile to the object depending on direction
     //spawns on top if direction is 0
-    public Blueprint summonSpawn(char direction) {
+    public MapObjectGenerator summonSpawn(char direction) {
         return switch (direction) {
-            case '<' -> new Blueprint(worldIndex, centerX-TILE_SIDE, centerY);
-            case '>' -> new Blueprint(worldIndex, centerX+TILE_SIDE, centerY);
-            case '^' -> new Blueprint(worldIndex, centerX, centerY-TILE_SIDE);
-            case 'v' -> new Blueprint(worldIndex, centerX, centerY+TILE_SIDE);
-            case '0' -> new Blueprint(worldIndex, centerX, centerY);
+            case '<' -> new MapObjectGenerator(worldIndex, centerX-TILE_SIDE, centerY);
+            case '>' -> new MapObjectGenerator(worldIndex, centerX+TILE_SIDE, centerY);
+            case '^' -> new MapObjectGenerator(worldIndex, centerX, centerY-TILE_SIDE);
+            case 'v' -> new MapObjectGenerator(worldIndex, centerX, centerY+TILE_SIDE);
+            case '0' -> new MapObjectGenerator(worldIndex, centerX, centerY);
             default -> {
                 System.out.println("error in summonSpawn");
                 yield null;
@@ -66,13 +66,13 @@ public class Spawner {
         };
     }
 
-    public Blueprint onTopPlayerSpawn(Player player) {
+    public MapObjectGenerator onTopPlayerSpawn(Player player) {
         int[] gridNumbers = player.getGridNumbers();
-        return new Blueprint(worldIndex, gridNumbers[0], gridNumbers[1]);
+        return new MapObjectGenerator(worldIndex, gridNumbers[0], gridNumbers[1]);
     }
 
     //spawns in the direction of player's current position, spawns on the circle with given radius
-        public Blueprint directionSpawn(double[] towards, double radius) {
+        public MapObjectGenerator directionSpawn(double[] towards, double radius) {
         double dx = towards[0] - centerX;
         double dy = towards[1] - centerY;
 
@@ -89,7 +89,7 @@ public class Spawner {
         }
 
 
-        return new Blueprint(worldIndex, spawnX, spawnY);
+        return new MapObjectGenerator(worldIndex, spawnX, spawnY);
     }
 
     //spawns in the direction of player's next position
@@ -98,25 +98,25 @@ public class Spawner {
     }
 
     //spawns towards next position of the player
-    public Blueprint aimSpawn(Player player) {
+    public MapObjectGenerator aimSpawn(Player player) {
         int nextXNum = (int) (player.getNextX() / TILE_SIDE) + 1;
         int nextYNum = (int) (player.getNextY() / TILE_SIDE) + 1;
-        return new Blueprint(worldIndex, nextXNum, nextYNum);
+        return new MapObjectGenerator(worldIndex, nextXNum, nextYNum);
     }
 
     //spawns the object at the given location with respect to the spawner object
-    public Blueprint targetSpawn(int xNum, int yNum) {
-        return new Blueprint(worldIndex, xNum, yNum);
+    public MapObjectGenerator targetSpawn(int xNum, int yNum) {
+        return new MapObjectGenerator(worldIndex, xNum, yNum);
     }
 
 
     //spawns in random places(notices the wall tiles)
-    public Blueprint[] randomSpawn(int range, int spawnNum, GridObject[][][] layers) {
-        Blueprint[] spawned = new Blueprint[spawnNum];
+    public MapObjectGenerator[] randomSpawn(int range, int spawnNum, GridObject[][][] layers) {
+        MapObjectGenerator[] spawned = new MapObjectGenerator[spawnNum];
         int[][] coordinates = getRandomCoordinates(range, spawnNum, layers);
         for (int i = 0; i<spawnNum; i++) {
             int[] coordinate = coordinates[i];
-            spawned[i] = new Blueprint(worldIndex, coordinate[0], coordinate[1]);
+            spawned[i] = new MapObjectGenerator(worldIndex, coordinate[0], coordinate[1]);
         }
         return spawned;
     }

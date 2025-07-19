@@ -1,6 +1,5 @@
 package mapobjects.mapobject;
 
-import game.Player;
 import mapobjects.category.Collidable;
 import mapobjects.category.GridObject;
 

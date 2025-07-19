@@ -1,7 +1,6 @@
 package mapobjects.mapobject;
 
-import game.Player;
-import helperobjects.Blueprint;
+import helpers.MapObjectGenerator;
 import mapobjects.component.Box;
 import mapobjects.component.HPBar;
 import mapobjects.component.Spawner;
@@ -30,7 +29,7 @@ public class Mortar extends GridObject implements Collidable, Ranged, Timed, Spa
     }
 
     public Mortar(int worldIndex, int xNum, int yNum, GridObject[][][] layers, int mineNum) {
-        super(worldIndex, xNum, yNum, 2, 2, "src/main/resources/misc/mortar.png", true);
+        super(worldIndex, xNum, yNum, 2, 2, true);
         this.mineNum = mineNum;
         this.layers = layers;
         collisionBox = positionBox.clone();
@@ -95,7 +94,7 @@ public class Mortar extends GridObject implements Collidable, Ranged, Timed, Spa
     @Override
     public void ifNoLivesLeft() {
         broken = true;
-        setFileName("src/main/resources/misc/brokenMortar.png");
+        setName("1");
     }
 
     @Override
@@ -118,9 +117,9 @@ public class Mortar extends GridObject implements Collidable, Ranged, Timed, Spa
 
     public Mine[] mutate() {
         Mine[] mutated = new Mine[mineNum];
-        Blueprint[] blueprints = spawner.getSpawnObjects();
+        MapObjectGenerator[] mapObjectGenerators = spawner.getSpawnObjects();
         for (int i = 0; i<mineNum; i++) {
-            mutated[i] = blueprints[i].mutateToMine();
+            mutated[i] = mapObjectGenerators[i].mutateToMine();
         }
         return mutated;
     }
