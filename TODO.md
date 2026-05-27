@@ -16,8 +16,8 @@
 ## 🚧 IMMEDIATE PRIORITIES
 
 ### Documentation & Project Management
-- [ ] Add proper documentation
-- [ ] Start structured Git tracking (commits, feature branches, etc.)
+- [v] Add proper documentation
+- [v] Start structured Git tracking (commits, feature branches, etc.)
 
 ### Core Refactoring
 - [ ] Tidy up Player class
