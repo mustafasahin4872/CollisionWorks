@@ -468,7 +468,7 @@ public abstract class Player extends MapObject implements MovingCollidable, Spaw
 
     //DRAW METHODS
 
-    public void draw(double frameX, double frameY) {
+    public void draw() {
 
         for (Projectile projectile : projectiles) projectile.draw();
 
@@ -529,7 +529,7 @@ public abstract class Player extends MapObject implements MovingCollidable, Spaw
         }
 
         @Override
-        public void draw(double frameX, double frameY) {
+        public void draw() {
 
             for (Projectile projectile : projectiles) projectile.draw();
 
