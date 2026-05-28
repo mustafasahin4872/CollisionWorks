@@ -20,68 +20,81 @@ import static helpers.FrameBox.CENTER_Y;
 public class GameScreen {
 
     private final GameState gameState;
+    private final PauseButton pauseButton;
     private final PauseScreen pauseScreen;
     private final DeadScreen deadScreen;
     private final HealthBar healthBar;
+    private final CoinAmount coinAmount;
+    private final LifeAmount lifeAmount;
+    private final AmmoBar ammoBar;
+    private final CriticalHealthEffect criticalHealthEffect;
 
     public GameScreen(GameState gameState) {
         this.gameState = gameState;
+        pauseButton = new PauseButton();
         pauseScreen = new PauseScreen();
         deadScreen = new DeadScreen();
         healthBar = new HealthBar();
+        coinAmount = new CoinAmount();
+        lifeAmount = new LifeAmount();
+        ammoBar = new AmmoBar();
+        criticalHealthEffect = new CriticalHealthEffect();
     }
 
     // processes all input that is done in in-game ui
     public void processInput(MouseData mouseData) {
+        pauseButton.processInput(mouseData);
         pauseScreen.processInput(mouseData);
         deadScreen.processInput(mouseData);
     }
 
     // updates all the values needed in draw functions.
     public void update() {
+        Player player = gameState.player;
+        HPBar hpBar = player.getHealthBar();
+        int coinsCollected = player.getCoinsCollected();
+        pauseButton.update();
         pauseScreen.update();
         deadScreen.update();
-        healthBar.updateCenter();
-        HPBar hpBar = gameState.player.getHealthBar();
-        healthBar.updateHp(hpBar.getMaxHP(), hpBar.getHP());
+
+        healthBar.update(hpBar.getMaxHP(), hpBar.getHP());
+        coinAmount.update(coinsCollected);
+        lifeAmount.update(hpBar.getLives());
+        ammoBar.update(hpBar.getMaxHP(), player.getAmmo());
+        criticalHealthEffect.update(hpBar.getRemainingHPPercentage());
     }
 
     // DRAW
 
-    public void draw(double frameX, double frameY) {
-        Player player = gameState.player;
-        HPBar hpBar = player.getHealthBar();
+    public void draw() {
+        STATE state = gameState.getState();
 
-        drawCriticalHealthEffect(frameX, frameY, hpBar);
+        criticalHealthEffect.draw();
         healthBar.draw();
-        drawAmmo(frameX, frameY, hpBar, player.getAmmo());
-        drawCoinAmount(frameX, frameY, player.getCoinsCollected());
-        drawLifeAmount(frameX, frameY, hpBar);
-        // TODO: move state checking here for pause screen!
-        // that requires splitting pause button and screen!
-        pauseScreen.draw();
-        if (gameState.getState() == STATE.DEAD) deadScreen.draw();
+        coinAmount.draw();
+        lifeAmount.draw();
+        ammoBar.draw();
+        pauseButton.draw();
+
+        if (state == STATE.PAUSE) {
+            pauseScreen.draw();
+        }
+
+        if (gameState.getState() == STATE.DEAD) {
+            deadScreen.draw();
+        }
     }
 
 
-    private class PauseScreen {
+    private class PauseButton {
+
         private static final double DISTANCE = 30;
-        private static final double BUTTON_HEIGHT = 60;
-        private static final double SCREEN_SIDE = 3*BUTTON_HEIGHT + 4*DISTANCE;
         private static final double PAUSE_SIDE = 40;
 
         private static final FrameBox PAUSE_BUTTON = new FrameBox(2*CENTER_X - DISTANCE, DISTANCE, PAUSE_SIDE, PAUSE_SIDE);
-        private static final FrameBox PAUSE_SCREEN = new FrameBox(CENTER_X, CENTER_Y, SCREEN_SIDE, SCREEN_SIDE);
-        private static final FrameBox RESUME_BUTTON = new FrameBox(CENTER_X, CENTER_Y-BUTTON_HEIGHT- DISTANCE, SCREEN_SIDE-2* DISTANCE, BUTTON_HEIGHT);
-        private static final FrameBox RESTART_BUTTON = new FrameBox(CENTER_X, CENTER_Y, SCREEN_SIDE-2* DISTANCE, BUTTON_HEIGHT);
-        private static final FrameBox EXIT_BUTTON = new FrameBox(CENTER_X, CENTER_Y+BUTTON_HEIGHT+ DISTANCE, SCREEN_SIDE-2* DISTANCE, BUTTON_HEIGHT);
-
-        private static final FrameBox[] BOXES = {PAUSE_BUTTON, PAUSE_SCREEN, RESUME_BUTTON, EXIT_BUTTON, RESTART_BUTTON};
 
         private void update() {
-            for (FrameBox frameBox : BOXES) {
-                frameBox.update();
-            }
+            PAUSE_BUTTON.update();
         }
 
         private void processInput(MouseData mouseData) {
@@ -96,7 +109,43 @@ public class GameScreen {
                 if (isIn(mouseX, mouseY, PAUSE_BUTTON.getFrameBox())) {
                     gameState.setState(STATE.PAUSE);
                 }
-            } else { // STATE.PAUSE
+            }
+
+        }
+
+        private void draw() {
+            Box pauseBox = PAUSE_BUTTON.getFrameBox();
+            StdDraw.picture(pauseBox.getCenterX(), pauseBox.getCenterY(), IMAGES_ROOT+"ui/pause.png", pauseBox.getWidth(), pauseBox.getHeight());
+        }
+
+    }
+
+    private class PauseScreen {
+        private static final double DISTANCE = 30;
+        private static final double BUTTON_HEIGHT = 60;
+        private static final double SCREEN_SIDE = 3*BUTTON_HEIGHT + 4*DISTANCE;
+
+        private static final FrameBox PAUSE_SCREEN = new FrameBox(CENTER_X, CENTER_Y, SCREEN_SIDE, SCREEN_SIDE);
+        private static final FrameBox RESUME_BUTTON = new FrameBox(CENTER_X, CENTER_Y-BUTTON_HEIGHT- DISTANCE, SCREEN_SIDE-2* DISTANCE, BUTTON_HEIGHT);
+        private static final FrameBox RESTART_BUTTON = new FrameBox(CENTER_X, CENTER_Y, SCREEN_SIDE-2* DISTANCE, BUTTON_HEIGHT);
+        private static final FrameBox EXIT_BUTTON = new FrameBox(CENTER_X, CENTER_Y+BUTTON_HEIGHT+ DISTANCE, SCREEN_SIDE-2* DISTANCE, BUTTON_HEIGHT);
+
+        private static final FrameBox[] BOXES = {PAUSE_SCREEN, RESUME_BUTTON, EXIT_BUTTON, RESTART_BUTTON};
+
+        private void update() {
+            for (FrameBox frameBox : BOXES) {
+                frameBox.update();
+            }
+        }
+
+        private void processInput(MouseData mouseData) {
+            double mouseX = mouseData.mouseX;
+            double mouseY = mouseData.mouseY;
+            boolean pressed = mouseData.pressed;
+
+            if (!pressed) return;
+
+            if (gameState.getState() == STATE.PAUSE) {
                 if (isIn(mouseX, mouseY, RESUME_BUTTON.getFrameBox())) {
                     gameState.setState(STATE.GAME);
                 }
@@ -111,25 +160,20 @@ public class GameScreen {
         }
 
         private void draw() {
-            // draw pause button
-            Box pauseBox = PAUSE_BUTTON.getFrameBox();
-            StdDraw.picture(pauseBox.getCenterX(), pauseBox.getCenterY(), IMAGES_ROOT+"ui/pause.png", pauseBox.getWidth(), pauseBox.getHeight());
+            // draw pause screen: resume, restart, exit
+            Color background = new Color(16, 78, 6);
+            Color buttons = new Color(23, 148, 9);
+            Color outline1 = Color.BLACK;
+            Color outline2 = Color.WHITE;
+            int fontSize = 30;
+            drawRectWithOutline(PAUSE_SCREEN.getFrameBox(), background, outline1);
+            drawRectWithOutline(RESUME_BUTTON.getFrameBox(), buttons, outline2);
+            textInsideBox(RESUME_BUTTON.getFrameBox(), "RESUME", outline2, fontSize);
+            drawRectWithOutline(RESTART_BUTTON.getFrameBox(), buttons, outline2);
+            textInsideBox(RESTART_BUTTON.getFrameBox(), "RESTART", outline2, fontSize);
+            drawRectWithOutline(EXIT_BUTTON.getFrameBox(), buttons, outline2);
+            textInsideBox(EXIT_BUTTON.getFrameBox(), "EXIT", outline2, fontSize);
 
-            if (gameState.getState() == STATE.PAUSE) {
-                // draw pause screen: resume, restart, exit
-                Color background = new Color(16, 78, 6);
-                Color buttons = new Color(23, 148, 9);
-                Color outline1 = Color.BLACK;
-                Color outline2 = Color.WHITE;
-                int fontSize = 30;
-                drawRectWithOutline(PAUSE_SCREEN.getFrameBox(), background, outline1);
-                drawRectWithOutline(RESUME_BUTTON.getFrameBox(), buttons, outline2);
-                textInsideBox(RESUME_BUTTON.getFrameBox(), "RESUME", outline2, fontSize);
-                drawRectWithOutline(RESTART_BUTTON.getFrameBox(), buttons, outline2);
-                textInsideBox(RESTART_BUTTON.getFrameBox(), "RESTART", outline2, fontSize);
-                drawRectWithOutline(EXIT_BUTTON.getFrameBox(), buttons, outline2);
-                textInsideBox(EXIT_BUTTON.getFrameBox(), "EXIT", outline2, fontSize);
-            }
         }
 
     }
@@ -192,14 +236,10 @@ public class GameScreen {
         private static final double HALFHEIGHT = 12;
         private static final double DISTANCE = 15;
 
-        private final FrameBox outBox, inBox;
+        private final FrameBox outBox = new FrameBox(0, 0, 0, 0);
+        private final FrameBox inBox = new FrameBox(0, 0, 0, 0);
 
-        public HealthBar() {
-            outBox = new FrameBox(0, 0, 0, 0);
-            inBox = new FrameBox(0, 0, 0, 0);
-        }
-
-        private void updateHp(double maxHp, double hp) {
+        private void update(double maxHp, double hp) {
             outBox.setCenterX(DISTANCE + (maxHp/2.0 + THICKNESS));
             outBox.setCenterY(DISTANCE + (HALFHEIGHT + THICKNESS));
             outBox.setWidth(maxHp + 2*THICKNESS);
@@ -209,9 +249,7 @@ public class GameScreen {
             inBox.setCenterY(DISTANCE + (HALFHEIGHT + THICKNESS));
             inBox.setWidth(hp);
             inBox.setHeight(HALFHEIGHT*2);
-        }
 
-        private void updateCenter() {
             outBox.update();
             inBox.update();
         }
@@ -227,104 +265,109 @@ public class GameScreen {
 
     }
 
-    // unused code, previous version of health bar mechanic.
-    private void drawHPBar(HPBar hpBar) {
+    private static class CoinAmount {
 
-        //the outline of hp bar
-        double maxHp = hpBar.getMaxHP();
-        double hp = hpBar.getHP();
-        double thickness = 2;
-        double halfHeight = 12;
-        double height = 24;
-        int distance = 15;
+        private static final double SIDE = 40;
+        private final FrameBox frameBox = new FrameBox(2*CENTER_X - 80, 30, SIDE, SIDE);
+        private int coinsCollected;
 
-        FrameBox outBox = new FrameBox(
-            distance + (maxHp/2.0 + thickness),
-            distance + (halfHeight + thickness),
-            maxHp + 2*thickness, height + 2*thickness);
-        FrameBox inBox = new FrameBox(
-            distance + (hp/2.0 + thickness),
-            distance + (halfHeight + thickness),
-            hp, height
-        );
-
-        outBox.update();
-        inBox.update();
-
-        StdDraw.setPenColor(StdDraw.BLACK);
-        drawRectangle(outBox.getFrameBox());
-
-        //the hp inside the outline
-        StdDraw.setPenColor(StdDraw.GREEN);
-        drawRectangle(inBox.getFrameBox());
-
-
-    }
-
-    private void drawCoinAmount(double frameX, double frameY, int coinsCollected) {
-        StdDraw.picture(frameX + game.Frame.X_SCALE/2.0 - 80, frameY - game.Frame.Y_SCALE/2.0 + 30, IMAGES_ROOT+"coin/singlecoin/0.png", 40, 40);
-        StdDraw.setFont(); StdDraw.setPenColor();
-        StdDraw.text(frameX + game.Frame.X_SCALE/2.0 - 80, frameY - game.Frame.Y_SCALE/2.0 + 30, "%d".formatted(coinsCollected));
-    }
-
-    private void drawLifeAmount(double frameX, double frameY, HPBar hpBar) {
-        int side = 40;
-        StdDraw.picture(frameX + Frame.X_SCALE/2.0 - 130, frameY - Frame.Y_SCALE/2.0 + 30, IMAGES_ROOT+"misc/heart.png", side, side);
-        StdDraw.setFont(); StdDraw.setPenColor();
-        StdDraw.text(frameX + Frame.X_SCALE/2.0 - 130, frameY - Frame.Y_SCALE/2.0 + 30, "%d".formatted(hpBar.getLives()));
-    }
-
-    private void drawAmmo(double frameX, double frameY, HPBar hpBar, int ammo) {
-        double halfHeight = 7;
-        int distance = 15;
-        double baseX = frameX - Frame.X_SCALE/2.0 + distance + hpBar.getMaxHP() + 4*halfHeight;
-        double baseY = frameY - Frame.Y_SCALE / 2.0 + distance + 16;
-        for (int i = 0; i<ammo; i++) {
-            StdDraw.picture(baseX + halfHeight*4*i, baseY, IMAGES_ROOT+"projectile/regularprojectile/0.png", halfHeight*4, halfHeight*2, 45);
+        private void update(int coinsCollected) {
+            frameBox.update();
+            this.coinsCollected = coinsCollected;
         }
+
+        private void draw() {
+            Box box = frameBox.getFrameBox();
+            StdDraw.picture(box.getCenterX(), box.getCenterY(), IMAGES_ROOT+"coin/singlecoin/0.png", SIDE, SIDE);
+            textInsideBox(box, "%d".formatted(coinsCollected));
+        }
+
     }
 
-    private void drawCriticalHealthEffect(double frameX, double frameY, HPBar hpBar) {
-        double halfThickness = 5;
-        int rectangleCount = (int) (10- hpBar.getRemainingHPPercentage()/3);
+    private static class LifeAmount {
 
-        for (int i = 0; i < rectangleCount; i++) {
-            double fadeFactor = 1 - (i / (double) rectangleCount); // linear fade
-            int alpha = (int) (fadeFactor * 255);
-            StdDraw.setPenColor(new Color(123, 9, 9, alpha));
+        private static final double SIDE = 40;
+        private final FrameBox frameBox = new FrameBox(2*CENTER_X - 130, 30, SIDE, SIDE);
+        private int lives;
 
-            // LEFT side
-            StdDraw.filledRectangle(
-                frameX - game.Frame.X_SCALE / 2.0 + (2 * i + 1) * halfThickness,
-                frameY,
-                halfThickness,
-                game.Frame.Y_SCALE / 2.0
-            );
-
-            // RIGHT side
-            StdDraw.filledRectangle(
-                frameX + game.Frame.X_SCALE / 2.0 - (2 * i + 1) * halfThickness,
-                frameY,
-                halfThickness,
-                game.Frame.Y_SCALE / 2.0
-            );
-
-            // BOTTOM side
-            StdDraw.filledRectangle(
-                frameX,
-                frameY + game.Frame.Y_SCALE / 2.0 - (2 * i + 1) * halfThickness,
-                game.Frame.X_SCALE / 2.0,
-                halfThickness
-            );
-
-            // TOP side
-            StdDraw.filledRectangle(
-                frameX,
-                frameY - game.Frame.Y_SCALE / 2.0 + (2 * i + 1) * halfThickness,
-                Frame.X_SCALE / 2.0,
-                halfThickness
-            );
+        private void update(int lives) {
+            frameBox.update();
+            this.lives = lives;
         }
+
+        private void draw() {
+            Box box = frameBox.getFrameBox();
+            StdDraw.picture(box.getCenterX(), box.getCenterY(), IMAGES_ROOT+"misc/heart.png", SIDE, SIDE);
+            textInsideBox(box, "%d".formatted(lives));
+        }
+
+    }
+
+    private static class AmmoBar {
+
+        private static final double HALFHEIGHT = 7;
+        private static final int DISTANCE = 15;
+        private int ammo;
+
+        private final FrameBox frameBox = new FrameBox(0, DISTANCE + 16, HALFHEIGHT*4, HALFHEIGHT*2);
+
+        private void update(double maxHp, int ammo) {
+            this.ammo = ammo;
+            frameBox.setCenterX(DISTANCE + maxHp + 4*HALFHEIGHT);
+            frameBox.update();
+        }
+
+        private void draw() {
+            Box box = frameBox.getFrameBox();
+            for (int i = 0; i<ammo; i++) {
+                StdDraw.picture(box.getCenterX() + HALFHEIGHT*4*i, box.getCenterY(), IMAGES_ROOT+"projectile/regularprojectile/0.png", HALFHEIGHT*4, HALFHEIGHT*2, 45);
+            }
+        }
+
+    }
+
+    private static class CriticalHealthEffect {
+
+        private static final double HALF_THICKNESS = 5;
+        private static final int MAX_RECT_COUNT = 10;
+        private double hpPercantage;
+
+        private final FrameBox frameBox = new FrameBox(CENTER_X, CENTER_Y, 2*CENTER_X, 2*CENTER_Y);
+
+        private void update(double hpPercantage) {
+            this.hpPercantage = hpPercantage;
+            frameBox.update();
+        }
+
+        private void draw() {
+            Box box = frameBox.getFrameBox();
+            double centerX = box.getCenterX();
+            double centerY = box.getCenterY();
+            int rectangleCount = (int) (MAX_RECT_COUNT - hpPercantage/3);
+
+            for (int i = 0; i < rectangleCount; i++) {
+
+                double fadeFactor = 1 - (i / (double) rectangleCount); // linear fade
+                int alpha = (int) (fadeFactor * 255);
+                Color color = new Color(123, 9, 9, alpha);
+                StdDraw.setPenColor(color);
+
+                // LEFT side
+                StdDraw.filledRectangle(centerX - CENTER_X + (2 * i + 1) * HALF_THICKNESS, centerY, HALF_THICKNESS, CENTER_Y);
+
+                // RIGHT side
+                StdDraw.filledRectangle(centerX + CENTER_X - (2 * i + 1) * HALF_THICKNESS, centerY, HALF_THICKNESS, CENTER_Y);
+
+                // BOTTOM side
+                StdDraw.filledRectangle(centerX, centerY + CENTER_Y - (2 * i + 1) * HALF_THICKNESS, CENTER_X, HALF_THICKNESS);
+
+                // TOP side
+                StdDraw.filledRectangle(centerX, centerY - CENTER_Y + (2 * i + 1) * HALF_THICKNESS, CENTER_X, HALF_THICKNESS);
+            }
+
+        }
+
+
     }
 
 }

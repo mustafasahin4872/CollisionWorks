@@ -73,7 +73,7 @@ public class Game {
             StdDraw.clear();
             gameMap.draw();
             player.draw(frameCenter[0], frameCenter[1]);
-            gameScreen.draw(frameCenter[0], frameCenter[1]);
+            gameScreen.draw();
 
             StdDraw.show();
 
