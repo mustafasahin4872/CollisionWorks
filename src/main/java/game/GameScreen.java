@@ -13,35 +13,26 @@ import java.awt.*;
 import static game.Main.IMAGES_ROOT;
 import static helpers.CollisionMethods.isIn;
 import static helpers.DrawMethods.*;
-import static helpers.FrameBox.CENTER_X;
-import static helpers.FrameBox.CENTER_Y;
+import static helpers.FrameBox.*;
 
 // the drawing and input handling of buttons and stats on in-game screen
 public class GameScreen {
 
     private final GameState gameState;
-    private final PauseButton pauseButton;
-    private final PauseScreen pauseScreen;
-    private final DeadScreen deadScreen;
-    private final HealthBar healthBar;
-    private final CoinAmount coinAmount;
-    private final LifeAmount lifeAmount;
-    private final AmmoBar ammoBar;
-    private final CriticalHealthEffect criticalHealthEffect;
+    private final PauseButton pauseButton = new PauseButton();
+    private final PauseScreen pauseScreen = new PauseScreen();
+    private final DeadScreen deadScreen = new DeadScreen();
+    private final HealthBar healthBar = new HealthBar();
+    private final CoinAmount coinAmount = new CoinAmount();
+    private final LifeAmount lifeAmount = new LifeAmount();
+    private final AmmoBar ammoBar = new AmmoBar();
+    private final CriticalHealthEffect criticalHealthEffect = new CriticalHealthEffect();
 
     public GameScreen(GameState gameState) {
         this.gameState = gameState;
-        pauseButton = new PauseButton();
-        pauseScreen = new PauseScreen();
-        deadScreen = new DeadScreen();
-        healthBar = new HealthBar();
-        coinAmount = new CoinAmount();
-        lifeAmount = new LifeAmount();
-        ammoBar = new AmmoBar();
-        criticalHealthEffect = new CriticalHealthEffect();
     }
 
-    // processes all input that is done in in-game ui
+    // processes all input that is needed for in-game ui
     public void processInput(MouseData mouseData) {
         pauseButton.processInput(mouseData);
         pauseScreen.processInput(mouseData);
@@ -49,10 +40,13 @@ public class GameScreen {
     }
 
     // updates all the values needed in draw functions.
-    public void update() {
+    public void updateValues(double frameX, double frameY) {
+        FrameBox.updateCenter(frameX, frameY);
+
         Player player = gameState.player;
         HPBar hpBar = player.getHealthBar();
         int coinsCollected = player.getCoinsCollected();
+
         pauseButton.update();
         pauseScreen.update();
         deadScreen.update();
@@ -62,10 +56,10 @@ public class GameScreen {
         lifeAmount.update(hpBar.getLives());
         ammoBar.update(hpBar.getMaxHP(), player.getAmmo());
         criticalHealthEffect.update(hpBar.getRemainingHPPercentage());
+
     }
 
     // DRAW
-
     public void draw() {
         STATE state = gameState.getState();
 
@@ -85,6 +79,10 @@ public class GameScreen {
         }
     }
 
+    //----------------------------------------------------------------------------------------------------------
+    //----------------------------------------------------------------------------------------------------------
+    //----------------------------------------------------------------------------------------------------------
+    // UI CLASSES - INPUT TAKING
 
     private class PauseButton {
 
@@ -230,6 +228,11 @@ public class GameScreen {
         }
 
     }
+
+    //----------------------------------------------------------------------------------------------------------
+    //----------------------------------------------------------------------------------------------------------
+    //----------------------------------------------------------------------------------------------------------
+    // UI CLASSES - NON INPUT TAKING
 
     private static class HealthBar {
         private static final double THICKNESS = 2;

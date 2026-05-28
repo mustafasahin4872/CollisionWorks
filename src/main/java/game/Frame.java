@@ -1,10 +1,6 @@
 package game;
 
-import mapobjects.mapobject.Player;
-import mapobjects.mapobject.Sign;
 import lib.StdDraw;
-
-import java.awt.event.KeyEvent;
 
 // handles input and screen for given player and map
 public class Frame {

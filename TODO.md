@@ -22,6 +22,8 @@
 ### Core Refactoring
 - [ ] Tidy up Player class
 - [ ] Tidy up Selection system
+- [ ] Tidy up GameMap class
+- [ ] Fill shop logic
 
 ### Rendering Architecture
 - [ ] Fix Player drawing responsibility (currently draws too much)

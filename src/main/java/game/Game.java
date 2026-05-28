@@ -1,6 +1,5 @@
 package game;
 
-import helpers.FrameBox;
 import helpers.MapType;
 import lib.StdDraw;
 import mapobjects.mapobject.Player;
@@ -21,7 +20,6 @@ public class Game {
         this.gameState = gameState;
     }
 
-
     public void gameLoop() {
 
         // create the corresponding NORMAL or IN_BETWEEN map
@@ -38,13 +36,11 @@ public class Game {
 
         gameState.resetState();
 
-
         while (gameState.getState() == STATE.GAME || gameState.getState() == STATE.PAUSE || gameState.getState() == STATE.DEAD) {
 
             long startTime = System.currentTimeMillis();
 
             inputHandler.takeInput();
-
             MouseData mouseData = inputHandler.getMouseData();
             gameScreen.processInput(mouseData);
 
@@ -65,8 +61,7 @@ public class Game {
 
             double[] frameCenter = frame.setFrameCenter(player.getX(), player.getY());
             Sign.updateDisplayCenter(frameCenter[0], frameCenter[1]);
-            FrameBox.updateCenter(frameCenter[0], frameCenter[1]);
-            gameScreen.update();
+            gameScreen.updateValues(frameCenter[0], frameCenter[1]);
             gameMap.setFrameTileRange();
 
             //draws everything
@@ -74,7 +69,6 @@ public class Game {
             gameMap.draw();
             player.draw();
             gameScreen.draw();
-
             StdDraw.show();
 
             player.resetInput();
