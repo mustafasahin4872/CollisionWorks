@@ -14,7 +14,6 @@ import java.util.Set;
 
 import static helpers.HelperMethods.*;
 
-
 public abstract class Player extends MapObject implements MovingCollidable, Spawnable, HealthBearer, Timed {
 
     private final String playerName;
@@ -24,7 +23,6 @@ public abstract class Player extends MapObject implements MovingCollidable, Spaw
     protected final Set<Projectile> projectiles = new HashSet<>();
     protected final HPBar hpBar;
     private final Timer timer, shootingCooldown;
-
 
     private final double defaultSide;
 
@@ -424,6 +422,7 @@ public abstract class Player extends MapObject implements MovingCollidable, Spaw
     }
 
     public void restart() {
+        //TODO: NEED TO RESET A LOT MORE FIELDS, E.G. COIN AMOUNT
         hpBar.restart();
         respawn();
     }
@@ -468,36 +467,8 @@ public abstract class Player extends MapObject implements MovingCollidable, Spaw
 
     //DRAW METHODS
 
-    public void draw() {
+    public abstract void drawBig(double multiplier);
 
-        for (Projectile projectile : projectiles) projectile.draw();
-
-        setName(playerName + "/" + getDirectionString(xDirection, yDirection));
-
-        super.draw();
-
-        if (accessories != null) {
-            for (Accessory accessory : accessories) {
-                accessory.draw();
-            }
-        }
-
-    }
-
-    public void drawBig(double multiplier) {
-        resize(multiplier);
-
-        setName(playerName + "/" + getDirectionString(xDirection, yDirection));
-
-        super.draw();
-
-        if (accessories != null) {
-            for (Accessory accessory : accessories) {
-                accessory.drawBig(multiplier);
-            }
-        }
-        resetSize();
-    }
 
     public static class RegularPlayer extends Player {
 
@@ -506,6 +477,37 @@ public abstract class Player extends MapObject implements MovingCollidable, Spaw
 
         public RegularPlayer(String playerName) {
             super(playerName);
+        }
+
+        public void draw() {
+
+            for (Projectile projectile : projectiles) projectile.draw();
+
+            setName(getPlayerName() + "/" + getDirectionString(getXDirection(), getYDirection()));
+
+            super.draw();
+
+            if (accessories != null) {
+                for (Accessory accessory : accessories) {
+                    accessory.draw();
+                }
+            }
+
+        }
+
+        public void drawBig(double multiplier) {
+            resize(multiplier);
+
+            setName(getPlayerName() + "/" + getDirectionString(getXDirection(), getYDirection()));
+
+            super.draw();
+
+            if (accessories != null) {
+                for (Accessory accessory : accessories) {
+                    accessory.drawBig(multiplier);
+                }
+            }
+            resetSize();
         }
 
     }

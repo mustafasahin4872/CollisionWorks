@@ -24,7 +24,6 @@ public class Selection {
             currentAccessoryIndex = 0, currentSkinIndex = 0;
 
     private Player currentSkin;
-    private Accessory currentAccessory;
 
     private final ArrayList<Accessory> selectedAccessories = new ArrayList<>();
 
@@ -37,20 +36,6 @@ public class Selection {
             new GameMap(4, 0, new Player.RegularPlayer(), MapType.SELECTION)
     };
 
-    private static final Player[] SKINS = {
-            new Player.RegularPlayer(),
-            new Player.AnimatedPlayer("Mike", 6),
-            new Player.RegularPlayer("Zahit")
-    };
-
-    private static final Accessory[] ACCESSORIES = {
-            null,
-            new Accessory.Hat("fedora", 65, 25, WORLDS[0].getPlayer()),
-            new Accessory.Headpiece("coquette", 20, 20, WORLDS[0].getPlayer())
-    };
-
-    private static final boolean[] ACCESSORY_CHOSEN = new boolean[ACCESSORIES.length];
-
     public static final Color[] WORLD_COLORS = {
             new Color(1,1,1),
             new Color(119, 14, 155, 255),
@@ -62,6 +47,21 @@ public class Selection {
     private static final String[] WORLD_NAMES = {
             null, "THE SPRING FESTIVAL", "INTO THE ICE CAVE", "TO THE TOP OF THE VOLCANO", "CRYSTAL PALACE"
     };
+
+    private static final Player[] SKINS = {
+        new Player.RegularPlayer(),
+        new Player.AnimatedPlayer("Mike", 6),
+        new Player.RegularPlayer("Zahit")
+    };
+
+    private static final Accessory[] ACCESSORIES = {
+        null,
+        new Accessory.Hat("fedora", 65, 25, WORLDS[0].getPlayer()),
+        new Accessory.Headpiece("coquette", 20, 20, WORLDS[0].getPlayer())
+    };
+
+    private static final boolean[] ACCESSORY_CHOSEN = new boolean[ACCESSORIES.length];
+
 
     //----------------------------------------------------------------------------------------------------------
     //----------------------------------------------------------------------------------------------------------
@@ -105,16 +105,6 @@ public class Selection {
 
         fillArrowBoxes();
         fillLevelBoxes();
-
-        for (Player skin : SKINS) {
-            skin.setSpawnPoint(WORLDS[0].getPlayer().getSpawnPoint());
-            skin.respawn();
-        }
-
-        for (Accessory accessory : ACCESSORIES) {
-            if (accessory!=null) accessory.update();
-        }
-
     }
 
     //----------------------------------------------------------------------------------------------------------
@@ -123,6 +113,15 @@ public class Selection {
     //----------------------------------------------------------------------------------------------------------
 
     public void selectionLoop() {
+
+        for (Player skin : SKINS) {
+            skin.setSpawnPoint(WORLDS[0].getSpawnPoint());
+            skin.restart();
+        }
+
+        for (Accessory accessory : ACCESSORIES) {
+            if (accessory!=null) accessory.update();
+        }
 
         while (gameState.getState() == STATE.SELECTION) {
             inputHandler.takeInput();
@@ -247,7 +246,7 @@ public class Selection {
 
         GameMap currentWorld = WORLDS[currentWorldIndex];
         currentSkin = SKINS[(currentSkinIndex)%SKINS.length];
-        currentAccessory = ACCESSORIES[currentAccessoryIndex];
+        Accessory currentAccessory = ACCESSORIES[currentAccessoryIndex];
 
         StdDraw.setXscale(0, Frame.X_SCALE);
         StdDraw.setYscale(Frame.Y_SCALE, 0);
@@ -255,7 +254,7 @@ public class Selection {
         if (currentWorldIndex==0) {
             double multiplier = 2.5;
             currentSkin.drawBig(multiplier);
-            if (currentAccessory!=null) {
+            if (currentAccessory !=null) {
                 currentAccessory.setPlayer(currentSkin);
                 currentAccessory.drawBig(multiplier);
             }
@@ -274,7 +273,7 @@ public class Selection {
             StdDraw.setFont(new Font("Monospaced", Font.BOLD, 50));
             StdDraw.text(X_TILE/2.0-1, Y_TILE-1.5-0.5-0.15, currentSkin.getPlayerName());
             StdDraw.setFont(new Font("Monospaced", Font.BOLD, 30));
-            if (currentAccessory!=null) {
+            if (currentAccessory !=null) {
                 StdDraw.text(X_TILE/2.0-1, Y_TILE-6.5-0.5, currentAccessory.getAccessoryName());
             } else {
                 StdDraw.text(X_TILE/2.0-1, Y_TILE-6.5-0.5, "no accessory");
@@ -358,4 +357,5 @@ public class Selection {
         fillBox[3] = coordinates[1] + side;
 
     }
+
 }

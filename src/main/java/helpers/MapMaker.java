@@ -26,6 +26,8 @@ public class MapMaker {
     private final EmptyGridObject[][] emptyGridObjects;
     private final Coin[][] coins;
 
+    private double[] spawnPoint;
+
     private static final Set<String> IMPASSABLE_CODES = new HashSet<>(Set.of("XXX", "###", "%%%"));
     private static final Set<Character>
             BASIC_CHARACTERS = new HashSet<>(Set.of( //tile symbols
@@ -105,6 +107,8 @@ points can have the indicator B for big displays, special to the selection scree
     public GridObject[][][] getLayers() {
         return layers;
     }
+
+    public double[] getSpawnPoint() {return spawnPoint;}
 
 
     //MAIN METHOD
@@ -278,6 +282,7 @@ points can have the indicator B for big displays, special to the selection scree
                 player.setSpawnPoint(currentCheckPoint.getCenterCoordinates());
                 player.resetLastCheckPointIndex();
                 player.respawn();
+                spawnPoint = currentCheckPoint.getCenterCoordinates();
             }
         }
     }

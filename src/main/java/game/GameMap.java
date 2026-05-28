@@ -21,6 +21,7 @@ public class GameMap {
 
     private final double width, height;
     private final int xTile, yTile;
+    private final double[] spawnPoint;
 
     private int[] tileRange;
 
@@ -48,6 +49,7 @@ public class GameMap {
         MapMaker mapMaker = new MapMaker(worldIndex, levelIndex, xTile, yTile, player, mapType);
         mapMaker.mapMaker();
         layers = mapMaker.getLayers();
+        spawnPoint = mapMaker.getSpawnPoint();
 
         for (GridObject[][] layer : layers) {
             for (int i = 0; i<yTile; i++) {
@@ -79,6 +81,7 @@ public class GameMap {
         MapMaker mapMaker = new MapMaker(worldIndex, levelIndex, xTile, yTile, player, mapType);
         mapMaker.mapMaker();
         layers = mapMaker.getLayers();
+        spawnPoint = mapMaker.getSpawnPoint();
 
         for (GridObject[][] layer : layers) {
             for (int i = 0; i<yTile; i++) {
@@ -112,6 +115,8 @@ public class GameMap {
     public double getHeight() {
         return height;
     }
+
+    public double[] getSpawnPoint() {return spawnPoint;}
 
     //------------------------------------------------------------------------------------------------------------
 
