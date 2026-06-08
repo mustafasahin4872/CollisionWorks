@@ -25,9 +25,9 @@ public class Game {
         // create the corresponding NORMAL or IN_BETWEEN map
         GameMap gameMap;
         if (gameState.getState() == STATE.PASSED) {
-            gameMap = new GameMap(gameState.worldIndex, 0, gameState.player, MapType.IN_BETWEEN);
+            gameMap = new GameMap(gameState, MapType.IN_BETWEEN);
         } else { // STATE.NEXT
-            gameMap = new GameMap(gameState);
+            gameMap = new GameMap(gameState, MapType.NORMAL);
         }
 
         Frame frame = new Frame(gameMap.getWidth(), gameMap.getHeight());

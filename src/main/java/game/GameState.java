@@ -13,7 +13,14 @@ public class GameState {
     public int worldIndex, levelIndex;
     public Player player;
 
+
     public GameState() {
+        this.player = new Player.RegularPlayer();
+    }
+
+    public GameState(int worldIndex, int levelIndex) {
+        this.worldIndex = worldIndex;
+        this.levelIndex = levelIndex;
         this.player = new Player.RegularPlayer();
     }
 
@@ -52,8 +59,6 @@ public class GameState {
         } else {
             levelIndex++;
         }
-
-        setState(STATE.NEXT);
 
     }
 

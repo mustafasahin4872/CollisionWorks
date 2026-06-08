@@ -29,11 +29,11 @@ public class Selection {
     //the selection screens
 
     public static final GameMap[] WORLDS = {
-        new GameMap(1, -1, MapType.SELECTION),
-        new GameMap(1, 0, MapType.SELECTION),
-        new GameMap(2, 0, MapType.SELECTION),
-        new GameMap(3, 0, MapType.SELECTION),
-        new GameMap(4, 0, MapType.SELECTION)
+        new GameMap(new GameState(1, -1), MapType.SELECTION),
+        new GameMap(new GameState(1, 0), MapType.SELECTION),
+        new GameMap(new GameState(2, 0), MapType.SELECTION),
+        new GameMap(new GameState(3, 0), MapType.SELECTION),
+        // new GameMap(new GameState(4, 0), MapType.SELECTION) // world4 disabled
     };
 
     public final Player[] skins = {

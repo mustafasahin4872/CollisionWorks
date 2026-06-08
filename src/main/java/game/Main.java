@@ -25,7 +25,10 @@ public class Main {
             switch (gameState.getState()) {
                 case SELECTION -> selection.selectionLoop();
                 case NEXT -> game.gameLoop();
-                case PASSED -> gameState.nextLevel();
+                case PASSED -> {
+                    gameState.nextLevel();
+                    game.gameLoop();
+                }
                 case ALTERNATE1 -> {} // add alternate1
                 case ALTERNATE2 -> {} // add alternate2
                 case SHOP -> shop.shopLoop();

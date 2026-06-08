@@ -34,23 +34,15 @@ public class GameMap {
 
     //------------------------------------------------------------------------------------------------------------
 
-    public GameMap(GameState gameState) {
-        this(gameState.worldIndex, gameState.levelIndex, gameState.player, MapType.NORMAL);
-    }
-
-    public GameMap(int worldIndex, int levelIndex, MapType mapType) {
-        this(worldIndex, levelIndex, new Player.RegularPlayer(), mapType);
-    }
-
-    public GameMap(int worldIndex, int levelIndex, Player player, MapType mapType) {
+    public GameMap(GameState gameState, MapType mapType) {
         xTile = mapType.xTile;
         yTile = mapType.yTile;
-        this.player = player;
+        this.player = gameState.player;
 
         width = xTile*Tile.HALF_SIDE*2;
         height = yTile*Tile.HALF_SIDE*2;
 
-        MapMaker mapMaker = new MapMaker(worldIndex, levelIndex, xTile, yTile, player, mapType);
+        MapMaker mapMaker = new MapMaker(gameState.worldIndex, gameState.levelIndex, xTile, yTile, player, mapType);
         mapMaker.mapMaker();
         layers = mapMaker.getLayers();
         spawnPoint = mapMaker.getSpawnPoint();
