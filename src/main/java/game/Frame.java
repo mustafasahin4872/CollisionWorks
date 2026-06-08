@@ -13,6 +13,7 @@ public class Frame {
 
     private final double width, height;
 
+    // intakes the map's width and height
     public Frame(double width, double height) {
         this.width = width;
         this.height = height;

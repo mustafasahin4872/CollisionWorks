@@ -1,5 +1,7 @@
 package game;
 
+//TODO: DECIDE WHETHER IN-GAME SHOP OR UI SHOP
+//ACTUALLY BOTH CAN BE IMPLEMENTED INSIDE GAME OR SELECTION CLASSES?
 public class Shop {
 
     private final InputHandler inputHandler;
