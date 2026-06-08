@@ -2,26 +2,17 @@ package mapobjects.mapobject;
 
 import mapobjects.category.MapObject;
 
+import static helpers.HelperMethods.getDirectionString;
 import static mapobjects.category.GridObject.TILE_SIDE;
 
+// different accessories are placed on different locations on player.
+// therefore, we created many subclasses, each having their unique setCoordinates() function
+// also, each accessory has 9 images, and their names change depending on the player's direction.
 public abstract class Accessory extends MapObject {
 
     protected Player player;
     protected String accessoryName;
-
-    //there can exist 9 different coordinates depending on the player's direction.
-    //some accessories have 3 coordinates depending on left, right, stationary; some have only 1.
-    //we cannot enter all coordinates in the constructor, so there should be some default alignments
-    //of accessories in the form of subclasses
-    //add new alignments as needed(as subclasses)
-    protected final double[][] coordinates = new double[9][2]; //with respect to player
-
     protected final double defaultWidth, defaultHeight;
-
-
-    public Accessory(String accessoryName, Player player) {
-        this(accessoryName, player.getWidth(), player.getHeight(), player);
-    }
 
     public Accessory(String accessoryName, double defaultWidth, double defaultHeight, Player player) {
         super(player.getWorldIndex(), player.getX(), player.getY(), defaultWidth, defaultHeight, accessoryName+"/0");
@@ -32,7 +23,6 @@ public abstract class Accessory extends MapObject {
         update();
     }
 
-
     public Player getPlayer() {
         return player;
     }
@@ -41,22 +31,31 @@ public abstract class Accessory extends MapObject {
         this.player = player;
     }
 
+    public String getAccessoryName() {
+        return accessoryName;
+    }
+
     public void resetSize() {
         setWidth(defaultWidth);
         setHeight(defaultHeight);
     }
 
-    public String getAccessoryName() {
-        return accessoryName;
-    }
 
+    //------------------------------------------------------------------------------------------
+    //------------------------------------------------------------------------------------------
+
+    public void update() {
+        setCoordinates();
+        changeName();
+    }
 
     //sets coordinates using player's position. different coordinates for each accessory type
     protected abstract void setCoordinates();
 
-    //updates position using coordinates. Calls setCoordinates and updates the fileName
-    public abstract void update();
-
+    private void changeName() {
+        String direction = getDirectionString(player.getXDirection(), player.getYDirection());
+        setName(accessoryName + "/" + direction);
+    }
 
     public void drawBig(double multiplier) {
         resize(multiplier);
@@ -68,120 +67,116 @@ public abstract class Accessory extends MapObject {
         player.resetSize();
     }
 
+    //------------------------------------------------------------------------------------------
+    //------------------------------------------------------------------------------------------
 
-    //classes that have specific placements on the player
-
-    //Stays on the middle top of the player. Have only 1 image, does not change as player moves.
+    //Stays on the middle top of the player, does not change as player moves.
     public static class Hat extends Accessory {
-        public Hat(String name, double defaultWidth, double defaultHeight, Player player) {
-            super(name, defaultWidth, defaultHeight, player);
-        }
         public Hat(String name, Player player) {
-            super(name, player);
+            super(name, 65, 25, player);
         }
 
         @Override
         protected void setCoordinates() {
-            coordinates[0] = new double[]{player.getX(), player.getY()-(2*player.getHeight()/5)-getHeight()/2};
-        }
+            double x = player.getX();
+            double y = player.getY()-(2*player.getHeight()/5)-getHeight()/2;
 
-        @Override
-        public void update() {
-            setCoordinates();
-            setX(coordinates[0][0]);
-            setY(coordinates[0][1]);
+            setX(x);
+            setY(y);
         }
 
     }
 
-    //Stays in the center of the player. Have only 1 image, does not change as player moves.
+    //Stays in the center of the player, does not change as player moves.
     public static class Necklace extends Accessory {
+
         public Necklace(String name, Player player) {
-            super(name, player);
-        }
-
-        public Necklace(String name, double defaultWidth, double defaultHeight, Player player) {
-            super(name, defaultWidth, defaultHeight, player);
+            super(name, 50, 25, player);
         }
 
         @Override
         protected void setCoordinates() {
-            coordinates[0] = new double[]{player.getX(), player.getY()};
-        }
+            double x = player.getX();
 
-        @Override
-        public void update() {
-            setCoordinates();
-            setX(coordinates[0][0]);
-            setY(coordinates[0][1]);
+            double baseY = player.getY()+player.getHeight()/3;
+            double yShift = player.getHeight() / 8;
+            int yDir = player.getYDirection();
+            double y = baseY + yDir*yShift;
+
+            setX(x);
+            setY(y);
         }
 
     }
 
+    //sits on lower half of player, moves to the direction player moves to (stays right below the eyes)
+    public static class Tie extends Accessory {
 
-    //Stays on top of the player. Have 3 images, moves to left side when going right.
-    public static class Headpiece extends Accessory {
-        public Headpiece(String name, Player player) {
-            super(name, player);
+        public Tie(String name, Player player) {
+            super(name, 50, 30, player);
         }
-
-        public Headpiece(String name, double defaultWidth, double defaultHeight, Player player) {
-            super(name, defaultWidth, defaultHeight, player);
-        }
-
 
         @Override
         protected void setCoordinates() {
-            coordinates[0] = new double[]{player.getX()+player.getWidth()/2, player.getY()-2*player.getHeight()/5};
-            coordinates[1] = new double[]{player.getX()+player.getWidth()/2, player.getY()-2*player.getHeight()/5};
-            coordinates[2] = new double[]{player.getX()-player.getWidth()/2, player.getY()-2*player.getHeight()/5};
+            double baseY = player.getY()+player.getHeight()/2;
+            double baseX = player.getX();
+            double xShift = player.getWidth()/2 - player.getWidth()*2/5;
+            double yShift = player.getHeight() / 8;
+
+            int xDir = player.getXDirection();
+            int yDir = player.getYDirection();
+
+            double x = baseX + xDir*xShift;
+            double y = baseY + yDir*yShift;
+
+            setX(x);
+            setY(y);
         }
 
-        @Override
-        public void update() {
-            setCoordinates();
-            int index = player.getXDirection() + 1;
-            setX(coordinates[index][0]);
-            setY(coordinates[index][1]);
-            setName(accessoryName + "/" + switch (index) {
-                case 0 -> "L";
-                case 1 -> "0";
-                default -> "R";
-            });
-        }
     }
 
-
-    //Stays in the center of the player. Have 3 images, moves to left side when going right.
+    //Stays on top of the player, moves to the left side when going right.
     public static class Pin extends Accessory {
-        public Pin(String name, Player player) {
-            super(name, player);
-        }
 
-        public Pin(String name, double defaultWidth, double defaultHeight, Player player) {
-            super(name, defaultWidth, defaultHeight, player);
+        public Pin(String name, Player player) {
+            super(name, 10, 10, player);
         }
 
         @Override
         protected void setCoordinates() {
-            coordinates[0] = new double[]{player.getX()+player.getWidth()/2, player.getY()};
-            coordinates[1] = new double[]{player.getX()+player.getWidth()/2, player.getY()};
-            coordinates[2] = new double[]{player.getX()-player.getWidth()/2, player.getY()};
+
+            double baseX = player.getX();
+            double xShift = player.getWidth() / 2 - player.getWidth() / 5;
+            int multiplier = (player.getXDirection() == -1) ? 1 : -1;
+            double x = baseX + multiplier*xShift;
+
+            double y = player.getY() + player.getHeight() / 4;
+
+            setX(x);
+            setY(y);
+        }
+
+    }
+
+    //Stays on top of the player, moves to the left side when going right.
+    public static class Headpiece extends Accessory {
+
+        public Headpiece(String name, Player player) {
+            super(name, 20, 20, player);
         }
 
         @Override
-        public void update() {
-            setCoordinates();
-            int index = player.getXDirection() + 1;
-            setX(coordinates[index][0]);
-            setY(coordinates[index][1]);
-            setName(accessoryName + "/" + switch (index) {
-                case 0 -> "L";
-                case 1 -> "0";
-                default -> "R";
-            });
+        protected void setCoordinates() {
+            double baseX = player.getX();
+            double xShift = player.getWidth() / 2;
+            int multiplier = (player.getXDirection() == 1) ? -1 : 1;
+            double x = baseX + multiplier * xShift;
+            double y = player.getY() - 2 * player.getHeight() / 5;
+
+            setX(x);
+            setY(y);
         }
 
-
     }
+
 }

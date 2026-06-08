@@ -44,8 +44,13 @@ public class Selection {
 
     public final Accessory[] accessories = {
         null,
-        new Accessory.Hat("fedora", 65, 25, WORLDS[0].getPlayer()),
-        new Accessory.Headpiece("coquette", 20, 20, WORLDS[0].getPlayer())
+        new Accessory.Hat("fedora", WORLDS[0].getPlayer()),
+        new Accessory.Headpiece("coquette", WORLDS[0].getPlayer()),
+        new Accessory.Pin("badge", WORLDS[0].getPlayer()),
+        new Accessory.Pin("badge2", WORLDS[0].getPlayer()),
+        new Accessory.Necklace("dollar", WORLDS[0].getPlayer()),
+        new Accessory.Necklace("sorcerer", WORLDS[0].getPlayer()),
+        new Accessory.Tie("tie", WORLDS[0].getPlayer())
     };
 
     private final boolean[] accessoryChosen = new boolean[accessories.length];
