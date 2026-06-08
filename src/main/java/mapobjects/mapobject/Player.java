@@ -422,13 +422,10 @@ public abstract class Player extends MapObject implements MovingCollidable, Spaw
     }
 
     public void restart() {
-        //TODO: NEED TO RESET A LOT MORE FIELDS, E.G. COIN AMOUNT
+        //TODO: CHECK IF THERE ARE MORE FIELDS THAT NEED RESETTING
         hpBar.restart();
+        coinsCollected = 0;
         respawn();
-    }
-
-    public void addLife(int lives) {
-        hpBar.addLives(lives);
     }
 
     //COIN
@@ -443,10 +440,6 @@ public abstract class Player extends MapObject implements MovingCollidable, Spaw
 
 
     //CHECKPOINT AND SPAWN POINT
-
-    public double[] getSpawnPoint() {
-        return new double[]{spawnX, spawnY};
-    }
 
     public void setSpawnPoint(double[] spawnPoint) {
         spawnX = spawnPoint[0];

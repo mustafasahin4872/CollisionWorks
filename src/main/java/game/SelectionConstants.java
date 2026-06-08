@@ -1,11 +1,20 @@
 package game;
 
+import helpers.MapType;
 import mapobjects.category.GridObject;
-
+import mapobjects.mapobject.Accessory;
+import mapobjects.mapobject.Player;
 import java.awt.*;
 
 public final class SelectionConstants {
 
+    public static final GameMap[] WORLDS = {
+        new GameMap(new GameState(1, -1), MapType.SELECTION),
+        new GameMap(new GameState(1, 0), MapType.SELECTION),
+        new GameMap(new GameState(2, 0), MapType.SELECTION),
+        new GameMap(new GameState(3, 0), MapType.SELECTION),
+        // new GameMap(new GameState(4, 0), MapType.SELECTION) // world4 disabled
+    };
 
     public static final Color[] WORLD_COLORS = {
         new Color(1,1,1),
@@ -16,8 +25,29 @@ public final class SelectionConstants {
     };
 
     public static final String[] WORLD_NAMES = {
-        null, "THE SPRING FESTIVAL", "INTO THE ICE CAVE", "TO THE TOP OF THE VOLCANO", "CRYSTAL PALACE"
+        null, "THE SPRING FESTIVAL", "INTO THE ICE CAVE", "TO THE TOP OF THE VOLCANO", // "CRYSTAL PALACE"
     };
+
+
+
+    public static final Player[] skins = {
+        new Player.RegularPlayer(),
+        new Player.AnimatedPlayer("Mike", 6),
+        new Player.RegularPlayer("Zahit")
+    };
+
+
+    public static final Accessory[] accessories = {
+        null,
+        new Accessory.Hat("fedora"),
+        new Accessory.Tie("tie"),
+        new Accessory.Headpiece("coquette"),
+        new Accessory.Necklace("dollar"),
+        new Accessory.Necklace("sorcerer"),
+        new Accessory.Pin("star"),
+        new Accessory.Pin("sheriff")
+    };
+
 
     public static final int
         X_TILE = (int)(Frame.X_SCALE / GridObject.TILE_SIDE),

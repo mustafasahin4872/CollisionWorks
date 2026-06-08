@@ -21,7 +21,8 @@
 
 ### Core Refactoring
 - [ ] Tidy up Player class
-- [ ] Tidy up Selection system
+- [v] Tidy up Selection system
+- [ ] Create a separate SelectionScreen similar to GameScreen
 - [ ] Tidy up GameMap class
 - [ ] Fill shop logic
 
@@ -159,8 +160,5 @@
 ## 🎨 ASSET CREATION
 
 - Create new skins:
-    - Mike
     - Sakura
-    - Sheriff
-    - Tie
 - Expand World 4 assets and design

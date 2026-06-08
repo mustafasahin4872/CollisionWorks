@@ -32,8 +32,7 @@ public class Main {
                 case ALTERNATE1 -> {} // add alternate1
                 case ALTERNATE2 -> {} // add alternate2
                 case SHOP -> shop.shopLoop();
-                case DEAD -> {} // restart or selection screen
-                // case PAUSE is handled inside gameLoop
+                // case PAUSE and DEAD is handled inside gameLoop
                 // case QUIT is unreachable.
             }
         }

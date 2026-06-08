@@ -185,8 +185,9 @@ public class GameScreen {
         private static final FrameBox DEAD_SCREEN = new FrameBox(CENTER_X, CENTER_Y, SCREEN_WIDTH, SCREEN_HEIGHT);
         private static final FrameBox RESTART_BUTTON = new FrameBox(CENTER_X, CENTER_Y - DISTANCE/2 - BUTTON_HEIGHT/2, SCREEN_WIDTH-2* DISTANCE, BUTTON_HEIGHT);
         private static final FrameBox EXIT_BUTTON = new FrameBox(CENTER_X, CENTER_Y + DISTANCE/2 + BUTTON_HEIGHT/2, SCREEN_WIDTH-2* DISTANCE, BUTTON_HEIGHT);
+        private static final FrameBox YOU_DIED = new FrameBox(CENTER_X, CENTER_Y - SCREEN_HEIGHT/2 - DISTANCE*2, SCREEN_WIDTH, BUTTON_HEIGHT);
 
-        private static final FrameBox[] BOXES = {EXIT_BUTTON, RESTART_BUTTON, DEAD_SCREEN};
+        private static final FrameBox[] BOXES = {EXIT_BUTTON, RESTART_BUTTON, DEAD_SCREEN, YOU_DIED};
 
         private void update() {
             for (FrameBox frameBox : BOXES) {
@@ -213,7 +214,6 @@ public class GameScreen {
         }
 
         private void draw() {
-            //TODO: write YOU DIED!!! to the top
 
             Color background = new Color(137, 10, 10);
             Color buttons = new Color(202, 60, 60);
@@ -225,6 +225,8 @@ public class GameScreen {
             textInsideBox(RESTART_BUTTON.getFrameBox(), "RESTART", outline2, fontSize);
             drawRectWithOutline(EXIT_BUTTON.getFrameBox(), buttons, outline2);
             textInsideBox(EXIT_BUTTON.getFrameBox(), "EXIT", outline2, fontSize);
+            drawRectWithOutline(YOU_DIED.getFrameBox(), buttons, outline2);
+            textInsideBox(YOU_DIED.getFrameBox(), "YOU DIED!", outline2, fontSize);
         }
 
     }

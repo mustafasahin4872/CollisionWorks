@@ -1,18 +1,15 @@
 package game;
 
-import helpers.MapType;
 import lib.StdDraw;
 import mapobjects.component.Box;
 import mapobjects.mapobject.Accessory;
 import mapobjects.mapobject.Player;
-
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import game.InputHandler.MouseData;
 import game.InputHandler.ArrowData;
 import game.GameState.STATE;
-
 import static game.SelectionConstants.*;
 import static helpers.CollisionMethods.isIn;
 
@@ -26,36 +23,7 @@ public class Selection {
     private int currentAccessoryIndex = 0;
     private int currentSkinIndex = 0;
 
-    //the selection screens
-
-    public static final GameMap[] WORLDS = {
-        new GameMap(new GameState(1, -1), MapType.SELECTION),
-        new GameMap(new GameState(1, 0), MapType.SELECTION),
-        new GameMap(new GameState(2, 0), MapType.SELECTION),
-        new GameMap(new GameState(3, 0), MapType.SELECTION),
-        // new GameMap(new GameState(4, 0), MapType.SELECTION) // world4 disabled
-    };
-
-    public final Player[] skins = {
-        new Player.RegularPlayer(),
-        new Player.AnimatedPlayer("Mike", 6),
-        new Player.RegularPlayer("Zahit")
-    };
-
-
-    public final Accessory[] accessories = {
-        null,
-        new Accessory.Hat("fedora"),
-        new Accessory.Headpiece("coquette"),
-        new Accessory.Pin("star"),
-        new Accessory.Pin("sheriff"),
-        new Accessory.Necklace("dollar"),
-        new Accessory.Necklace("sorcerer"),
-        new Accessory.Tie("tie")
-    };
-
     private final boolean[] accessoryChosen = new boolean[accessories.length];
-
 
     //----------------------------------------------------------------------------------------------------------
 
@@ -77,7 +45,7 @@ public class Selection {
             if (accessory!=null) accessory.update();
         }
 
-        while (gameState.getState() == STATE.SELECTION) {
+        while (gameState.getState() == STATE.SELECTION || gameState.getState() == STATE.SHOP || gameState.getState() == STATE.GAME) {
             inputHandler.takeInput();
             MouseData mouseData = inputHandler.getMouseData();
             ArrowData arrowData = inputHandler.getArrowData();
@@ -235,7 +203,7 @@ public class Selection {
         }
 
         StdDraw.show();
-        StdDraw.pause(10* Frame.PAUSE);
+        StdDraw.pause(10* Frame.PAUSE); // allows time between clicks
     }
 
     private void drawLevelButtons() {
