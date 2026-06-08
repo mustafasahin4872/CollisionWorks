@@ -14,9 +14,9 @@ public abstract class Accessory extends MapObject {
     protected String accessoryName;
     protected final double defaultWidth, defaultHeight;
 
-    public Accessory(String accessoryName, double defaultWidth, double defaultHeight, Player player) {
-        super(player.getWorldIndex(), player.getX(), player.getY(), defaultWidth, defaultHeight, accessoryName+"/0");
-        this.player = player;
+    public Accessory(String accessoryName, double defaultWidth, double defaultHeight) {
+        super(0, 0, 0, defaultWidth, defaultHeight, accessoryName+"/0");
+        this.player = new Player.RegularPlayer(); // replaced later
         this.accessoryName = accessoryName;
         this.defaultWidth = defaultWidth;
         this.defaultHeight = defaultHeight;
@@ -72,8 +72,8 @@ public abstract class Accessory extends MapObject {
 
     //Stays on the middle top of the player, does not change as player moves.
     public static class Hat extends Accessory {
-        public Hat(String name, Player player) {
-            super(name, 65, 25, player);
+        public Hat(String name) {
+            super(name, 65, 25);
         }
 
         @Override
@@ -90,8 +90,8 @@ public abstract class Accessory extends MapObject {
     //Stays in the center of the player, does not change as player moves.
     public static class Necklace extends Accessory {
 
-        public Necklace(String name, Player player) {
-            super(name, 50, 25, player);
+        public Necklace(String name) {
+            super(name, 50, 25);
         }
 
         @Override
@@ -112,8 +112,8 @@ public abstract class Accessory extends MapObject {
     //sits on lower half of player, moves to the direction player moves to (stays right below the eyes)
     public static class Tie extends Accessory {
 
-        public Tie(String name, Player player) {
-            super(name, 50, 30, player);
+        public Tie(String name) {
+            super(name, 50, 30);
         }
 
         @Override
@@ -138,8 +138,8 @@ public abstract class Accessory extends MapObject {
     //Stays on top of the player, moves to the left side when going right.
     public static class Pin extends Accessory {
 
-        public Pin(String name, Player player) {
-            super(name, 10, 10, player);
+        public Pin(String name) {
+            super(name, 10, 10);
         }
 
         @Override
@@ -161,8 +161,8 @@ public abstract class Accessory extends MapObject {
     //Stays on top of the player, moves to the left side when going right.
     public static class Headpiece extends Accessory {
 
-        public Headpiece(String name, Player player) {
-            super(name, 20, 20, player);
+        public Headpiece(String name) {
+            super(name, 20, 20);
         }
 
         @Override

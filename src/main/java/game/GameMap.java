@@ -38,41 +38,13 @@ public class GameMap {
         this(gameState.worldIndex, gameState.levelIndex, gameState.player, MapType.NORMAL);
     }
 
+    public GameMap(int worldIndex, int levelIndex, MapType mapType) {
+        this(worldIndex, levelIndex, new Player.RegularPlayer(), mapType);
+    }
+
     public GameMap(int worldIndex, int levelIndex, Player player, MapType mapType) {
         xTile = mapType.xTile;
         yTile = mapType.yTile;
-        this.player = player;
-
-        width = xTile*Tile.HALF_SIDE*2;
-        height = yTile*Tile.HALF_SIDE*2;
-
-        MapMaker mapMaker = new MapMaker(worldIndex, levelIndex, xTile, yTile, player, mapType);
-        mapMaker.mapMaker();
-        layers = mapMaker.getLayers();
-        spawnPoint = mapMaker.getSpawnPoint();
-
-        for (GridObject[][] layer : layers) {
-            for (int i = 0; i<yTile; i++) {
-                for (int j = 0; j<xTile; j++) {
-                    GridObject gridObject = layer[i][j];
-                    if (gridObject instanceof MovingCollidable movingCollidable) {
-                        movingCollidableObjects.add(movingCollidable);
-                    } else if (gridObject instanceof Moving moving) {
-                        movingObjects.add(moving);
-                    }
-                    if (gridObject instanceof Door || gridObject instanceof Shooter || gridObject instanceof Moving) {
-                        alwaysCalledObjects.add(gridObject);
-                    }
-                }
-            }
-        }
-
-        setFrameTileRange();
-    }
-
-    public GameMap(int worldIndex, int levelIndex, int xTile, int yTile, Player player, MapType mapType) {
-        this.xTile = xTile;
-        this.yTile = yTile;
         this.player = player;
 
         width = xTile*Tile.HALF_SIDE*2;

@@ -29,11 +29,11 @@ public class Selection {
     //the selection screens
 
     public static final GameMap[] WORLDS = {
-        new GameMap(1, -1, new Player.RegularPlayer(), MapType.SELECTION),
-        new GameMap(1, 0, new Player.RegularPlayer(), MapType.SELECTION),
-        new GameMap(2, 0, new Player.RegularPlayer(), MapType.SELECTION),
-        new GameMap(3, 0, new Player.RegularPlayer(), MapType.SELECTION),
-        new GameMap(4, 0, new Player.RegularPlayer(), MapType.SELECTION)
+        new GameMap(1, -1, MapType.SELECTION),
+        new GameMap(1, 0, MapType.SELECTION),
+        new GameMap(2, 0, MapType.SELECTION),
+        new GameMap(3, 0, MapType.SELECTION),
+        new GameMap(4, 0, MapType.SELECTION)
     };
 
     public final Player[] skins = {
@@ -42,15 +42,16 @@ public class Selection {
         new Player.RegularPlayer("Zahit")
     };
 
+
     public final Accessory[] accessories = {
         null,
-        new Accessory.Hat("fedora", WORLDS[0].getPlayer()),
-        new Accessory.Headpiece("coquette", WORLDS[0].getPlayer()),
-        new Accessory.Pin("badge", WORLDS[0].getPlayer()),
-        new Accessory.Pin("badge2", WORLDS[0].getPlayer()),
-        new Accessory.Necklace("dollar", WORLDS[0].getPlayer()),
-        new Accessory.Necklace("sorcerer", WORLDS[0].getPlayer()),
-        new Accessory.Tie("tie", WORLDS[0].getPlayer())
+        new Accessory.Hat("fedora"),
+        new Accessory.Headpiece("coquette"),
+        new Accessory.Pin("star"),
+        new Accessory.Pin("sheriff"),
+        new Accessory.Necklace("dollar"),
+        new Accessory.Necklace("sorcerer"),
+        new Accessory.Tie("tie")
     };
 
     private final boolean[] accessoryChosen = new boolean[accessories.length];
