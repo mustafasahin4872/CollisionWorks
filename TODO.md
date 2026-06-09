@@ -22,7 +22,7 @@
 ### Core Refactoring
 - [ ] Tidy up Player class
 - [v] Tidy up Selection system
-- [ ] Create a separate SelectionScreen similar to GameScreen
+- [v] Create a separate SelectionScreen similar to GameScreen
 - [ ] Tidy up GameMap class
 - [ ] Fill shop logic
 
