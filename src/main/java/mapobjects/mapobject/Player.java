@@ -1,7 +1,7 @@
 package mapobjects.mapobject;
 
 import game.GameState;
-import game.InputHandler.ArrowData;
+import helpers.InputHandler.ArrowData;
 import game.Main;
 import helpers.MapObjectGenerator;
 

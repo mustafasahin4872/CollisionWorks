@@ -1,7 +1,7 @@
 package game;
 
-import game.InputHandler.MouseData;
-import game.InputHandler.ArrowData;
+import helpers.InputHandler.MouseData;
+import helpers.InputHandler.ArrowData;
 import game.GameState.STATE;
 import lib.StdDraw;
 import mapobjects.component.Box;

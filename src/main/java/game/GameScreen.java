@@ -1,6 +1,6 @@
 package game;
 
-import game.InputHandler.MouseData;
+import helpers.InputHandler.MouseData;
 import game.GameState.STATE;
 import helpers.FrameBox;
 import lib.StdDraw;

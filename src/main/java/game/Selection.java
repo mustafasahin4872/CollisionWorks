@@ -1,5 +1,6 @@
 package game;
 
+import helpers.InputHandler;
 import helpers.MapType;
 import lib.StdDraw;
 import mapobjects.mapobject.Accessory;
@@ -7,8 +8,8 @@ import mapobjects.mapobject.Player;
 
 import java.util.ArrayList;
 
-import game.InputHandler.MouseData;
-import game.InputHandler.ArrowData;
+import helpers.InputHandler.MouseData;
+import helpers.InputHandler.ArrowData;
 import game.GameState.STATE;
 
 public class Selection {

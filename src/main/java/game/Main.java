@@ -1,5 +1,7 @@
 package game;
 
+import helpers.InputHandler;
+
 public class Main {
 
     public static final String RESOURCES_ROOT = "src/main/resources/";

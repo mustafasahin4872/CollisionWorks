@@ -1,12 +1,13 @@
 package game;
 
+import helpers.InputHandler;
 import helpers.MapType;
 import lib.StdDraw;
 import mapobjects.mapobject.Player;
 import mapobjects.mapobject.Sign;
 import game.GameState.STATE;
-import game.InputHandler.ArrowData;
-import game.InputHandler.MouseData;
+import helpers.InputHandler.ArrowData;
+import helpers.InputHandler.MouseData;
 
 
 // create the necessary map and run the while loop
