@@ -54,17 +54,28 @@ public class DrawMethods {
 
     public static void textInsideBox(Box box, String text) {
         StdDraw.setFont(); StdDraw.setPenColor();
-        double yOffset = 16 * 0.15;
+        double yOffset = box.getHeight() * 0.05;
         StdDraw.text(box.getCenterX(), box.getCenterY()+yOffset, text);
     }
 
     public static void textInsideBox(Box box, String text, Color color, int fontSize) {
-        StdDraw.setPenColor(color);
         Font font = new Font("Arial", Font.PLAIN, fontSize);
+        textInsideBox(box, text, color, font);
+    }
+
+    public static void textInsideBox(Box box, String text, Color color, Font font) {
+        StdDraw.setPenColor(color);
         StdDraw.setFont(font);
-        double yOffset = fontSize * 0.15;
+        double yOffset = box.getHeight() * 0.05;
         StdDraw.text(box.getCenterX(), box.getCenterY()+yOffset, text);
     }
+
+    public static void drawText(String text, double x, double y, Font font, Color color) {
+        StdDraw.setPenColor(color);
+        StdDraw.setFont(font);
+        StdDraw.text(x, y, text);
+    }
+
 
 //    // unused code, previous version of health bar mechanic.
 //    private void drawHPBar(HPBar hpBar) {
