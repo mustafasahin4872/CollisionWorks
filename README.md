@@ -48,9 +48,13 @@ The game supports multiple worlds, each with distinct level designs and mechanic
 #### Game
 - Runs the main game loop and coordinates updates, rendering, and state transitions.
 
-#### Selection
-- Level selection screen
-- Creates a temporary map instance used exclusively for previewing and selection logic.
+#### LevelSelection
+- Handles the level and world selection logic
+- Uses a temporary background map corresponding to the selected world for previewing
+
+#### SkinSelection
+- Handles the character and accessory customization
+- Instantiates the player object with selected skins and accessories before the game starts
 
 #### Shop
 - Shop screen used to buy skins and stat buffs.
@@ -62,13 +66,10 @@ The game supports multiple worlds, each with distinct level designs and mechanic
 ### 1. Initialization
 - GameState, InputHandler, Frame, Game, Shop, Selection instances are created.
 
-### 2. Selection Screen
-- Multiple maps and player configurations are generated
-- Player chooses:
-    - World
-    - Level
-    - Accessories / configuration
+### 2. Skin and Level Selection
+- Player customizes character skins and accessories in the `SkinSelection` screen
 - Player object is created
+- Player chooses World and Level in the `LevelSelection` screen
 - Initial `GameState` is produced
 
 ### 3. Map Creation

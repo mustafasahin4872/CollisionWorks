@@ -18,14 +18,17 @@ public class Main {
         gameState = new GameState();
         inputHandler = new InputHandler();
 
-        Selection selection = new Selection(inputHandler, gameState);
-        Game game = new Game(inputHandler, gameState);
+        SkinSelection skinSelection = new SkinSelection(inputHandler, gameState);
+        LevelSelection levelSelection = new LevelSelection(inputHandler, gameState);
         Shop shop = new Shop(inputHandler, gameState);
+        Game game = new Game(inputHandler, gameState);
 
         while (gameState.getState() != GameState.STATE.QUIT) {
 
             switch (gameState.getState()) {
-                case SELECTION -> selection.selectionLoop();
+                case SELECTION -> skinSelection.skinSelectionLoop();
+                case GAME -> levelSelection.levelSelectionLoop();
+                case SHOP -> shop.shopLoop();
                 case NEXT -> game.gameLoop();
                 case PASSED -> {
                     gameState.nextLevel();
@@ -33,7 +36,7 @@ public class Main {
                 }
                 case ALTERNATE1 -> {} // add alternate1
                 case ALTERNATE2 -> {} // add alternate2
-                case SHOP -> shop.shopLoop();
+                // case SHOP is handled inside gameLoop and selectionLoop
                 // case PAUSE and DEAD is handled inside gameLoop
                 // case QUIT is unreachable.
             }

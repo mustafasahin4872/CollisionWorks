@@ -20,11 +20,12 @@
 - [v] Start structured Git tracking (commits, feature branches, etc.)
 
 ### Core Refactoring
+- [v] Finalize the Selection classes, separate level selection and skin/accessory selection altogether, also separate shop from them.
+- [ ] Fill shop logic
 - [ ] Tidy up Player class
 - [v] Tidy up Selection system
 - [v] Create a separate SelectionScreen similar to GameScreen
 - [ ] Tidy up GameMap class
-- [ ] Fill shop logic
 
 ### Rendering Architecture
 - [ ] Fix Player drawing responsibility (currently draws too much)
@@ -109,7 +110,7 @@
 - [ ] Shop system design:
     - Start with "Crystal Palace" concept
 
-- [ ] Fix selection world index system
+- [v] Fix selection world index system
     - Remove confusing 13–14 level indexing
     - Make level progression consistent
 
