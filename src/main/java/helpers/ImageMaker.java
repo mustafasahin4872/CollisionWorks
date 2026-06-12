@@ -13,34 +13,78 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import mapobjects.mapobject.Ghost.ghostTypes;
 
 import static game.Main.IMAGES_ROOT;
 import static game.Main.RESOURCES_ROOT;
 import static helpers.HelperMethods.getDirectionString;
 
-//uses a framework txt file to create a png
-//used once to create the files, not used as long as the created files are still intact
+// uses a framework txt file to create a png
+// use once to create the files, not used as long as the created files are still intact
 public class ImageMaker {
 
-//for mike, the only animated character so far
-//    for (int i = -1; i<2; i++) {
-//        for (int j = -1; j<2; j++) {
-//            for (int k = 0; k<animationNumber; k++) {
-//                createCharacterImage(
-//                        getPlayerName(),
-//                        i, j, k,
-//                        RESOURCES_ROOT + "misc/mikeFrameWork/body.txt",
-//                        RESOURCES_ROOT + "misc/mikeFrameWork/eye.txt",
-//                        new Color(3, 196, 205),     // bodyColor
-//                        new Color(242, 242, 242),   // eyeWhite
-//                        new Color(236, 125, 35),    // eyeOutline
-//                        new Color(242, 183, 13),    // eyelidColor
-//                        new Color(242, 112, 13),    // eyeSpark
-//                        new Color(242, 223, 56)     // pupilColor
-//                );
-//            }
-//        }
-//    }
+    public static void main(String[] args) {
+
+        // animated player image creation
+        for (ANIMATED_PLAYER animatedPlayer : ANIMATED_PLAYER.values()) {
+            createAnimationFrames(animatedPlayer.getAnimationNum(), animatedPlayer.name());
+        }
+
+        //ghost image creation
+        for (ghostTypes ghostType : ghostTypes.values()) {
+            createGhostImage(ghostType, 0, 0);
+            createGhostImage(ghostType, 1, 0);
+            createGhostImage(ghostType, -1, 0);
+            createGhostImage(ghostType, 0, 1);
+            createGhostImage(ghostType, 0, -1);
+        }
+
+    }
+
+
+    //------------------------------------------------------------------------------------------------------------------
+    //------------------------------------------------------------------------------------------------------------------
+    //------------------------------------------------------------------------------------------------------------------
+    //------------------------------------------------------------------------------------------------------------------
+    //------------------------------------------------------------------------------------------------------------------
+    //------------------------------------------------------------------------------------------------------------------
+    // ANIMATED PLAYER IMAGE CREATION
+
+    private enum ANIMATED_PLAYER {
+        Mike(6);
+
+        private final int animationNum;
+
+        ANIMATED_PLAYER(int animationNum) {
+            this.animationNum = animationNum;
+        }
+
+        public int getAnimationNum() {
+            return animationNum;
+        }
+
+    }
+
+    private static void createAnimationFrames(int animationNumber, String playerName) {
+        for (int i = -1; i<2; i++) {
+            for (int j = -1; j<2; j++) {
+                for (int k = 0; k<animationNumber; k++) {
+                    createCharacterImage(
+                        playerName,
+                        i, j, k,
+                        RESOURCES_ROOT + "misc/mikeFrameWork/body.txt",
+                        RESOURCES_ROOT + "misc/mikeFrameWork/eye.txt",
+                        new Color(3, 196, 205),     // bodyColor
+                        new Color(242, 242, 242),   // eyeWhite
+                        new Color(236, 125, 35),    // eyeOutline
+                        new Color(242, 183, 13),    // eyelidColor
+                        new Color(242, 112, 13),    // eyeSpark
+                        new Color(242, 223, 56)     // pupilColor
+                    );
+                }
+            }
+        }
+    }
 
     public static void createCharacterImage(
             String name,
@@ -191,10 +235,15 @@ public class ImageMaker {
     }
 
 
+    //------------------------------------------------------------------------------------------------------------------
+    //------------------------------------------------------------------------------------------------------------------
+    //------------------------------------------------------------------------------------------------------------------
+    //------------------------------------------------------------------------------------------------------------------
+    //------------------------------------------------------------------------------------------------------------------
+    //------------------------------------------------------------------------------------------------------------------
+    // GHOST IMAGE CREATION
 
-
-
-    public static final Map<Ghost.ghostTypes, Color[]> ghostColors = new HashMap<>();
+    public static final Map<ghostTypes, Color[]> ghostColors = new HashMap<>();
 
     private static final int transparency = 20; //percentage
     private static final int alpha = (int) ((1-transparency/100.0) * 255);
@@ -234,18 +283,7 @@ public class ImageMaker {
     }
 
 
-//ghost image  creation code
-//    createGhostImage(type, 1, 0);
-//    createGhostImage(type, -1, 0);
-//    createGhostImage(type, 0, 1);
-//    createGhostImage(type, 0, -1);
-//
-//        for (
-//    Ghost.ghostTypes ghostType : Ghost.ghostTypes.values()) {
-//        createGhostImage(ghostType, 0, 0);
-//    }
-
-    public static void createGhostImage(Ghost.ghostTypes type, int xDirection, int yDirection) {
+    public static void createGhostImage(ghostTypes type, int xDirection, int yDirection) {
         // Step 1: Determine direction string
         String direction = getDirectionString(xDirection, yDirection);
 
@@ -267,24 +305,13 @@ public class ImageMaker {
             while ((line = reader.readLine()) != null && y < 32) {
                 for (int x = 0; x < Math.min(line.length(), 32); x++) {
                     char ch = line.charAt(x);
-                    Color pixelColor;
-                    switch (ch) {
-                        case '0':
-                            pixelColor = bodyColor;
-                            break;
-                        case '*':
-                            pixelColor = eyeWhite;
-                            break;
-                        case '1':
-                            pixelColor = eyeColor;
-                            break;
-                        case '_':
-                            pixelColor = transparent;
-                            break;
-                        default:
-                            pixelColor = transparent;
-                            break;
-                    }
+                    Color pixelColor = switch (ch) {
+                        case '0' -> bodyColor;
+                        case '*' -> eyeWhite;
+                        case '1' -> eyeColor;
+                        case '_' -> transparent;
+                        default -> transparent;
+                    };
                     bufferedImage.setRGB(x, y, pixelColor.getRGB());
                 }
                 y++;
@@ -301,6 +328,14 @@ public class ImageMaker {
 
     }
 
+
+    //------------------------------------------------------------------------------------------------------------------
+    //------------------------------------------------------------------------------------------------------------------
+    //------------------------------------------------------------------------------------------------------------------
+    //------------------------------------------------------------------------------------------------------------------
+    //------------------------------------------------------------------------------------------------------------------
+    //------------------------------------------------------------------------------------------------------------------
+    // HELPERS
 
     public static void createPng(BufferedImage bufferedImage, File output) {
         try {

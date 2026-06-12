@@ -31,7 +31,7 @@ public class LevelSelection {
             new Color(119, 14, 155, 255),
             new Color(25, 127, 180),
             new Color(233, 116, 49),
-            new Color(199, 193, 189)
+            new Color(254, 208, 36)
     };
 
     private int currentWorldIndex = 0;
@@ -159,7 +159,7 @@ public class LevelSelection {
 
                 Color outlineColor = (i == currentLevelIndex) ? StdDraw.WHITE : WORLD_COLORS[currentWorldIndex];
                 StdDraw.setPenColor(outlineColor);
-                drawRectangleOutline(currentButton);
+                drawRectangleOutline(currentButton, THICKNESS.THIN);
 
                 textInsideBox(currentButton, String.valueOf(i + 1), StdDraw.WHITE, 16);
             }

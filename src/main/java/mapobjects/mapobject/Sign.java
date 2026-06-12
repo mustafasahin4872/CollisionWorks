@@ -82,7 +82,7 @@ public class Sign extends GridObject implements OnEffector {
             StdDraw.setPenColor(COLOR);
             drawRectangle(displayCoordinates);
             StdDraw.setPenColor(StdDraw.BLACK);
-            drawRectangleOutline(displayCoordinates);
+            drawRectangleOutline(displayCoordinates, THICKNESS.DEFAULT);
             StdDraw.setFont(FONT);
 
             double baseHeight = DISPLAY_CENTER[1] - displayHalfHeight + SPACE_ON_SIDE + CHAR_HEIGHT / 2;

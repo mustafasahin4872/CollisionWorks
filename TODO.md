@@ -2,7 +2,7 @@
 
 ---
 
-## ✅ DONE / COMPLETED
+## ✅ Major Updates Since v1
 
 - Added GameState for easier player access and improved game loop structure
 - Separated entangled logic:
@@ -14,10 +14,6 @@
 ---
 
 ## 🚧 IMMEDIATE PRIORITIES
-
-### Documentation & Project Management
-- [v] Add proper documentation
-- [v] Start structured Git tracking (commits, feature branches, etc.)
 
 ### Core Refactoring
 - [v] Finalize the Selection classes, separate level selection and skin/accessory selection altogether, also separate shop from them.
@@ -32,6 +28,10 @@
 - [ ] Move projectile rendering into always-called objects system (planned)
 - [ ] Ensure HP bars and effects remain in game loop only
 
+### Documentation & Project Management
+- [v] Add proper documentation
+- [v] Start structured Git tracking (commits, feature branches, etc.)
+
 ---
 
 ## ⚠️ CRITICAL ISSUES
@@ -43,6 +43,7 @@
     - Enemies remain active after restart
 - [ ] Fix persistent player stats (e.g. coin amount)
 - [ ] Fix leftover world state after restart
+- [ ] In between maps do not create their doors???
 
 ### Win State System
 - [ ] Define and document win point logic clearly
@@ -51,21 +52,13 @@
 
 ---
 
-## 🧩 OLD SYSTEM ISSUES
+## 🧩 OLD SYSTEM ISSUES STILL EMERGING
 
 ### Collision / Entity System
 - [ ] Always-called objects should also be checked in projectile collision logic
 - [ ] Fix empty grid object collision trigger causing unwanted projectile behavior
 - [ ] Fix moving entity check inconsistencies
 - [ ] Consider redesigning or removing "always called objects" system
-
-### Entity Mechanics
-- [ ] Mines should not be gridObjects
-- [ ] Buttons should support "hold to stay active" (also triggered by monsters)
-- [ ] Add movable boxes:
-    - Block projectiles
-    - Hold buttons down
-- [ ] Fix player shooting mechanism
 
 ### Spawn / Lifetime Issues
 - [ ] When items expire, spawnObjects stop updating correctly
@@ -81,6 +74,8 @@
 ### MapMaker / Visualization
 - [ ] Improve naming in shooter MapMaker
 - [ ] Add MapMaker visualization/debug mode
+
+### Game Physics
 - [ ] Improve collision system design
 - [ ] Possibly redesign movement/collision system entirely
 
@@ -88,6 +83,10 @@
 - [ ] Consider introducing a generic `Movable` class
 - [ ] Generalize collision logic for all movable entities
 - [ ] Fix or redesign always-called object system
+
+### Entity Enhancements
+- [ ] Mines should not be gridObjects
+- [ ] Enhance player shooting mechanism
 
 ---
 
@@ -110,11 +109,11 @@
 - [ ] Shop system design:
     - Start with "Crystal Palace" concept
 
-- [v] Fix selection world index system
-    - Remove confusing 13–14 level indexing
+- [ ] Fix selection world index system
+    - Remove confusing level indexing (13 means world 1 level 3 -> ambiguous)
     - Make level progression consistent
 
-- [ ] Add signal handling system:
+- [v] Add signal handling system:
     - Next level
     - Shop
     - Selection
@@ -122,19 +121,24 @@
 
 - [ ] Add random reward system between levels
 
-- [ ] Generalize mud + special tiles across all 4 worlds
+- [ ] Buttons should support "hold to stay active" (also triggered by monsters)
+- [ ] Add movable boxes:
+    - Block projectiles
+    - Hold buttons down
+
+- [ ] All assets need major updates, better designs
+  - [ ] Generalize mud + special tiles across all 4 worlds
 
 ---
 
 ## 🎮 GAME CONTENT
 
 ### Skins
-- [ ] Add test skin
 - [ ] Add big/small size skin variants
+- [ ] Add sakura skin (prize for spring festival)
 
 ### Worlds
-- [ ] Add World 4
-- [ ] Expand world system structure
+- [v] Add World 4
 
 ---
 
@@ -148,18 +152,5 @@
 
 ### Entity System
 - Create `Monster` (opponent) class
+- Create movable box/crate
 
----
-
-## 🏗 OBJECT INITIALIZATION
-
-- [ ] Add stage system
-- [ ] Improve world initialization flow
-
----
-
-## 🎨 ASSET CREATION
-
-- Create new skins:
-    - Sakura
-- Expand World 4 assets and design

@@ -55,7 +55,7 @@ public abstract class Button extends GridObject implements OnEffector {
         StdDraw.setPenColor(color);
         drawRectangle(positionBox);
         StdDraw.setPenColor(FRAME_COLOR);
-        drawRectangleOutline(positionBox);
+        drawRectangleOutline(positionBox, THICKNESS.DEFAULT);
     }
 
 

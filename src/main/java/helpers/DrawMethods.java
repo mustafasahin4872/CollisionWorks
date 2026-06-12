@@ -1,18 +1,26 @@
 package helpers;
 
-import game.Frame;
 import lib.StdDraw;
 import mapobjects.component.Box;
-import mapobjects.component.HPBar;
 
 import java.awt.*;
-
-import static game.Main.IMAGES_ROOT;
 
 //static methods for drawing
 public class DrawMethods {
 
-    private static final double THICKNESS = 0.015;
+    public enum THICKNESS {
+        THIN(0.01),
+        DEFAULT(0.015),
+        THICK(0.025)
+        ;
+
+        THICKNESS(double thickness) {
+            this.thickness = thickness;
+        }
+
+        private final double thickness;
+
+    }
 
     public static void drawRectangle(Box box) {
         double[] region = box.getCorners();
@@ -25,29 +33,29 @@ public class DrawMethods {
                 (region[2] - region[0]) / 2.0, (region[3] - region[1]) / 2.0);
     }
 
-    public static void drawRectangleOutline(Box box) {
-        StdDraw.setPenRadius(THICKNESS);
+    public static void drawRectangleOutline(Box box, THICKNESS thickness) {
+        StdDraw.setPenRadius(thickness.thickness);
         double[] region = box.getCorners();
         StdDraw.rectangle((region[0] + region[2]) / 2.0, (region[1] + region[3]) / 2.0,
                 (region[2] - region[0]) / 2.0, (region[3] - region[1]) / 2.0);
     }
 
-    public static void drawRectangleOutline(double[] region) {
-        StdDraw.setPenRadius(THICKNESS);
+    public static void drawRectangleOutline(double[] region, THICKNESS thickness) {
+        StdDraw.setPenRadius(thickness.thickness);
         StdDraw.rectangle((region[0] + region[2]) / 2.0, (region[1] + region[3]) / 2.0,
                 (region[2] - region[0]) / 2.0, (region[3] - region[1]) / 2.0);
     }
 
     public static void drawRectWithOutline(double[] region, Color boxColor, Color outColor) {
         StdDraw.setPenColor(outColor);
-        drawRectangleOutline(region);
+        drawRectangleOutline(region, THICKNESS.DEFAULT);
         StdDraw.setPenColor(boxColor);
         drawRectangle(region);
     }
 
     public static void drawRectWithOutline(Box region, Color boxColor, Color outColor) {
         StdDraw.setPenColor(outColor);
-        drawRectangleOutline(region);
+        drawRectangleOutline(region, THICKNESS.DEFAULT);
         StdDraw.setPenColor(boxColor);
         drawRectangle(region);
     }
