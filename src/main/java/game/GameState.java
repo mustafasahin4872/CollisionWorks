@@ -41,7 +41,7 @@ public class GameState {
     private final List<ShopEntry<Accessory>> buyableAccessories = List.of(
         new ShopEntry<>(new Accessory.Hat("fedora"), 0, true),
         new ShopEntry<>(new Accessory.Tie("tie"), 100, true),
-        new ShopEntry<>(new Accessory.Headpiece("coquette"), 150, true),
+        new ShopEntry<>(new Accessory.Headpiece("coquette"), 0, true),
         new ShopEntry<>(new Accessory.Necklace("dollar"), 200, true),
         new ShopEntry<>(new Accessory.Necklace("sorcerer"), 250, true),
         new ShopEntry<>(new Accessory.Pin("star"), 50000, true),
@@ -55,8 +55,8 @@ public class GameState {
     //------------------------------------------------------------------------------------------------------------------
     //------------------------------------------------------------------------------------------------------------------
 
-    private final List<Player> skins = new ArrayList<>(List.of(new Player.RegularPlayer()));
-    private final List<Accessory> accessories = new ArrayList<>(List.of(new Accessory.Pin("star")));
+    private final ArrayList<Player> skins = new ArrayList<>(List.of(new Player.RegularPlayer()));
+    private final ArrayList<Accessory> accessories = new ArrayList<>();
 
     //------------------------------------------------------------------------------------------------------------------
     //------------------------------------------------------------------------------------------------------------------
@@ -67,18 +67,23 @@ public class GameState {
 
     public GameState() {
         this.player = new Player.RegularPlayer();
+        accessories.add(null);
     }
 
     public GameState(int worldIndex, int levelIndex) {
         this.worldIndex = worldIndex;
         this.levelIndex = levelIndex;
         this.player = new Player.RegularPlayer();
+        accessories.add(null);
+
     }
 
     public GameState(int worldIndex, int levelIndex, Player player) {
         this.worldIndex = worldIndex;
         this.levelIndex = levelIndex;
         this.player = player;
+        accessories.add(null);
+
     }
 
     //------------------------------------------------------------------------------------------------------------------

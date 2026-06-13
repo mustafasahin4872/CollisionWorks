@@ -10,7 +10,9 @@ import mapobjects.mapobject.Accessory;
 import mapobjects.mapobject.Player;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import static mapobjects.category.GridObject.TILE_SIDE;
 import static helpers.CollisionMethods.isIn;
@@ -23,28 +25,14 @@ public class SkinSelection {
     private final InputHandler inputHandler;
     private final GameState gameState;
 
-    public static final Player[] skins = {
-            new Player.RegularPlayer(),
-            new Player.AnimatedPlayer("Mike"),
-            new Player.RegularPlayer("Zahit")
-    };
-
-    public static final Accessory[] accessories = {
-            null,
-            new Accessory.Hat("fedora"),
-            new Accessory.Tie("tie"),
-            new Accessory.Headpiece("coquette"),
-            new Accessory.Necklace("dollar"),
-            new Accessory.Necklace("sorcerer"),
-            new Accessory.Pin("star"),
-            new Accessory.Pin("sheriff")
-    };
-
     private final GameMap backgroundMap = new GameMap(new GameState(1, -1), helpers.MapType.SELECTION);
+
+    private List<Player> skins;
+    private List<Accessory> accessories;
 
     private int currentSkinIndex = 0;
     private int currentAccessoryIndex = 0;
-    private final boolean[] accessoryChosen = new boolean[accessories.length];
+    private boolean[] accessoryChosen;
 
     private static final double DRAW_BIG_MULTIPLIER = 2.5;
 
@@ -69,14 +57,21 @@ public class SkinSelection {
     }
 
     public void skinSelectionLoop() {
+
+        skins = gameState.getSkins();
+        accessories = gameState.getAccessories();
+        accessoryChosen = new boolean[accessories.size()];
+
         for (Player skin : skins) {
             skin.setSpawnPoint(backgroundMap.getSpawnPoint());
             skin.restart();
         }
 
         for (Accessory accessory : accessories) {
-            if (accessory != null)
+            if (accessory != null) {
+                accessory.setAlone(false);
                 accessory.update();
+            }
         }
 
         while (gameState.getState() == STATE.SELECTION) {
@@ -92,36 +87,36 @@ public class SkinSelection {
 
             backgroundMap.draw();
 
-            Player currentSkin = skins[currentSkinIndex];
+            Player currentSkin = skins.get(currentSkinIndex);
             currentSkin.drawBig(DRAW_BIG_MULTIPLIER);
 
-            Accessory currentAccessory = accessories[currentAccessoryIndex];
+            Accessory currentAccessory = accessories.get(currentAccessoryIndex);
             if (currentAccessory != null) {
                 currentAccessory.setPlayer(currentSkin);
                 currentAccessory.drawBig(DRAW_BIG_MULTIPLIER);
             }
 
             for (int i = 0; i < accessoryChosen.length; i++) {
-                if (accessoryChosen[i] && accessories[i] != null) {
-                    accessories[i].drawBig(DRAW_BIG_MULTIPLIER);
+                if (accessoryChosen[i] && accessories.get(i) != null) {
+                    accessories.get(i).drawBig(DRAW_BIG_MULTIPLIER);
                 }
             }
 
             draw();
 
             StdDraw.show();
-            StdDraw.pause(10 * Frame.PAUSE);
+            StdDraw.pause(8 * Frame.PAUSE);
         }
 
         if (gameState.getState() != GameState.STATE.QUIT) {
-            Player player = skins[currentSkinIndex];
+            Player player = skins.get(currentSkinIndex);
             java.util.ArrayList<Accessory> selectedAccessories = new java.util.ArrayList<>();
 
             for (int i = 0; i < accessoryChosen.length; i++) {
                 if (accessoryChosen[i]) {
-                    Accessory accessory = accessories[i];
+                    Accessory accessory = accessories.get(i);
                     accessory.setPlayer(player);
-                    selectedAccessories.add(accessories[i]);
+                    selectedAccessories.add(accessories.get(i));
                 }
             }
             player.setAccessories(selectedAccessories.toArray(new Accessory[0]));
@@ -131,17 +126,15 @@ public class SkinSelection {
 
     private class SkinSelectionUI {
 
-        private final Player[] skins = SkinSelection.skins;
-
         private static final double PLAYER_NAME_Y_OFFSET = 2.15 * TILE_SIDE;
         private static final double SKIN_BOX_SIZE = TILE_SIDE;
         private static final double SKIN_LEFT_X = 5.5 * TILE_SIDE;
         private static final double SKIN_RIGHT_X_OFFSET = 7.5 * TILE_SIDE;
 
         private static final Box SKIN_LEFT_BOX = new Box(SKIN_LEFT_X, PLAYER_NAME_Y_OFFSET, SKIN_BOX_SIZE,
-                SKIN_BOX_SIZE);
+            SKIN_BOX_SIZE);
         private static final Box SKIN_RIGHT_BOX = new Box(Frame.X_SCALE - SKIN_RIGHT_X_OFFSET,
-                PLAYER_NAME_Y_OFFSET, SKIN_BOX_SIZE, SKIN_BOX_SIZE);
+            PLAYER_NAME_Y_OFFSET, SKIN_BOX_SIZE, SKIN_BOX_SIZE);
 
         public void processInput(MouseData mouseData, ArrowData arrowData) {
             double mouseX = mouseData.mouseX;
@@ -163,17 +156,17 @@ public class SkinSelection {
                     currentSkinIndex++;
                 }
             }
-            currentSkinIndex = (currentSkinIndex + skins.length) % skins.length;
+            currentSkinIndex = (currentSkinIndex + skins.size()) % skins.size();
         }
 
         public void draw() {
-            Player currentSkin = skins[currentSkinIndex];
+            Player currentSkin = skins.get(currentSkinIndex);
             Color color = StdDraw.BLACK;
 
             double centerX = (SKIN_LEFT_X + (Frame.X_SCALE - SKIN_RIGHT_X_OFFSET)) / 2;
             Font nameFont = new Font("Monospaced", Font.BOLD, 50);
             drawText(currentSkin.getPlayerName(), centerX, PLAYER_NAME_Y_OFFSET, nameFont,
-                    color);
+                color);
 
             Font accessoryFont = new Font("Monospaced", Font.BOLD, 30);
             textInsideBox(SKIN_LEFT_BOX, "<", color, accessoryFont);
@@ -190,12 +183,12 @@ public class SkinSelection {
         private static final double ACCESSORY_CHOOSE_Y_OFFSET = 8.0 * TILE_SIDE;
 
         private static final Box ACCESSORY_LEFT_BOX = new Box(ACCESSORY_LEFT_X, ACCESSORY_Y_OFFSET,
-                ACCESSORY_BOX_SIZE, ACCESSORY_BOX_SIZE);
+            ACCESSORY_BOX_SIZE, ACCESSORY_BOX_SIZE);
         private static final Box ACCESSORY_RIGHT_BOX = new Box(Frame.X_SCALE - ACCESSORY_RIGHT_X_OFFSET,
-                ACCESSORY_Y_OFFSET, ACCESSORY_BOX_SIZE, ACCESSORY_BOX_SIZE);
+            ACCESSORY_Y_OFFSET, ACCESSORY_BOX_SIZE, ACCESSORY_BOX_SIZE);
         private static final Box ACCESSORY_CHOOSE_BOX = new Box(
-                (ACCESSORY_LEFT_X + (Frame.X_SCALE - ACCESSORY_RIGHT_X_OFFSET)) / 2, ACCESSORY_CHOOSE_Y_OFFSET,
-                ACCESSORY_BOX_SIZE, ACCESSORY_BOX_SIZE);
+            (ACCESSORY_LEFT_X + (Frame.X_SCALE - ACCESSORY_RIGHT_X_OFFSET)) / 2, ACCESSORY_CHOOSE_Y_OFFSET,
+            ACCESSORY_BOX_SIZE, ACCESSORY_BOX_SIZE);
 
         private void processInput(MouseData mouseData) {
             double mouseX = mouseData.mouseX;
@@ -209,7 +202,7 @@ public class SkinSelection {
                     currentAccessoryIndex++;
                 }
 
-                currentAccessoryIndex = (currentAccessoryIndex + accessories.length) % accessories.length;
+                currentAccessoryIndex = (currentAccessoryIndex + accessories.size()) % accessories.size();
 
                 if (isIn(mouseX, mouseY, ACCESSORY_CHOOSE_BOX)) {
                     accessoryChosen[currentAccessoryIndex] = !accessoryChosen[currentAccessoryIndex];
@@ -221,14 +214,14 @@ public class SkinSelection {
         }
 
         private void draw() {
-            Accessory currentAccessory = accessories[currentAccessoryIndex];
+            Accessory currentAccessory = accessories.get(currentAccessoryIndex);
             Color color = StdDraw.BLACK;
 
             Font accessoryFont = new Font("Monospaced", Font.BOLD, 30);
             String accessoryName = currentAccessory != null ? currentAccessory.getAccessoryName() : "no accessory";
             drawText(accessoryName, ACCESSORY_CHOOSE_BOX.getCenterX(), ACCESSORY_LEFT_BOX.getCenterY(),
-                    accessoryFont,
-                    color);
+                accessoryFont,
+                color);
 
             textInsideBox(ACCESSORY_LEFT_BOX, "<", color, accessoryFont);
             textInsideBox(ACCESSORY_RIGHT_BOX, ">", color, accessoryFont);
@@ -246,7 +239,7 @@ public class SkinSelection {
 
         public static final double ARROW_BOX_SIZE = 2.0 * TILE_SIDE;
         private static final Box ARROW_BOX = new Box(Frame.X_SCALE - 1 * TILE_SIDE, 8 * TILE_SIDE, ARROW_BOX_SIZE,
-                ARROW_BOX_SIZE);
+            ARROW_BOX_SIZE);
 
         public static final double SHOP_BOX_X = 8 * TILE_SIDE;
         public static final double SHOP_BOX_Y = 11 * TILE_SIDE;

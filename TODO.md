@@ -18,9 +18,13 @@
 ### Core Refactoring
 - [v] Finalize the Selection classes, separate level selection and skin/accessory selection altogether, also separate shop from them.
 - [v] Fill shop logic
-- [ ] Add currency system, decouple currencies from Player and move to GameState
-- [ ] Add ShopEntry to tidy shop logic
-- [ ] Finalize shop logicx
+- [v] Add currency system
+- [ ] Decouple currencies from Player and move to GameState
+- [v] Add ShopEntry to tidy shop logic
+- [v] Finalize shop logic
+- [ ] Add buff system
+- [ ] Add buffs to shop
+- [ ] Add in game shop
 - [ ] Tidy up Player class
 - [v] Tidy up Selection system
 - [v] Create a separate SelectionScreen similar to GameScreen
@@ -109,7 +113,7 @@
     - Coin collection sound
     - Critical health background change
 
-- [ ] Shop system design:
+- [v] Shop system design:
     - Start with "Crystal Palace" concept
 
 - [ ] Fix selection world index system
@@ -146,6 +150,9 @@
 ---
 
 ## 💡 FUTURE IDEAS
+
+### Player Records
+- The player continues from the last level they were in
 
 ### Gameplay Systems
 - Moving monsters

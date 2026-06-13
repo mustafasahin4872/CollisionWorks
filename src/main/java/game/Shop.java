@@ -26,17 +26,6 @@ import static helpers.HelperMethods.capitalize;
 
 // The shop screen in selection phase
 // Displays 3(hardcoded) different item types to buy
-
-/*
-TODO:
-    1) ACCESSORIES BEING DRAWN INACCURATELY SINCE THEY ARE LINKED TO PLAYER - FIXED!
-    2) BUYABLE ARRAY COMPLETE REDESIGN - DONE!
-    3) IMPLEMENT THE GAMESTATE.BOUGHT_... LOGIC, ADD TO SKIN SELECTION
-    4) ADD CURRENCY - DONE!
-    5) UNRELATED: ALL GAMESTATE FIELDS ARE PUBLIC, FIX!!! - DONE!
-    6) LONG TERM: SEPARATE PLAYER RECORDS TO KEEP PROGRESS
- */
-
 public class Shop {
 
     private static final int N = 3;
@@ -82,8 +71,6 @@ public class Shop {
 
         Box accessoryBox = ShopUI.SHOP_BOXES[1];
         Player player = gameState.getPlayer(); // in buy screen, accessories are displayed on top of the player
-        double[] displayCenter = BuyScreen.BOUGHT_BOX.getCenterCoordinates();
-        player.setCenterCoordinates(displayCenter[0], displayCenter[1]);
         player.setAccessories(new Accessory[0]);
         for (ShopEntry<Accessory> entry : accessories) {
             Accessory accessory = entry.getItem();
@@ -280,6 +267,11 @@ public class Shop {
                 String text = (sold) ? "SOLD" : "BUY";
                 textInsideBox(BUY_BOXES[i], text, textColor, bigFont);
 
+                if (sold) {
+                    double s = SHOP_BOX_SIDE * 1.5;
+                    StdDraw.picture(SHOP_BOXES[i].getCenterX(), SHOP_BOXES[i].getCenterY(), IMAGES_ROOT + "ui/sold.png", s, s);
+                }
+
             }
         }
 
@@ -371,11 +363,17 @@ public class Shop {
 
             if (buyable.getItem() instanceof Accessory accessory) {
                 // draw accessory on top of the current player
+                Player player = gameState.getPlayer();
+                double playerX = player.getX();
+                double playerY = player.getY();
+                double[] displayCenter = BOUGHT_BOX.getCenterCoordinates();
+                player.setCenterCoordinates(displayCenter[0], displayCenter[1]);
                 accessory.setAlone(false);
-                gameState.getPlayer().drawBig(DRAW_BIG_MULTIPLIER);
+                player.drawBig(DRAW_BIG_MULTIPLIER);
                 buyable.drawBig(DRAW_BIG_MULTIPLIER);
                 // isolate accessory from player
                 accessory.setAlone(true);
+                player.setCenterCoordinates(playerX, playerY);
             } else {
                 buyable.drawBig(DRAW_BIG_MULTIPLIER);
             }
