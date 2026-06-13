@@ -68,4 +68,15 @@ public class HelperMethods {
 
         return s.substring(0, 1).toUpperCase() + s.substring(1);
     }
+
+    public static String center(String s, int width) {
+        if (s.length() >= width) {
+            return s;
+        }
+
+        int leftPadding = (width - s.length()) / 2;
+        int rightPadding = width - s.length() - leftPadding;
+
+        return " ".repeat(leftPadding) + s + " ".repeat(rightPadding);
+    }
 }

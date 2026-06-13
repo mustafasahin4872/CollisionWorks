@@ -17,7 +17,10 @@
 
 ### Core Refactoring
 - [v] Finalize the Selection classes, separate level selection and skin/accessory selection altogether, also separate shop from them.
-- [ ] Fill shop logic
+- [v] Fill shop logic
+- [ ] Add currency system, decouple currencies from Player and move to GameState
+- [ ] Add ShopEntry to tidy shop logic
+- [ ] Finalize shop logicx
 - [ ] Tidy up Player class
 - [v] Tidy up Selection system
 - [v] Create a separate SelectionScreen similar to GameScreen

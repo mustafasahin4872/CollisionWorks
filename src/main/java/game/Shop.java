@@ -2,7 +2,6 @@ package game;
 
 import helpers.MapType;
 import lib.StdDraw;
-import mapobjects.category.MapObject;
 import mapobjects.component.Box;
 import helpers.InputHandler;
 import mapobjects.mapobject.Accessory;
@@ -10,7 +9,9 @@ import mapobjects.mapobject.Player;
 
 import java.awt.*;
 import java.util.Arrays;
+import java.util.List;
 
+import static game.Main.IMAGES_ROOT;
 import static helpers.CollisionMethods.isIn;
 import static helpers.DrawMethods.drawRectWithOutline;
 import static helpers.DrawMethods.textInsideBox;
@@ -21,20 +22,24 @@ import static helpers.InputHandler.MouseData;
 import static game.GameState.STATE;
 import static helpers.HelperMethods.capitalize;
 
+
+
 // The shop screen in selection phase
-// Displays 4(hardcoded) different item types to buy
+// Displays 3(hardcoded) different item types to buy
 
 /*
 TODO:
     1) ACCESSORIES BEING DRAWN INACCURATELY SINCE THEY ARE LINKED TO PLAYER - FIXED!
-    2) BUYABLE ARRAY COMPLETE REDESIGN
+    2) BUYABLE ARRAY COMPLETE REDESIGN - DONE!
     3) IMPLEMENT THE GAMESTATE.BOUGHT_... LOGIC, ADD TO SKIN SELECTION
-    4) UNRELATED: ALL GAMESTATE FIELDS ARE PUBLIC, FIX!!!
-    5) LONG TERM: ADD CURRENCY AND SEPARATE PLAYER RECORDS TO KEEP PROGRESS
+    4) ADD CURRENCY - DONE!
+    5) UNRELATED: ALL GAMESTATE FIELDS ARE PUBLIC, FIX!!! - DONE!
+    6) LONG TERM: SEPARATE PLAYER RECORDS TO KEEP PROGRESS
  */
 
-
 public class Shop {
+
+    private static final int N = 3;
 
     private final InputHandler inputHandler;
     private final GameState gameState;
@@ -45,36 +50,21 @@ public class Shop {
     private final ShopUI shopUI = new ShopUI();
     private final BuyScreen buyScreen = new BuyScreen();
 
-    private final int[] indexes = new int[4];
-    private final boolean[] selected = new boolean[4];
+    private final int[] indexes = new int[N];
+    private final boolean[] selected = new boolean[N];
 
     private static final double DRAW_BIG_MULTIPLIER = 2.0;
 
-    // the skins that are attainable from the shop
-    private static final Player[] SKINS = {
-        new Player.RegularPlayer(),
-        new Player.AnimatedPlayer("Mike")
-    };
-
-
-    // the accessories that are attainable from the shop
-    private static final Accessory[] ACCESSORIES = {
-        new Accessory.Hat("fedora"),
-        new Accessory.Tie("tie"),
-        new Accessory.Headpiece("coquette"),
-        new Accessory.Necklace("dollar"),
-        new Accessory.Necklace("sorcerer"),
-        new Accessory.Pin("star"),
-        new Accessory.Pin("sheriff")
-    };
-
-    private static final MapObject[][] BUYABLES = {
-        SKINS, ACCESSORIES, SKINS, ACCESSORIES
-    };
+    private final List<List<? extends ShopEntry<?>>> buyables;
+    private final List<ShopEntry<Player>> skins;
+    private final List<ShopEntry<Accessory>> accessories;
 
     public Shop(InputHandler inputHandler, GameState gameState) {
         this.inputHandler = inputHandler;
         this.gameState = gameState;
+        skins = gameState.getBuyableSkins();
+        accessories = gameState.getBuyableAccessories();
+        buyables = List.of(skins, accessories, skins);
     }
 
     public void shopLoop() {
@@ -84,17 +74,19 @@ public class Shop {
 
         Box skinBox = ShopUI.SHOP_BOXES[0];
         double[] spawnPoint = skinBox.getCenterCoordinates();
-        for (Player skin : SKINS) {
+        for (ShopEntry<Player> entry : skins) {
+            Player skin = entry.getItem();
             skin.setSpawnPoint(spawnPoint);
             skin.restart();
         }
 
         Box accessoryBox = ShopUI.SHOP_BOXES[1];
-        Player player = gameState.player; // in buy screen, accessories are displayed on top of the player
+        Player player = gameState.getPlayer(); // in buy screen, accessories are displayed on top of the player
         double[] displayCenter = BuyScreen.BOUGHT_BOX.getCenterCoordinates();
         player.setCenterCoordinates(displayCenter[0], displayCenter[1]);
         player.setAccessories(new Accessory[0]);
-        for (Accessory accessory : ACCESSORIES) {
+        for (ShopEntry<Accessory> entry : accessories) {
+            Accessory accessory = entry.getItem();
             accessory.setPlayer(player);
             accessory.setCenterCoordinates(accessoryBox.getCenterX(), accessoryBox.getCenterY());
             accessory.setAlone(true);
@@ -111,7 +103,7 @@ public class Shop {
             draw();
 
             StdDraw.show();
-            StdDraw.pause(8 * Frame.PAUSE);
+            StdDraw.pause(10 * Frame.PAUSE);
         }
     }
 
@@ -128,73 +120,83 @@ public class Shop {
     private void draw() {
 
         backgroundMap.draw();
-        for (int i = 0; i<2; i++) { //TODO: CHANGE 2 TO 4 WHEN OTHER BUYABLES ADDED
-            BUYABLES[i][indexes[i]].drawBig(DRAW_BIG_MULTIPLIER);
+        for (int i = 0; i < N-1; i++) { // TODO: CHANGE N-1 TO N WHEN OTHER BUYABLES ADDED
+            getShopEntry(i).drawBig(DRAW_BIG_MULTIPLIER);
         }
 
         shopUI.draw();
-        if (gameState.getState() == STATE.PAUSE) buyScreen.draw();
+        if (gameState.getState() == STATE.PAUSE)
+            buyScreen.draw();
     }
 
+    private ShopEntry<?> getShopEntry(int i) {
+        return buyables.get(i).get(indexes[i]);
+    }
 
-    private MapObject getSelectedItem() {
-        int selectedIndex = 0;
-        for (int i = 0; i<4; i++) {
+    private ShopEntry getSelectedItem() {
+        int selectedIndex = -1;
+        for (int i = 0; i < N; i++) {
             if (selected[i]) {
                 selectedIndex = i;
                 break;
             }
         }
-        return BUYABLES[selectedIndex][indexes[selectedIndex]];
+        if (selectedIndex == -1) return null;
+        return getShopEntry(selectedIndex);
     }
-
 
     private class ShopUI {
 
-        private static final double SHOP_BOX_SIDE = 2*TILE_SIDE;
+        private static final double SHOP_BOX_SIDE = 2 * TILE_SIDE;
 
-        private static final double ARROWS_SIDE = TILE_SIDE;
+        private static final double ARROWS_SIDE = 0.5 * TILE_SIDE;
         private static final double ARROWS_GAP = 0.5 * TILE_SIDE;
 
         private static final double BOX_GAP = 0.25 * TILE_SIDE;
+
+        private static final double LABEL_BOX_WIDTH = 3 * TILE_SIDE;
+        private static final double LABEL_BOX_HEIGHT = 0.6 * TILE_SIDE;
         private static final double NAME_BOX_WIDTH = 2.5 * TILE_SIDE;
         private static final double NAME_BOX_HEIGHT = 0.6 * TILE_SIDE;
+        private static final double PRICE_BOX_WIDTH = 2.5 * TILE_SIDE;
+        private static final double PRICE_BOX_HEIGHT = 0.6 * TILE_SIDE;
+        private static final double BUY_BOX_WIDTH = 2.5 * TILE_SIDE;
+        private static final double BUY_BOX_HEIGHT = 0.6 * TILE_SIDE;
 
-        private static final double LABEL_BOX_WIDTH = 3*TILE_SIDE;
-        private static final double LABEL_BOX_HEIGHT = 0.6*TILE_SIDE;
-
-
-        private static final Box[] SHOP_BOXES = new Box[]{
-            new Box(5 * TILE_SIDE, 4 * TILE_SIDE, SHOP_BOX_SIDE, SHOP_BOX_SIDE),
-            new Box(13 * TILE_SIDE, 4 * TILE_SIDE, SHOP_BOX_SIDE, SHOP_BOX_SIDE),
-            new Box(5 * TILE_SIDE, 8 * TILE_SIDE, SHOP_BOX_SIDE, SHOP_BOX_SIDE),
-            new Box(13 * TILE_SIDE, 8 * TILE_SIDE, SHOP_BOX_SIDE, SHOP_BOX_SIDE)
+        private static final Box[] SHOP_BOXES = new Box[] {
+                new Box(4.5 * TILE_SIDE, 6 * TILE_SIDE, SHOP_BOX_SIDE, SHOP_BOX_SIDE),
+                new Box(9 * TILE_SIDE, 6 * TILE_SIDE, SHOP_BOX_SIDE, SHOP_BOX_SIDE),
+                new Box(13.5 * TILE_SIDE, 6 * TILE_SIDE, SHOP_BOX_SIDE, SHOP_BOX_SIDE),
         };
 
-        private static final Box[][] ARROW_BOXES = new Box[4][2];
-        private static final Box[] NAME_BOXES = new Box[4];
-        private static final Box[] LABEL_BOXES = new Box[4];
+        private static final Box[][] ARROW_BOXES = new Box[N][2];
+        private static final Box[] NAME_BOXES = new Box[N];
+        private static final Box[] LABEL_BOXES = new Box[N];
+        private static final Box[] PRICE_BOXES = new Box[N];
+        private static final Box[] BUY_BOXES = new Box[N];
 
         static {
-            for (int i = 0; i<4; i++) {
+            for (int i = 0; i < N; i++) {
                 Box box = SHOP_BOXES[i];
 
                 double x = box.getCenterX();
-                double xShiftArrow = SHOP_BOX_SIDE/2 + ARROWS_GAP + ARROWS_SIDE/2;
+                double xShiftArrow = SHOP_BOX_SIDE / 2 + ARROWS_GAP + ARROWS_SIDE / 2;
                 double y = box.getCenterY();
 
                 ARROW_BOXES[i][0] = new Box(x - xShiftArrow, y, ARROWS_SIDE, ARROWS_SIDE);
                 ARROW_BOXES[i][1] = new Box(x + xShiftArrow, y, ARROWS_SIDE, ARROWS_SIDE);
 
-                double yShiftBuy = SHOP_BOX_SIDE/2 + BOX_GAP + NAME_BOX_HEIGHT /2;
+                double yShiftSmall = SHOP_BOX_SIDE / 2 + 4 * BOX_GAP + NAME_BOX_HEIGHT / 2;
+                double yShiftBig = yShiftSmall + NAME_BOX_HEIGHT/2 + BOX_GAP + LABEL_BOX_HEIGHT/2;
 
-                NAME_BOXES[i] = new Box(x, y + yShiftBuy, NAME_BOX_WIDTH, NAME_BOX_HEIGHT);
-                LABEL_BOXES[i] = new Box(x, y - yShiftBuy, LABEL_BOX_WIDTH, LABEL_BOX_HEIGHT);
+                NAME_BOXES[i] = new Box(x, y - yShiftSmall, NAME_BOX_WIDTH, NAME_BOX_HEIGHT);
+                LABEL_BOXES[i] = new Box(x, y - yShiftBig, LABEL_BOX_WIDTH, LABEL_BOX_HEIGHT);
+                PRICE_BOXES[i] = new Box(x, y + yShiftSmall, PRICE_BOX_WIDTH, PRICE_BOX_HEIGHT);
+                BUY_BOXES[i] = new Box(x, y + yShiftBig, BUY_BOX_WIDTH, BUY_BOX_HEIGHT);
             }
         }
 
-        private static final String[] LABELS = {"Skins", "Accessories", "Buffs", "ADD_LATER"};
-
+        private static final String[] LABELS = { "Skins", "Accessories", "Buffs"};
 
         private void processInput(MouseData mouseData) {
 
@@ -204,15 +206,20 @@ public class Shop {
 
             if (pressed) {
 
-                for (int i = 0; i<4; i++) {
+                for (int i = 0; i < N; i++) {
 
-                    if (isIn(mouseX, mouseY, NAME_BOXES[i])) {
+                    if (isIn(mouseX, mouseY, BUY_BOXES[i])) {
+
+                        ShopEntry shopEntry = getShopEntry(i);
+                        if (shopEntry.isSold()) return;
+                        if (!gameState.canAfford(shopEntry)) return;
+
                         selected[i] = true;
                         gameState.setState(STATE.PAUSE);
                         break;
                     }
 
-                    int len = BUYABLES[i].length;
+                    int len = buyables.get(i).size();
 
                     if (isIn(mouseX, mouseY, ARROW_BOXES[i][0])) {
                         indexes[i] = ((indexes[i] - 1) + len) % len;
@@ -229,34 +236,62 @@ public class Shop {
         }
 
         private void draw() {
-            Font arrowFont = new Font("Monospaced", Font.BOLD, 25);
-            Font nameFont = new Font("Monospaced", Font.BOLD, 20);
+            Font bigFont = new Font("Monospaced", Font.BOLD, 25);
+            Font smallFont = new Font("Monospaced", Font.BOLD, 20);
             Color outlineColor = StdDraw.BLACK;
+
             Color textColor = StdDraw.WHITE;
-            Color nameColor = new Color(34, 171, 160);
-            Color buyColor = new Color(16, 78, 6);
+            Color labelColor = new Color(34, 171, 160);
+            Color nameColor = new Color(21, 106, 132);
 
-            for (int i = 0; i<4; i++) {
-                textInsideBox(ARROW_BOXES[i][0], "<", outlineColor, arrowFont);
-                textInsideBox(ARROW_BOXES[i][1], ">", outlineColor, arrowFont);
+            Color canBuy = new Color(16, 78, 6);
+            Color cantBuy = new Color(113, 6, 6);
 
-                drawRectWithOutline(LABEL_BOXES[i], nameColor, outlineColor);
-                textInsideBox(LABEL_BOXES[i], LABELS[i], textColor, nameFont);
+            for (int i = 0; i < N; i++) {
+                ShopEntry shopEntry = getShopEntry(i);
+                boolean sold = shopEntry.isSold();
+                boolean positive = gameState.canAfford(shopEntry) || sold;
+                Color buyColor = (positive) ? canBuy : cantBuy;
 
-                drawRectWithOutline(NAME_BOXES[i], buyColor, outlineColor);
-                String name = BUYABLES[i][indexes[i]].getName().split("/")[0];
-                textInsideBox(NAME_BOXES[i], capitalize(name), textColor, nameFont);
+                textInsideBox(ARROW_BOXES[i][0], "<", outlineColor, bigFont);
+                textInsideBox(ARROW_BOXES[i][1], ">", outlineColor, bigFont);
+
+                drawRectWithOutline(LABEL_BOXES[i], labelColor, outlineColor);
+                textInsideBox(LABEL_BOXES[i], LABELS[i], textColor, smallFont);
+
+                drawRectWithOutline(NAME_BOXES[i], nameColor, outlineColor);
+                String name = getShopEntry(i).getName().split("/")[0];
+                textInsideBox(NAME_BOXES[i], capitalize(name), textColor, smallFont);
+
+
+                drawRectWithOutline(PRICE_BOXES[i], buyColor, outlineColor);
+
+                String price = " " + shopEntry.getCost(); // 1 space to right to offset the gem's space
+                String type = (!shopEntry.isCosmetic()) ? "gem" : "coin";
+                String fileName = IMAGES_ROOT + "ui/" + type + ".png";
+                double side = PRICE_BOX_HEIGHT * 0.8;
+                double textWidth = 0.6 * smallFont.getSize() * price.length();
+
+                Box box = new Box(PRICE_BOXES[i].getCenterX() - side/2, PRICE_BOXES[i].getCenterY(), PRICE_BOX_WIDTH - side, PRICE_BOX_HEIGHT);
+                textInsideBox(box, price, textColor, smallFont);
+                StdDraw.picture(PRICE_BOXES[i].getCenterX() + textWidth/2, PRICE_BOXES[i].getCenterY(), fileName, side, side);
+
+                drawRectWithOutline(BUY_BOXES[i], buyColor, outlineColor);
+                String text = (sold) ? "SOLD" : "BUY";
+                textInsideBox(BUY_BOXES[i], text, textColor, bigFont);
+
             }
         }
 
     }
+
 
     private class BuyScreen {
 
         private static final double BUTTON_HEIGHT = TILE_SIDE;
         private static final double BUTTON_WIDTH = 5 * TILE_SIDE;
         private static final double BUTTON_GAP = 0.5 * TILE_SIDE;
-        private static final double SMALL_BUTTON_WIDTH = (BUTTON_WIDTH - BUTTON_GAP)/2;
+        private static final double SMALL_BUTTON_WIDTH = (BUTTON_WIDTH - BUTTON_GAP) / 2;
         private static final double SHOP_BOX_SIDE = ShopUI.SHOP_BOX_SIDE;
         private static final double SCREEN_UP_SPACE = 2 * TILE_SIDE;
         private static final double SCREEN_WIDTH = BUTTON_WIDTH + 2 * BUTTON_GAP;
@@ -271,8 +306,8 @@ public class Shop {
         // yes and no boxes location logic
         static {
             double x = CENTER_X;
-            double xShift = BUTTON_GAP/2 + SMALL_BUTTON_WIDTH/2;
-            double y = CENTER_Y + SCREEN_HEIGHT/2 - BUTTON_GAP - BUTTON_HEIGHT / 2;
+            double xShift = BUTTON_GAP / 2 + SMALL_BUTTON_WIDTH / 2;
+            double y = CENTER_Y + SCREEN_HEIGHT / 2 - BUTTON_GAP - BUTTON_HEIGHT / 2;
             YES_BOX = new Box(x - xShift, y, SMALL_BUTTON_WIDTH, BUTTON_HEIGHT);
             NO_BOX = new Box(x + xShift, y, SMALL_BUTTON_WIDTH, BUTTON_HEIGHT);
         }
@@ -284,7 +319,7 @@ public class Shop {
         }
 
         static {
-            double y = ((CENTER_Y - SCREEN_HEIGHT/2) + (QUESTION_BOX.getCenterY() - QUESTION_BOX.getHeight()/2)) / 2;
+            double y = ((CENTER_Y - SCREEN_HEIGHT / 2) + (QUESTION_BOX.getCenterY() - QUESTION_BOX.getHeight() / 2)) / 2;
             BOUGHT_BOX = new Box(CENTER_X, y, SHOP_BOX_SIDE, SHOP_BOX_SIDE);
         }
 
@@ -295,12 +330,8 @@ public class Shop {
 
             if (pressed) {
                 if (isIn(mouseX, mouseY, YES_BOX)) {
-                    MapObject selected = getSelectedItem();
-                    if (selected instanceof Player s) {
-                        gameState.buySkin(s);
-                    } else if (selected instanceof Accessory a) {
-                        gameState.buyAccessory(a);
-                    }
+                    gameState.buy(getSelectedItem());
+                    Arrays.fill(selected, false);
                     gameState.setState(STATE.SHOP);
                 } else if (isIn(mouseX, mouseY, NO_BOX)) {
                     Arrays.fill(selected, false);
@@ -311,7 +342,7 @@ public class Shop {
 
         private void draw() {
 
-            MapObject buyable = getSelectedItem();
+            ShopEntry buyable = getSelectedItem();
 
             String name = buyable.getName().split("/")[0];
             String question = "Buy: " + name + "?";
@@ -333,15 +364,15 @@ public class Shop {
             // TODO: IS THIS CODE MESSY OR ACCEPTABLE?
 
             // record initial position of buyable
-            double x = buyable.getX();
-            double y = buyable.getY();
+            double x = buyable.getItem().getX();
+            double y = buyable.getItem().getY();
             // move buyable to BOUGHT_BOX
-            buyable.setCenterCoordinates(BOUGHT_BOX.getCenterX(), BOUGHT_BOX.getCenterY());
+            buyable.getItem().setCenterCoordinates(BOUGHT_BOX.getCenterX(), BOUGHT_BOX.getCenterY());
 
-            if (buyable instanceof Accessory accessory) {
+            if (buyable.getItem() instanceof Accessory accessory) {
                 // draw accessory on top of the current player
                 accessory.setAlone(false);
-                gameState.player.drawBig(DRAW_BIG_MULTIPLIER);
+                gameState.getPlayer().drawBig(DRAW_BIG_MULTIPLIER);
                 buyable.drawBig(DRAW_BIG_MULTIPLIER);
                 // isolate accessory from player
                 accessory.setAlone(true);
@@ -350,7 +381,7 @@ public class Shop {
             }
 
             // reset position
-            buyable.setCenterCoordinates(x, y);
+            buyable.getItem().setCenterCoordinates(x, y);
 
         }
 
@@ -379,7 +410,5 @@ public class Shop {
         }
 
     }
-
-
 
 }

@@ -24,20 +24,20 @@ public class SkinSelection {
     private final GameState gameState;
 
     public static final Player[] skins = {
-        new Player.RegularPlayer(),
-        new Player.AnimatedPlayer("Mike"),
-        new Player.RegularPlayer("Zahit")
+            new Player.RegularPlayer(),
+            new Player.AnimatedPlayer("Mike"),
+            new Player.RegularPlayer("Zahit")
     };
 
     public static final Accessory[] accessories = {
-        null,
-        new Accessory.Hat("fedora"),
-        new Accessory.Tie("tie"),
-        new Accessory.Headpiece("coquette"),
-        new Accessory.Necklace("dollar"),
-        new Accessory.Necklace("sorcerer"),
-        new Accessory.Pin("star"),
-        new Accessory.Pin("sheriff")
+            null,
+            new Accessory.Hat("fedora"),
+            new Accessory.Tie("tie"),
+            new Accessory.Headpiece("coquette"),
+            new Accessory.Necklace("dollar"),
+            new Accessory.Necklace("sorcerer"),
+            new Accessory.Pin("star"),
+            new Accessory.Pin("sheriff")
     };
 
     private final GameMap backgroundMap = new GameMap(new GameState(1, -1), helpers.MapType.SELECTION);
@@ -110,7 +110,7 @@ public class SkinSelection {
             draw();
 
             StdDraw.show();
-            StdDraw.pause(8 * Frame.PAUSE);
+            StdDraw.pause(10 * Frame.PAUSE);
         }
 
         if (gameState.getState() != GameState.STATE.QUIT) {
@@ -125,12 +125,9 @@ public class SkinSelection {
                 }
             }
             player.setAccessories(selectedAccessories.toArray(new Accessory[0]));
-            gameState.player = player;
+            gameState.setPlayer(player);
         }
     }
-
-
-
 
     private class SkinSelectionUI {
 
@@ -275,7 +272,5 @@ public class SkinSelection {
         }
 
     }
-
-
 
 }

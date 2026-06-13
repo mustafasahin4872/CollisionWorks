@@ -43,7 +43,7 @@ public class GameScreen {
     public void updateValues(double frameX, double frameY) {
         FrameBox.updateCenter(frameX, frameY);
 
-        Player player = gameState.player;
+        Player player = gameState.getPlayer();
         HPBar hpBar = player.getHealthBar();
         int coinsCollected = player.getCoinsCollected();
 
@@ -275,15 +275,19 @@ public class GameScreen {
         private static final double SIDE = 40;
         private final FrameBox frameBox = new FrameBox(2*CENTER_X - 80, 30, SIDE, SIDE);
         private int coinsCollected;
+        private String fileName = IMAGES_ROOT+"coin/singlecoin/0.png";
 
         private void update(int coinsCollected) {
             frameBox.update();
             this.coinsCollected = coinsCollected;
+
+            if (this.coinsCollected >= 10) fileName = IMAGES_ROOT+"coin/triplecoin/0.png";
+            if (this.coinsCollected >= 50) fileName = IMAGES_ROOT+"coin/coinbag/0.png";
         }
 
         private void draw() {
             Box box = frameBox.getFrameBox();
-            StdDraw.picture(box.getCenterX(), box.getCenterY(), IMAGES_ROOT+"coin/singlecoin/0.png", SIDE, SIDE);
+            StdDraw.picture(box.getCenterX(), box.getCenterY(), fileName, SIDE, SIDE);
             textInsideBox(box, "%d".formatted(coinsCollected));
         }
 
@@ -302,7 +306,7 @@ public class GameScreen {
 
         private void draw() {
             Box box = frameBox.getFrameBox();
-            StdDraw.picture(box.getCenterX(), box.getCenterY(), IMAGES_ROOT+"misc/heart.png", SIDE, SIDE);
+            StdDraw.picture(box.getCenterX(), box.getCenterY(), IMAGES_ROOT+"ui/heart.png", SIDE, SIDE);
             textInsideBox(box, "%d".formatted(lives));
         }
 

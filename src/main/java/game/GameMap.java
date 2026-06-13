@@ -37,12 +37,12 @@ public class GameMap {
     public GameMap(GameState gameState, MapType mapType) {
         xTile = mapType.xTile;
         yTile = mapType.yTile;
-        this.player = gameState.player;
+        this.player = gameState.getPlayer();
 
         width = xTile*Tile.HALF_SIDE*2;
         height = yTile*Tile.HALF_SIDE*2;
 
-        MapMaker mapMaker = new MapMaker(gameState.worldIndex, gameState.levelIndex, xTile, yTile, player, mapType);
+        MapMaker mapMaker = new MapMaker(gameState.getWorldIndex(), gameState.getLevelIndex(), xTile, yTile, player, mapType);
         mapMaker.mapMaker();
         layers = mapMaker.getLayers();
         spawnPoint = mapMaker.getSpawnPoint();

@@ -64,14 +64,14 @@ public class LevelSelection {
             draw();
 
             StdDraw.show();
-            StdDraw.pause(8 * Frame.PAUSE);
+            StdDraw.pause(10 * Frame.PAUSE);
         }
 
         if (gameState.getState() == GameState.STATE.NEXT) {
-            gameState.worldIndex = currentWorldIndex + 1;
-            gameState.levelIndex = currentLevelIndex + 1;
-            if (gameState.player != null) {
-                gameState.player.setWorldIndex(currentWorldIndex + 1);
+            gameState.setWorldIndex(currentWorldIndex + 1);
+            gameState.setLevelIndex(currentLevelIndex + 1);
+            if (gameState.getPlayer() != null) {
+                gameState.getPlayer().setWorldIndex(currentWorldIndex + 1);
             }
         }
     }

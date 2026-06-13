@@ -33,9 +33,9 @@ public class Game {
 
         Frame frame = new Frame(gameMap.getWidth(), gameMap.getHeight());
         GameScreen gameScreen = new GameScreen(gameState);
-        Player player = gameState.player;
+        Player player = gameState.getPlayer();
 
-        gameState.resetState();
+        gameState.setState(STATE.GAME);
 
         while (gameState.getState() == STATE.GAME || gameState.getState() == STATE.PAUSE || gameState.getState() == STATE.DEAD) {
 
