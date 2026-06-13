@@ -25,7 +25,7 @@ public class SkinSelection {
 
     public static final Player[] skins = {
         new Player.RegularPlayer(),
-        new Player.AnimatedPlayer("Mike", 6),
+        new Player.AnimatedPlayer("Mike"),
         new Player.RegularPlayer("Zahit")
     };
 

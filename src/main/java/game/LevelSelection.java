@@ -31,7 +31,7 @@ public class LevelSelection {
             new Color(119, 14, 155, 255),
             new Color(25, 127, 180),
             new Color(233, 116, 49),
-            new Color(254, 208, 36)
+            new Color(244, 157, 8)
     };
 
     private int currentWorldIndex = 0;

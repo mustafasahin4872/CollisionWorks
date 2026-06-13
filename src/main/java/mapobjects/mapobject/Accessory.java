@@ -57,6 +57,7 @@ public abstract class Accessory extends MapObject {
         setName(accessoryName + "/" + direction);
     }
 
+    @Override
     public void drawBig(double multiplier) {
         resize(multiplier);
         resize(player.getDefaultSide()/(TILE_SIDE));

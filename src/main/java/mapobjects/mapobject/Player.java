@@ -70,6 +70,10 @@ public abstract class Player extends MapObject implements MovingCollidable, Spaw
     }
 
 
+    public String getName() {
+        return super.name;
+    }
+
     private static double getDefaultSide(String playerName) {
         final double defaultSide;
         defaultSide = switch (playerName) {
@@ -495,12 +499,13 @@ public abstract class Player extends MapObject implements MovingCollidable, Spaw
 
             super.draw();
 
+            resetSize();
+
             if (accessories != null) {
                 for (Accessory accessory : accessories) {
                     accessory.drawBig(multiplier);
                 }
             }
-            resetSize();
         }
 
     }
@@ -510,11 +515,13 @@ public abstract class Player extends MapObject implements MovingCollidable, Spaw
         private final Timer animationTimer;
         private final int animationNumber;
 
-        public AnimatedPlayer(String name, int animationNumber) {
+        public AnimatedPlayer(String name) {
             super(name, "png");
             animationTimer = new Timer(300, 3000);
-            this.animationNumber = animationNumber;
-
+            this.animationNumber = switch (name) {
+                case "Mike" -> 6;
+                default -> 6;
+            };
         }
 
         @Override

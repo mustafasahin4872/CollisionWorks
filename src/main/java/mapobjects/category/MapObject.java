@@ -64,6 +64,9 @@ public abstract class MapObject {
         return directory;
     }
 
+    public String getName() {
+        return name;
+    }
 
     //all map objects are called every iteration if they are not expired
     //each map object has their unique actions, when called, they perform them
@@ -85,6 +88,15 @@ public abstract class MapObject {
 
     public void draw() {
         StdDraw.picture(getX(), getY(), imageFileName, getWidth(), getHeight());
+    }
+
+    public void drawBig(double multiplier) {
+        double width = getWidth();
+        double height = getHeight();
+        resize(multiplier);
+        draw();
+        setWidth(width);
+        setHeight(height);
     }
 
     public void expire() {
