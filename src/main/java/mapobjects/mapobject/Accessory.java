@@ -11,8 +11,9 @@ import static mapobjects.category.GridObject.TILE_SIDE;
 public abstract class Accessory extends MapObject {
 
     protected Player player;
-    protected String accessoryName;
-    protected final double defaultWidth, defaultHeight;
+    private final String accessoryName;
+    private final double defaultWidth, defaultHeight;
+    private boolean alone;
 
     public Accessory(String accessoryName, double defaultWidth, double defaultHeight) {
         super(0, 0, 0, defaultWidth, defaultHeight, accessoryName+"/0");
@@ -40,6 +41,9 @@ public abstract class Accessory extends MapObject {
         setHeight(defaultHeight);
     }
 
+    public void setAlone(boolean alone) {
+        this.alone = alone;
+    }
 
     //------------------------------------------------------------------------------------------
     //------------------------------------------------------------------------------------------
@@ -62,7 +66,7 @@ public abstract class Accessory extends MapObject {
         resize(multiplier);
         resize(player.getDefaultSide()/(TILE_SIDE));
         player.resize(multiplier);
-        update();
+        if (!alone) update();
         draw();
         resetSize();
         player.resetSize();
