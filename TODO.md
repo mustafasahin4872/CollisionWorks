@@ -15,7 +15,8 @@
 
 ## 🚧 IMMEDIATE PRIORITIES
 
-- [ ] Buff shrinking and growing animation is buggy
+### BUFFS
+- [v] Buff shrinking and growing animation is vibrating
 - [v] Buff shrinking and growing animation should stop when bought
 - [ ] Add buffs to mapmaker
 - [ ] BUFFS IDEA: (decide whether to implement or not)
