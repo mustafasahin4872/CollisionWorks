@@ -1,6 +1,7 @@
 package game;
 
 import helpers.MapType;
+import helpers.ShopEntry;
 import lib.StdDraw;
 import mapobjects.component.Box;
 import helpers.InputHandler;

@@ -1,4 +1,4 @@
-package game;
+package helpers;
 
 import mapobjects.category.MapObject;
 

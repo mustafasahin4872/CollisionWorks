@@ -1,5 +1,6 @@
 package game;
 
+import helpers.ShopEntry;
 import mapobjects.category.MapObject;
 import mapobjects.mapobject.Accessory;
 import mapobjects.mapobject.Buff;
