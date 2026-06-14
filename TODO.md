@@ -33,7 +33,7 @@
 ### Rendering Architecture
 - [ ] Fix Player drawing responsibility (currently draws too much)
 - [ ] Move projectile rendering into always-called objects system (planned)
-- [ ] Ensure HP bars and effects remain in game loop only
+- [v] Ensure HP bars and effects remain in game loop only
 
 ### Documentation & Project Management
 - [v] Add proper documentation
@@ -142,7 +142,7 @@
 
 ### Skins
 - [ ] Add big/small size skin variants
-- [ ] Add sakura skin (prize for spring festival)
+- [v] Add sakura skin
 
 ### Worlds
 - [v] Add World 4

@@ -35,7 +35,7 @@ public class GameState {
 
     private final List<ShopEntry<Player>> buyableSkins = List.of(
         new ShopEntry<>(new Player.AnimatedPlayer("Mike"), 0, true),
-        new ShopEntry<>(new Player.RegularPlayer("Zahit"), 70, true)
+        new ShopEntry<>(new Player.AnimatedPlayer("Sakura"), 0, true)
     );
 
     private final List<ShopEntry<Accessory>> buyableAccessories = List.of(

@@ -26,8 +26,8 @@ public class ImageMaker {
     public static void main(String[] args) {
 
         // animated player image creation
-        for (ANIMATED_PLAYER animatedPlayer : ANIMATED_PLAYER.values()) {
-            createAnimationFrames(animatedPlayer.getAnimationNum(), animatedPlayer.name());
+        for (PLAYERS animatedPlayer : PLAYERS.values()) {
+            createAnimationFrames(animatedPlayer);
         }
 
         //ghost image creation
@@ -50,36 +50,44 @@ public class ImageMaker {
     //------------------------------------------------------------------------------------------------------------------
     // ANIMATED PLAYER IMAGE CREATION
 
-    private enum ANIMATED_PLAYER {
-        Mike(6);
+    public enum PLAYERS {
+        Mike(6, new Color[]{
+            new Color(3, 196, 205),     // bodyColor -> _
+            new Color(242, 242, 242),   // eyeWhite -> 0
+            new Color(236, 125, 35),    // eyeOutline -> *
+            new Color(242, 183, 13),    // eyelidColor -> *
+            new Color(242, 112, 13),    // eyeSpark -> +
+            new Color(242, 223, 56),    // pupilColor -> .
+            new Color(0, 0, 0)          // pupilOutline -> X, =
+        }),
+        Sakura(6, new Color[]{
+            new Color(222, 124, 222),   // bodyColor
+            new Color(242, 242, 242),   // eyeWhite
+            new Color(177, 45, 192),    // eyeOutline
+            new Color(177, 45, 192),    // eyelidColor
+            new Color(244, 157, 8),    // eyeSpark
+            new Color(220, 84, 220),    // pupilColor
+            new Color(124, 17, 131)     // pupilOutline
+        });
 
         private final int animationNum;
+        private final Color[] colors;
 
-        ANIMATED_PLAYER(int animationNum) {
+        PLAYERS(int animationNum, Color[] colors) {
             this.animationNum = animationNum;
-        }
-
-        public int getAnimationNum() {
-            return animationNum;
+            this.colors = colors;
         }
 
     }
 
-    private static void createAnimationFrames(int animationNumber, String playerName) {
-        for (int i = -1; i<2; i++) {
-            for (int j = -1; j<2; j++) {
-                for (int k = 0; k<animationNumber; k++) {
+    private static void createAnimationFrames(PLAYERS animatedPlayer) {
+        Color[] colors = animatedPlayer.colors;
+        for (int i = -1; i<2; i++) { // x direction
+            for (int j = -1; j<2; j++) { // y direction
+                for (int k = 0; k<animatedPlayer.animationNum; k++) {
                     createCharacterImage(
-                        playerName,
-                        i, j, k,
-                        RESOURCES_ROOT + "misc/mikeFrameWork/body.txt",
-                        RESOURCES_ROOT + "misc/mikeFrameWork/eye.txt",
-                        new Color(3, 196, 205),     // bodyColor
-                        new Color(242, 242, 242),   // eyeWhite
-                        new Color(236, 125, 35),    // eyeOutline
-                        new Color(242, 183, 13),    // eyelidColor
-                        new Color(242, 112, 13),    // eyeSpark
-                        new Color(242, 223, 56)     // pupilColor
+                        animatedPlayer, i, j, k,
+                        colors[0], colors[1], colors[2], colors[3], colors[4], colors[5], colors[6]
                     );
                 }
             }
@@ -87,12 +95,18 @@ public class ImageMaker {
     }
 
     public static void createCharacterImage(
-            String name,
+            PLAYERS animatedPlayer,
             int xDirection, int yDirection, int animationNumber,
-            String bodyFileName, String eyeFileName,
             Color bodyColor, Color eyeWhite, Color eyeOutline,
-            Color eyelidColor, Color eyeSpark, Color pupilColor
+            Color eyelidColor, Color eyeSpark, Color pupilColor, Color pupilOutline
     ) {
+        String name = animatedPlayer.name();
+        String root = RESOURCES_ROOT + "frameworks/" + name;
+        String bodyFileName = root + "/body.txt";
+        String eyeFileName = root + "/eye.txt";
+
+
+
         ArrayList<String> bodyLines = new ArrayList<>(), eyeLines = new ArrayList<>();
 
         // Read body
@@ -114,7 +128,7 @@ public class ImageMaker {
         }
 
         int height = bodyLines.size();
-        int width = bodyLines.get(0).length();
+        int width = bodyLines.getFirst().length();
         BufferedImage bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 
         // === Infer Eye Layout ===
@@ -167,7 +181,7 @@ public class ImageMaker {
                 char ch = eyeLine.charAt(col);
                 Color pixelColor = switch (ch) {
                     case '0' -> eyeWhite;
-                    case 'X' -> Color.BLACK;
+                    case 'X' -> pupilOutline;
                     case '.' -> pupilColor;
                     case '+' -> eyeSpark;
                     default -> eyeWhite;
@@ -188,14 +202,20 @@ public class ImageMaker {
                 switch (line.charAt(x)) {
                     case '_' -> bufferedImage.setRGB(x, y, bodyColor.getRGB());
                     case '*' -> bufferedImage.setRGB(x, y, eyeOutline.getRGB());
-                    case '=' -> bufferedImage.setRGB(x, y, Color.BLACK.getRGB());
+                    case '=' -> bufferedImage.setRGB(x, y, pupilOutline.getRGB());
                 }
             }
         }
 
         // === Save ===
         String direction = getDirectionString(xDirection, yDirection);
-        File output = new File(IMAGES_ROOT + "player/animatedplayer/" + name + "/" + direction + "_" + animationNumber + ".png");
+        String path;
+        if (animatedPlayer.animationNum == 1) {
+            path = IMAGES_ROOT + "player/regularplayer/" + name + "/" + direction + ".png";
+        } else {
+            path = IMAGES_ROOT + "player/animatedplayer/" + name + "/" + direction + "_" + animationNumber + ".png";
+        }
+        File output = new File(path);
         createPng(bufferedImage, output);
     }
 
@@ -288,7 +308,7 @@ public class ImageMaker {
         String direction = getDirectionString(xDirection, yDirection);
 
         // Step 2: Load from txt file
-        String pathName = RESOURCES_ROOT + "misc/ghostFramework/" + direction + ".txt";
+        String pathName = RESOURCES_ROOT + "frameworks/ghost/" + direction + ".txt";
         File file = new File(pathName);
 
         Color[] colors = ghostColors.get(type);
