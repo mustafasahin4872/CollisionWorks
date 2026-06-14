@@ -22,13 +22,15 @@
 - [ ] Decouple currencies from Player and move to GameState
 - [v] Add ShopEntry to tidy shop logic
 - [v] Finalize shop logic
-- [ ] Add buff system
-- [ ] Add buffs to shop
-- [ ] Add in game shop
 - [ ] Tidy up Player class
 - [v] Tidy up Selection system
-- [v] Create a separate SelectionScreen similar to GameScreen
 - [ ] Tidy up GameMap class
+
+### New Elements
+- [ ] Add buff system
+- [ ] Add buffs to shop
+- [ ] Add in-game shop
+- [v] Create a separate SelectionScreen similar to GameScreen
 
 ### Rendering Architecture
 - [ ] Fix Player drawing responsibility (currently draws too much)
@@ -36,6 +38,7 @@
 - [v] Ensure HP bars and effects remain in game loop only
 
 ### Documentation & Project Management
+- [ ] Get rid of unnecessary warnings
 - [v] Add proper documentation
 - [v] Start structured Git tracking (commits, feature branches, etc.)
 

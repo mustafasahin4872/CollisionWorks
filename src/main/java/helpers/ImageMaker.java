@@ -25,18 +25,14 @@ public class ImageMaker {
 
     public static void main(String[] args) {
 
-        // animated player image creation
-        for (PLAYERS animatedPlayer : PLAYERS.values()) {
-            createAnimationFrames(animatedPlayer);
+        // player image creation
+        for (PLAYERS player : PLAYERS.values()) {
+            createAnimationFrames(player);
         }
 
         //ghost image creation
         for (ghostTypes ghostType : ghostTypes.values()) {
-            createGhostImage(ghostType, 0, 0);
-            createGhostImage(ghostType, 1, 0);
-            createGhostImage(ghostType, -1, 0);
-            createGhostImage(ghostType, 0, 1);
-            createGhostImage(ghostType, 0, -1);
+            createGhostImages(ghostType);
         }
 
     }
@@ -44,11 +40,9 @@ public class ImageMaker {
 
     //------------------------------------------------------------------------------------------------------------------
     //------------------------------------------------------------------------------------------------------------------
+    // PLAYER IMAGE CREATION
     //------------------------------------------------------------------------------------------------------------------
     //------------------------------------------------------------------------------------------------------------------
-    //------------------------------------------------------------------------------------------------------------------
-    //------------------------------------------------------------------------------------------------------------------
-    // ANIMATED PLAYER IMAGE CREATION
 
     public enum PLAYERS {
         Mike(6, new Color[]{
@@ -65,7 +59,7 @@ public class ImageMaker {
             new Color(242, 242, 242),   // eyeWhite
             new Color(177, 45, 192),    // eyeOutline
             new Color(177, 45, 192),    // eyelidColor
-            new Color(244, 157, 8),    // eyeSpark
+            new Color(244, 157, 8),     // eyeSpark
             new Color(220, 84, 220),    // pupilColor
             new Color(124, 17, 131)     // pupilOutline
         });
@@ -81,31 +75,29 @@ public class ImageMaker {
     }
 
     private static void createAnimationFrames(PLAYERS animatedPlayer) {
-        Color[] colors = animatedPlayer.colors;
         for (int i = -1; i<2; i++) { // x direction
             for (int j = -1; j<2; j++) { // y direction
                 for (int k = 0; k<animatedPlayer.animationNum; k++) {
-                    createCharacterImage(
-                        animatedPlayer, i, j, k,
-                        colors[0], colors[1], colors[2], colors[3], colors[4], colors[5], colors[6]
-                    );
+                    createCharacterFrame(animatedPlayer, i, j, k);
                 }
             }
         }
     }
 
-    public static void createCharacterImage(
-            PLAYERS animatedPlayer,
-            int xDirection, int yDirection, int animationNumber,
-            Color bodyColor, Color eyeWhite, Color eyeOutline,
-            Color eyelidColor, Color eyeSpark, Color pupilColor, Color pupilOutline
-    ) {
+    public static void createCharacterFrame(PLAYERS animatedPlayer, int xDirection, int yDirection, int animationNumber) {
         String name = animatedPlayer.name();
         String root = RESOURCES_ROOT + "frameworks/" + name;
         String bodyFileName = root + "/body.txt";
         String eyeFileName = root + "/eye.txt";
 
-
+        Color[] colors = animatedPlayer.colors;
+        Color bodyColor = colors[0];
+        Color eyeWhite = colors[1];
+        Color eyeOutline = colors[2];
+        Color eyelidColor = colors[3];
+        Color eyeSpark = colors[4];
+        Color pupilColor = colors[5];
+        Color pupilOutline = colors[6];
 
         ArrayList<String> bodyLines = new ArrayList<>(), eyeLines = new ArrayList<>();
 
@@ -257,11 +249,9 @@ public class ImageMaker {
 
     //------------------------------------------------------------------------------------------------------------------
     //------------------------------------------------------------------------------------------------------------------
-    //------------------------------------------------------------------------------------------------------------------
-    //------------------------------------------------------------------------------------------------------------------
-    //------------------------------------------------------------------------------------------------------------------
-    //------------------------------------------------------------------------------------------------------------------
     // GHOST IMAGE CREATION
+    //------------------------------------------------------------------------------------------------------------------
+    //------------------------------------------------------------------------------------------------------------------
 
     public static final Map<ghostTypes, Color[]> ghostColors = new HashMap<>();
 
@@ -302,6 +292,13 @@ public class ImageMaker {
                                                                specialEyeColor}); // darker crystal blue/green
     }
 
+    private static void createGhostImages(ghostTypes ghostType) {
+        createGhostImage(ghostType, 0, 0);
+        createGhostImage(ghostType, 1, 0);
+        createGhostImage(ghostType, -1, 0);
+        createGhostImage(ghostType, 0, 1);
+        createGhostImage(ghostType, 0, -1);
+    }
 
     public static void createGhostImage(ghostTypes type, int xDirection, int yDirection) {
         // Step 1: Determine direction string
@@ -351,11 +348,9 @@ public class ImageMaker {
 
     //------------------------------------------------------------------------------------------------------------------
     //------------------------------------------------------------------------------------------------------------------
-    //------------------------------------------------------------------------------------------------------------------
-    //------------------------------------------------------------------------------------------------------------------
-    //------------------------------------------------------------------------------------------------------------------
-    //------------------------------------------------------------------------------------------------------------------
     // HELPERS
+    //------------------------------------------------------------------------------------------------------------------
+    //------------------------------------------------------------------------------------------------------------------
 
     public static void createPng(BufferedImage bufferedImage, File output) {
         try {
