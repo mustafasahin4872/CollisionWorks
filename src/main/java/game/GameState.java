@@ -51,7 +51,11 @@ public class GameState {
     );
 
     private final List<ShopEntry<Buff>> buyableBuffs = List.of(
-        new ShopEntry<>(new Buff.SpeedBuff(0, 0), 0, false)
+        new ShopEntry<>(new Buff.SpeedBuff(0, 0), 0, false),
+        new ShopEntry<>(new Buff.ShieldBuff(0, 0), 0, false),
+        new ShopEntry<>(new Buff.ShrinkBuff(0, 0), 0, false),
+        new ShopEntry<>(new Buff.MagnetBuff(0, 0), 0, false),
+        new ShopEntry<>(new Buff.VisionBuff(0, 0), 0, false)
     );
 
 

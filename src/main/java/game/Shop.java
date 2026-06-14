@@ -153,7 +153,7 @@ public class Shop {
 
         private static final double LABEL_BOX_WIDTH = 3 * TILE_SIDE;
         private static final double LABEL_BOX_HEIGHT = 0.6 * TILE_SIDE;
-        private static final double NAME_BOX_WIDTH = 2.5 * TILE_SIDE;
+        private static final double NAME_BOX_WIDTH = 2.75 * TILE_SIDE;
         private static final double NAME_BOX_HEIGHT = 0.6 * TILE_SIDE;
         private static final double PRICE_BOX_WIDTH = 2.5 * TILE_SIDE;
         private static final double PRICE_BOX_HEIGHT = 0.6 * TILE_SIDE;

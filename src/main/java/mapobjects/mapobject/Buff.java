@@ -15,8 +15,8 @@ public abstract class Buff extends GridObject implements OnEffector, Timed {
     private final Timer timer;
     private final Timer animationTimer;
 
-    public Buff(int xNum, int yNum, boolean permanent) {
-        super(0, xNum, yNum);
+    public Buff(int xNum, int yNum, String name, boolean permanent) {
+        super(0, xNum, yNum, name);
         this.permanent = permanent;
 
         effectBox = positionBox.clone();
@@ -28,8 +28,8 @@ public abstract class Buff extends GridObject implements OnEffector, Timed {
         animationTimer.activate();
     }
 
-    public Buff(int xNum, int yNum) {
-        this(xNum, yNum, false);
+    public Buff(int xNum, int yNum, String name) {
+        this(xNum, yNum, name,false);
     }
 
     @Override
@@ -76,7 +76,7 @@ public abstract class Buff extends GridObject implements OnEffector, Timed {
     public static class SpeedBuff extends Buff {
 
         public SpeedBuff(int xNum, int yNum) {
-            super(xNum, yNum);
+            super(xNum, yNum, "speedBuff");
         }
 
         @Override
@@ -86,10 +86,10 @@ public abstract class Buff extends GridObject implements OnEffector, Timed {
 
     }
 
-    public class ShrinkBuff extends Buff {
+    public static class ShrinkBuff extends Buff {
 
         public ShrinkBuff(int xNum, int yNum) {
-            super(xNum, yNum);
+            super(xNum, yNum, "shrinkBuff");
         }
 
         @Override
@@ -99,10 +99,10 @@ public abstract class Buff extends GridObject implements OnEffector, Timed {
 
     }
 
-    public class ShieldBuff extends Buff {
+    public static class ShieldBuff extends Buff {
 
         public ShieldBuff(int xNum, int yNum) {
-            super(xNum, yNum);
+            super(xNum, yNum, "shieldBuff");
         }
 
         @Override
@@ -112,10 +112,10 @@ public abstract class Buff extends GridObject implements OnEffector, Timed {
 
     }
 
-    public class MagnetBuff extends Buff {
+    public static class MagnetBuff extends Buff {
 
         public MagnetBuff(int xNum, int yNum) {
-            super(xNum, yNum);
+            super(xNum, yNum, "magnetBuff");
         }
 
         @Override
@@ -125,10 +125,10 @@ public abstract class Buff extends GridObject implements OnEffector, Timed {
 
     }
 
-    public class EagleEyeBuff extends Buff {
+    public static class VisionBuff extends Buff {
 
-        public EagleEyeBuff(int xNum, int yNum) {
-            super(xNum, yNum);
+        public VisionBuff(int xNum, int yNum) {
+            super(xNum, yNum, "visionBuff");
         }
 
         @Override

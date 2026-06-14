@@ -15,6 +15,8 @@
 
 ## 🚧 IMMEDIATE PRIORITIES
 
+- [ ] Buff shrinking and growing animation is buggy
+
 ### Core Refactoring
 - [v] Add a cooldown to the input taking logic, separate the drawing logic pauses from it
 - [v] Finalize the Selection classes, separate level selection and skin/accessory selection altogether, also separate shop from them.
