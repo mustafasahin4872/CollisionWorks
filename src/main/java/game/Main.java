@@ -10,6 +10,8 @@ public class Main {
     public static GameState gameState;
     public static InputHandler inputHandler;
 
+    public static final Long GAME_START = System.currentTimeMillis();
+
     // manage selection, in-game, shop screen calls according to gameState
     // create corresponding maps and frames, then run and edit gameState
     public static void main(String[] args){

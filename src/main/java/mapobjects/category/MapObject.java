@@ -22,7 +22,6 @@ public abstract class MapObject {
     protected boolean expired; //if object is no longer needed, it is marked
     protected final Box positionBox; //object's position and dimensions are stored in the box
 
-
     //empty map object, the attributes are set up manually for this.
     public MapObject() {
         this(0, 0, 0, 0, 0);
@@ -113,9 +112,12 @@ public abstract class MapObject {
         setY(oldY);
     }
 
-    public void drawAnimated(Timer animationTimer) {
+    /// All animated draws use the same current time and start time, so they are synced.
+    /// Draws shrinking - enlarging animations using current time.
+    public void drawAnimated() {
+        double period = 3000; // in milliseconds
+        double ratio = ((System.currentTimeMillis() - Main.GAME_START) % period) / period;
         double multiplier;
-        double ratio = animationTimer.progressRatio();
         double maxDiff = 0.05;
         if (ratio > 0.5) {
             multiplier = 1 + maxDiff - 2 * maxDiff * ((ratio - 0.5) / 0.5);

@@ -13,7 +13,6 @@ public abstract class Buff extends GridObject implements OnEffector, Timed {
 
     private final Box effectBox;
     private final Timer timer;
-    private final Timer animationTimer;
 
     public Buff(int xNum, int yNum, String name, boolean permanent) {
         super(0, xNum, yNum, name);
@@ -24,8 +23,6 @@ public abstract class Buff extends GridObject implements OnEffector, Timed {
         if (permanent) timer = null;
         else timer = new Timer(BUFF_DURATION, 0);
 
-        animationTimer = new Timer(3000, -1);
-        animationTimer.activate();
     }
 
     public Buff(int xNum, int yNum, String name) {
@@ -61,7 +58,7 @@ public abstract class Buff extends GridObject implements OnEffector, Timed {
         if (expired) {
             super.draw();
         } else {
-            drawAnimated(animationTimer);
+            drawAnimated();
         }
     }
 
