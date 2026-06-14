@@ -78,7 +78,7 @@ public abstract class Player extends MapObject implements MovingCollidable, Spaw
         final double defaultSide;
         defaultSide = switch (playerName) {
             case "Bob", "Mike" -> 50;
-            case "Zahit" -> 70;
+            case "Sakura" -> 40;
             default -> 50;
         };
         return defaultSide;
@@ -561,12 +561,6 @@ public abstract class Player extends MapObject implements MovingCollidable, Spaw
             resize(multiplier);
 
             super.draw();
-
-            if (accessories != null) {
-                for (Accessory accessory : accessories) {
-                    accessory.drawBig(multiplier);
-                }
-            }
 
             resetSize();
         }

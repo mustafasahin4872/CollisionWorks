@@ -37,8 +37,9 @@ public abstract class Accessory extends MapObject {
     }
 
     public void resetSize() {
-        setWidth(defaultWidth);
-        setHeight(defaultHeight);
+        double scale = player.getDefaultSide() / TILE_SIDE;
+        setWidth(defaultWidth * scale);
+        setHeight(defaultHeight * scale);
     }
 
     public void setAlone(boolean alone) {
@@ -64,12 +65,39 @@ public abstract class Accessory extends MapObject {
     @Override
     public void drawBig(double multiplier) {
         resize(multiplier);
-        resize(player.getDefaultSide()/(TILE_SIDE));
         player.resize(multiplier);
         if (!alone) update();
         draw();
         resetSize();
         player.resetSize();
+    }
+
+    @Override
+    public void drawBigAt(double x, double y, double multiplier) {
+        if (alone) {
+            super.drawBigAt(x, y, multiplier);
+        } else { // still, draw ONLY ACCESSORY, update it accordingly.
+            double oldX = getX();
+            double oldY = getY();
+            double playerX = player.getX();
+            double playerY = player.getY();
+            player.setCenterCoordinates(x, y);
+
+            resize(multiplier);
+            player.resize(multiplier);
+            update();
+
+            draw();
+
+            resetSize();
+            player.resetSize();
+
+            player.setCenterCoordinates(playerX, playerY);
+            setCenterCoordinates(oldX, oldY);
+            // do not call update!!!
+            // if it was on the player, put it back to player
+            // if not, put it back to where it is
+        }
     }
 
     //------------------------------------------------------------------------------------------

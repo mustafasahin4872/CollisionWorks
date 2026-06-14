@@ -16,6 +16,7 @@
 ## 🚧 IMMEDIATE PRIORITIES
 
 - [ ] Buff shrinking and growing animation is buggy
+- [ ] Buff shrinking and growing animation should stop when bought
 
 ### Core Refactoring
 - [v] Add a cooldown to the input taking logic, separate the drawing logic pauses from it
@@ -31,7 +32,7 @@
 
 ### New Elements
 - [ ] Add buff system
-- [ ] Add buffs to shop
+- [v] Add buffs to shop
 - [ ] Add in-game shop
 - [v] Create a separate SelectionScreen similar to GameScreen
 

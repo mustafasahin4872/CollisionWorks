@@ -38,8 +38,4 @@ public class ShopEntry<T extends MapObject> {
         return item.getName();
     }
 
-    public void drawBig(double multiplier) {
-        item.drawBig(multiplier);
-    }
-
 }

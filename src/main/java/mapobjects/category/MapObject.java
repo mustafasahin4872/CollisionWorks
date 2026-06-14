@@ -99,6 +99,19 @@ public abstract class MapObject {
         setHeight(height);
     }
 
+    public void drawBigAt(double x, double y, double scale) {
+        double oldX = getX();
+        double oldY = getY();
+
+        setX(x);
+        setY(y);
+
+        drawBig(scale);
+
+        setX(oldX);
+        setY(oldY);
+    }
+
     public void expire() {
         expired = true;
     }

@@ -60,7 +60,8 @@ public class SkinSelection {
 
         skins = gameState.getSkins();
         accessories = gameState.getAccessories();
-        accessoryChosen = new boolean[accessories.size()];
+        if (accessoryChosen == null) accessoryChosen = new boolean[accessories.size()];
+        accessoryChosen = Arrays.copyOf(accessoryChosen, accessories.size());
 
         for (Player skin : skins) {
             skin.setSpawnPoint(backgroundMap.getSpawnPoint());
@@ -90,15 +91,15 @@ public class SkinSelection {
             Player currentSkin = skins.get(currentSkinIndex);
             currentSkin.drawBig(DRAW_BIG_MULTIPLIER);
 
-            Accessory currentAccessory = accessories.get(currentAccessoryIndex);
-            if (currentAccessory != null) {
-                currentAccessory.setPlayer(currentSkin);
-                currentAccessory.drawBig(DRAW_BIG_MULTIPLIER);
-            }
-
             for (int i = 0; i < accessoryChosen.length; i++) {
-                if (accessoryChosen[i] && accessories.get(i) != null) {
-                    accessories.get(i).drawBig(DRAW_BIG_MULTIPLIER);
+                Accessory accessory = accessories.get(i);
+                boolean isNull = accessory == null;
+                boolean isTriedOn = i == currentAccessoryIndex;
+                boolean isSelected = accessoryChosen[i];
+                if (isNull) continue;
+                if (isTriedOn || isSelected) {
+                    accessory.setPlayer(currentSkin);
+                    accessory.drawBig(DRAW_BIG_MULTIPLIER);
                 }
             }
 

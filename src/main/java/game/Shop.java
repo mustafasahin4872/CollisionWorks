@@ -3,6 +3,7 @@ package game;
 import helpers.MapType;
 import helpers.ShopEntry;
 import lib.StdDraw;
+import mapobjects.category.MapObject;
 import mapobjects.component.Box;
 import helpers.InputHandler;
 import mapobjects.mapobject.Accessory;
@@ -14,6 +15,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static game.Main.IMAGES_ROOT;
+import static game.Main.main;
 import static helpers.CollisionMethods.isIn;
 import static helpers.DrawMethods.drawRectWithOutline;
 import static helpers.DrawMethods.textInsideBox;
@@ -28,6 +30,7 @@ import static helpers.HelperMethods.capitalize;
 
 // The shop screen in selection phase
 // Displays 3(hardcoded) different item types to buy
+@SuppressWarnings("rawtypes")
 public class Shop {
 
     private static final int N = 3;
@@ -74,11 +77,8 @@ public class Shop {
         }
 
         Box accessoryBox = ShopUI.SHOP_BOXES[1];
-        Player player = gameState.getPlayer(); // in buy screen, accessories are displayed on top of the player
-        player.setAccessories(new Accessory[0]);
         for (ShopEntry<Accessory> entry : accessories) {
             Accessory accessory = entry.getItem();
-            accessory.setPlayer(player);
             accessory.setCenterCoordinates(accessoryBox.getCenterX(), accessoryBox.getCenterY());
             accessory.setAlone(true);
         }
@@ -118,7 +118,7 @@ public class Shop {
 
         backgroundMap.draw();
         for (int i = 0; i < N; i++) {
-            getShopEntry(i).drawBig(DRAW_BIG_MULTIPLIER);
+            getShopEntry(i).getItem().drawBig(DRAW_BIG_MULTIPLIER);
         }
 
         shopUI.draw();
@@ -138,7 +138,6 @@ public class Shop {
                 break;
             }
         }
-        if (selectedIndex == -1) return null;
         return getShopEntry(selectedIndex);
     }
 
@@ -363,33 +362,18 @@ public class Shop {
             drawRectWithOutline(QUESTION_BOX, buttonColor, outlineColor);
             textInsideBox(QUESTION_BOX, question, textColor, font);
 
-            // TODO: IS THIS CODE MESSY OR ACCEPTABLE?
+            MapObject mapObject = buyable.getItem();
 
-            // record initial position of buyable
-            double x = buyable.getItem().getX();
-            double y = buyable.getItem().getY();
-            // move buyable to BOUGHT_BOX
-            buyable.getItem().setCenterCoordinates(BOUGHT_BOX.getCenterX(), BOUGHT_BOX.getCenterY());
-
-            if (buyable.getItem() instanceof Accessory accessory) {
-                // draw accessory on top of the current player
-                Player player = gameState.getPlayer();
-                double playerX = player.getX();
-                double playerY = player.getY();
-                double[] displayCenter = BOUGHT_BOX.getCenterCoordinates();
-                player.setCenterCoordinates(displayCenter[0], displayCenter[1]);
+            if (mapObject instanceof Accessory accessory) {
                 accessory.setAlone(false);
-                player.drawBig(DRAW_BIG_MULTIPLIER);
-                buyable.drawBig(DRAW_BIG_MULTIPLIER);
-                // isolate accessory from player
+                Player player = gameState.getPlayer();
+                accessory.setPlayer(player);
+                player.drawBigAt(BOUGHT_BOX.getCenterX(), BOUGHT_BOX.getCenterY(), DRAW_BIG_MULTIPLIER);
+                accessory.drawBigAt(BOUGHT_BOX.getCenterX(), BOUGHT_BOX.getCenterY(), DRAW_BIG_MULTIPLIER);
                 accessory.setAlone(true);
-                player.setCenterCoordinates(playerX, playerY);
             } else {
-                buyable.drawBig(DRAW_BIG_MULTIPLIER);
+                mapObject.drawBigAt(BOUGHT_BOX.getCenterX(), BOUGHT_BOX.getCenterY(), DRAW_BIG_MULTIPLIER);
             }
-
-            // reset position
-            buyable.getItem().setCenterCoordinates(x, y);
 
         }
 
