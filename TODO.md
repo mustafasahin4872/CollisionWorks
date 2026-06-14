@@ -7,40 +7,50 @@
 - Added GameState for easier player access and improved game loop structure
 - Separated entangled logic:
     - Input handling vs frame management
+    - Input pauses vs drawing pauses
     - GameState vs player stats
     - UI rendering vs map rendering
+    - Selection screens separation
 - Added helper classes for better encapsulation and scoping
+- Added in game Shop
 
 ---
 
 ## 🚧 IMMEDIATE PRIORITIES
 
-### BUFFS
-- [v] Buff shrinking and growing animation is vibrating
-- [v] Buff shrinking and growing animation should stop when bought
-- [ ] Add buffs to mapmaker
-- [ ] BUFFS IDEA: (decide whether to implement or not)
-  - [ ] player should hold a buffs list
-  - [ ] buffs should have an apply(Player player) function that applies the effects
-  - [ ] playerIsOn should only add the buff to the List
-
-### Core Refactoring
-- [v] Add a cooldown to the input taking logic, separate the drawing logic pauses from it
-- [v] Finalize the Selection classes, separate level selection and skin/accessory selection altogether, also separate shop from them.
-- [v] Fill shop logic
-- [v] Add currency system
-- [ ] Decouple currencies from Player and move to GameState
-- [v] Add ShopEntry to tidy shop logic
-- [v] Finalize shop logic
-- [ ] Tidy up Player class
-- [v] Tidy up Selection system
-- [ ] Tidy up GameMap class
-
 ### New Elements
 - [ ] Add buff system
-- [v] Add buffs to shop
-- [ ] Add in-game shop
+  - [v] Buff shrinking and growing animation is vibrating
+  - [v] Buff shrinking and growing animation should stop when bought
+  - [v] Buff buying logic - calls playerontop -> change to calling buff.expire() only
+  - [v] Add buffs to shop
+  - [ ] Add buffs to mapmaker
+  - [ ] BUFFS IDEA: (decide whether to implement or not)
+      - [ ] player should hold a in-game buffs list (not gamestate)
+      - [ ] buffs should have an apply(Player player) and revert(Player player) function that applies/reverts the effects
+      - [ ] playerIsOn should only add the buff to the List
+- [ ] Enhance currency system
+    - [ ] in-game collected currencies add to the gamestate currencies
+    - [ ] add a gem counter into in-game ui as well
+- [ ] in-between levels content
+  - [ ] add shop
+  - [ ] add random rewards
 - [v] Create a separate SelectionScreen similar to GameScreen
+
+### Core Refactoring
+- [ ] Tidy up Player class
+- [ ] Decouple currencies from Player and move to GameState
+- [ ] Tidy up GameMap class
+- [v] Add a cooldown to the input taking logic, separate the drawing logic pauses from it
+- [v] Tidy up Selection system
+  - [v] separate level selection and skin/accessory selection altogether
+  - [v] separate shop
+  - [v] finalize the Selection classes
+- [v] Shop logic
+  - [v] Fill shop logic
+  - [v] Add ShopEntry to tidy shop logic
+  - [v] Finalize shop logic
+
 
 ### Rendering Architecture
 - [ ] Fix Player drawing responsibility (currently draws too much)
@@ -93,7 +103,6 @@
 
 ### MapMaker / Visualization
 - [ ] Improve naming in shooter MapMaker
-- [ ] Add MapMaker visualization/debug mode
 
 ### Game Physics
 - [ ] Improve collision system design
@@ -108,16 +117,25 @@
 - [ ] Mines should not be gridObjects
 - [ ] Enhance player shooting mechanism
 
+### File System - Indexing
+- [ ] Fix selection world index system
+    - Remove confusing level indexing (13 means world 1 level 3 -> ambiguous)
+    - Make level progression consistent
+
 ---
 
 ## ✨ NEW GAME MECHANICS
 
-- [ ] Buff system implementation:
+- [v] Buff system implementation:
     - Fast
     - Small
     - Immune
     - Magnetic
     - Eagle Eye
+
+- [ ] in-between levels content
+    - [ ] add shop
+    - [ ] add random rewards
 
 - [ ] Sound system:
     - World background sounds
@@ -129,51 +147,51 @@
 - [v] Shop system design:
     - Start with "Crystal Palace" concept
 
-- [ ] Fix selection world index system
-    - Remove confusing level indexing (13 means world 1 level 3 -> ambiguous)
-    - Make level progression consistent
-
 - [v] Add signal handling system:
     - Next level
     - Shop
     - Selection
     - Death
 
-- [ ] Add random reward system between levels
-
-- [ ] Buttons should support "hold to stay active" (also triggered by monsters)
-- [ ] Add movable boxes:
-    - Block projectiles
-    - Hold buttons down
-
-- [ ] All assets need major updates, better designs
-  - [ ] Generalize mud + special tiles across all 4 worlds
-
 ---
 
-## 🎮 GAME CONTENT
+## 🎮 NEW GAME CONTENT
+
+### Assets
+- [ ] All assets need major updates, better designs
+    - [ ] Generalize mud + special tiles across all 4 worlds
 
 ### Skins
 - [ ] Add big/small size skin variants
 - [v] Add sakura skin
+- [ ] add a ghost as a skin - twist! it can pass through walls
+
+### Entities
+- [ ] Fake walls
+- [ ] Moving monsters
 
 ### Worlds
 - [v] Add World 4
+
+### Levels
+- [ ] start designing levels
 
 ---
 
 ## 💡 FUTURE IDEAS
 
 ### Player Records
-- The player continues from the last level they were in
+- [ ] Players' gamestates are remembered with each login
 
 ### Gameplay Systems
-- Moving monsters
-- Fake walls
-- In-game currency system
-- Boss fights
+- [ ] Boss fights
+
+### Mapmaker
+- [ ] Add MapMaker visualization/debug mode
 
 ### Entity System
-- Create `Monster` (opponent) class
-- Create movable box/crate
+- [ ] Create `Monster` (opponent) class
+- [ ] Create movable box/crate
+  - [ ] Buttons should support "hold to stay active" (also triggered by monsters)
+  - [ ] Add movable boxes
 

@@ -32,6 +32,16 @@ public class GameState {
 
     //------------------------------------------------------------------------------------------------------------------
     //------------------------------------------------------------------------------------------------------------------
+    // OWNED ITEMS
+    //------------------------------------------------------------------------------------------------------------------
+    //------------------------------------------------------------------------------------------------------------------
+
+    private final ArrayList<Player> skins = new ArrayList<>(List.of(new Player.RegularPlayer()));
+    private final ArrayList<Accessory> accessories = new ArrayList<>();
+    private final ArrayList<Buff> permanentBuffs = new ArrayList<>();
+
+    //------------------------------------------------------------------------------------------------------------------
+    //------------------------------------------------------------------------------------------------------------------
     // SHOP ENTRIES
     //------------------------------------------------------------------------------------------------------------------
     //------------------------------------------------------------------------------------------------------------------
@@ -58,16 +68,6 @@ public class GameState {
         new ShopEntry<>(new Buff.MagnetBuff(0, 0), 0, false),
         new ShopEntry<>(new Buff.VisionBuff(0, 0), 0, false)
     );
-
-
-    //------------------------------------------------------------------------------------------------------------------
-    //------------------------------------------------------------------------------------------------------------------
-    // OWNED ITEMS
-    //------------------------------------------------------------------------------------------------------------------
-    //------------------------------------------------------------------------------------------------------------------
-
-    private final ArrayList<Player> skins = new ArrayList<>(List.of(new Player.RegularPlayer()));
-    private final ArrayList<Accessory> accessories = new ArrayList<>();
 
     //------------------------------------------------------------------------------------------------------------------
     //------------------------------------------------------------------------------------------------------------------
@@ -128,19 +128,11 @@ public class GameState {
         this.player = player;
     }
 
-    public int getCoinAmount() {
-        return coinAmount;
-    }
-
     public void addCoin(int added) {
         coinAmount += added;
     }
 
     public void spendCoin(int spent) {coinAmount -= spent;}
-
-    public int getGemAmount() {
-        return gemAmount;
-    }
 
     public void addGem(int added) {
         gemAmount += added;
@@ -164,12 +156,18 @@ public class GameState {
         accessories.add(accessory);
     }
 
+    public void addOwnedBuff(Buff buff) {permanentBuffs.add(buff);}
+
     public List<Player> getSkins() {
         return skins;
     }
 
     public List<Accessory> getAccessories() {
         return accessories;
+    }
+
+    public List<Buff> gettPermanentBuffs() {
+        return permanentBuffs;
     }
 
     public List<ShopEntry<Player>> getBuyableSkins() {
@@ -237,7 +235,8 @@ public class GameState {
         } else {
             spendCoin(cost);
             if (item instanceof Buff b) {
-                b.playerIsOn(player);
+                b.expire(); // stops the animation
+                addOwnedBuff(b);
             }
         }
     }
