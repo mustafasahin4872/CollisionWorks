@@ -9,6 +9,7 @@ import mapobjects.mapobject.Player;
 import java.util.ArrayList;
 import java.util.List;
 
+@SuppressWarnings("rawtypes")
 public class GameState {
 
     //------------------------------------------------------------------------------------------------------------------

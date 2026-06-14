@@ -16,7 +16,12 @@
 ## 🚧 IMMEDIATE PRIORITIES
 
 - [ ] Buff shrinking and growing animation is buggy
-- [ ] Buff shrinking and growing animation should stop when bought
+- [v] Buff shrinking and growing animation should stop when bought
+- [ ] Add buffs to mapmaker
+- [ ] BUFFS IDEA: (decide whether to implement or not)
+  - [ ] player should hold a buffs list
+  - [ ] buffs should have an apply(Player player) function that applies the effects
+  - [ ] playerIsOn should only add the buff to the List
 
 ### Core Refactoring
 - [v] Add a cooldown to the input taking logic, separate the drawing logic pauses from it

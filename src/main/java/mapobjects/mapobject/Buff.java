@@ -53,23 +53,16 @@ public abstract class Buff extends GridObject implements OnEffector, Timed {
     }
 
     @Override
-    public void timeIsUp(Player player) {
+    public void timeIsUp(Player player) {} // unused
 
-    }
 
     @Override
     public void draw() {
-        double multiplier;
-        double ratio = animationTimer.progressRatio();
-        double maxDiff = 0.05;
-        if (ratio > 0.5) {
-            multiplier = 1 + maxDiff - 2 * maxDiff * ((ratio - 0.5) / 0.5);
+        if (expired) {
+            super.draw();
         } else {
-            multiplier = 1 - maxDiff + 2 * maxDiff * (ratio / 0.5);
+            drawAnimated(animationTimer);
         }
-        resize(multiplier);
-        super.draw();
-        resize(1/multiplier);
     }
 
 
@@ -81,7 +74,7 @@ public abstract class Buff extends GridObject implements OnEffector, Timed {
 
         @Override
         public void playerIsOn(Player player) {
-
+            expire();
         }
 
     }
@@ -94,7 +87,7 @@ public abstract class Buff extends GridObject implements OnEffector, Timed {
 
         @Override
         public void playerIsOn(Player player) {
-
+            expire();
         }
 
     }
@@ -107,7 +100,7 @@ public abstract class Buff extends GridObject implements OnEffector, Timed {
 
         @Override
         public void playerIsOn(Player player) {
-
+            expire();
         }
 
     }
@@ -120,7 +113,7 @@ public abstract class Buff extends GridObject implements OnEffector, Timed {
 
         @Override
         public void playerIsOn(Player player) {
-
+            expire();
         }
 
     }
@@ -133,7 +126,7 @@ public abstract class Buff extends GridObject implements OnEffector, Timed {
 
         @Override
         public void playerIsOn(Player player) {
-
+            expire();
         }
 
     }

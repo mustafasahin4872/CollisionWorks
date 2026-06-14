@@ -5,6 +5,7 @@ package mapobjects.category;
 //(x0, y0) and (x1, y1) are the rectangle's bottom left and top right corners.
 
 import game.Main;
+import mapobjects.component.Timer;
 import mapobjects.mapobject.Player;
 import lib.StdDraw;
 import mapobjects.component.Box;
@@ -110,6 +111,23 @@ public abstract class MapObject {
 
         setX(oldX);
         setY(oldY);
+    }
+
+    public void drawAnimated(Timer animationTimer) {
+        double multiplier;
+        double ratio = animationTimer.progressRatio();
+        double maxDiff = 0.05;
+        if (ratio > 0.5) {
+            multiplier = 1 + maxDiff - 2 * maxDiff * ((ratio - 0.5) / 0.5);
+        } else {
+            multiplier = 1 - maxDiff + 2 * maxDiff * (ratio / 0.5);
+        }
+        double width = getWidth();
+        double height = getHeight();
+        resize(multiplier);
+        StdDraw.picture(getX(), getY(), imageFileName, getWidth(), getHeight());
+        setWidth(width);
+        setHeight(height);
     }
 
     public void expire() {
