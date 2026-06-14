@@ -16,6 +16,7 @@
 ## 🚧 IMMEDIATE PRIORITIES
 
 ### Core Refactoring
+- [v] Add a cooldown to the input taking logic, separate the drawing logic pauses from it
 - [v] Finalize the Selection classes, separate level selection and skin/accessory selection altogether, also separate shop from them.
 - [v] Fill shop logic
 - [v] Add currency system

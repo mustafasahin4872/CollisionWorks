@@ -1,6 +1,7 @@
 package helpers;
 
 import lib.StdDraw;
+import mapobjects.component.Timer;
 
 import java.awt.event.KeyEvent;
 
@@ -10,24 +11,12 @@ public class InputHandler {
         public int xDirection, yDirection;
         public boolean space;
 
-        public ArrowData(int xDirection, int yDirection, boolean space) {
-            this.xDirection = xDirection;
-            this.yDirection = yDirection;
-            this.space = space;
-        }
-
         public ArrowData() {}
     }
 
     public static class MouseData {
         public double mouseX, mouseY;
         public boolean pressed;
-
-        public MouseData(double mouseX, double mouseY, boolean pressed) {
-            this.mouseX = mouseX;
-            this.mouseY = mouseY;
-            this.pressed = pressed;
-        }
 
         public MouseData() {}
     }
@@ -38,8 +27,11 @@ public class InputHandler {
     private static final int[] DOWN_CODES = {KeyEvent.VK_DOWN, KeyEvent.VK_S};
     private static final int[] SHOOT_CODES = {KeyEvent.VK_SPACE};
 
-    private final ArrowData arrowData = new ArrowData();
-    private final MouseData mouseData = new MouseData();
+    private ArrowData arrowData = new ArrowData();
+    private MouseData mouseData = new MouseData();
+
+    private static final int COOLDOWN = 100; // in milliseconds
+    private final Timer timer = new Timer(Integer.MAX_VALUE, COOLDOWN);
 
     public ArrowData getArrowData() {
         return arrowData;
@@ -50,8 +42,15 @@ public class InputHandler {
     }
 
     public void takeInput() {
-        handleArrowInput();
-        handleMouseInput();
+        if (timer.inCooldown()) {
+            timer.tick();
+            mouseData = new MouseData();
+            arrowData = new ArrowData();
+        } else {
+            handleArrowInput();
+            handleMouseInput();
+            timer.startCooldown();
+        }
     }
 
     private void handleArrowInput() {

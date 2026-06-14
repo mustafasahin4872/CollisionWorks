@@ -2,6 +2,7 @@ package game;
 
 import mapobjects.category.MapObject;
 import mapobjects.mapobject.Accessory;
+import mapobjects.mapobject.Buff;
 import mapobjects.mapobject.Player;
 
 import java.util.ArrayList;
@@ -46,6 +47,10 @@ public class GameState {
         new ShopEntry<>(new Accessory.Necklace("sorcerer"), 250, true),
         new ShopEntry<>(new Accessory.Pin("star"), 50000, true),
         new ShopEntry<>(new Accessory.Pin("sheriff"), 1075, true)
+    );
+
+    private final List<ShopEntry<Buff>> buyableBuffs = List.of(
+        new ShopEntry<>(new Buff.SpeedBuff(0, 0), 0, false)
     );
 
 
@@ -169,6 +174,10 @@ public class GameState {
         return buyableAccessories;
     }
 
+    public List<ShopEntry<Buff>> getBuyableBuffs() {
+        return buyableBuffs;
+    }
+
     //------------------------------------------------------------------------------------------------------------------
     //------------------------------------------------------------------------------------------------------------------
     // STATE MUTATION
@@ -221,7 +230,9 @@ public class GameState {
             }
         } else {
             spendCoin(cost);
-            // if (item instanceof ???) {} // add logic here
+            if (item instanceof Buff b) {
+                b.playerIsOn(player);
+            }
         }
     }
 

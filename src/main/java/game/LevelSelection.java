@@ -64,7 +64,7 @@ public class LevelSelection {
             draw();
 
             StdDraw.show();
-            StdDraw.pause(10 * Frame.PAUSE);
+            StdDraw.pause(Frame.PAUSE);
         }
 
         if (gameState.getState() == GameState.STATE.NEXT) {

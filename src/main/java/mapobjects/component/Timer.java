@@ -75,7 +75,7 @@ public class Timer {
             return 1;
         } else {
             double timePassed = System.currentTimeMillis() - startTime;
-            return timePassed/period;
+            return timePassed/period % 1;
         }
     }
 

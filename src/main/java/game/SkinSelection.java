@@ -105,7 +105,7 @@ public class SkinSelection {
             draw();
 
             StdDraw.show();
-            StdDraw.pause(8 * Frame.PAUSE);
+            StdDraw.pause(Frame.PAUSE);
         }
 
         if (gameState.getState() != GameState.STATE.QUIT) {

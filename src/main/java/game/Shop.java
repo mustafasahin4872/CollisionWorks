@@ -5,6 +5,7 @@ import lib.StdDraw;
 import mapobjects.component.Box;
 import helpers.InputHandler;
 import mapobjects.mapobject.Accessory;
+import mapobjects.mapobject.Buff;
 import mapobjects.mapobject.Player;
 
 import java.awt.*;
@@ -47,13 +48,15 @@ public class Shop {
     private final List<List<? extends ShopEntry<?>>> buyables;
     private final List<ShopEntry<Player>> skins;
     private final List<ShopEntry<Accessory>> accessories;
+    private final List<ShopEntry<Buff>> buffs;
 
     public Shop(InputHandler inputHandler, GameState gameState) {
         this.inputHandler = inputHandler;
         this.gameState = gameState;
         skins = gameState.getBuyableSkins();
         accessories = gameState.getBuyableAccessories();
-        buyables = List.of(skins, accessories, skins);
+        buffs = gameState.getBuyableBuffs();
+        buyables = List.of(skins, accessories, buffs);
     }
 
     public void shopLoop() {
@@ -79,6 +82,12 @@ public class Shop {
             accessory.setAlone(true);
         }
 
+        Box buffBox = ShopUI.SHOP_BOXES[2];
+        for (ShopEntry<Buff> entry : buffs) {
+            Buff buff = entry.getItem();
+            buff.setCenterCoordinates(buffBox.getCenterX(), buffBox.getCenterY());
+        }
+
         while (gameState.getState() == STATE.SHOP || gameState.getState() == STATE.PAUSE) {
             inputHandler.takeInput();
             MouseData mouseData = inputHandler.getMouseData();
@@ -90,7 +99,7 @@ public class Shop {
             draw();
 
             StdDraw.show();
-            StdDraw.pause(10 * Frame.PAUSE);
+            StdDraw.pause(Frame.PAUSE);
         }
     }
 
@@ -107,7 +116,7 @@ public class Shop {
     private void draw() {
 
         backgroundMap.draw();
-        for (int i = 0; i < N-1; i++) { // TODO: CHANGE N-1 TO N WHEN OTHER BUYABLES ADDED
+        for (int i = 0; i < N; i++) {
             getShopEntry(i).drawBig(DRAW_BIG_MULTIPLIER);
         }
 
@@ -254,7 +263,7 @@ public class Shop {
                 drawRectWithOutline(PRICE_BOXES[i], buyColor, outlineColor);
 
                 String price = " " + shopEntry.getCost(); // 1 space to right to offset the gem's space
-                String type = (!shopEntry.isCosmetic()) ? "gem" : "coin";
+                String type = (shopEntry.isCosmetic()) ? "gem" : "coin";
                 String fileName = IMAGES_ROOT + "ui/" + type + ".png";
                 double side = PRICE_BOX_HEIGHT * 0.8;
                 double textWidth = 0.6 * smallFont.getSize() * price.length();
