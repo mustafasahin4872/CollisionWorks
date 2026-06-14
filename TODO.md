@@ -24,6 +24,7 @@
   - [v] Buff shrinking and growing animation should stop when bought
   - [v] Buff buying logic - calls playerontop -> change to calling buff.expire() only
   - [v] Add buffs to shop
+  - [v] Display permanentbuffs in skinselection
   - [ ] Add buffs to mapmaker
   - [ ] BUFFS IDEA: (decide whether to implement or not)
       - [ ] player should hold a in-game buffs list (not gamestate)

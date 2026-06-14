@@ -7,10 +7,10 @@ import game.GameState.STATE;
 import lib.StdDraw;
 import mapobjects.component.Box;
 import mapobjects.mapobject.Accessory;
+import mapobjects.mapobject.Buff;
 import mapobjects.mapobject.Player;
 
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -29,6 +29,7 @@ public class SkinSelection {
 
     private List<Player> skins;
     private List<Accessory> accessories;
+    private List<Buff> buffs;
 
     private int currentSkinIndex = 0;
     private int currentAccessoryIndex = 0;
@@ -39,6 +40,7 @@ public class SkinSelection {
     private final NavigationUI navigationUI = new NavigationUI();
     private final SkinSelectionUI skinSelectionUI = new SkinSelectionUI();
     private final AccessorySelectionUI accessorySelectionUI = new AccessorySelectionUI();
+    private final BuffDrawingUI buffDrawingUI = new BuffDrawingUI();
 
     public SkinSelection(InputHandler inputHandler, GameState gameState) {
         this.inputHandler = inputHandler;
@@ -54,12 +56,15 @@ public class SkinSelection {
     void draw() {
         skinSelectionUI.draw();
         accessorySelectionUI.draw();
+        buffDrawingUI.draw();
     }
 
     public void skinSelectionLoop() {
 
         skins = gameState.getSkins();
         accessories = gameState.getAccessories();
+        buffs = gameState.gettPermanentBuffs();
+
         if (accessoryChosen == null) accessoryChosen = new boolean[accessories.size()];
         accessoryChosen = Arrays.copyOf(accessoryChosen, accessories.size());
 
@@ -74,6 +79,8 @@ public class SkinSelection {
                 accessory.update();
             }
         }
+
+        buffDrawingUI.setBuffLocations();
 
         while (gameState.getState() == STATE.SELECTION) {
             inputHandler.takeInput();
@@ -233,6 +240,29 @@ public class SkinSelection {
                 textInsideBox(ACCESSORY_CHOOSE_BOX, "❎", color, accessoryFont);
             }
         }
+    }
+
+    private class BuffDrawingUI {
+
+        private static final double BOXES_X = 2 * TILE_SIDE;
+        private static final double BOXES_Y_START = 2 * TILE_SIDE;
+        private static final double BOXES_Y_SHIFT = 1.5 * TILE_SIDE;
+
+        private static final double BUFF_MULTIPLIER = 2.0;
+
+        public void setBuffLocations() {
+            for (int i = 0; i<buffs.size(); i++) {
+                Buff buff = buffs.get(i);
+                buff.setCenterCoordinates(BOXES_X, BOXES_Y_START + i * BOXES_Y_SHIFT);
+            }
+        }
+
+        public void draw() {
+            for (Buff buff : buffs) {
+                buff.drawBig(BUFF_MULTIPLIER);
+            }
+        }
+
     }
 
     // move to level selection or shop
