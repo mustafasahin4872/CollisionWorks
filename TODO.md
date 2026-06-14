@@ -20,11 +20,11 @@
 
 ### New Elements
 - [ ] Add buff system
-  - [v] Buff shrinking and growing animation is vibrating
-  - [v] Buff shrinking and growing animation should stop when bought
-  - [v] Buff buying logic - calls playerontop -> change to calling buff.expire() only
-  - [v] Add buffs to shop
-  - [v] Display permanentbuffs in skinselection
+  - [x] Buff shrinking and growing animation is vibrating
+  - [x] Buff shrinking and growing animation should stop when bought
+  - [x] Buff buying logic - calls playerontop -> change to calling buff.expire() only
+  - [x] Add buffs to shop
+  - [x] Display permanentbuffs in skinselection
   - [ ] Add buffs to mapmaker
   - [ ] BUFFS IDEA: (decide whether to implement or not)
       - [ ] player should hold a in-game buffs list (not gamestate)
@@ -36,32 +36,32 @@
 - [ ] in-between levels content
   - [ ] add shop
   - [ ] add random rewards
-- [v] Create a separate SelectionScreen similar to GameScreen
+- [x] Create a separate SelectionScreen similar to GameScreen
 
 ### Core Refactoring
 - [ ] Tidy up Player class
 - [ ] Decouple currencies from Player and move to GameState
 - [ ] Tidy up GameMap class
-- [v] Add a cooldown to the input taking logic, separate the drawing logic pauses from it
-- [v] Tidy up Selection system
-  - [v] separate level selection and skin/accessory selection altogether
-  - [v] separate shop
-  - [v] finalize the Selection classes
-- [v] Shop logic
-  - [v] Fill shop logic
-  - [v] Add ShopEntry to tidy shop logic
-  - [v] Finalize shop logic
+- [x] Add a cooldown to the input taking logic, separate the drawing logic pauses from it
+- [x] Tidy up Selection system
+  - [x] separate level selection and skin/accessory selection altogether
+  - [x] separate shop
+  - [x] finalize the Selection classes
+- [x] Shop logic
+  - [x] Fill shop logic
+  - [x] Add ShopEntry to tidy shop logic
+  - [x] Finalize shop logic
 
 
 ### Rendering Architecture
 - [ ] Fix Player drawing responsibility (currently draws too much)
 - [ ] Move projectile rendering into always-called objects system (planned)
-- [v] Ensure HP bars and effects remain in game loop only
+- [x] Ensure HP bars and effects remain in game loop only
 
 ### Documentation & Project Management
 - [ ] Get rid of unnecessary warnings
-- [v] Add proper documentation
-- [v] Start structured Git tracking (commits, feature branches, etc.)
+- [x] Add proper documentation
+- [x] Start structured Git tracking (commits, feature branches, etc.)
 
 ---
 
@@ -127,7 +127,7 @@
 
 ## ✨ NEW GAME MECHANICS
 
-- [v] Buff system implementation:
+- [x] Buff system implementation:
     - Fast
     - Small
     - Immune
@@ -145,10 +145,10 @@
     - Coin collection sound
     - Critical health background change
 
-- [v] Shop system design:
+- [x] Shop system design:
     - Start with "Crystal Palace" concept
 
-- [v] Add signal handling system:
+- [x] Add signal handling system:
     - Next level
     - Shop
     - Selection
@@ -164,7 +164,7 @@
 
 ### Skins
 - [ ] Add big/small size skin variants
-- [v] Add sakura skin
+- [x] Add sakura skin
 - [ ] add a ghost as a skin - twist! it can pass through walls
 
 ### Entities
@@ -172,7 +172,7 @@
 - [ ] Moving monsters
 
 ### Worlds
-- [v] Add World 4
+- [x] Add World 4
 
 ### Levels
 - [ ] start designing levels
