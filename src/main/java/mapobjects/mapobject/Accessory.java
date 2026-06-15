@@ -37,7 +37,7 @@ public abstract class Accessory extends MapObject {
     }
 
     public void resetSize() {
-        double scale = player.getDefaultSide() / TILE_SIDE;
+        double scale = player.getBaseSide() / TILE_SIDE;
         setWidth(defaultWidth * scale);
         setHeight(defaultHeight * scale);
     }

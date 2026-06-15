@@ -96,9 +96,8 @@ public class HPBar {
         HP = maxHP;
     }
 
-    public void restart() {
+    public void resetLives() {
         lives = maxLives;
-        revive();
     }
 
 

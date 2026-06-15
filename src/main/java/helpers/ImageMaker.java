@@ -14,7 +14,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import mapobjects.mapobject.Ghost.ghostTypes;
-import mapobjects.mapobject.Player;
 
 import static game.Main.IMAGES_ROOT;
 import static game.Main.RESOURCES_ROOT;
@@ -67,7 +66,7 @@ public class ImageMaker {
             new Color(124, 17, 131)     // pupilOutline
         });
 
-        private final boolean isAnimated = PlayerData.valueOf(name()).isAnimated();
+        private final boolean isAnimated = PlayerDefaults.valueOf(name()).isAnimated();
         private final Color[] colors;
 
         PLAYERS(Color[] colors) {

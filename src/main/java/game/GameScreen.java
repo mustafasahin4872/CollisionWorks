@@ -57,7 +57,7 @@ public class GameScreen {
         coinAmount.update(coinsCollected);
         gemAmount.update(gemsCollected);
         lifeAmount.update(hpBar.getLives());
-        ammoBar.update(hpBar.getMaxHP(), player.getAmmo());
+        ammoBar.update(player.getAmmo());
         criticalHealthEffect.update(hpBar.getRemainingHPPercentage());
 
     }
@@ -243,23 +243,28 @@ public class GameScreen {
     //----------------------------------------------------------------------------------------------------------
 
     private static class HealthBar {
+
         private static final double THICKNESS = 2;
-        private static final double HALFHEIGHT = 12;
         private static final double DISTANCE = 15;
 
-        private final FrameBox outBox = new FrameBox(0, 0, 0, 0);
-        private final FrameBox inBox = new FrameBox(0, 0, 0, 0);
+        private static final double HEIGHT = 28;
+        private static final double WIDTH = 200;
+
+        private static final double IN_HEIGHT = HEIGHT - 2 * THICKNESS;
+        private static final double IN_WIDTH = WIDTH - 2 * THICKNESS;
+
+        private final FrameBox outBox = new FrameBox(DISTANCE + WIDTH/2, DISTANCE + HEIGHT/2, WIDTH, HEIGHT);
+        private final FrameBox inBox = new FrameBox(0, DISTANCE + THICKNESS + IN_HEIGHT/2, IN_WIDTH, IN_HEIGHT);
+
+        private double hp, maxHp;
 
         private void update(double maxHp, double hp) {
-            outBox.setCenterX(DISTANCE + (maxHp/2.0 + THICKNESS));
-            outBox.setCenterY(DISTANCE + (HALFHEIGHT + THICKNESS));
-            outBox.setWidth(maxHp + 2*THICKNESS);
-            outBox.setHeight(HALFHEIGHT*2 + 2*THICKNESS);
+            this.hp = hp;
+            this.maxHp = maxHp;
+            double width = IN_WIDTH * (hp / maxHp);
 
-            inBox.setCenterX(DISTANCE + (hp/2.0 + THICKNESS));
-            inBox.setCenterY(DISTANCE + (HALFHEIGHT + THICKNESS));
-            inBox.setWidth(hp);
-            inBox.setHeight(HALFHEIGHT*2);
+            inBox.setCenterX(DISTANCE + THICKNESS + width/2);
+            inBox.setWidth(width);
 
             outBox.update();
             inBox.update();
@@ -272,6 +277,11 @@ public class GameScreen {
             //the hp inside the outline
             StdDraw.setPenColor(StdDraw.GREEN);
             drawRectangle(inBox.getFrameBox());
+
+            Font font = new Font("Ariel", Font.BOLD, (int)HEIGHT/2);
+            String health = "%d/%d".formatted((int)hp, (int)maxHp);
+            textInsideBox(outBox.getFrameBox(), health, StdDraw.WHITE, font);
+
         }
 
     }
@@ -346,23 +356,46 @@ public class GameScreen {
 
     private static class AmmoBar {
 
-        private static final double HALFHEIGHT = 7;
-        private static final int DISTANCE = 15;
+        private static final int ANGLE = 45;
+        private static final double RADIANS = (ANGLE / 360.0) * 2 * Math.PI;
+        private static final double SINE = Math.sin(RADIANS);
+        private static final double COSINE = Math.cos(RADIANS);
+
+        private static final double DISTANCE = 14; // distance from HealthBar
+        private static final double HEIGHT = 14, WIDTH = 28; // one ammo's dimensions
+        private static final double EFF_W = Math.abs(WIDTH * COSINE) + Math.abs(HEIGHT * SINE);
+        private static final double EFF_H = Math.abs(WIDTH * SINE) + Math.abs(HEIGHT * COSINE);
+
         private int ammo;
+        private static final int MAX_AMMO_DRAWN = 10;
 
-        private final FrameBox frameBox = new FrameBox(0, DISTANCE + 16, HALFHEIGHT*4, HALFHEIGHT*2);
+        private final FrameBox firstAmmoBox = new FrameBox(
+            HealthBar.DISTANCE + HealthBar.WIDTH + DISTANCE + EFF_W / 2,
+            HealthBar.DISTANCE + EFF_H / 2,
+            EFF_W, EFF_H);
+        private final FrameBox lastAmmoBox = new FrameBox(
+            HealthBar.DISTANCE + HealthBar.WIDTH + DISTANCE + EFF_W / 2 + (MAX_AMMO_DRAWN - 1) * EFF_W,
+            HealthBar.DISTANCE + EFF_H / 2,
+            EFF_W, EFF_H);
 
-        private void update(double maxHp, int ammo) {
+        private void update(int ammo) {
             this.ammo = ammo;
-            frameBox.setCenterX(DISTANCE + maxHp + 4*HALFHEIGHT);
-            frameBox.update();
+            firstAmmoBox.update();
+            lastAmmoBox.update();
         }
 
         private void draw() {
-            Box box = frameBox.getFrameBox();
-            for (int i = 0; i<ammo; i++) {
-                StdDraw.picture(box.getCenterX() + HALFHEIGHT*4*i, box.getCenterY(), IMAGES_ROOT+"projectile/regularprojectile/0.png", HALFHEIGHT*4, HALFHEIGHT*2, 45);
+            Box box = firstAmmoBox.getFrameBox();
+            int ammoDrawn = Math.min(ammo, MAX_AMMO_DRAWN);
+
+            for (int i = 0; i<ammoDrawn; i++) {
+                    StdDraw.picture(box.getCenterX() + EFF_W*i, box.getCenterY(), IMAGES_ROOT+"projectile/regularprojectile/0.png", WIDTH, HEIGHT, 45);
             }
+            if (ammo>MAX_AMMO_DRAWN) { // does not display +0 or +1, starts from +2.
+                Font font = new Font("Ariel", Font.BOLD, (int)EFF_H/2);
+                textInsideBox(lastAmmoBox.getFrameBox(), "+" + (ammo - MAX_AMMO_DRAWN + 1), StdDraw.BLACK, font);
+            }
+
         }
 
     }

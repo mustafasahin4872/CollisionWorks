@@ -6,7 +6,7 @@ import helpers.InputHandler.ArrowData;
 import game.Main;
 import helpers.MapObjectGenerator;
 
-import helpers.PlayerData;
+import helpers.PlayerDefaults;
 import mapobjects.component.*;
 import mapobjects.category.*;
 
@@ -15,12 +15,33 @@ import java.util.Set;
 
 import static helpers.HelperMethods.*;
 
-public class Player extends MapObject implements MovingCollidable, Spawnable, HealthBearer, Timed {
+public class Player extends MapObject implements MovingCollidable, Spawnable, HealthBearer {
 
+    // initial fields that are unique to the player type
     private final String playerName;
     private final boolean animated;
-    private final double defaultSide;
 
+    // the base stats of a player
+    // they are kept in case of non-permanent buffs are needed to be reverted
+    // the permanent buff values are applied to here
+    private double baseSide;
+    private double baseMaxSpeed;
+    private double baseAcceleration;
+    private double baseDeceleration;
+    private int maxAmmo;
+
+    // positioning, moving and collision logic fields
+    private double spawnX, spawnY;
+    private double xVelocity, yVelocity;
+    private double maxSpeed, acceleration, deceleration;
+    private int xDirection, yDirection;
+    private boolean xCollided, yCollided;
+
+    // shooting logic fields
+    private boolean shoot;
+    private int ammo;
+
+    // player's collision, spawn, health, time components
     private final Box collisionBox;
     private final Spawner spawner;
     protected final Set<Projectile> projectiles = new HashSet<>();
@@ -28,18 +49,6 @@ public class Player extends MapObject implements MovingCollidable, Spawnable, He
     private final Timer reloadTimer, shootingCooldown;
 
 
-    private static final double
-            MAX_SPEED1 = 7.5, MAX_SPEED2 = 15, MAX_SPEED3 = 40,
-            A1 = 0.1, A2 = 0.4, A3 = 0.8, A4 = 1.6;
-
-    private double spawnX, spawnY, xVelocity, yVelocity, maxSpeed, acceleration, deceleration;
-    private int xDirection, yDirection;
-    private boolean xCollided, yCollided;
-
-    private boolean shoot;
-    private int maxAmmo = 5;
-    private int ammo = maxAmmo;
-    private static final int MAX_LIVES = 3;
 
     protected Accessory[] accessories;
 
@@ -52,21 +61,39 @@ public class Player extends MapObject implements MovingCollidable, Spawnable, He
     }
 
     public Player(String playerName) {
+
         super(0,0, 0, 0, 0, playerName);
         this.playerName = playerName;
-        PlayerData playerData = PlayerData.valueOf(playerName);
-        this.animated = playerData.isAnimated();
-        this.imageType = playerData.getImageType();
-        defaultSide = playerData.getDefaultSide();
-        setWidth(defaultSide);
-        setHeight(defaultSide);
+
+        PlayerDefaults playerDefaults = PlayerDefaults.valueOf(playerName);
+
+        animated = playerDefaults.isAnimated();
+        imageType = playerDefaults.getImageType();
+
+        baseMaxSpeed = playerDefaults.getMaxSpeed();
+        baseAcceleration = playerDefaults.getAcceleration();
+        baseDeceleration = playerDefaults.getDeceleration();
+        baseSide = playerDefaults.getSide();
+
+        setWidth(baseSide);
+        setHeight(baseSide);
+
+        int defaultMaxLives = playerDefaults.getMaxLives();
+        double defaultMaxHP = playerDefaults.getMaxHP();
+        double defaultDef = playerDefaults.getDefence();
+        hpBar = new HPBar(defaultMaxHP, defaultMaxLives, defaultDef);
+
+        maxAmmo = playerDefaults.getMaxAmmo();
+        ammo = maxAmmo;
+        int reloadTime = playerDefaults.getReloadTime();
+        int shootCooldown = playerDefaults.getShootCooldown();
+        reloadTimer = new Timer(0, reloadTime);
+        shootingCooldown = new Timer(0, shootCooldown);
+        reloadTimer.activate();
 
         collisionBox = positionBox.clone();
         spawner = new Spawner(worldIndex, getX(), getY());
-        hpBar = new HPBar(defaultSide*4, MAX_LIVES, 0);
-        reloadTimer = new Timer(0, 1000);
-        shootingCooldown = new Timer(0, 100);
-        reloadTimer.activate();
+
         respawn();
     }
 
@@ -77,9 +104,9 @@ public class Player extends MapObject implements MovingCollidable, Spawnable, He
 
         checkDead();
 
-        if (!isComplete()) {timeIsUp(this);}
-        if (isActive()) {reload();}
-        updateTimer();
+        if (!reloadTimer.isCompleted()) {reloadTimer.activate();}
+        if (reloadTimer.isActive()) {reload();}
+        reloadTimer.tick();
         shootingCooldown.tick();
 
         if (shoot) {
@@ -87,6 +114,7 @@ public class Player extends MapObject implements MovingCollidable, Spawnable, He
                 shootingCooldown.activate();
                 spawn();
                 ammo--;
+                reloadTimer.startCooldown();
             }
             shoot = false;
         }
@@ -220,7 +248,7 @@ public class Player extends MapObject implements MovingCollidable, Spawnable, He
     public void setAccessories(Accessory[] accessories) {
         this.accessories = accessories;
         for (Accessory accessory : accessories) {
-            accessory.resize(defaultSide/50);
+            accessory.resize(baseSide /50);
         }
     }
 
@@ -239,16 +267,6 @@ public class Player extends MapObject implements MovingCollidable, Spawnable, He
         double speed = Math.sqrt(xVelocity * xVelocity + yVelocity * yVelocity);
         Projectile projectile = mapObjectGenerator.mutateToRegularProjectile(20, 10, direction, speed + Projectile.DEFAULT_INITIAL_SPEED);
         projectiles.add(projectile);
-    }
-
-    @Override
-    public Timer getTimer() {
-        return reloadTimer;
-    }
-
-    @Override
-    public void timeIsUp(Player player) {
-        activateTimer();
     }
 
     private void reload() {
@@ -293,15 +311,21 @@ public class Player extends MapObject implements MovingCollidable, Spawnable, He
     //MOVEMENTS
 
     public void slip() {
-        setAcceleration(A1);
-        setDeceleration(A1);
-        setMaxSpeed(MAX_SPEED3);
+        double a = 0.12 * baseAcceleration;
+        double s = 3 * baseMaxSpeed;
+        setAcceleration(a);
+        setDeceleration(a);
+        setMaxSpeed(s);
     }
 
     public void slow() {
-        setAcceleration(A1);
-        setDeceleration(A4);
-        setMaxSpeed(MAX_SPEED1);
+        double a = 0.12 * baseAcceleration;
+        double d = 2 * baseAcceleration;
+        double s = 0.5 * baseMaxSpeed;
+
+        setAcceleration(a);
+        setDeceleration(d);
+        setMaxSpeed(s);
     }
 
     @Override
@@ -328,28 +352,28 @@ public class Player extends MapObject implements MovingCollidable, Spawnable, He
         return yVelocity;
     }
 
-    public void setXVelocity(double xVelocity) {
+    private void setXVelocity(double xVelocity) {
         this.xVelocity = xVelocity;
     }
 
-    public void setYVelocity(double yVelocity) {
+    private void setYVelocity(double yVelocity) {
         this.yVelocity = yVelocity;
     }
 
-    public void setMaxSpeed(double maxSpeed) {
+    private void setMaxSpeed(double maxSpeed) {
         this.maxSpeed = maxSpeed;
     }
 
     public void resetMaxSpeed() {
-        maxSpeed = MAX_SPEED2;
+        maxSpeed = baseMaxSpeed;
     }
 
-    public void setDeceleration(double deceleration) {
+    private void setDeceleration(double deceleration) {
         this.deceleration = deceleration;
     }
 
     public void resetDeceleration() {
-        deceleration = A3;
+        deceleration = baseDeceleration;
     }
 
     public void setAcceleration(double acceleration) {
@@ -357,7 +381,7 @@ public class Player extends MapObject implements MovingCollidable, Spawnable, He
     }
 
     public void resetAcceleration() {
-        acceleration = A3;
+        acceleration = baseAcceleration;
     }
 
 
@@ -373,13 +397,13 @@ public class Player extends MapObject implements MovingCollidable, Spawnable, He
 
     //SIZE
 
-    public double getDefaultSide() {
-        return defaultSide;
+    public double getBaseSide() {
+        return baseSide;
     }
 
     public void resetSize() {
-        setWidth(defaultSide);
-        setHeight(defaultSide);
+        setWidth(baseSide);
+        setHeight(baseSide);
     }
 
 
@@ -413,7 +437,7 @@ public class Player extends MapObject implements MovingCollidable, Spawnable, He
 
     public void restart() {
         //TODO: CHECK IF THERE ARE MORE FIELDS THAT NEED RESETTING
-        hpBar.restart();
+        hpBar.resetLives();
         respawn();
     }
 

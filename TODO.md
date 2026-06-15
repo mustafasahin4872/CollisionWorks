@@ -45,7 +45,11 @@
 
 ### Core Refactoring
 - [ ] Tidy up Player class
-  - [ ] Decouple currencies from Player and move to GameState
+  - [x] Decouple currencies from Player and move to GameState
+  - [x] Decouple lastcheckpointindex from Player and move to Point as a static variable 
+  - [x] Decouple innate player field initiations like defaultWidth or default accelaration from player class, move them to a new PlayerData class.
+  - [ ] Create a dummy player type aside from Bob
+  - [ ] Fix reset functions to reset ALL variables
 - [ ] Tidy up GameMap class
 - [x] Add a cooldown to the input taking logic, separate the drawing logic pauses from it
 - [x] Tidy up Selection system
