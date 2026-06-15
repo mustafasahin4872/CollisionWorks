@@ -41,8 +41,6 @@ public class Player extends MapObject implements MovingCollidable, Spawnable, He
     private int ammo = maxAmmo;
     private static final int MAX_LIVES = 3;
 
-    private int lastCheckPointIndex;
-
     protected Accessory[] accessories;
 
 
@@ -419,26 +417,11 @@ public class Player extends MapObject implements MovingCollidable, Spawnable, He
         respawn();
     }
 
-    //CHECKPOINT AND SPAWN POINT
-    /// TODO: LAST CHECKPOINT INDEX INFO MUST BELONG TO MAP!!!
-    /// SPAWNPOINT SHOULD STILL BELONG TO PLAYER
-
     public void setSpawnPoint(double[] spawnPoint) {
         spawnX = spawnPoint[0];
         spawnY = spawnPoint[1];
     }
 
-    public void updateLastCheckPointIndex() {
-        lastCheckPointIndex++;
-    }
-
-    public int getLastCheckPointIndex() {
-        return lastCheckPointIndex;
-    }
-
-    public void resetLastCheckPointIndex() {
-        lastCheckPointIndex = 0;
-    }
 
     //DRAW METHODS
 

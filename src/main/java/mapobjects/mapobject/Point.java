@@ -75,6 +75,7 @@ public abstract class Point extends GridObject implements OnEffector {
         private CheckPoint prev;
         protected boolean visited;
         private static final Sign ERROR_SIGN = new Sign(0, 0, 0, new String[]{"first unlock the previous checkpoint"}, false);
+        private static int lastCheckPointIndex;
 
         public CheckPoint(int worldIndex, int xNum, int yNum, int index) {
             this(worldIndex, xNum, yNum, index, false);
@@ -85,6 +86,9 @@ public abstract class Point extends GridObject implements OnEffector {
             effectBox = positionBox.clone();
         }
 
+        public static void resetLastCheckPointIndex() {
+            lastCheckPointIndex = 0;
+        }
 
         @Override
         public Box getEffectBox() {
@@ -99,7 +103,6 @@ public abstract class Point extends GridObject implements OnEffector {
 
         @Override
         public void playerIsOn(Player player) {
-            int lastCheckPointIndex = player.getLastCheckPointIndex();
 
             if (index == lastCheckPointIndex + 1) {
                 markVisited(player);
@@ -112,7 +115,7 @@ public abstract class Point extends GridObject implements OnEffector {
             visited = true;
             setName("0");
             if (prev != null) prev.setName("-1");
-            player.updateLastCheckPointIndex();
+            lastCheckPointIndex++;
             player.setSpawnPoint(getCenterCoordinates());
         }
 

@@ -280,7 +280,7 @@ points can have the indicator B for big displays, special to the selection scree
                 currentCheckPoint.setPrev(checkPoints[i-1]);
             } else {
                 player.setSpawnPoint(currentCheckPoint.getCenterCoordinates());
-                player.resetLastCheckPointIndex();
+                Point.CheckPoint.resetLastCheckPointIndex();
                 player.respawn();
                 spawnPoint = currentCheckPoint.getCenterCoordinates();
             }

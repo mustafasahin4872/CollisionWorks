@@ -72,14 +72,15 @@
 
 ## ⚠️ CRITICAL ISSUES
 
+- [ ] In between maps do not create their doors???
+
 ### Restart / Exit System
 - [ ] Restart does not reset full map state
-    - Player HP resets correctly
-    - Map data does NOT reset
-    - Enemies remain active after restart
-- [ ] Fix persistent player stats (e.g. coin amount)
-- [ ] Fix leftover world state after restart
-- [ ] In between maps do not create their doors???
+    - [x] Player HP resets correctly
+    - [ ] Map data does NOT reset
+    - [ ] Enemies remain active after restart
+    - [x] Fix persistent player stats (e.g. coin amount)
+    - [x] Fix leftover world state after restart
 
 ### Win State System
 - [ ] Define and document win point logic clearly
