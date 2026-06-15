@@ -36,7 +36,7 @@ public class GameState {
     //------------------------------------------------------------------------------------------------------------------
     //------------------------------------------------------------------------------------------------------------------
 
-    private final ArrayList<Player> skins = new ArrayList<>(List.of(new Player.RegularPlayer()));
+    private final ArrayList<Player> skins = new ArrayList<>(List.of(new Player()));
     private final ArrayList<Accessory> accessories = new ArrayList<>();
     private final ArrayList<Buff> permanentBuffs = new ArrayList<>();
 
@@ -47,8 +47,8 @@ public class GameState {
     //------------------------------------------------------------------------------------------------------------------
 
     private final List<ShopEntry<Player>> buyableSkins = List.of(
-        new ShopEntry<>(new Player.AnimatedPlayer("Mike"), 0, true),
-        new ShopEntry<>(new Player.AnimatedPlayer("Sakura"), 0, true)
+        new ShopEntry<>(new Player("Mike"), 0, true),
+        new ShopEntry<>(new Player("Sakura"), 0, true)
     );
 
     private final List<ShopEntry<Accessory>> buyableAccessories = List.of(
@@ -77,14 +77,14 @@ public class GameState {
 
 
     public GameState() {
-        this.player = new Player.RegularPlayer();
+        this.player = new Player();
         accessories.add(null);
     }
 
     public GameState(int worldIndex, int levelIndex) {
         this.worldIndex = worldIndex;
         this.levelIndex = levelIndex;
-        this.player = new Player.RegularPlayer();
+        this.player = new Player();
         accessories.add(null);
 
     }

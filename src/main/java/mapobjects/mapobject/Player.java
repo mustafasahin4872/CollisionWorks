@@ -1,22 +1,25 @@
 package mapobjects.mapobject;
 
+import game.Frame;
 import game.GameState;
 import helpers.InputHandler.ArrowData;
 import game.Main;
 import helpers.MapObjectGenerator;
 
+import helpers.PlayerData;
 import mapobjects.component.*;
 import mapobjects.category.*;
-
 
 import java.util.HashSet;
 import java.util.Set;
 
 import static helpers.HelperMethods.*;
 
-public abstract class Player extends MapObject implements MovingCollidable, Spawnable, HealthBearer, Timed {
+public class Player extends MapObject implements MovingCollidable, Spawnable, HealthBearer, Timed {
 
     private final String playerName;
+    private final boolean animated;
+    private final double defaultSide;
 
     private final Box collisionBox;
     private final Spawner spawner;
@@ -24,7 +27,6 @@ public abstract class Player extends MapObject implements MovingCollidable, Spaw
     protected final HPBar hpBar;
     private final Timer timer, shootingCooldown;
 
-    private final double defaultSide;
 
     private static final double
             MAX_SPEED1 = 7.5, MAX_SPEED2 = 15, MAX_SPEED3 = 40,
@@ -53,13 +55,15 @@ public abstract class Player extends MapObject implements MovingCollidable, Spaw
     }
 
     public Player(String playerName) {
-        this(playerName, "jpg");
-    }
-
-    public Player(String playerName, String imageType) {
-        super(0,0, 0, getDefaultSide(playerName), getDefaultSide(playerName), playerName, imageType);
+        super(0,0, 0, 0, 0, playerName);
         this.playerName = playerName;
-        defaultSide = getDefaultSide(playerName);
+        PlayerData playerData = PlayerData.valueOf(playerName);
+        this.animated = playerData.isAnimated();
+        this.imageType = playerData.getImageType();
+        defaultSide = playerData.getDefaultSide();
+        setWidth(defaultSide);
+        setHeight(defaultSide);
+
         collisionBox = positionBox.clone();
         spawner = new Spawner(worldIndex, getX(), getY());
         hpBar = new HPBar(defaultSide*4, MAX_LIVES, 0);
@@ -67,21 +71,6 @@ public abstract class Player extends MapObject implements MovingCollidable, Spaw
         shootingCooldown = new Timer(0, 100);
         timer.activate();
         respawn();
-    }
-
-
-    public String getName() {
-        return super.name;
-    }
-
-    private static double getDefaultSide(String playerName) {
-        final double defaultSide;
-        defaultSide = switch (playerName) {
-            case "Bob", "Mike" -> 50;
-            case "Sakura" -> 40;
-            default -> 50;
-        };
-        return defaultSide;
     }
 
 
@@ -118,7 +107,7 @@ public abstract class Player extends MapObject implements MovingCollidable, Spaw
         }
         //player's projectiles are not checking player collisions
         for (Projectile projectile : projectiles) {
-            projectile.call(new Player.RegularPlayer(), layers);
+            projectile.call(new Player(), layers);
         }
         projectiles.removeIf(Projectile::isExpired);
     }
@@ -136,10 +125,10 @@ public abstract class Player extends MapObject implements MovingCollidable, Spaw
     public void update() {
 
         if (!isXCollided()) {
-            setX(getX()+ getXVelocity() * game.Frame.DT);
+            setX(getX()+ getXVelocity() * Frame.DT);
         }
         if (!isYCollided()) {
-            setY(getY() + getYVelocity() * game.Frame.DT);
+            setY(getY() + getYVelocity() * Frame.DT);
         }
         xCollided = false;
         yCollided = false;
@@ -163,7 +152,7 @@ public abstract class Player extends MapObject implements MovingCollidable, Spaw
 
     public void updateVelocity() {
 
-        final double DT = game.Frame.DT;
+        final double DT = Frame.DT;
         final double SQRT2 = Math.sqrt(2);
 
         double effectiveAccelX = acceleration;
@@ -464,128 +453,75 @@ public abstract class Player extends MapObject implements MovingCollidable, Spaw
 
     //DRAW METHODS
 
-    public abstract void drawBig(double multiplier);
+    public void draw() {
 
+        drawProjectiles();
 
-    public static class RegularPlayer extends Player {
-
-        public RegularPlayer() {
+        StringBuilder name = new StringBuilder();
+        name.append(getPlayerName()).append("/").append(getDirectionString(getXDirection(), getYDirection()));
+        if (animated) {
+            int currentAnimationNum = getCurrentAnimationNum();
+            name.append("_").append(currentAnimationNum);
         }
+        setName(name.toString());
 
-        public RegularPlayer(String playerName) {
-            super(playerName);
-        }
+        super.draw();
 
-        public void draw() {
-
-            for (Projectile projectile : projectiles) projectile.draw();
-
-            setName(getPlayerName() + "/" + getDirectionString(getXDirection(), getYDirection()));
-
-            super.draw();
-
-            if (accessories != null) {
-                for (Accessory accessory : accessories) {
-                    accessory.draw();
-                }
-            }
-
-        }
-
-        public void drawBig(double multiplier) {
-            resize(multiplier);
-
-            setName(getPlayerName() + "/" + getDirectionString(getXDirection(), getYDirection()));
-
-            super.draw();
-
-            resetSize();
-
-            if (accessories != null) {
-                for (Accessory accessory : accessories) {
-                    accessory.drawBig(multiplier);
-                }
+        if (accessories != null) {
+            for (Accessory accessory : accessories) {
+                accessory.draw();
             }
         }
 
     }
 
-    public static class AnimatedPlayer extends Player {
+    public void drawBig(double multiplier) {
+        resize(multiplier);
 
-        private final Timer animationTimer;
-        private final int animationNumber;
-
-        public AnimatedPlayer(String name) {
-            super(name, "png");
-            animationTimer = new Timer(300, 3000);
-            this.animationNumber = switch (name) {
-                case "Mike" -> 6;
-                default -> 6;
-            };
-        }
-
-        @Override
-        public void call(GridObject[][][] layers) {
-            updateAnimationTimer();
-            super.call(layers);
-        }
-
-        @Override
-        public void draw() {
-
-            for (Projectile projectile : projectiles) projectile.draw();
-
+        StringBuilder name = new StringBuilder();
+        name.append(getPlayerName()).append("/").append(getDirectionString(getXDirection(), getYDirection()));
+        if (animated) {
             int currentAnimationNum = getCurrentAnimationNum();
-
-            setName(getPlayerName() + "/" + getDirectionString(getXDirection(), getYDirection()) + "_" + currentAnimationNum);
-
-            super.draw();
-
-            if (accessories != null) {
-                for (Accessory accessory : accessories) {
-                    accessory.draw();
-                }
-            }
-
+            name.append("_").append(currentAnimationNum);
         }
+        setName(name.toString());
 
-        @Override
-        public void drawBig(double multiplier) {
+        super.draw();
 
-            updateAnimationTimer();
+        resetSize();
 
-            int currentAnimationNum = getCurrentAnimationNum();
-
-            setName(getPlayerName() + "/" + getDirectionString(getXDirection(), getYDirection()) + "_" + currentAnimationNum);
-
-            resize(multiplier);
-
-            super.draw();
-
-            resetSize();
-        }
-
-
-        private int getCurrentAnimationNum() {
-            double progressRatio = animationTimer.progressRatio() * 100;
-            int steps = 2 * (animationNumber - 1); // e.g., 6 for animationNumber = 4
-            double segmentSize = 100.0 / steps;
-
-            int segment = Math.min((int)(progressRatio / segmentSize), steps - 1);
-
-            if (segment < animationNumber) {
-                return segment; // ramping up: 0 to animationNumber - 1
-            } else {
-                return steps - segment; // ramping down
+        if (accessories != null) {
+            for (Accessory accessory : accessories) {
+                accessory.drawBig(multiplier);
             }
         }
+    }
 
-        private void updateAnimationTimer() {
-            animationTimer.tick();
-            if (!animationTimer.isActive() && !animationTimer.isCompleted()) {
-                animationTimer.activate();
-            }
+    private int getCurrentAnimationNum() {
+
+        int animationNumber = 6;
+        int blinkDuration = 300;
+        int eyeOpenDuration = 3000;
+        int total = blinkDuration + eyeOpenDuration;
+
+        long delta = System.currentTimeMillis() - Main.GAME_START;
+        double progress = (delta % total) - eyeOpenDuration;
+        if (progress < 0) progress = 0;
+        double progressRatio = progress / blinkDuration;
+
+        int steps = 2 * (animationNumber - 1); // steps = 10 for animationNumber = 6
+        int currentStep = (int)(progressRatio * steps);
+
+        if (currentStep < animationNumber) {
+            return currentStep; // ramping up: 0 to animationNumber - 1
+        } else {
+            return steps - currentStep; // ramping down
         }
+        // 0(cooldown) - 1 - 2 - 3 - 4 - 5 - 4 - 3 - 2 - 1 - 0(cooldown)
+    }
+
+    public void drawProjectiles() {
+        for (Projectile projectile : projectiles) projectile.draw();
     }
 
 }

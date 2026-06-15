@@ -17,7 +17,7 @@ public abstract class Accessory extends MapObject {
 
     public Accessory(String accessoryName, double defaultWidth, double defaultHeight) {
         super(0, 0, 0, defaultWidth, defaultHeight, accessoryName+"/0");
-        this.player = new Player.RegularPlayer(); // replaced later
+        this.player = new Player(); // replaced later
         this.accessoryName = accessoryName;
         this.defaultWidth = defaultWidth;
         this.defaultHeight = defaultHeight;

@@ -40,7 +40,7 @@
 
 ### Core Refactoring
 - [ ] Tidy up Player class
-- [ ] Decouple currencies from Player and move to GameState
+  - [ ] Decouple currencies from Player and move to GameState
 - [ ] Tidy up GameMap class
 - [x] Add a cooldown to the input taking logic, separate the drawing logic pauses from it
 - [x] Tidy up Selection system

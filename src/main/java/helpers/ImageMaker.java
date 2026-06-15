@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import mapobjects.mapobject.Ghost.ghostTypes;
+import mapobjects.mapobject.Player;
 
 import static game.Main.IMAGES_ROOT;
 import static game.Main.RESOURCES_ROOT;
@@ -44,8 +45,10 @@ public class ImageMaker {
     //------------------------------------------------------------------------------------------------------------------
     //------------------------------------------------------------------------------------------------------------------
 
+    private static final int ANIMATION_NUMBER = 6;
+
     public enum PLAYERS {
-        Mike(6, new Color[]{
+        Mike(new Color[]{
             new Color(3, 196, 205),     // bodyColor -> _
             new Color(242, 242, 242),   // eyeWhite -> 0
             new Color(236, 125, 35),    // eyeOutline -> *
@@ -54,7 +57,7 @@ public class ImageMaker {
             new Color(242, 223, 56),    // pupilColor -> .
             new Color(0, 0, 0)          // pupilOutline -> X, =
         }),
-        Sakura(6, new Color[]{
+        Sakura(new Color[]{
             new Color(222, 124, 222),   // bodyColor
             new Color(242, 242, 242),   // eyeWhite
             new Color(177, 45, 192),    // eyeOutline
@@ -64,20 +67,20 @@ public class ImageMaker {
             new Color(124, 17, 131)     // pupilOutline
         });
 
-        private final int animationNum;
+        private final boolean isAnimated = PlayerData.valueOf(name()).isAnimated();
         private final Color[] colors;
 
-        PLAYERS(int animationNum, Color[] colors) {
-            this.animationNum = animationNum;
+        PLAYERS(Color[] colors) {
             this.colors = colors;
         }
 
     }
 
     private static void createAnimationFrames(PLAYERS animatedPlayer) {
+        int animationNumber = (animatedPlayer.isAnimated) ? (ANIMATION_NUMBER) : 1;
         for (int i = -1; i<2; i++) { // x direction
             for (int j = -1; j<2; j++) { // y direction
-                for (int k = 0; k<animatedPlayer.animationNum; k++) {
+                for (int k = 0; k<animationNumber; k++) {
                     createCharacterFrame(animatedPlayer, i, j, k);
                 }
             }
@@ -202,13 +205,16 @@ public class ImageMaker {
         // === Save ===
         String direction = getDirectionString(xDirection, yDirection);
         String path;
-        if (animatedPlayer.animationNum == 1) {
+        if (animatedPlayer.isAnimated) {
             path = IMAGES_ROOT + "player/regularplayer/" + name + "/" + direction + ".png";
+            File output = new File(path);
+            createPng(bufferedImage, output);
         } else {
             path = IMAGES_ROOT + "player/animatedplayer/" + name + "/" + direction + "_" + animationNumber + ".png";
+            File output = new File(path);
+            createJpg(bufferedImage, output);
         }
-        File output = new File(path);
-        createPng(bufferedImage, output);
+
     }
 
 
