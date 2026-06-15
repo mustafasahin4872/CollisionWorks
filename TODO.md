@@ -20,6 +20,13 @@
 
 ### New Elements
 
+- [ ] ADD GUNS!!!
+  - [x] move the spawn logic to guns from the player
+  - [x] the basic initiation of guns are done in playerDefaults class
+  - [ ] add gun types, different spawn logics
+  - [ ] add guns to the shop
+  - [x] fix spawner class!
+- [ ] New button - screen: Info about player and buff stats.
 - [ ] Lock levels and keep the last unlocked level index inside gamestate
   - [ ] draw chains on locked level boxes
   - [ ] keep passed level indexes in gamestate

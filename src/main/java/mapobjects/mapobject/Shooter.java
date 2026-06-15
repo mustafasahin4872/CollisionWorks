@@ -2,10 +2,7 @@ package mapobjects.mapobject;
 
 import game.Frame;
 import helpers.MapObjectGenerator;
-import mapobjects.component.Box;
-import mapobjects.component.HPBar;
-import mapobjects.component.Spawner;
-import mapobjects.component.Timer;
+import mapobjects.component.*;
 import mapobjects.category.*;
 
 import java.util.HashSet;
@@ -104,7 +101,7 @@ public abstract class Shooter extends GridObject implements Collidable, Timed, S
     @Override
     public void spawn() {
         MapObjectGenerator mapObjectGenerator;
-        mapObjectGenerator = spawner.summonSpawn(type);
+        mapObjectGenerator = spawner.summonSpawn(getX(), getY(), type);
         int d = switch (type) {
             case RIGHT -> 0;
             case UP -> 270;
@@ -177,7 +174,7 @@ public abstract class Shooter extends GridObject implements Collidable, Timed, S
 
         @Override
         public void spawn() {
-            MapObjectGenerator mapObjectGenerator = spawner.directionSpawn(player.getCenterCoordinates(), 50);
+            MapObjectGenerator mapObjectGenerator = spawner.directionSpawn(getCenterCoordinates(), player.getCenterCoordinates(), 50);
             Projectile projectile = mapObjectGenerator.mutateToRegularProjectile(0);
             projectile.rotate(player.getCenterCoordinates());
             projectiles.add(projectile);
@@ -198,8 +195,8 @@ public abstract class Shooter extends GridObject implements Collidable, Timed, S
 
         @Override
         public void spawn() {
-            MapObjectGenerator mapObjectGenerator = spawner.directionSpawn(player.getCenterCoordinates(), 50);
-            Projectile projectile = mapObjectGenerator.mutateToHomingProjectile(0, I);
+            MapObjectGenerator mapObjectGenerator = spawner.directionSpawn(getCenterCoordinates(), player.getCenterCoordinates(), 50);
+            Projectile projectile = mapObjectGenerator.mutateToHomingProjectile(0, I, 20);
             projectile.rotate(player.getCenterCoordinates());
             projectiles.add(projectile);
         }
@@ -270,7 +267,6 @@ public abstract class Shooter extends GridObject implements Collidable, Timed, S
             positionBox.yShift(yVelocity * Frame.DT);
             collisionBox.xShift(xVelocity * Frame.DT);
             collisionBox.yShift(yVelocity * Frame.DT);
-            spawner.setCenterCoordinates(getX(), getY());
         }
 
 
@@ -308,14 +304,12 @@ public abstract class Shooter extends GridObject implements Collidable, Timed, S
         public void setX(double x) {
             super.setX(x);
             collisionBox.setCenterX(x);
-            spawner.setCenterCoordinates(x, getY());
         }
 
         @Override
         public void setY(double y) {
             super.setY(y);
             collisionBox.setCenterY(y);
-            spawner.setCenterCoordinates(getX(), y);
         }
     }
 

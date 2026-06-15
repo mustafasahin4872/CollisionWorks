@@ -1,10 +1,12 @@
 package helpers;
 
+import mapobjects.mapobject.Gun.GunType;
+
 public enum PlayerDefaults {
 
-    Bob(false, "jpg", 50, MovingTypes.DEFAULT, HealthTypes.DEFAULT, GunTypes.DEFAULT),
-    Mike(true, "png", 50, MovingTypes.FAST, HealthTypes.FRAGILE, GunTypes.UZI),
-    Sakura(true, "png", 40, MovingTypes.DEFAULT, HealthTypes.RECURRING, GunTypes.PACIFIST);
+    Bob(false, "jpg", 50, MovingTypes.DEFAULT, HealthTypes.DEFAULT, GunType.STAFF),
+    Mike(true, "png", 50, MovingTypes.FAST, HealthTypes.FRAGILE, GunType.UZI),
+    Sakura(true, "png", 40, MovingTypes.DEFAULT, HealthTypes.RECURRING, GunType.PACIFIST);
 
     private enum MovingTypes {
 
@@ -76,28 +78,6 @@ public enum PlayerDefaults {
 
     }
 
-    private enum GunTypes {
-
-        DEFAULT(5, 1000, 300, 20), // reload once per second
-        UZI(10, 400, 100, 10),
-        SHOTGUN(3, 2000, 600, 60),
-        PACIFIST(0, 1000, 1000, 0) // does not have ammo
-
-        ;
-
-        private final int maxAmmo;
-        private final int reloadTime; // in milliseconds
-        private final int cooldown;
-        private final double damagePerAmmo;
-
-        GunTypes(int maxAmmo, int reloadTime, int cooldown, double damagePerAmmo) {
-            this.maxAmmo = maxAmmo;
-            this.reloadTime = reloadTime;
-            this.cooldown = cooldown;
-            this.damagePerAmmo = damagePerAmmo;
-        }
-
-    }
 
     private final boolean animated;
     private final String imageType;
@@ -108,12 +88,9 @@ public enum PlayerDefaults {
     private final int maxLives;
     private final double maxHP;
     private final double defence;
-    private final int maxAmmo;
-    private final int reloadTime;
-    private final int shootCooldown;
-    private final double damagePerAmmo;
+    private final GunType gunType;
 
-    PlayerDefaults(boolean animated, String imageType, double side, MovingTypes movingTypes, HealthTypes healthTypes, GunTypes gunTypes) {
+    PlayerDefaults(boolean animated, String imageType, double side, MovingTypes movingTypes, HealthTypes healthTypes, GunType gunType) {
         this.animated = animated;
         this.imageType = imageType;
         this.side = side;
@@ -123,10 +100,7 @@ public enum PlayerDefaults {
         this.maxLives = healthTypes.maxLives;
         this.maxHP = healthTypes.maxHP;
         this.defence = healthTypes.defence;
-        this.maxAmmo = gunTypes.maxAmmo;
-        this.reloadTime = gunTypes.reloadTime;
-        this.damagePerAmmo = gunTypes.damagePerAmmo;
-        this.shootCooldown = gunTypes.cooldown;
+        this.gunType = gunType;
     }
 
     public boolean isAnimated() {
@@ -165,20 +139,7 @@ public enum PlayerDefaults {
         return defence;
     }
 
-    public int getMaxAmmo() {
-        return maxAmmo;
+    public GunType getGunType() {
+        return gunType;
     }
-
-    public int getReloadTime() {
-        return reloadTime;
-    }
-
-    public int getShootCooldown() {
-        return shootCooldown;
-    }
-
-    public double getDamagePerAmmo() {
-        return damagePerAmmo;
-    }
-
 }

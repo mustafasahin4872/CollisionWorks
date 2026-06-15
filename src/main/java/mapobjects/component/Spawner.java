@@ -1,6 +1,5 @@
 package mapobjects.component;
 
-import mapobjects.mapobject.Player;
 import helpers.MapObjectGenerator;
 import mapobjects.category.GridObject;
 
@@ -15,14 +14,10 @@ import static mapobjects.category.GridObject.TILE_SIDE;
 public class Spawner {
 
     private final Set<MapObjectGenerator> spawnObjects;
-    private double centerX;
-    private double centerY;
     private final int worldIndex, xNum, yNum;
 
-    public Spawner(int worldIndex, double x, double y) {
+    public Spawner(int worldIndex) {
         this.worldIndex = worldIndex;
-        centerX = x;
-        centerY = y;
         xNum = 0;
         yNum = 0;
         spawnObjects = new HashSet<>();
@@ -32,12 +27,8 @@ public class Spawner {
         this.worldIndex = gridObject.getWorldIndex();
         this.xNum = gridObject.getXNum();
         this.yNum = gridObject.getYNum();
-        double[] centerCoordinates = gridObject.getCenterCoordinates();
-        centerX = centerCoordinates[0];
-        centerY = centerCoordinates[1];
         spawnObjects = new HashSet<>();
     }
-
 
     public MapObjectGenerator[] getSpawnObjects() {
         return spawnObjects.toArray(new MapObjectGenerator[0]);
@@ -50,15 +41,15 @@ public class Spawner {
     }
 
 
-    //spawns in the adjacent tile to the object depending on direction
+    //spawns one tile shifted to the object depending on direction
     //spawns on top if direction is 0
-    public MapObjectGenerator summonSpawn(char direction) {
+    public MapObjectGenerator summonSpawn(double x, double y, char direction) {
         return switch (direction) {
-            case '<' -> new MapObjectGenerator(worldIndex, centerX-TILE_SIDE, centerY);
-            case '>' -> new MapObjectGenerator(worldIndex, centerX+TILE_SIDE, centerY);
-            case '^' -> new MapObjectGenerator(worldIndex, centerX, centerY-TILE_SIDE);
-            case 'v' -> new MapObjectGenerator(worldIndex, centerX, centerY+TILE_SIDE);
-            case '0' -> new MapObjectGenerator(worldIndex, centerX, centerY);
+            case '<' -> new MapObjectGenerator(worldIndex, x-TILE_SIDE, y);
+            case '>' -> new MapObjectGenerator(worldIndex, x+TILE_SIDE, y);
+            case '^' -> new MapObjectGenerator(worldIndex, x, y-TILE_SIDE);
+            case 'v' -> new MapObjectGenerator(worldIndex, x, y+TILE_SIDE);
+            case '0' -> new MapObjectGenerator(worldIndex, x, y);
             default -> {
                 System.out.println("error in summonSpawn");
                 yield null;
@@ -66,49 +57,33 @@ public class Spawner {
         };
     }
 
-    public MapObjectGenerator onTopPlayerSpawn(Player player) {
-        int[] gridNumbers = player.getGridNumbers();
-        return new MapObjectGenerator(worldIndex, gridNumbers[0], gridNumbers[1]);
+    public MapObjectGenerator locationSpawn(double[] location) {
+        return new MapObjectGenerator(worldIndex, location[0], location[1]);
     }
 
-    //spawns in the direction of player's current position, spawns on the circle with given radius
-        public MapObjectGenerator directionSpawn(double[] towards, double radius) {
-        double dx = towards[0] - centerX;
-        double dy = towards[1] - centerY;
+    //spawns in the direction of given position, spawns on the circle with given radius
+    public MapObjectGenerator directionSpawn(double[] from, double[] towards, double radius) {
+        double x = from[0];
+        double y = from[1];
+
+        double dx = towards[0] - x;
+        double dy = towards[1] - y;
 
         double distance = Math.sqrt(dx * dx + dy * dy);
 
         double spawnX;
         double spawnY;
         if (distance == 0) {
-            spawnX = centerX + radius;
-            spawnY = centerY;
+            spawnX = x + radius;
+            spawnY = y;
         } else {
-            spawnX = centerX + dx * radius / distance;
-            spawnY = centerY + dy * radius / distance;
+            spawnX = x + dx * radius / distance;
+            spawnY = y + dy * radius / distance;
         }
 
 
         return new MapObjectGenerator(worldIndex, spawnX, spawnY);
     }
-
-    //spawns in the direction of player's next position
-    public void aimDirectionSpawn(Player player) {
-
-    }
-
-    //spawns towards next position of the player
-    public MapObjectGenerator aimSpawn(Player player) {
-        int nextXNum = (int) (player.getNextX() / TILE_SIDE) + 1;
-        int nextYNum = (int) (player.getNextY() / TILE_SIDE) + 1;
-        return new MapObjectGenerator(worldIndex, nextXNum, nextYNum);
-    }
-
-    //spawns the object at the given location with respect to the spawner object
-    public MapObjectGenerator targetSpawn(int xNum, int yNum) {
-        return new MapObjectGenerator(worldIndex, xNum, yNum);
-    }
-
 
     //spawns in random places(notices the wall tiles)
     public MapObjectGenerator[] randomSpawn(int range, int spawnNum, GridObject[][][] layers) {
@@ -149,18 +124,5 @@ public class Spawner {
         return holder.toArray(new int[0][]);
     }
 
-
-    public void setCenterCoordinates(double x, double y) {
-        centerX = x;
-        centerY = y;
-    }
-
-    public void setCenterX (double x) {
-        centerX = x;
-    }
-
-    public void setCenterY (double y) {
-        centerY = y;
-    }
 
 }

@@ -14,8 +14,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static helpers.HelperMethods.*;
+import static mapobjects.category.GridObject.TILE_SIDE;
 
-public class Player extends MapObject implements MovingCollidable, Spawnable, HealthBearer {
+public class Player extends MapObject implements MovingCollidable, HealthBearer {
 
     // initial fields that are unique to the player type
     private final String playerName;
@@ -28,9 +29,8 @@ public class Player extends MapObject implements MovingCollidable, Spawnable, He
     private double baseMaxSpeed;
     private double baseAcceleration;
     private double baseDeceleration;
-    private int maxAmmo;
 
-    // positioning, moving and collision logic fields
+    // positioning, moving and collision logic fields - current values, mutable
     private double spawnX, spawnY;
     private double xVelocity, yVelocity;
     private double maxSpeed, acceleration, deceleration;
@@ -39,17 +39,13 @@ public class Player extends MapObject implements MovingCollidable, Spawnable, He
 
     // shooting logic fields
     private boolean shoot;
-    private int ammo;
 
     // player's collision, spawn, health, time components
     private final Box collisionBox;
-    private final Spawner spawner;
-    protected final Set<Projectile> projectiles = new HashSet<>();
     protected final HPBar hpBar;
-    private final Timer reloadTimer, shootingCooldown;
+    private final Gun gun;
 
-
-
+    // owned objects
     protected Accessory[] accessories;
 
 
@@ -61,7 +57,6 @@ public class Player extends MapObject implements MovingCollidable, Spawnable, He
     }
 
     public Player(String playerName) {
-
         super(0,0, 0, 0, 0, playerName);
         this.playerName = playerName;
 
@@ -70,29 +65,24 @@ public class Player extends MapObject implements MovingCollidable, Spawnable, He
         animated = playerDefaults.isAnimated();
         imageType = playerDefaults.getImageType();
 
+        baseSide = playerDefaults.getSide();
         baseMaxSpeed = playerDefaults.getMaxSpeed();
         baseAcceleration = playerDefaults.getAcceleration();
         baseDeceleration = playerDefaults.getDeceleration();
-        baseSide = playerDefaults.getSide();
 
         setWidth(baseSide);
         setHeight(baseSide);
+        setMaxSpeed(baseMaxSpeed);
+        setAcceleration(baseAcceleration);
+        setDeceleration(baseDeceleration);
 
         int defaultMaxLives = playerDefaults.getMaxLives();
         double defaultMaxHP = playerDefaults.getMaxHP();
         double defaultDef = playerDefaults.getDefence();
         hpBar = new HPBar(defaultMaxHP, defaultMaxLives, defaultDef);
 
-        maxAmmo = playerDefaults.getMaxAmmo();
-        ammo = maxAmmo;
-        int reloadTime = playerDefaults.getReloadTime();
-        int shootCooldown = playerDefaults.getShootCooldown();
-        reloadTimer = new Timer(0, reloadTime);
-        shootingCooldown = new Timer(0, shootCooldown);
-        reloadTimer.activate();
-
         collisionBox = positionBox.clone();
-        spawner = new Spawner(worldIndex, getX(), getY());
+        gun = new Gun(playerDefaults.getGunType());
 
         respawn();
     }
@@ -104,20 +94,8 @@ public class Player extends MapObject implements MovingCollidable, Spawnable, He
 
         checkDead();
 
-        if (!reloadTimer.isCompleted()) {reloadTimer.activate();}
-        if (reloadTimer.isActive()) {reload();}
-        reloadTimer.tick();
-        shootingCooldown.tick();
-
-        if (shoot) {
-            if (ammo > 0 && !shootingCooldown.isCompleted()) {
-                shootingCooldown.activate();
-                spawn();
-                ammo--;
-                reloadTimer.startCooldown();
-            }
-            shoot = false;
-        }
+        gun.call(this);
+        if (shoot) gun.shoot();
 
         int range = 2; //the checking range
         int[] gridNumbers = getGridNumbers();
@@ -131,11 +109,12 @@ public class Player extends MapObject implements MovingCollidable, Spawnable, He
             }
         }
         //player's projectiles are not checking player collisions
-        for (Projectile projectile : projectiles) {
+        for (Projectile projectile : gun.getProjectiles()) {
             projectile.call(new Player(), layers);
         }
-        projectiles.removeIf(Projectile::isExpired);
+        gun.getProjectiles().removeIf(MapObject::isExpired);
     }
+
 
     private void checkMapObjectEffects(GridObject currentGridObject) {
         if (currentGridObject instanceof Collidable c && !(c instanceof Ghost)) {
@@ -147,6 +126,7 @@ public class Player extends MapObject implements MovingCollidable, Spawnable, He
         }
     }
 
+    // update position and accessory positions
     public void update() {
 
         if (!isXCollided()) {
@@ -242,39 +222,15 @@ public class Player extends MapObject implements MovingCollidable, Spawnable, He
         return playerName;
     }
 
-
     //ACCESSORY
 
     public void setAccessories(Accessory[] accessories) {
         this.accessories = accessories;
-        for (Accessory accessory : accessories) {
-            accessory.resize(baseSide /50);
-        }
     }
 
-
-    //SPAWNING PROJECTILES
-
-    @Override
-    public MapObject[] getSpawnObjects() {
-        return projectiles.toArray(new Projectile[0]);
-    }
-
-    @Override
-    public void spawn() {
-        MapObjectGenerator mapObjectGenerator = spawner.directionSpawn(getNextCenterCoordinates(), 30);
-        int direction = ((int) Math.toDegrees(Math.atan2(yVelocity, xVelocity)) + 360) % 360;
-        double speed = Math.sqrt(xVelocity * xVelocity + yVelocity * yVelocity);
-        Projectile projectile = mapObjectGenerator.mutateToRegularProjectile(20, 10, direction, speed + Projectile.DEFAULT_INITIAL_SPEED);
-        projectiles.add(projectile);
-    }
-
-    private void reload() {
-        if (ammo+1<=maxAmmo) ammo++;
-    }
 
     public int getAmmo() {
-        return ammo;
+        return gun.getAmmo();
     }
 
 
@@ -332,14 +288,12 @@ public class Player extends MapObject implements MovingCollidable, Spawnable, He
     public void setX(double x) {
         super.setX(x);
         collisionBox.setCenterX(x);
-        spawner.setCenterX(x);
     }
 
     @Override
     public void setY(double y) {
         super.setY(y);
         collisionBox.setCenterY(y);
-        spawner.setCenterY(y);
     }
 
     @Override
@@ -421,7 +375,6 @@ public class Player extends MapObject implements MovingCollidable, Spawnable, He
         yVelocity = 0;
         acceleration = 0;
         deceleration = 0;
-        ammo = maxAmmo;
         hpBar.revive();
     }
 
@@ -484,7 +437,7 @@ public class Player extends MapObject implements MovingCollidable, Spawnable, He
     }
 
     public void drawProjectiles() {
-        for (Projectile projectile : projectiles) projectile.draw();
+        for (Projectile projectile : gun.getProjectiles()) projectile.draw();
     }
 
     public void drawAccessories() {

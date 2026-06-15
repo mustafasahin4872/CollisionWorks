@@ -28,14 +28,14 @@ public abstract class Projectile extends MapObject implements MovingCollidable, 
     }
 
     public Projectile(int worldIndex, double x, double y, double width, double height, int direction) {
-        this(worldIndex, x, y, width, height, direction, DEFAULT_INITIAL_SPEED);
+        this(worldIndex, x, y, width, height, direction, DEFAULT_INITIAL_SPEED, 20);
     }
 
-    public Projectile(int worldIndex, double x, double y, double width, double height, int direction, double speed) {
+    public Projectile(int worldIndex, double x, double y, double width, double height, int direction, double speed, double damage) {
         super(worldIndex, x, y, width, height);
         this.direction = new Direction(direction);
         collisionBox = new Box(x, y, height, height);
-        damager = new Damager(20);
+        damager = new Damager(damage);
         initialSpeed = speed;
         this.speed = initialSpeed;
         activateTimer();
@@ -160,8 +160,8 @@ public abstract class Projectile extends MapObject implements MovingCollidable, 
             super(worldIndex, x, y, width, height, direction);
         }
 
-        public RegularProjectile(int worldIndex, double x, double y, double width, double height, int direction, double speed) {
-            super(worldIndex, x, y, width, height, direction, speed);
+        public RegularProjectile(int worldIndex, double x, double y, double width, double height, int direction, double speed, double damage) {
+            super(worldIndex, x, y, width, height, direction, speed, damage);
         }
     }
 
@@ -169,7 +169,7 @@ public abstract class Projectile extends MapObject implements MovingCollidable, 
 
         private final double I;
 
-        public HomingProjectile(int worldIndex, double x, double y, int direction, double I) {
+        public HomingProjectile(int worldIndex, double x, double y, int direction, double I, double damage) {
             super(worldIndex, x, y, direction);
             this.I = I;
         }

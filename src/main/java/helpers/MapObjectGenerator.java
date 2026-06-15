@@ -31,12 +31,12 @@ public class MapObjectGenerator {
         return new Projectile.RegularProjectile(worldIndex, centerX, centerY, direction);
     }
 
-    public Projectile mutateToRegularProjectile(double width, double height, int direction, double speed) {
-        return new Projectile.RegularProjectile(worldIndex, centerX, centerY, width, height, direction, speed);
+    public Projectile mutateToRegularProjectile(double width, double height, int direction, double speed, double damage) {
+        return new Projectile.RegularProjectile(worldIndex, centerX, centerY, width, height, direction, speed, damage);
     }
 
-    public Projectile mutateToHomingProjectile(int direction, double I) {
-        return new Projectile.HomingProjectile(worldIndex, centerX, centerY, direction, I);
+    public Projectile mutateToHomingProjectile(int direction, double I, double damage) {
+        return new Projectile.HomingProjectile(worldIndex, centerX, centerY, direction, I, damage);
     }
 
     public Coin.SingleCoin mutateToSingleCoin() {
