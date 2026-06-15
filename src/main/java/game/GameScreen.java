@@ -24,6 +24,7 @@ public class GameScreen {
     private final DeadScreen deadScreen = new DeadScreen();
     private final HealthBar healthBar = new HealthBar();
     private final CoinAmount coinAmount = new CoinAmount();
+    private final GemAmount gemAmount = new GemAmount();
     private final LifeAmount lifeAmount = new LifeAmount();
     private final AmmoBar ammoBar = new AmmoBar();
     private final CriticalHealthEffect criticalHealthEffect = new CriticalHealthEffect();
@@ -45,7 +46,8 @@ public class GameScreen {
 
         Player player = gameState.getPlayer();
         HPBar hpBar = player.getHealthBar();
-        int coinsCollected = player.getCoinsCollected();
+        int coinsCollected = gameState.getCollectedCoins();
+        int gemsCollected = gameState.getCollectedGems();
 
         pauseButton.update();
         pauseScreen.update();
@@ -53,6 +55,7 @@ public class GameScreen {
 
         healthBar.update(hpBar.getMaxHP(), hpBar.getHP());
         coinAmount.update(coinsCollected);
+        gemAmount.update(gemsCollected);
         lifeAmount.update(hpBar.getLives());
         ammoBar.update(hpBar.getMaxHP(), player.getAmmo());
         criticalHealthEffect.update(hpBar.getRemainingHPPercentage());
@@ -66,6 +69,7 @@ public class GameScreen {
         criticalHealthEffect.draw();
         healthBar.draw();
         coinAmount.draw();
+        gemAmount.draw();
         lifeAmount.draw();
         ammoBar.draw();
         pauseButton.draw();
@@ -81,15 +85,16 @@ public class GameScreen {
 
     //----------------------------------------------------------------------------------------------------------
     //----------------------------------------------------------------------------------------------------------
-    //----------------------------------------------------------------------------------------------------------
     // UI CLASSES - INPUT TAKING
+    //----------------------------------------------------------------------------------------------------------
+    //----------------------------------------------------------------------------------------------------------
 
     private class PauseButton {
 
         private static final double DISTANCE = 30;
-        private static final double PAUSE_SIDE = 40;
+        private static final double SIDE = 40;
 
-        private static final FrameBox PAUSE_BUTTON = new FrameBox(2*CENTER_X - DISTANCE, DISTANCE, PAUSE_SIDE, PAUSE_SIDE);
+        private static final FrameBox PAUSE_BUTTON = new FrameBox(2*CENTER_X - DISTANCE, DISTANCE, SIDE, SIDE);
 
         private void update() {
             PAUSE_BUTTON.update();
@@ -145,13 +150,13 @@ public class GameScreen {
 
             if (gameState.getState() == STATE.PAUSE) {
                 if (isIn(mouseX, mouseY, RESUME_BUTTON.getFrameBox())) {
-                    gameState.setState(STATE.GAME);
+                    gameState.continueGame();
                 }
                 if (isIn(mouseX, mouseY, EXIT_BUTTON.getFrameBox())) {
-                    gameState.setState(STATE.SELECTION);
+                    gameState.exitGame();
                 }
                 if (isIn(mouseX, mouseY, RESTART_BUTTON.getFrameBox())) {
-                    gameState.restart();
+                    gameState.restartGame();
                 }
             }
 
@@ -204,10 +209,10 @@ public class GameScreen {
 
             if (gameState.getState() == STATE.DEAD) { // STATE.PAUSE
                 if (isIn(mouseX, mouseY, EXIT_BUTTON.getFrameBox())) {
-                    gameState.setState(STATE.SELECTION);
+                    gameState.exitGame();
                 }
                 if (isIn(mouseX, mouseY, RESTART_BUTTON.getFrameBox())) {
-                    gameState.restart();
+                    gameState.restartGame();
                 }
             }
 
@@ -233,8 +238,9 @@ public class GameScreen {
 
     //----------------------------------------------------------------------------------------------------------
     //----------------------------------------------------------------------------------------------------------
-    //----------------------------------------------------------------------------------------------------------
     // UI CLASSES - NON INPUT TAKING
+    //----------------------------------------------------------------------------------------------------------
+    //----------------------------------------------------------------------------------------------------------
 
     private static class HealthBar {
         private static final double THICKNESS = 2;
@@ -273,7 +279,9 @@ public class GameScreen {
     private static class CoinAmount {
 
         private static final double SIDE = 40;
-        private final FrameBox frameBox = new FrameBox(2*CENTER_X - 80, 30, SIDE, SIDE);
+        private static final double DISTANCE = 30;
+
+        private final FrameBox frameBox = new FrameBox(2*CENTER_X - 2*SIDE, DISTANCE, SIDE, SIDE);
         private int coinsCollected;
         private String fileName = IMAGES_ROOT+"coin/singlecoin/0.png";
 
@@ -293,10 +301,34 @@ public class GameScreen {
 
     }
 
+    private static class GemAmount {
+
+        private static final double SIDE = 40;
+        private static final double DISTANCE = 30;
+
+        private final FrameBox frameBox = new FrameBox(2*CENTER_X - 3*SIDE, DISTANCE, SIDE, SIDE);
+        private int gemsCollected;
+
+        private void update(int gemsCollected) {
+            frameBox.update();
+            this.gemsCollected = gemsCollected;
+        }
+
+        private void draw() {
+            Box box = frameBox.getFrameBox();
+            String fileName = IMAGES_ROOT + "ui/gem.png";
+            StdDraw.picture(box.getCenterX(), box.getCenterY(), fileName, SIDE, SIDE);
+            textInsideBox(box, "%d".formatted(gemsCollected));
+        }
+
+    }
+
     private static class LifeAmount {
 
         private static final double SIDE = 40;
-        private final FrameBox frameBox = new FrameBox(2*CENTER_X - 130, 30, SIDE, SIDE);
+        private static final double DISTANCE = 30;
+
+        private final FrameBox frameBox = new FrameBox(2*CENTER_X - 4*SIDE, DISTANCE, SIDE, SIDE);
         private int lives;
 
         private void update(int lives) {

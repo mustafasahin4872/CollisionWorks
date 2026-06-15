@@ -63,7 +63,7 @@ public class SkinSelection {
 
         skins = gameState.getSkins();
         accessories = gameState.getAccessories();
-        buffs = gameState.gettPermanentBuffs();
+        buffs = gameState.getPermanentBuffs();
 
         if (accessoryChosen == null) accessoryChosen = new boolean[accessories.size()];
         accessoryChosen = Arrays.copyOf(accessoryChosen, accessories.size());

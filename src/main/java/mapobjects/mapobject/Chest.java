@@ -4,6 +4,8 @@ import mapobjects.component.Box;
 import mapobjects.category.GridObject;
 import mapobjects.category.OnEffector;
 
+import static game.Main.gameState;
+
 public abstract class Chest extends GridObject implements OnEffector {
 
     private final Box effectBox;
@@ -49,7 +51,7 @@ public abstract class Chest extends GridObject implements OnEffector {
         if (isOpen) return;
         isOpen = true;
         setName("1");
-        player.collectCoin(coinNum);
+        gameState.collectCoin(coinNum);
     }
 
 

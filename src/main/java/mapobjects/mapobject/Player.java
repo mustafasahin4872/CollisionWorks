@@ -25,7 +25,7 @@ public class Player extends MapObject implements MovingCollidable, Spawnable, He
     private final Spawner spawner;
     protected final Set<Projectile> projectiles = new HashSet<>();
     protected final HPBar hpBar;
-    private final Timer timer, shootingCooldown;
+    private final Timer reloadTimer, shootingCooldown;
 
 
     private static final double
@@ -43,13 +43,12 @@ public class Player extends MapObject implements MovingCollidable, Spawnable, He
 
     private int lastCheckPointIndex;
 
-    private int coinsCollected = 0;
-
     protected Accessory[] accessories;
 
 
     //CONSTRUCTORS
 
+    // TODO: CREATE A DUMMY PLAYER TYPE, ASIDE FROM BOB
     public Player() {
         this("Bob");
     }
@@ -67,9 +66,9 @@ public class Player extends MapObject implements MovingCollidable, Spawnable, He
         collisionBox = positionBox.clone();
         spawner = new Spawner(worldIndex, getX(), getY());
         hpBar = new HPBar(defaultSide*4, MAX_LIVES, 0);
-        timer = new Timer(0, 1000);
+        reloadTimer = new Timer(0, 1000);
         shootingCooldown = new Timer(0, 100);
-        timer.activate();
+        reloadTimer.activate();
         respawn();
     }
 
@@ -246,7 +245,7 @@ public class Player extends MapObject implements MovingCollidable, Spawnable, He
 
     @Override
     public Timer getTimer() {
-        return timer;
+        return reloadTimer;
     }
 
     @Override
@@ -417,22 +416,12 @@ public class Player extends MapObject implements MovingCollidable, Spawnable, He
     public void restart() {
         //TODO: CHECK IF THERE ARE MORE FIELDS THAT NEED RESETTING
         hpBar.restart();
-        coinsCollected = 0;
         respawn();
     }
 
-    //COIN
-
-    public void collectCoin(int n) {
-        coinsCollected += n;
-    }
-
-    public int getCoinsCollected() {
-        return coinsCollected;
-    }
-
-
     //CHECKPOINT AND SPAWN POINT
+    /// TODO: LAST CHECKPOINT INDEX INFO MUST BELONG TO MAP!!!
+    /// SPAWNPOINT SHOULD STILL BELONG TO PLAYER
 
     public void setSpawnPoint(double[] spawnPoint) {
         spawnX = spawnPoint[0];
@@ -454,47 +443,14 @@ public class Player extends MapObject implements MovingCollidable, Spawnable, He
     //DRAW METHODS
 
     public void draw() {
-
-        drawProjectiles();
-
-        StringBuilder name = new StringBuilder();
-        name.append(getPlayerName()).append("/").append(getDirectionString(getXDirection(), getYDirection()));
-        if (animated) {
-            int currentAnimationNum = getCurrentAnimationNum();
-            name.append("_").append(currentAnimationNum);
-        }
-        setName(name.toString());
-
+        updateName();
         super.draw();
-
-        if (accessories != null) {
-            for (Accessory accessory : accessories) {
-                accessory.draw();
-            }
-        }
-
     }
 
-    public void drawBig(double multiplier) {
-        resize(multiplier);
-
-        StringBuilder name = new StringBuilder();
-        name.append(getPlayerName()).append("/").append(getDirectionString(getXDirection(), getYDirection()));
-        if (animated) {
-            int currentAnimationNum = getCurrentAnimationNum();
-            name.append("_").append(currentAnimationNum);
-        }
-        setName(name.toString());
-
-        super.draw();
-
-        resetSize();
-
-        if (accessories != null) {
-            for (Accessory accessory : accessories) {
-                accessory.drawBig(multiplier);
-            }
-        }
+    private void updateName() {
+        String base = getPlayerName() + "/" + getDirectionString(getXDirection(), getYDirection());
+        String plus = (animated) ? ("_" + getCurrentAnimationNum()) : "";
+        setName(base + plus);
     }
 
     private int getCurrentAnimationNum() {
@@ -524,4 +480,11 @@ public class Player extends MapObject implements MovingCollidable, Spawnable, He
         for (Projectile projectile : projectiles) projectile.draw();
     }
 
+    public void drawAccessories() {
+        if (accessories != null) {
+            for (Accessory accessory : accessories) {
+                accessory.draw();
+            }
+        }
+    }
 }

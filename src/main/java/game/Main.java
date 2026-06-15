@@ -31,11 +31,7 @@ public class Main {
                 case SELECTION -> skinSelection.skinSelectionLoop();
                 case GAME -> levelSelection.levelSelectionLoop();
                 case SHOP -> shop.shopLoop();
-                case NEXT -> game.gameLoop();
-                case PASSED -> {
-                    gameState.nextLevel();
-                    game.gameLoop();
-                }
+                case NEXT, PASSED -> game.gameLoop();
                 case ALTERNATE1 -> {} // add alternate1
                 case ALTERNATE2 -> {} // add alternate2
                 // case SHOP is handled inside gameLoop and selectionLoop

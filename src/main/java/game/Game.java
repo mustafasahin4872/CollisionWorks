@@ -69,6 +69,8 @@ public class Game {
             StdDraw.clear();
             gameMap.draw();
             player.draw();
+            player.drawProjectiles();
+            player.drawAccessories();
             gameScreen.draw();
             StdDraw.show();
 
@@ -79,6 +81,10 @@ public class Game {
                 StdDraw.pause(Frame.PAUSE-timeElapsed);
             }
 
+        }
+
+        if (gameState.getState() == STATE.PASSED) {
+            gameState.nextLevel();
         }
 
     }

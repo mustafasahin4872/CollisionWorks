@@ -30,6 +30,9 @@ public class GameState {
     private int coinAmount = 0;
     private int gemAmount = 0;
 
+    private int collectedCoins = 0;
+    private int collectedGems = 0;
+
     //------------------------------------------------------------------------------------------------------------------
     //------------------------------------------------------------------------------------------------------------------
     // OWNED ITEMS
@@ -62,7 +65,7 @@ public class GameState {
     );
 
     private final List<ShopEntry<Buff>> buyableBuffs = List.of(
-        new ShopEntry<>(new Buff.SpeedBuff(0, 0), 0, false),
+        new ShopEntry<>(new Buff.SpeedBuff(0, 0), 1, false),
         new ShopEntry<>(new Buff.ShieldBuff(0, 0), 0, false),
         new ShopEntry<>(new Buff.ShrinkBuff(0, 0), 0, false),
         new ShopEntry<>(new Buff.MagnetBuff(0, 0), 0, false),
@@ -128,14 +131,30 @@ public class GameState {
         this.player = player;
     }
 
-    public void addCoin(int added) {
-        coinAmount += added;
+    public int getCoinAmount() {
+        return coinAmount;
+    }
+
+    public int getCollectedCoins() {
+        return collectedCoins;
+    }
+
+    public void collectCoin(int added) {
+        collectedCoins += added;
     }
 
     public void spendCoin(int spent) {coinAmount -= spent;}
 
-    public void addGem(int added) {
-        gemAmount += added;
+    public int getGemAmount() {
+        return gemAmount;
+    }
+
+    public int getCollectedGems() {
+        return collectedGems;
+    }
+
+    public void collectGem(int added) {
+        collectedGems += added;
     }
 
     public void spendGem(int spent) {gemAmount -= spent;}
@@ -166,7 +185,7 @@ public class GameState {
         return accessories;
     }
 
-    public List<Buff> gettPermanentBuffs() {
+    public List<Buff> getPermanentBuffs() {
         return permanentBuffs;
     }
 
@@ -188,12 +207,29 @@ public class GameState {
     //------------------------------------------------------------------------------------------------------------------
     //------------------------------------------------------------------------------------------------------------------
 
-    public void restart() {
+    public void continueGame() {
+        state = STATE.GAME;
+    }
+
+    public void exitGame() {
+        collectedCoins = 0;
+        collectedGems = 0;
+        state = STATE.SELECTION;
+    }
+
+    public void restartGame() {
+        collectedCoins = 0;
+        collectedGems = 0;
         state = STATE.NEXT;
         player.restart();
     }
 
     public void nextLevel() {
+
+        coinAmount += collectedCoins;
+        gemAmount += collectedGems;
+        collectedCoins = 0;
+        collectedGems = 0;
 
         if (levelIndex == 12) {
 

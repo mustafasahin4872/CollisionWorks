@@ -1,5 +1,6 @@
 package game;
 
+import helpers.FrameBox;
 import helpers.MapType;
 import helpers.ShopEntry;
 import lib.StdDraw;
@@ -141,9 +142,16 @@ public class Shop {
         return getShopEntry(selectedIndex);
     }
 
+
     private class ShopUI {
 
         private static final double SHOP_BOX_SIDE = 2 * TILE_SIDE;
+
+        private static final Box[] SHOP_BOXES = new Box[] {
+            new Box(4.5 * TILE_SIDE, 6 * TILE_SIDE, SHOP_BOX_SIDE, SHOP_BOX_SIDE),
+            new Box(9 * TILE_SIDE, 6 * TILE_SIDE, SHOP_BOX_SIDE, SHOP_BOX_SIDE),
+            new Box(13.5 * TILE_SIDE, 6 * TILE_SIDE, SHOP_BOX_SIDE, SHOP_BOX_SIDE),
+            };
 
         private static final double ARROWS_SIDE = 0.5 * TILE_SIDE;
         private static final double ARROWS_GAP = 0.5 * TILE_SIDE;
@@ -158,12 +166,6 @@ public class Shop {
         private static final double PRICE_BOX_HEIGHT = 0.6 * TILE_SIDE;
         private static final double BUY_BOX_WIDTH = 2.5 * TILE_SIDE;
         private static final double BUY_BOX_HEIGHT = 0.6 * TILE_SIDE;
-
-        private static final Box[] SHOP_BOXES = new Box[] {
-                new Box(4.5 * TILE_SIDE, 6 * TILE_SIDE, SHOP_BOX_SIDE, SHOP_BOX_SIDE),
-                new Box(9 * TILE_SIDE, 6 * TILE_SIDE, SHOP_BOX_SIDE, SHOP_BOX_SIDE),
-                new Box(13.5 * TILE_SIDE, 6 * TILE_SIDE, SHOP_BOX_SIDE, SHOP_BOX_SIDE),
-        };
 
         private static final Box[][] ARROW_BOXES = new Box[N][2];
         private static final Box[] NAME_BOXES = new Box[N];
@@ -191,6 +193,13 @@ public class Shop {
                 BUY_BOXES[i] = new Box(x, y + yShiftBig, BUY_BOX_WIDTH, BUY_BOX_HEIGHT);
             }
         }
+
+        private static final double CURRENCY_Y = TILE_SIDE;
+        private static final double GEMS_X = BUY_BOXES[0].getCenterX();
+        private static final double COINS_X = BUY_BOXES[2].getCenterX();
+
+        private static final Box GEM_BOX = new Box(GEMS_X, CURRENCY_Y, TILE_SIDE, TILE_SIDE);
+        private static final Box COIN_BOX = new Box(COINS_X, CURRENCY_Y, TILE_SIDE, TILE_SIDE);
 
         private static final String[] LABELS = { "Skins", "Accessories", "Buffs"};
 
@@ -243,6 +252,14 @@ public class Shop {
             Color canBuy = new Color(16, 78, 6);
             Color cantBuy = new Color(113, 6, 6);
 
+            String gemFile = IMAGES_ROOT + "ui/gem.png";
+            String coinFile = IMAGES_ROOT + "ui/coin.png";
+
+            StdDraw.picture(GEM_BOX.getCenterX(), GEM_BOX.getCenterY(), gemFile, GEM_BOX.getWidth(), GEM_BOX.getHeight());
+            StdDraw.picture(COIN_BOX.getCenterX(), COIN_BOX.getCenterY(), coinFile, COIN_BOX.getWidth(), COIN_BOX.getHeight());
+            textInsideBox(GEM_BOX, gameState.getGemAmount() + "");
+            textInsideBox(COIN_BOX, gameState.getCoinAmount() + "");
+
             for (int i = 0; i < N; i++) {
                 ShopEntry shopEntry = getShopEntry(i);
                 boolean sold = shopEntry.isSold();
@@ -263,8 +280,7 @@ public class Shop {
                 drawRectWithOutline(PRICE_BOXES[i], buyColor, outlineColor);
 
                 String price = " " + shopEntry.getCost(); // 1 space to right to offset the gem's space
-                String type = (shopEntry.isCosmetic()) ? "gem" : "coin";
-                String fileName = IMAGES_ROOT + "ui/" + type + ".png";
+                String fileName = (shopEntry.isCosmetic()) ? gemFile : coinFile;
                 double side = PRICE_BOX_HEIGHT * 0.8;
                 double textWidth = 0.6 * smallFont.getSize() * price.length();
 
@@ -282,6 +298,7 @@ public class Shop {
                 }
 
             }
+
         }
 
     }

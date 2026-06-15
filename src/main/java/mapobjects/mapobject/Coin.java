@@ -4,6 +4,8 @@ import mapobjects.component.Box;
 import mapobjects.category.OnEffector;
 import mapobjects.category.GridObject;
 
+import static game.Main.gameState;
+
 public abstract class Coin extends GridObject implements OnEffector {
 
     private final Box effectBox;
@@ -32,11 +34,11 @@ public abstract class Coin extends GridObject implements OnEffector {
 
     @Override
     public void playerIsOn(Player player) {
-        collect(player);
+        collect();
     }
 
-    private void collect(Player player) {
-        player.collectCoin(value);
+    private void collect() {
+        gameState.collectCoin(value);
         expire();
     }
 

@@ -19,6 +19,11 @@
 ## 🚧 IMMEDIATE PRIORITIES
 
 ### New Elements
+
+- [ ] Lock levels and keep the last unlocked level index inside gamestate
+  - [ ] draw chains on locked level boxes
+  - [ ] keep passed level indexes in gamestate
+  - [ ] disable coin collection on already passed levels
 - [ ] Add buff system
   - [x] Buff shrinking and growing animation is vibrating
   - [x] Buff shrinking and growing animation should stop when bought
@@ -30,12 +35,12 @@
       - [ ] player should hold a in-game buffs list (not gamestate)
       - [ ] buffs should have an apply(Player player) and revert(Player player) function that applies/reverts the effects
       - [ ] playerIsOn should only add the buff to the List
-- [ ] Enhance currency system
-    - [ ] in-game collected currencies add to the gamestate currencies
-    - [ ] add a gem counter into in-game ui as well
 - [ ] in-between levels content
-  - [ ] add shop
-  - [ ] add random rewards
+    - [ ] add shop
+    - [ ] add random rewards
+- [x] Enhance currency system
+    - [x] in-game collected currencies add to the gamestate currencies
+    - [x] add a gem counter into in-game ui as well
 - [x] Create a separate SelectionScreen similar to GameScreen
 
 ### Core Refactoring
