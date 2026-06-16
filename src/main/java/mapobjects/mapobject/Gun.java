@@ -58,7 +58,11 @@ public class Gun extends MapObject implements Spawnable {
 
     protected final Set<Projectile> projectiles = new HashSet<>();
 
-    Gun(GunType gunType) {
+    public Gun() {
+        this(GunType.DEFAULT);
+    }
+
+    public Gun(GunType gunType) {
         this.gunType = gunType;
         this.maxAmmo = gunType.maxAmmo;
         this.damagePerAmmo = gunType.damagePerAmmo;

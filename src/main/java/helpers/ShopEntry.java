@@ -2,13 +2,13 @@ package helpers;
 
 import mapobjects.category.MapObject;
 
-public class ShopEntry<T extends MapObject> {
-    private final T item;
+public class ShopEntry {
+    private final MapObject item;
     private final int cost;
     private final boolean isCosmetic;
     private boolean isSold;
 
-    public ShopEntry(T item, int cost, boolean isCosmetic) {
+    public ShopEntry(MapObject item, int cost, boolean isCosmetic) {
         this.item = item;
         this.cost = cost;
         this.isCosmetic = isCosmetic;
@@ -30,7 +30,7 @@ public class ShopEntry<T extends MapObject> {
         return isCosmetic;
     }
 
-    public T getItem() {
+    public MapObject getItem() {
         return item;
     }
 

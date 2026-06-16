@@ -4,12 +4,12 @@ import helpers.ShopEntry;
 import mapobjects.category.MapObject;
 import mapobjects.mapobject.Accessory;
 import mapobjects.mapobject.Buff;
+import mapobjects.mapobject.Gun;
 import mapobjects.mapobject.Player;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@SuppressWarnings("rawtypes")
 public class GameState {
 
     //------------------------------------------------------------------------------------------------------------------
@@ -19,7 +19,7 @@ public class GameState {
     //------------------------------------------------------------------------------------------------------------------
 
     public enum STATE {
-        SELECTION, GAME, DEAD, PASSED, NEXT, ALTERNATE1, ALTERNATE2, SHOP, PAUSE, QUIT
+        SELECTION, GAME, DEAD, PASSED, NEXT, SHOP, ALTERNATE1, ALTERNATE2, PAUSE, QUIT
     }
     private STATE state = STATE.SELECTION;
 
@@ -42,35 +42,9 @@ public class GameState {
     private final ArrayList<Player> skins = new ArrayList<>(List.of(new Player()));
     private final ArrayList<Accessory> accessories = new ArrayList<>();
     private final ArrayList<Buff> permanentBuffs = new ArrayList<>();
+    private final  ArrayList<Gun> guns = new ArrayList<>(List.of(new Gun()));
 
-    //------------------------------------------------------------------------------------------------------------------
-    //------------------------------------------------------------------------------------------------------------------
-    // SHOP ENTRIES
-    //------------------------------------------------------------------------------------------------------------------
-    //------------------------------------------------------------------------------------------------------------------
 
-    private final List<ShopEntry<Player>> buyableSkins = List.of(
-        new ShopEntry<>(new Player("Mike"), 0, true),
-        new ShopEntry<>(new Player("Sakura"), 0, true)
-    );
-
-    private final List<ShopEntry<Accessory>> buyableAccessories = List.of(
-        new ShopEntry<>(new Accessory.Hat("fedora"), 0, true),
-        new ShopEntry<>(new Accessory.Tie("tie"), 100, true),
-        new ShopEntry<>(new Accessory.Headpiece("coquette"), 0, true),
-        new ShopEntry<>(new Accessory.Necklace("dollar"), 200, true),
-        new ShopEntry<>(new Accessory.Necklace("sorcerer"), 250, true),
-        new ShopEntry<>(new Accessory.Pin("star"), 50000, true),
-        new ShopEntry<>(new Accessory.Pin("sheriff"), 1075, true)
-    );
-
-    private final List<ShopEntry<Buff>> buyableBuffs = List.of(
-        new ShopEntry<>(new Buff.SpeedBuff(0, 0), 1, false),
-        new ShopEntry<>(new Buff.ShieldBuff(0, 0), 0, false),
-        new ShopEntry<>(new Buff.ShrinkBuff(0, 0), 0, false),
-        new ShopEntry<>(new Buff.MagnetBuff(0, 0), 0, false),
-        new ShopEntry<>(new Buff.VisionBuff(0, 0), 0, false)
-    );
 
     //------------------------------------------------------------------------------------------------------------------
     //------------------------------------------------------------------------------------------------------------------
@@ -177,6 +151,8 @@ public class GameState {
 
     public void addOwnedBuff(Buff buff) {permanentBuffs.add(buff);}
 
+    public void addOwnedGun(Gun gun) {guns.add(gun);}
+
     public List<Player> getSkins() {
         return skins;
     }
@@ -189,16 +165,8 @@ public class GameState {
         return permanentBuffs;
     }
 
-    public List<ShopEntry<Player>> getBuyableSkins() {
-        return buyableSkins;
-    }
-
-    public List<ShopEntry<Accessory>> getBuyableAccessories() {
-        return buyableAccessories;
-    }
-
-    public List<ShopEntry<Buff>> getBuyableBuffs() {
-        return buyableBuffs;
+    public ArrayList<Gun> getGuns() {
+        return guns;
     }
 
     //------------------------------------------------------------------------------------------------------------------

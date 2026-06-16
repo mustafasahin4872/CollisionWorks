@@ -1,6 +1,7 @@
 package game;
 
 import helpers.InputHandler;
+import game.GameState.STATE;
 
 public class Main {
 
@@ -14,7 +15,7 @@ public class Main {
 
     // manage selection, in-game, shop screen calls according to gameState
     // create corresponding maps and frames, then run and edit gameState
-    public static void main(String[] args){
+    public static void main(String[] args) throws Exception {
 
         Frame.setCanvas();
         gameState = new GameState();
@@ -22,18 +23,16 @@ public class Main {
 
         SkinSelection skinSelection = new SkinSelection(inputHandler, gameState);
         LevelSelection levelSelection = new LevelSelection(inputHandler, gameState);
-        Shop shop = new Shop(inputHandler, gameState);
         Game game = new Game(inputHandler, gameState);
+        Shop shop = new Shop(inputHandler, gameState);
 
-        while (gameState.getState() != GameState.STATE.QUIT) {
+        while (gameState.getState() != STATE.QUIT) {
 
             switch (gameState.getState()) {
                 case SELECTION -> skinSelection.skinSelectionLoop();
                 case GAME -> levelSelection.levelSelectionLoop();
-                case SHOP -> shop.shopLoop();
+                case SHOP, ALTERNATE1, ALTERNATE2 -> shop.shopLoop();
                 case NEXT, PASSED -> game.gameLoop();
-                case ALTERNATE1 -> {} // add alternate1
-                case ALTERNATE2 -> {} // add alternate2
                 // case SHOP is handled inside gameLoop and selectionLoop
                 // case PAUSE and DEAD is handled inside gameLoop
                 // case QUIT is unreachable.
