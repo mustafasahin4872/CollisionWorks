@@ -71,7 +71,6 @@ public class GameState {
         this.levelIndex = levelIndex;
         this.player = player;
         accessories.add(null);
-
     }
 
     //------------------------------------------------------------------------------------------------------------------
@@ -244,7 +243,5 @@ public class GameState {
             }
         }
     }
-
-
 
 }

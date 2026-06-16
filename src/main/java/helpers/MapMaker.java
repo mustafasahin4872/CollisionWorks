@@ -1,5 +1,6 @@
 package helpers;
 
+import mapobjects.mapobject.Currency;
 import mapobjects.mapobject.Player;
 import mapobjects.category.GridObject;
 import mapobjects.mapobject.*;
@@ -24,7 +25,7 @@ public class MapMaker {
     private final Tile[][] tiles;
     private final GridObject[][] gridObjects;
     private final EmptyGridObject[][] emptyGridObjects;
-    private final Coin[][] coins;
+    private final Currency[][] coins;
 
     private double[] spawnPoint;
 
@@ -42,7 +43,8 @@ public class MapMaker {
                     '|', '—', // alignment information
                     '^', 'v', '<', '>', // direction information
 
-                    'o', '*', '$', // single/triple/bag coins
+                    'o', 'ö', '&', // single/triple/bag coins
+                    'u', 'ü', '$', // single/triple/bag gems
                     ':', '.', // big/little button
                     '@', '%', '+', ';',// mine, mortar, shooter, ghost
 
@@ -93,7 +95,7 @@ points can have the indicator B for big displays, special to the selection scree
         tiles = new Tile[yTile][xTile];
         gridObjects = new GridObject[yTile][xTile];
         emptyGridObjects = new EmptyGridObject[yTile][xTile];
-        coins = new Coin[yTile][xTile];
+        coins = new Currency[yTile][xTile];
         layers = new GridObject[][][]{tiles, gridObjects, emptyGridObjects, coins};
         switch (mapType) {
             case SELECTION -> mapFile = new File((RESOURCES_ROOT + "maps/selectionMaps/%d%d.txt").formatted(worldIndex, levelIndex));
@@ -152,7 +154,7 @@ points can have the indicator B for big displays, special to the selection scree
 
                 Tile initializedTile;
                 GridObject initializedGridObject;
-                Coin initializedCoin;
+                Currency initializedCoin;
 
                 String tileCode = mapData[y][x];
 
@@ -162,7 +164,7 @@ points can have the indicator B for big displays, special to the selection scree
                     char char1 = tileCode.charAt(1), char2 = tileCode.charAt(2);
 
                     initializedTile = mapObjectGenerator.mutateToTile(char0);
-                    initializedCoin = initializeCoin(char1, mapObjectGenerator);
+                    initializedCoin = initializeCurrency(char1, mapObjectGenerator);
                     initializedGridObject = switch (char1) {
                         case '@' -> mapObjectGenerator.mutateToMine();
                         case '%' -> mapObjectGenerator.mutateToMortar(layers);
@@ -194,9 +196,9 @@ points can have the indicator B for big displays, special to the selection scree
                             yield checkPoint;
                         }
                         case '5', '6', '7', '8', '9' -> mapObjectGenerator.mutateToWinPoint(char1 - '5', char2 == 'B');
-                        case '~' -> mapObjectGenerator.mutateToWoodenChest(new char[]{char2});
-                        case '≈' -> mapObjectGenerator.mutateToSilverChest(new char[]{char2});
-                        case '=' -> mapObjectGenerator.mutateToGoldenChest(new char[]{char2});
+                        case '~' -> mapObjectGenerator.mutateToChest(Chest.ChestType.WoodenChest); // TODO: utilize char2 as buff type
+                        case '≈' -> mapObjectGenerator.mutateToChest(Chest.ChestType.SilverChest);
+                        case '=' -> mapObjectGenerator.mutateToChest(Chest.ChestType.GoldenChest);
                         case 'D' -> mapObjectGenerator.mutateToDoor(char2);
                         default -> null;
                     };
@@ -207,19 +209,20 @@ points can have the indicator B for big displays, special to the selection scree
                     String onTileCode = details[0];
 
                     initializedTile = mapObjectGenerator.mutateToTile(onTileCode.charAt(0));
-                    initializedCoin = initializeCoin(onTileCode.charAt(1), mapObjectGenerator);
+                    initializedCoin = initializeCurrency(onTileCode.charAt(1), mapObjectGenerator);
                     initializedGridObject = switch (char0) {
                         case 'C' -> {
-                            String[] buffs = details[2].split(", ");
-                            yield switch (details[1].charAt(0)) {
-                                case '~' -> mapObjectGenerator.mutateToWoodenChest(toCharArray(buffs));
-                                case '≈' -> mapObjectGenerator.mutateToSilverChest(toCharArray(buffs));
-                                case '=' -> mapObjectGenerator.mutateToGoldenChest(toCharArray(buffs));
+                            String[] buffs = details[2].split(", "); // TODO: UTILIZE BUFF MECHANIC ON A37 INITIALIZER
+                            Chest.ChestType chestType =  switch (details[1].charAt(0)) {
+                                case '~' -> Chest.ChestType.WoodenChest;
+                                case '≈' -> Chest.ChestType.SilverChest;
+                                case '=' -> Chest.ChestType.GoldenChest;
                                 default -> {
                                     System.out.println("error at C37");
                                     yield null;
                                 }
                             };
+                            yield mapObjectGenerator.mutateToChest(chestType);
                         }
                         case 'D' -> {
                             int length = (details.length == 4) ? Integer.parseInt(details[3]) : 4;
@@ -261,13 +264,18 @@ points can have the indicator B for big displays, special to the selection scree
     }
 
 
-    private Coin initializeCoin(char type, MapObjectGenerator mapObjectGenerator) {
-        return switch (type) {
-            case 'o' -> mapObjectGenerator.mutateToSingleCoin();
-            case '*' -> mapObjectGenerator.mutateToTripleCoin();
-            case '$' -> mapObjectGenerator.mutateToCoinBag();
+    private Currency initializeCurrency(char type, MapObjectGenerator mapObjectGenerator) {
+        Currency.CurrencyType currencyType = switch (type) {
+            case 'o' -> Currency.CurrencyType.singleCoin;
+            case 'ö' -> Currency.CurrencyType.tripleCoin;
+            case '&' -> Currency.CurrencyType.coinBag;
+            case 'u' -> Currency.CurrencyType.singleGem;
+            case 'ü' -> Currency.CurrencyType.tripleGem;
+            case '$' -> Currency.CurrencyType.gemBag;
             default -> null;
         };
+        if (currencyType == null) return null;
+        return mapObjectGenerator.mutateToCoin(currencyType);
     }
 
 

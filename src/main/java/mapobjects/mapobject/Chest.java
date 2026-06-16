@@ -6,19 +6,32 @@ import mapobjects.category.OnEffector;
 
 import static game.Main.gameState;
 
-public abstract class Chest extends GridObject implements OnEffector {
+public class Chest extends GridObject implements OnEffector {
+
+    public enum ChestType {
+        WoodenChest(5, 0), SilverChest(10, 1), GoldenChest(20, 3);
+
+        ChestType(int coinNum, int gemNum) {
+            this.coinNum = coinNum;
+            this.gemNum = gemNum;
+        }
+
+        private final int coinNum;
+        private final int gemNum;
+    }
 
     private final Box effectBox;
     private boolean isOpen;
-    private final double buffTime;
-    private final char[] buffs;
     private final int coinNum;
+    private final int gemNum;
+    private final String type;
 
-    public Chest(int worldIndex, int xNum, int yNum, char[] buffs, double buffTime, int coinNum) {
+    public Chest(int worldIndex, int xNum, int yNum, ChestType chestType) {
         super(worldIndex, xNum, yNum, 2, 2, true);
-        this.buffs = buffs;
-        this.buffTime = buffTime;
-        this.coinNum = coinNum;
+        this.coinNum = chestType.coinNum;
+        this.gemNum = chestType.gemNum;
+        this.type = chestType.name();
+        setName(type + "/0");
         effectBox = positionBox.clone();
         effectBox.setCorners(new double[]{
                 positionBox.getCorner(0), (positionBox.getCorner(1) + positionBox.getCorner(3)) / 2,
@@ -26,10 +39,6 @@ public abstract class Chest extends GridObject implements OnEffector {
         });
     }
 
-
-    public int getCoinNum() {
-        return coinNum;
-    }
 
     @Override
     public Box getEffectBox() {
@@ -43,43 +52,16 @@ public abstract class Chest extends GridObject implements OnEffector {
 
     @Override
     public void playerIsOn(Player player) {
-        openChest(player);
+        openChest();
     }
 
 
-    public void openChest(Player player) {
+    public void openChest() {
         if (isOpen) return;
         isOpen = true;
-        setName("1");
+        setName(type + "/1");
         gameState.collectCoin(coinNum);
-    }
-
-
-    public static class WoodenChest extends Chest {
-        private static final double BUFF_TIME = 10;
-        private static final int COIN_NUM = 5;
-
-        public WoodenChest(int worldIndex, int xNum, int yNum, char[] buff) {
-            super(worldIndex, xNum, yNum, buff, BUFF_TIME, COIN_NUM);
-        }
-    }
-
-    public static class SilverChest extends Chest {
-        private static final double BUFF_TIME = 20;
-        private static final int COIN_NUM = 10;
-
-        public SilverChest(int worldIndex, int xNum, int yNum, char[] buff) {
-            super(worldIndex, xNum, yNum, buff, BUFF_TIME, COIN_NUM);
-        }
-    }
-
-    public static class GoldenChest extends Chest {
-        private static final double BUFF_TIME = 30;
-        private static final int COIN_NUM = 20;
-
-        public GoldenChest(int worldIndex, int xNum, int yNum, char[] buff) {
-            super(worldIndex, xNum, yNum, buff, BUFF_TIME, COIN_NUM);
-        }
+        gameState.collectGem(gemNum);
     }
 
 }

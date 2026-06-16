@@ -26,7 +26,7 @@
   - [ ] add gun types, different spawn logics
   - [ ] add guns to the shop
   - [x] fix spawner class!
-- [ ] New button - screen: Info about player and buff stats.
+- [ ] New button - screen in shop: Info about player and buff stats.
 - [ ] Lock levels and keep the last unlocked level index inside gamestate
   - [ ] draw chains on locked level boxes
   - [ ] keep passed level indexes in gamestate

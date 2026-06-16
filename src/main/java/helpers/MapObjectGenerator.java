@@ -39,16 +39,8 @@ public class MapObjectGenerator {
         return new Projectile.HomingProjectile(worldIndex, centerX, centerY, direction, I, damage);
     }
 
-    public Coin.SingleCoin mutateToSingleCoin() {
-        return new Coin.SingleCoin(worldIndex, xNum, yNum);
-    }
-
-    public Coin.TripleCoin mutateToTripleCoin() {
-        return new Coin.TripleCoin(worldIndex, xNum, yNum);
-    }
-
-    public Coin.CoinBag mutateToCoinBag() {
-        return new Coin.CoinBag(worldIndex, xNum, yNum);
+    public Currency mutateToCoin(Currency.CurrencyType type) {
+        return new Currency(worldIndex, xNum, yNum, type);
     }
 
     public Mine mutateToMine() {
@@ -79,16 +71,8 @@ public class MapObjectGenerator {
         return new Point.WinPoint(worldIndex, xNum, yNum, index, isBlue);
     }
 
-    public Chest.WoodenChest mutateToWoodenChest(char[] buffs) {
-        return new Chest.WoodenChest(worldIndex, xNum, yNum, buffs);
-    }
-
-    public Chest.SilverChest mutateToSilverChest(char[] buffs) {
-        return new Chest.SilverChest(worldIndex, xNum, yNum, buffs);
-    }
-
-    public Chest.GoldenChest mutateToGoldenChest(char[] buffs) {
-        return new Chest.GoldenChest(worldIndex, xNum, yNum, buffs);
+    public Chest mutateToChest(Chest.ChestType chestType) {
+        return new Chest(worldIndex, xNum, yNum, chestType);
     }
 
     public Door mutateToDoor(char alignment) {

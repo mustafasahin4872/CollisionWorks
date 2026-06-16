@@ -293,14 +293,14 @@ public class GameScreen {
 
         private final FrameBox frameBox = new FrameBox(2*CENTER_X - 2*SIDE, DISTANCE, SIDE, SIDE);
         private int coinsCollected;
-        private String fileName = IMAGES_ROOT+"coin/singlecoin/0.png";
+        private String fileName = IMAGES_ROOT+"currency/singleCoin.png";
 
         private void update(int coinsCollected) {
             frameBox.update();
             this.coinsCollected = coinsCollected;
 
-            if (this.coinsCollected >= 10) fileName = IMAGES_ROOT+"coin/triplecoin/0.png";
-            if (this.coinsCollected >= 50) fileName = IMAGES_ROOT+"coin/coinbag/0.png";
+            if (this.coinsCollected >= 10) fileName = IMAGES_ROOT+"currency/tripleCoin.png";
+            if (this.coinsCollected >= 50) fileName = IMAGES_ROOT+"currency/coinBag.png";
         }
 
         private void draw() {
