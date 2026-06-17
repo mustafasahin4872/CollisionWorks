@@ -25,7 +25,7 @@ FOR GODS SAKE DECOUPLE PLAYER FROM EVERYTHING
 - [ ] ADD GUNS!!!
   - [x] move the spawn logic to guns from the player
   - [x] the basic initiation of guns are done in playerDefaults class
-  - [ ] add gun types, different spawn logics
+  - [X] add gun types, different spawn logics
   - [ ] add guns to the shop
   - [x] fix spawner class!
 - [ ] New button - screen in shop: Info about player and buff stats.
