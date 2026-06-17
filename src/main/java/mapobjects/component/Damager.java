@@ -3,6 +3,7 @@ package mapobjects.component;
 public class Damager {
 
     private double damage;
+    private double shred; // TODO: ADD DEFENSE SHREDDING OPTION AND MORE
     public Damager(double damage) {
         this.damage = damage;
     }

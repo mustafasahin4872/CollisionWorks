@@ -6,17 +6,17 @@ import java.util.ArrayList;
 import static mapobjects.category.GridObject.TILE_SIDE;
 
 //creates and stores blueprints for the linked object. has different spawn styles
-public class Generator {
+public class Spawner {
 
     private final int worldIndex, xNum, yNum;
 
-    public Generator(int worldIndex) {
+    public Spawner(int worldIndex) {
         this.worldIndex = worldIndex;
         xNum = 0;
         yNum = 0;
     }
 
-    public Generator(GridObject gridObject) {
+    public Spawner(GridObject gridObject) {
         this.worldIndex = gridObject.getWorldIndex();
         this.xNum = gridObject.getXNum();
         this.yNum = gridObject.getYNum();

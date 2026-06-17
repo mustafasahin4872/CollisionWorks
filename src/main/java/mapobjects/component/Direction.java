@@ -4,7 +4,7 @@ public class Direction {
 
     private double direction;
 
-    public Direction(int direction) {
+    public Direction(double direction) {
         this.direction = Math.toRadians(direction);
     }
 

@@ -2,34 +2,39 @@ package mapobjects.mapobject;
 
 import game.Frame;
 import helpers.Blueprint;
-import mapobjects.category.Spawner;
 import mapobjects.component.*;
 import mapobjects.category.*;
+import mapobjects.component.Spawner;
 
 import java.util.HashSet;
 import java.util.Set;
 
 import static helpers.HelperMethods.outOfMapBounds;
+import mapobjects.mapobject.Projectile.ProjectileType;
+import mapobjects.mapobject.Projectile.ProjectileBlueprint;
 
-public abstract class Shooter extends GridObject implements Collidable, Timed, Spawner, HealthBearer {
+public abstract class Shooter extends GridObject implements Collidable, Timed, Generator, HealthBearer {
 
+    protected final ProjectileBlueprint projectileBlueprint;
     protected final Box collisionBox;
     protected final Timer timer;
-    protected final Generator generator;
+    protected final Spawner spawner;
     private final HPBar HPBar;
     protected final char type;
     protected final Set<Projectile> projectiles = new HashSet<>();
     protected static final double DEFAULT_COOLDOWN = 3000; //in milliseconds
     protected final GridObject[][][] layers;
     protected boolean broken;
+    protected Set<HealthBearer> targets;
 
-    public Shooter(int worldIndex, int xNum, int yNum, char type, GridObject[][][] layers) {
+    public Shooter(int worldIndex, int xNum, int yNum, char type, ProjectileType projectileType, GridObject[][][] layers) {
         super(worldIndex, xNum, yNum, "0");
         this.type = type;
         this.layers = layers;
+        this.projectileBlueprint = new ProjectileBlueprint(projectileType);
         collisionBox = positionBox.clone();
         timer = new Timer(0, DEFAULT_COOLDOWN / worldIndex);
-        generator = new Generator(this);
+        spawner = new Spawner(this);
         HPBar = new HPBar(50);
     }
 
@@ -64,6 +69,10 @@ public abstract class Shooter extends GridObject implements Collidable, Timed, S
         setName("1");
     }
 
+    public void setTargets(Set<HealthBearer> targets) {
+        this.targets = targets;
+    }
+
     @Override
     public void call(Player player) {
         for (Projectile projectile : projectiles) {
@@ -95,7 +104,7 @@ public abstract class Shooter extends GridObject implements Collidable, Timed, S
     @Override
     public void spawn() {
         Blueprint blueprint;
-        blueprint = generator.summonSpawn(getX(), getY(), type);
+        blueprint = spawner.summonSpawn(getX(), getY(), type);
         int d = switch (type) {
             case RIGHT -> 0;
             case UP -> 270;
@@ -106,14 +115,15 @@ public abstract class Shooter extends GridObject implements Collidable, Timed, S
                 yield 0;
             }
         };
-        Projectile projectile = blueprint.mutateToRegularProjectile(d);
+        Projectile projectile = blueprint.mutateToProjectile(projectileBlueprint, d);
+        projectile.setTargets(targets);
         projectiles.add(projectile);
     }
 
 
     public static class RegularShooter extends Shooter {
         public RegularShooter(int worldIndex, int xNum, int yNum, char type, GridObject[][][] layers) {
-            super(worldIndex, xNum, yNum, type, layers);
+            super(worldIndex, xNum, yNum, type, ProjectileType.REGULAR, layers);
             activateTimer();
         }
 
@@ -127,7 +137,7 @@ public abstract class Shooter extends GridObject implements Collidable, Timed, S
         private static final double RANGE = 1.5;
 
         public DirectionShooter(int worldIndex, int xNum, int yNum, GridObject[][][] layers, Player player) {
-            super(worldIndex, xNum, yNum, 'x', layers);
+            super(worldIndex, xNum, yNum, 'x', ProjectileType.REGULAR, layers);
             rangeBox = new Box(positionBox.getCenterCoordinates(), RANGE*TILE_SIDE*2, RANGE*TILE_SIDE*2);
             this.player = player;
         }
@@ -168,8 +178,8 @@ public abstract class Shooter extends GridObject implements Collidable, Timed, S
 
         @Override
         public void spawn() {
-            Blueprint blueprint = generator.directionSpawn(getCenterCoordinates(), player.getCenterCoordinates(), 50);
-            Projectile projectile = blueprint.mutateToRegularProjectile(0);
+            Blueprint blueprint = spawner.directionSpawn(getCenterCoordinates(), player.getCenterCoordinates(), 50);
+            Projectile projectile = blueprint.mutateToProjectile(projectileBlueprint, 0);
             projectile.rotate(player.getCenterCoordinates());
             projectiles.add(projectile);
         }
@@ -180,19 +190,64 @@ public abstract class Shooter extends GridObject implements Collidable, Timed, S
         }
     }
 
-    public static class HomingShooter extends DirectionShooter {
-        public final double I;
+    public static class HomingShooter extends Shooter implements  Ranged {
+
+        private final Box rangeBox;
+        protected final Player player;
+        private static final double RANGE = 9.5;
+
         public HomingShooter(int worldIndex, int xNum, int yNum, GridObject[][][] layers, Player player) {
-            super(worldIndex, xNum, yNum, layers, player);
-            I = 0.7 + 0.25 / worldIndex;
+            super(worldIndex, xNum, yNum, 'h', ProjectileType.HOMING, layers);
+            this.player = player;
+            rangeBox = new Box(positionBox.getCenterCoordinates(), RANGE*TILE_SIDE*2, RANGE*TILE_SIDE*2);
+        }
+
+        @Override
+        public Box getRangeBox() {
+            return rangeBox;
+        }
+
+        @Override
+        public void playerInRange(Player player) {
+            activateTimer();
+        }
+
+
+        @Override
+        public void call(Player player) {
+            for (Projectile projectile : projectiles) {
+                projectile.call(player, layers);
+            }
+            projectiles.removeIf(Projectile::isExpired);
+
+            checkDead();
+            if (broken) return;
+
+            if (isActive()) {
+                spawn();
+            }
+
+            updateTimer();
+
+            if (cooldownOver()) {
+                timeIsUp(player);
+            }
+
+
         }
 
         @Override
         public void spawn() {
-            Blueprint blueprint = generator.directionSpawn(getCenterCoordinates(), player.getCenterCoordinates(), 50);
-            Projectile projectile = blueprint.mutateToHomingProjectile(0, I, 20);
+            Blueprint blueprint = spawner.directionSpawn(getCenterCoordinates(), player.getCenterCoordinates(), 50);
+            Projectile projectile = blueprint.mutateToProjectile(projectileBlueprint, 0);
             projectile.rotate(player.getCenterCoordinates());
+            projectile.setTargets(targets);
             projectiles.add(projectile);
+        }
+
+        @Override
+        public void timeIsUp(Player player) {
+            checkPlayerInRange(player);
         }
     }
 
@@ -204,7 +259,7 @@ public abstract class Shooter extends GridObject implements Collidable, Timed, S
         private double xVelocity, yVelocity;
         private final char alignment;
         public MovingShooter(int worldIndex, int xNum, int yNum, char type, char alignment, GridObject[][][] layers) {
-            super(worldIndex, xNum, yNum, type, layers);
+            super(worldIndex, xNum, yNum, type, ProjectileType.REGULAR, layers);
             this.alignment = alignment;
             if (alignment == HORIZONTAL) {
                 xVelocity = SPEED;

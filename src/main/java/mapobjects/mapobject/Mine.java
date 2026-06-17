@@ -7,6 +7,7 @@ import mapobjects.component.Timer;
 import mapobjects.category.*;
 
 import java.awt.*;
+import java.util.Set;
 
 public class Mine extends GridObject implements OnEffector, Ranged, Timed, Damaging {
 
@@ -14,6 +15,7 @@ public class Mine extends GridObject implements OnEffector, Ranged, Timed, Damag
     private final Box effectBox;
     private final Timer timer;
     private final Damager damager;
+    private Set<HealthBearer> targets;
 
     private static final double RANGE = 6; //in tiles
     private static final double DEFAULT_DAMAGE = 30;
@@ -51,6 +53,16 @@ public class Mine extends GridObject implements OnEffector, Ranged, Timed, Damag
     @Override
     public Damager getDamager() {
         return damager;
+    }
+
+    @Override
+    public void setTargets(Set<HealthBearer> targets) {
+        this.targets = targets;
+    }
+
+    @Override
+    public Set<HealthBearer> getTargets() {
+        return targets;
     }
 
     @Override

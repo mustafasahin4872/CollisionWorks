@@ -1,12 +1,13 @@
 package helpers;
 
-import mapobjects.mapobject.Gun.GunType;
+import mapobjects.mapobject.Gun;
+import mapobjects.mapobject.Gun.*;
 
 public enum PlayerDefaults {
 
-    Bob(false, "jpg", 50, MovingTypes.DEFAULT, HealthTypes.DEFAULT, GunType.STAFF),
-    Mike(true, "png", 50, MovingTypes.FAST, HealthTypes.FRAGILE, GunType.UZI),
-    Sakura(true, "png", 40, MovingTypes.DEFAULT, HealthTypes.RECURRING, GunType.PACIFIST);
+    Bob(false, "jpg", 50, MovingTypes.DEFAULT, HealthTypes.DEFAULT, new MachineGun()),
+    Mike(true, "png", 50, MovingTypes.FAST, HealthTypes.FRAGILE, new Uzi()),
+    Sakura(true, "png", 40, MovingTypes.DEFAULT, HealthTypes.RECURRING, new Shotgun());
 
     private enum MovingTypes {
 
@@ -88,9 +89,9 @@ public enum PlayerDefaults {
     private final int maxLives;
     private final double maxHP;
     private final double defence;
-    private final GunType gunType;
+    private final Gun gun;
 
-    PlayerDefaults(boolean animated, String imageType, double side, MovingTypes movingTypes, HealthTypes healthTypes, GunType gunType) {
+    PlayerDefaults(boolean animated, String imageType, double side, MovingTypes movingTypes, HealthTypes healthTypes, Gun gun) {
         this.animated = animated;
         this.imageType = imageType;
         this.side = side;
@@ -100,7 +101,7 @@ public enum PlayerDefaults {
         this.maxLives = healthTypes.maxLives;
         this.maxHP = healthTypes.maxHP;
         this.defence = healthTypes.defence;
-        this.gunType = gunType;
+        this.gun = gun;
     }
 
     public boolean isAnimated() {
@@ -139,7 +140,7 @@ public enum PlayerDefaults {
         return defence;
     }
 
-    public GunType getGunType() {
-        return gunType;
+    public Gun getGun() {
+        return gun;
     }
 }

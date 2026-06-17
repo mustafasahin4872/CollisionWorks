@@ -2,7 +2,12 @@ package mapobjects.category;
 
 import mapobjects.component.Damager;
 
+import java.util.Set;
+
 public interface Damaging {
+
+    void setTargets(Set<HealthBearer> targets);
+    Set<HealthBearer> getTargets();
 
     Damager getDamager();
 

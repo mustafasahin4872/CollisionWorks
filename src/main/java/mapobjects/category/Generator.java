@@ -1,6 +1,6 @@
 package mapobjects.category;
 
-public interface Spawner {
+public interface Generator {
 
     void spawn();
 

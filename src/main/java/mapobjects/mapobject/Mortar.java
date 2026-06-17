@@ -1,18 +1,18 @@
 package mapobjects.mapobject;
 
 import helpers.Blueprint;
-import mapobjects.component.Generator;
+import mapobjects.component.Spawner;
 import mapobjects.component.Box;
 import mapobjects.component.HPBar;
 import mapobjects.component.Timer;
 import mapobjects.category.*;
 
-public class Mortar extends GridObject implements Collidable, Ranged, Timed, Spawner, HealthBearer {
+public class Mortar extends GridObject implements Collidable, Ranged, Timed, Generator, HealthBearer {
 
     private final Box collisionBox;
     private final Timer timer;
     private final Box rangeBox;
-    private final Generator generator;
+    private final Spawner spawner;
     private final HPBar HPBar;
 
     private boolean broken;
@@ -35,7 +35,7 @@ public class Mortar extends GridObject implements Collidable, Ranged, Timed, Spa
         collisionBox = positionBox.clone();
         rangeBox = new Box(positionBox.getCenterCoordinates(), RANGE*TILE_SIDE*2, RANGE*TILE_SIDE*2);
         timer = new Timer(PERIOD, DEFAULT_COOLDOWN/worldIndex);
-        generator = new Generator(this);
+        spawner = new Spawner(this);
         HPBar = new HPBar(getWidth()*4);
         mines = new Mine[mineNum];
     }
@@ -111,7 +111,7 @@ public class Mortar extends GridObject implements Collidable, Ranged, Timed, Spa
     }
 
     public void spawn() {
-        Blueprint[] generators = generator.randomSpawn(RANGE/2, mineNum, layers);
+        Blueprint[] generators = spawner.randomSpawn(RANGE/2, mineNum, layers);
         Mine[] newMines = new Mine[mineNum];
         for (int i = 0; i<mineNum; i++) {
             newMines[i] = generators[i].mutateToMine();

@@ -389,7 +389,7 @@ public class GameScreen {
             int ammoDrawn = Math.min(ammo, MAX_AMMO_DRAWN);
 
             for (int i = 0; i<ammoDrawn; i++) {
-                    StdDraw.picture(box.getCenterX() + EFF_W*i, box.getCenterY(), IMAGES_ROOT+"projectile/regularprojectile/0.png", WIDTH, HEIGHT, 45);
+                    StdDraw.picture(box.getCenterX() + EFF_W*i, box.getCenterY(), IMAGES_ROOT+"ui/projectile.png", WIDTH, HEIGHT, 45);
             }
             if (ammo>MAX_AMMO_DRAWN) { // does not display +0 or +1, starts from +2.
                 Font font = new Font("Ariel", Font.BOLD, (int)EFF_H/2);

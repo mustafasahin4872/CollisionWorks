@@ -3,12 +3,10 @@ package game;
 import helpers.HelperMethods;
 import helpers.MapMaker;
 import helpers.MapType;
-import mapobjects.category.GridObject;
-import mapobjects.category.MapObject;
-import mapobjects.category.Moving;
-import mapobjects.category.MovingCollidable;
+import mapobjects.category.*;
 import mapobjects.mapobject.*;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -28,6 +26,7 @@ public class GameMap {
     private final GridObject[][][] layers;
     private final Set<Moving> movingObjects = new HashSet<>();
     private final Set<MovingCollidable> movingCollidableObjects = new HashSet<>();
+    private final Set<HealthBearer> healthBearers = new HashSet<>();
     private final Set<MapObject> alwaysCalledObjects = new HashSet<>();
 
     //private final int totalCoinOnMap;
@@ -47,6 +46,7 @@ public class GameMap {
         layers = mapMaker.getLayers();
         spawnPoint = mapMaker.getSpawnPoint();
 
+        ArrayList<Shooter> shooters = new ArrayList<>();
         for (GridObject[][] layer : layers) {
             for (int i = 0; i<yTile; i++) {
                 for (int j = 0; j<xTile; j++) {
@@ -55,14 +55,22 @@ public class GameMap {
                         movingCollidableObjects.add(movingCollidable);
                     } else if (gridObject instanceof Moving moving) {
                         movingObjects.add(moving);
+                    } else if (gridObject instanceof HealthBearer healthBearer) {
+                        healthBearers.add(healthBearer);
                     }
+                    if (gridObject instanceof Shooter s) shooters.add(s);
                     if (gridObject instanceof Door || gridObject instanceof Shooter || gridObject instanceof Moving) {
                         alwaysCalledObjects.add(gridObject);
                     }
                 }
             }
         }
+        healthBearers.add(player);
 
+        for (Shooter s : shooters) {
+            s.setTargets(healthBearers);
+        }
+        player.setTargets(healthBearers);
         setFrameTileRange();
     }
 

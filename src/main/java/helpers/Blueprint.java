@@ -6,7 +6,8 @@ import mapobjects.mapobject.*;
 
 import static mapobjects.category.GridObject.TILE_SIDE;
 
-//creates a blueprint for mapObjects, then mutates to a specific mapObject with methods
+/// creates a blueprint for mapObjects, holds worldIndex, x and y.
+/// with methods and necessary parameters, mutates to/creates a new MapObject
 public class Blueprint {
 
     private final int worldIndex, xNum, yNum;
@@ -27,16 +28,8 @@ public class Blueprint {
         centerY = y;
     }
 
-    public Projectile mutateToRegularProjectile(int direction) {
-        return new Projectile.RegularProjectile(worldIndex, centerX, centerY, direction);
-    }
-
-    public Projectile mutateToRegularProjectile(double width, double height, int direction, double speed, double damage) {
-        return new Projectile.RegularProjectile(worldIndex, centerX, centerY, width, height, direction, speed, damage);
-    }
-
-    public Projectile mutateToHomingProjectile(int direction, double I, double damage) {
-        return new Projectile.HomingProjectile(worldIndex, centerX, centerY, direction, I, damage);
+    public Projectile mutateToProjectile(Projectile.ProjectileBlueprint projectileBlueprint, double direction) {
+        return projectileBlueprint.createProjectile(worldIndex, centerX, centerY, direction);
     }
 
     public Currency mutateToCoin(Currency.CurrencyType type) {

@@ -42,7 +42,7 @@ public class GameState {
     private final ArrayList<Player> skins = new ArrayList<>(List.of(new Player()));
     private final ArrayList<Accessory> accessories = new ArrayList<>();
     private final ArrayList<Buff> permanentBuffs = new ArrayList<>();
-    private final  ArrayList<Gun> guns = new ArrayList<>(List.of(new Gun()));
+    private final  ArrayList<Gun> guns = new ArrayList<>();
 
 
 

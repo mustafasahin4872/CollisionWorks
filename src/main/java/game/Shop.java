@@ -35,9 +35,9 @@ public class Shop {
     );
 
     private final List<ShopEntry> buyableGuns = List.of(
-        new ShopEntry(new Gun(Gun.GunType.UZI), 0, false),
-        new ShopEntry(new Gun(Gun.GunType.SHOTGUN), 0, false),
-        new ShopEntry(new Gun(Gun.GunType.STAFF), 0, false)
+        new ShopEntry(new Gun.Uzi(), 0, false),
+        new ShopEntry(new Gun.Shotgun(), 0, false),
+        new ShopEntry(new Gun.Staff(), 0, false)
     );
 
 

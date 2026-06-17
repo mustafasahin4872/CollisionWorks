@@ -2,7 +2,8 @@ package mapobjects.category;
 
 import mapobjects.component.HPBar;
 
-public interface HealthBearer {
+// extends collidable, //TODO: IS THIS GOOD DESIGN?
+public interface HealthBearer extends Collidable {
 
     HPBar getHealthBar();
 

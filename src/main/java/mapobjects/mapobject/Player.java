@@ -9,6 +9,8 @@ import helpers.PlayerDefaults;
 import mapobjects.component.*;
 import mapobjects.category.*;
 
+import java.util.Set;
+
 import static helpers.HelperMethods.*;
 
 public class Player extends MapObject implements MovingCollidable, HealthBearer {
@@ -77,13 +79,16 @@ public class Player extends MapObject implements MovingCollidable, HealthBearer 
         hpBar = new HPBar(defaultMaxHP, defaultMaxLives, defaultDef);
 
         collisionBox = positionBox.clone();
-        gun = new Gun(playerDefaults.getGunType());
+        gun = playerDefaults.getGun();
 
         respawn();
     }
 
+    public Gun getGun() {
+        return gun;
+    }
 
-    //UPDATES
+//UPDATES
 
     public void call(GridObject[][][] layers) {
 
@@ -392,6 +397,10 @@ public class Player extends MapObject implements MovingCollidable, HealthBearer 
     public void setSpawnPoint(double[] spawnPoint) {
         spawnX = spawnPoint[0];
         spawnY = spawnPoint[1];
+    }
+
+    public void setTargets(Set<HealthBearer> targets) {
+        gun.setTargets(targets);
     }
 
 

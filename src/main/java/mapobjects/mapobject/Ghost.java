@@ -6,6 +6,8 @@ import mapobjects.component.Box;
 import mapobjects.component.Damager;
 import mapobjects.component.Timer;
 
+import java.util.Set;
+
 import static helpers.HelperMethods.*;
 
 
@@ -28,6 +30,7 @@ public class Ghost extends GridObject implements OnEffector, MovingCollidable, D
     private double speed = 3, xVelocity, yVelocity;
     private boolean xCollided, yCollided;
     private final GridObject[][][] layers;
+    private Set<HealthBearer> targets;
 
     public Ghost(int worldIndex, int xNum, int yNum, char alignment, GridObject[][][] layers) {
         super(worldIndex, xNum, yNum);
@@ -163,6 +166,16 @@ public class Ghost extends GridObject implements OnEffector, MovingCollidable, D
     @Override
     public Timer getTimer() {
         return timer;
+    }
+
+    @Override
+    public void setTargets(Set<HealthBearer> targets) {
+        this.targets = targets;
+    }
+
+    @Override
+    public Set<HealthBearer> getTargets() {
+        return targets;
     }
 
     @Override
