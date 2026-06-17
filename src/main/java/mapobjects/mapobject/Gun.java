@@ -1,16 +1,16 @@
 package mapobjects.mapobject;
 
-import helpers.MapObjectGenerator;
+import helpers.Blueprint;
 import mapobjects.category.MapObject;
-import mapobjects.category.Spawnable;
-import mapobjects.component.Spawner;
+import mapobjects.category.Spawner;
+import mapobjects.component.Generator;
 import mapobjects.component.Timer;
 import java.util.HashSet;
 import java.util.Set;
 import static mapobjects.mapobject.Projectile.RegularProjectile;
 import static mapobjects.mapobject.Projectile.HomingProjectile;
 
-public class Gun extends MapObject implements Spawnable {
+public class Gun extends MapObject implements Spawner {
 
     public enum GunType {
 
@@ -42,7 +42,7 @@ public class Gun extends MapObject implements Spawnable {
     }
 
     private final GunType gunType;
-    private final Spawner spawner;
+    private final Generator spawner;
 
     private int ammo;
     private final int maxAmmo;
@@ -71,7 +71,7 @@ public class Gun extends MapObject implements Spawnable {
         reloadTimer = new Timer(0, gunType.reloadTime);
         cooldownTimer = new Timer(0, gunType.cooldown);
 
-        spawner = new Spawner(worldIndex);
+        spawner = new Generator(worldIndex);
     }
 
 
@@ -93,18 +93,18 @@ public class Gun extends MapObject implements Spawnable {
 
     @Override
     public void spawn() {
-        MapObjectGenerator mapObjectGenerator = spawner.directionSpawn(centerCoordinates, nextCenterCoordinates, 30);
+        Blueprint blueprint = spawner.directionSpawn(centerCoordinates, nextCenterCoordinates, 30);
 
-        Projectile projectile = createProjectile(mapObjectGenerator, direction, speed);
+        Projectile projectile = createProjectile(blueprint, direction, speed);
         projectiles.add(projectile);
     }
 
 
-    private Projectile createProjectile(MapObjectGenerator mapObjectGenerator, int direction, double speed) {
-        if (gunType.projectileClass == HomingProjectile.class) {
-            return mapObjectGenerator.mutateToHomingProjectile(direction, 0.75, damagePerAmmo);
+    private Projectile createProjectile(Blueprint blueprint, int direction, double speed) {
+        if (gunType.getProjectileClass() == HomingProjectile.class) {
+            return blueprint.mutateToHomingProjectile(direction, 0.75, damagePerAmmo);
         } else {
-            return mapObjectGenerator.mutateToRegularProjectile(20, 10, direction, speed + Projectile.DEFAULT_INITIAL_SPEED, damagePerAmmo);
+            return blueprint.mutateToRegularProjectile(20, 10, direction, speed + Projectile.DEFAULT_INITIAL_SPEED, damagePerAmmo);
         }
     }
 
@@ -128,13 +128,5 @@ public class Gun extends MapObject implements Spawnable {
     }
 
     public Set<Projectile> getProjectiles() {return projectiles;}
-
-    // unused, use getProjectiles instead
-    @Override
-    public MapObject[] getSpawnObjects() {
-        return projectiles.toArray(new Projectile[0]);
-    }
-
-
 
 }

@@ -11,7 +11,6 @@ import java.util.*;
 import java.util.Map;
 
 import static game.Main.RESOURCES_ROOT;
-import static helpers.HelperMethods.toCharArray;
 
 //creates all the map objects from map file
 public class MapMaker {
@@ -150,7 +149,7 @@ points can have the indicator B for big displays, special to the selection scree
             for (int x = 0; x < xTile; x++) {
 
                 int xNum = x+1, yNum = y+1;
-                MapObjectGenerator mapObjectGenerator = new MapObjectGenerator(worldIndex, xNum, yNum);
+                Blueprint blueprint = new Blueprint(worldIndex, xNum, yNum);
 
                 Tile initializedTile;
                 GridObject initializedGridObject;
@@ -163,43 +162,43 @@ points can have the indicator B for big displays, special to the selection scree
 
                     char char1 = tileCode.charAt(1), char2 = tileCode.charAt(2);
 
-                    initializedTile = mapObjectGenerator.mutateToTile(char0);
-                    initializedCoin = initializeCurrency(char1, mapObjectGenerator);
+                    initializedTile = blueprint.mutateToTile(char0);
+                    initializedCoin = initializeCurrency(char1, blueprint);
                     initializedGridObject = switch (char1) {
-                        case '@' -> mapObjectGenerator.mutateToMine();
-                        case '%' -> mapObjectGenerator.mutateToMortar(layers);
+                        case '@' -> blueprint.mutateToMine();
+                        case '%' -> blueprint.mutateToMortar(layers);
                         case '+' -> {
-                            if (char2 == 'x') yield mapObjectGenerator.mutateToDirectionShooter(layers, player);
+                            if (char2 == 'x') yield blueprint.mutateToDirectionShooter(layers, player);
                             else if (char2 == 'h') {
-                                yield mapObjectGenerator.mutateToHomingShooter(layers, player);
-                            } else yield mapObjectGenerator.mutateToRegularShooter(char2, layers);
+                                yield blueprint.mutateToHomingShooter(layers, player);
+                            } else yield blueprint.mutateToRegularShooter(char2, layers);
                         }
-                        case ';' -> mapObjectGenerator.mutateToGhost(char2, layers);
+                        case ';' -> blueprint.mutateToGhost(char2, layers);
                         case ':' -> {
-                            Button button = mapObjectGenerator.mutateToBigButton();
+                            Button button = blueprint.mutateToBigButton();
                             buttonMap.put("%d:%d".formatted(xNum, yNum), button);
                             yield button;
                         }
                         case '.' -> {
-                            Button button = mapObjectGenerator.mutateToLittleButton();
+                            Button button = blueprint.mutateToLittleButton();
                             buttonMap.put("%d:%d".formatted(xNum, yNum), button);
                             yield button;
                         }
                         case '0' -> {
-                            Point.SpawnPoint spawnPoint = mapObjectGenerator.mutateToSpawnPoint(char2 == 'B');
+                            Point.SpawnPoint spawnPoint = blueprint.mutateToSpawnPoint(char2 == 'B');
                             checkPointsToSetPrev[0] = spawnPoint;
                             yield spawnPoint;
                         }
                         case '1', '2', '3', '4' -> {
-                            Point.CheckPoint checkPoint = mapObjectGenerator.mutateToCheckPoint(char1 - '0', char2 == 'B');
+                            Point.CheckPoint checkPoint = blueprint.mutateToCheckPoint(char1 - '0', char2 == 'B');
                             checkPointsToSetPrev[char1 - '0'] = checkPoint;
                             yield checkPoint;
                         }
-                        case '5', '6', '7', '8', '9' -> mapObjectGenerator.mutateToWinPoint(char1 - '5', char2 == 'B');
-                        case '~' -> mapObjectGenerator.mutateToChest(Chest.ChestType.WoodenChest); // TODO: utilize char2 as buff type
-                        case '≈' -> mapObjectGenerator.mutateToChest(Chest.ChestType.SilverChest);
-                        case '=' -> mapObjectGenerator.mutateToChest(Chest.ChestType.GoldenChest);
-                        case 'D' -> mapObjectGenerator.mutateToDoor(char2);
+                        case '5', '6', '7', '8', '9' -> blueprint.mutateToWinPoint(char1 - '5', char2 == 'B');
+                        case '~' -> blueprint.mutateToChest(Chest.ChestType.WoodenChest); // TODO: utilize char2 as buff type
+                        case '≈' -> blueprint.mutateToChest(Chest.ChestType.SilverChest);
+                        case '=' -> blueprint.mutateToChest(Chest.ChestType.GoldenChest);
+                        case 'D' -> blueprint.mutateToDoor(char2);
                         default -> null;
                     };
 
@@ -208,8 +207,8 @@ points can have the indicator B for big displays, special to the selection scree
                     String[] details = objectDetails.get(lineIndex).split("; ");
                     String onTileCode = details[0];
 
-                    initializedTile = mapObjectGenerator.mutateToTile(onTileCode.charAt(0));
-                    initializedCoin = initializeCurrency(onTileCode.charAt(1), mapObjectGenerator);
+                    initializedTile = blueprint.mutateToTile(onTileCode.charAt(0));
+                    initializedCoin = initializeCurrency(onTileCode.charAt(1), blueprint);
                     initializedGridObject = switch (char0) {
                         case 'C' -> {
                             String[] buffs = details[2].split(", "); // TODO: UTILIZE BUFF MECHANIC ON A37 INITIALIZER
@@ -222,23 +221,23 @@ points can have the indicator B for big displays, special to the selection scree
                                     yield null;
                                 }
                             };
-                            yield mapObjectGenerator.mutateToChest(chestType);
+                            yield blueprint.mutateToChest(chestType);
                         }
                         case 'D' -> {
                             int length = (details.length == 4) ? Integer.parseInt(details[3]) : 4;
-                            Door door = mapObjectGenerator.mutateToDoor(details[1].charAt(0), length);
+                            Door door = blueprint.mutateToDoor(details[1].charAt(0), length);
                             doorsToWire.put(door, lineIndex);
                             yield door;
                         }
                         case 'S' -> {
                             String[] messages = details[2].split(", ");
                             yield switch (details[1].charAt(0)) {
-                                case '\'' -> mapObjectGenerator.mutateToSign(messages);
+                                case '\'' -> blueprint.mutateToSign(messages);
                                 case '"' -> {
                                     for (int i = 0; i < messages.length; i++) {
                                         messages[i] = objectDetails.get(Integer.parseInt(messages[i]) - 37);
                                     }
-                                    yield mapObjectGenerator.mutateToSign(messages);
+                                    yield blueprint.mutateToSign(messages);
                                 }
                                 default -> {
                                     System.out.println("error at S37");
@@ -246,7 +245,7 @@ points can have the indicator B for big displays, special to the selection scree
                                 }
                             };
                         }
-                        case 'O' -> mapObjectGenerator.mutateToMovingShooter(details[1].charAt(0), details[2].charAt(0), layers);
+                        case 'O' -> blueprint.mutateToMovingShooter(details[1].charAt(0), details[2].charAt(0), layers);
                         default -> {
                             System.out.println("default message for A37, an error occurred.");
                             yield null;
@@ -264,7 +263,7 @@ points can have the indicator B for big displays, special to the selection scree
     }
 
 
-    private Currency initializeCurrency(char type, MapObjectGenerator mapObjectGenerator) {
+    private Currency initializeCurrency(char type, Blueprint blueprint) {
         Currency.CurrencyType currencyType = switch (type) {
             case 'o' -> Currency.CurrencyType.singleCoin;
             case 'ö' -> Currency.CurrencyType.tripleCoin;
@@ -275,7 +274,7 @@ points can have the indicator B for big displays, special to the selection scree
             default -> null;
         };
         if (currencyType == null) return null;
-        return mapObjectGenerator.mutateToCoin(currencyType);
+        return blueprint.mutateToCoin(currencyType);
     }
 
 

@@ -48,6 +48,7 @@
 - [x] Enhance currency system
     - [x] in-game collected currencies add to the gamestate currencies
     - [x] add a gem counter into in-game ui as well
+    - [x] add gems in mapmaker as well
 - [x] Create a separate SelectionScreen similar to GameScreen
 
 ### Core Refactoring

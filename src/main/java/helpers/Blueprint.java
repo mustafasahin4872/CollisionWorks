@@ -6,13 +6,13 @@ import mapobjects.mapobject.*;
 
 import static mapobjects.category.GridObject.TILE_SIDE;
 
-//creates a blueprint for mapobjects, then mutates to a specific mapobject with methods
-public class MapObjectGenerator {
+//creates a blueprint for mapObjects, then mutates to a specific mapObject with methods
+public class Blueprint {
 
     private final int worldIndex, xNum, yNum;
     private final double centerX, centerY;
 
-    public MapObjectGenerator(int worldIndex, int xNum, int yNum) {
+    public Blueprint(int worldIndex, int xNum, int yNum) {
         this.worldIndex = worldIndex;
         this.xNum = xNum;
         this.yNum = yNum;
@@ -20,7 +20,7 @@ public class MapObjectGenerator {
         centerY = (yNum - 0.5) * TILE_SIDE;
     }
 
-    public MapObjectGenerator(int worldIndex, double x, double y) {
+    public Blueprint(int worldIndex, double x, double y) {
         this.worldIndex = worldIndex;
         xNum = (int) (x/TILE_SIDE) + 1; yNum = (int) (y/TILE_SIDE) + 1;
         centerX = x;

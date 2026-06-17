@@ -1,7 +1,8 @@
 package mapobjects.mapobject;
 
 import game.Frame;
-import helpers.MapObjectGenerator;
+import helpers.Blueprint;
+import mapobjects.category.Spawner;
 import mapobjects.component.*;
 import mapobjects.category.*;
 
@@ -10,12 +11,11 @@ import java.util.Set;
 
 import static helpers.HelperMethods.outOfMapBounds;
 
-//can move?
-public abstract class Shooter extends GridObject implements Collidable, Timed, Spawnable, HealthBearer {
+public abstract class Shooter extends GridObject implements Collidable, Timed, Spawner, HealthBearer {
 
     protected final Box collisionBox;
     protected final Timer timer;
-    protected final Spawner spawner;
+    protected final Generator generator;
     private final HPBar HPBar;
     protected final char type;
     protected final Set<Projectile> projectiles = new HashSet<>();
@@ -29,7 +29,7 @@ public abstract class Shooter extends GridObject implements Collidable, Timed, S
         this.layers = layers;
         collisionBox = positionBox.clone();
         timer = new Timer(0, DEFAULT_COOLDOWN / worldIndex);
-        spawner = new Spawner(this);
+        generator = new Generator(this);
         HPBar = new HPBar(50);
     }
 
@@ -84,12 +84,6 @@ public abstract class Shooter extends GridObject implements Collidable, Timed, S
     }
 
     @Override
-    public MapObject[] getSpawnObjects() {
-        return projectiles.toArray(new Projectile[0]);
-    }
-
-
-    @Override
     public void draw() {
         super.draw();
         HPBar.drawHPBar(this);
@@ -100,8 +94,8 @@ public abstract class Shooter extends GridObject implements Collidable, Timed, S
 
     @Override
     public void spawn() {
-        MapObjectGenerator mapObjectGenerator;
-        mapObjectGenerator = spawner.summonSpawn(getX(), getY(), type);
+        Blueprint blueprint;
+        blueprint = generator.summonSpawn(getX(), getY(), type);
         int d = switch (type) {
             case RIGHT -> 0;
             case UP -> 270;
@@ -112,7 +106,7 @@ public abstract class Shooter extends GridObject implements Collidable, Timed, S
                 yield 0;
             }
         };
-        Projectile projectile = mapObjectGenerator.mutateToRegularProjectile(d);
+        Projectile projectile = blueprint.mutateToRegularProjectile(d);
         projectiles.add(projectile);
     }
 
@@ -130,7 +124,7 @@ public abstract class Shooter extends GridObject implements Collidable, Timed, S
 
         private final Box rangeBox;
         protected final Player player;
-        private static final double RANGE = 9.5;
+        private static final double RANGE = 1.5;
 
         public DirectionShooter(int worldIndex, int xNum, int yNum, GridObject[][][] layers, Player player) {
             super(worldIndex, xNum, yNum, 'x', layers);
@@ -174,8 +168,8 @@ public abstract class Shooter extends GridObject implements Collidable, Timed, S
 
         @Override
         public void spawn() {
-            MapObjectGenerator mapObjectGenerator = spawner.directionSpawn(getCenterCoordinates(), player.getCenterCoordinates(), 50);
-            Projectile projectile = mapObjectGenerator.mutateToRegularProjectile(0);
+            Blueprint blueprint = generator.directionSpawn(getCenterCoordinates(), player.getCenterCoordinates(), 50);
+            Projectile projectile = blueprint.mutateToRegularProjectile(0);
             projectile.rotate(player.getCenterCoordinates());
             projectiles.add(projectile);
         }
@@ -195,8 +189,8 @@ public abstract class Shooter extends GridObject implements Collidable, Timed, S
 
         @Override
         public void spawn() {
-            MapObjectGenerator mapObjectGenerator = spawner.directionSpawn(getCenterCoordinates(), player.getCenterCoordinates(), 50);
-            Projectile projectile = mapObjectGenerator.mutateToHomingProjectile(0, I, 20);
+            Blueprint blueprint = generator.directionSpawn(getCenterCoordinates(), player.getCenterCoordinates(), 50);
+            Projectile projectile = blueprint.mutateToHomingProjectile(0, I, 20);
             projectile.rotate(player.getCenterCoordinates());
             projectiles.add(projectile);
         }

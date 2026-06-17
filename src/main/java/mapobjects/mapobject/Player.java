@@ -4,17 +4,12 @@ import game.Frame;
 import game.GameState;
 import helpers.InputHandler.ArrowData;
 import game.Main;
-import helpers.MapObjectGenerator;
 
 import helpers.PlayerDefaults;
 import mapobjects.component.*;
 import mapobjects.category.*;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import static helpers.HelperMethods.*;
-import static mapobjects.category.GridObject.TILE_SIDE;
 
 public class Player extends MapObject implements MovingCollidable, HealthBearer {
 

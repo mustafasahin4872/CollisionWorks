@@ -1,18 +1,18 @@
 package mapobjects.mapobject;
 
-import helpers.MapObjectGenerator;
+import helpers.Blueprint;
+import mapobjects.component.Generator;
 import mapobjects.component.Box;
 import mapobjects.component.HPBar;
-import mapobjects.component.Spawner;
 import mapobjects.component.Timer;
 import mapobjects.category.*;
 
-public class Mortar extends GridObject implements Collidable, Ranged, Timed, Spawnable, HealthBearer {
+public class Mortar extends GridObject implements Collidable, Ranged, Timed, Spawner, HealthBearer {
 
     private final Box collisionBox;
     private final Timer timer;
     private final Box rangeBox;
-    private final Spawner spawner;
+    private final Generator generator;
     private final HPBar HPBar;
 
     private boolean broken;
@@ -35,7 +35,7 @@ public class Mortar extends GridObject implements Collidable, Ranged, Timed, Spa
         collisionBox = positionBox.clone();
         rangeBox = new Box(positionBox.getCenterCoordinates(), RANGE*TILE_SIDE*2, RANGE*TILE_SIDE*2);
         timer = new Timer(PERIOD, DEFAULT_COOLDOWN/worldIndex);
-        spawner = new Spawner(this);
+        generator = new Generator(this);
         HPBar = new HPBar(getWidth()*4);
         mines = new Mine[mineNum];
     }
@@ -52,7 +52,7 @@ public class Mortar extends GridObject implements Collidable, Ranged, Timed, Spa
         updateTimer();
         if (isComplete()) return; //in cooldown
         if (isActive()) {
-            callSpawnObjects(player);
+            for (Mine mine : mines) mine.call(player);
             if (areMinesComplete()) {timeIsUp(player);} //start cooldown
         } else if (!broken) {checkPlayerInRange(player);}
 
@@ -110,23 +110,12 @@ public class Mortar extends GridObject implements Collidable, Ranged, Timed, Spa
         timer.startCooldown();
     }
 
-    @Override
-    public Mine[] getSpawnObjects() {
-        return mines;
-    }
-
-    public Mine[] mutate() {
-        Mine[] mutated = new Mine[mineNum];
-        MapObjectGenerator[] mapObjectGenerators = spawner.getSpawnObjects();
-        for (int i = 0; i<mineNum; i++) {
-            mutated[i] = mapObjectGenerators[i].mutateToMine();
-        }
-        return mutated;
-    }
-
     public void spawn() {
-        spawner.replaceAll(spawner.randomSpawn(RANGE/2, mineNum, layers));
-        Mine[] newMines = mutate();
+        Blueprint[] generators = generator.randomSpawn(RANGE/2, mineNum, layers);
+        Mine[] newMines = new Mine[mineNum];
+        for (int i = 0; i<mineNum; i++) {
+            newMines[i] = generators[i].mutateToMine();
+        }
         System.arraycopy(newMines, 0, mines, 0, mineNum);
     }
 
