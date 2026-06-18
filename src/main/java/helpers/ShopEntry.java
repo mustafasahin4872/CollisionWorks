@@ -17,6 +17,13 @@ public class ShopEntry {
         this.info = info;
     }
 
+    public ShopEntry(MapObject item, int cost, boolean isCosmetic) {
+        this.item = item;
+        this.cost = cost;
+        this.isCosmetic = isCosmetic;
+        this.info = new ShopInfo(item);
+    }
+
     public boolean isSold() {
         return isSold;
     }

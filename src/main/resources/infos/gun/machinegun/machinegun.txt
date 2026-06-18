@@ -1,0 +1,1 @@
+The machine gun shoots multiple bullets at once in a cone shape with a high unload speed, but its slow reload speed and low accuracy hold it back. Upgrade it to reduce the jitter in its attacks.

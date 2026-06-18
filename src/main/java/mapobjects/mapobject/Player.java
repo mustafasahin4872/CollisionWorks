@@ -12,6 +12,7 @@ import mapobjects.category.*;
 import java.util.Set;
 
 import static helpers.HelperMethods.*;
+import static mapobjects.category.GridObject.TILE_SIDE;
 
 public class Player extends MapObject implements MovingCollidable, HealthBearer {
 
@@ -84,9 +85,6 @@ public class Player extends MapObject implements MovingCollidable, HealthBearer 
         respawn();
     }
 
-    public Gun getGun() {
-        return gun;
-    }
 
 //UPDATES
 
@@ -450,5 +448,18 @@ public class Player extends MapObject implements MovingCollidable, HealthBearer 
                 accessory.draw();
             }
         }
+    }
+
+    @Override
+    public String[] getStats() {
+        return new String[]{
+            "Size: " + Math.round(10 * baseSide / TILE_SIDE)/10.0 + " tiles",
+            "HP: " + hpBar.getMaxHP(),
+            "Defense: " + hpBar.getDefense(),
+            "Lives: " + hpBar.getLives(),
+            "Max Speed: " + baseMaxSpeed,
+            "Acceleration: " + baseAcceleration,
+            "Deceleration: " + baseDeceleration
+            };
     }
 }

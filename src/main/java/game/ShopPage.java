@@ -25,7 +25,7 @@ import static mapobjects.category.GridObject.TILE_SIDE;
 import static helpers.InputHandler.MouseData;
 import static game.GameState.STATE;
 import static helpers.HelperMethods.capitalize;
-
+import static helpers.ShopInfo.modes;
 
 
 // The shop screen in selection phase
@@ -49,7 +49,7 @@ public class ShopPage {
 
     private final int[] indexes = new int[N];
     private final boolean[] selected = new boolean[N];
-    private final boolean[] infoDisplayed = new boolean[N];
+    private final modes[] infoModes = new modes[N];
 
     private static final double DRAW_BIG_MULTIPLIER = 2.0;
 
@@ -58,6 +58,7 @@ public class ShopPage {
     public ShopPage(InputHandler inputHandler, GameState gameState) {
         this.inputHandler = inputHandler;
         this.gameState = gameState;
+        Arrays.fill(infoModes, modes.ZERO);
     }
 
     @SafeVarargs
@@ -141,33 +142,30 @@ public class ShopPage {
 
     private void configureShopInfos() {
 
-        Color infoColor = ShopUI.infoColor;
-        Color outlineColor = StdDraw.BLACK;
-        Color textColor = StdDraw.WHITE;
         Box[] shopBoxes = ShopUI.SHOP_BOXES;
 
         if (displayNum == 0) return;
 
         if (displayNum == 1) {
             for (ShopEntry shopEntry : buyables.get(1)) {
-                shopEntry.getInfo().configure(shopBoxes[1], infoColor, outlineColor, textColor);
+                shopEntry.getInfo().configure(shopBoxes[1]);
             }
         } else if (displayNum == 2) {
             for (ShopEntry shopEntry : buyables.get(0)) {
-                shopEntry.getInfo().configure(shopBoxes[0], infoColor, outlineColor, textColor);
+                shopEntry.getInfo().configure(shopBoxes[0]);
             }
             for (ShopEntry shopEntry : buyables.get(2)) {
-                shopEntry.getInfo().configure(shopBoxes[2], infoColor, outlineColor, textColor);
+                shopEntry.getInfo().configure(shopBoxes[2]);
             }
         } else if (displayNum==3) {
             for (ShopEntry shopEntry : buyables.get(0)) {
-                shopEntry.getInfo().configure(shopBoxes[0], infoColor, outlineColor, textColor);
+                shopEntry.getInfo().configure(shopBoxes[0]);
             }
             for (ShopEntry shopEntry : buyables.get(1)) {
-                shopEntry.getInfo().configure(shopBoxes[1], infoColor, outlineColor, textColor);
+                shopEntry.getInfo().configure(shopBoxes[1]);
             }
             for (ShopEntry shopEntry : buyables.get(2)) {
-                shopEntry.getInfo().configure(shopBoxes[2], infoColor, outlineColor, textColor);
+                shopEntry.getInfo().configure(shopBoxes[2]);
             }
         }
     }
@@ -211,19 +209,9 @@ public class ShopPage {
         backgroundMap.draw();
 
         shopUI.draw();
-        if (gameState.getState() == STATE.PAUSE)
+        if (gameState.getState() == STATE.PAUSE) {
             buyScreen.draw();
-
-        for (int i = 0; i < N; i++) {
-            if (!infoDisplayed[i]) {
-                ShopEntry shopEntry = getShopEntry(i);
-                if (shopEntry != null) shopEntry.getItem().drawBig(DRAW_BIG_MULTIPLIER);
-            } else {
-                ShopEntry shopEntry = getShopEntry(i);
-                if (shopEntry != null) shopEntry.getInfo().draw();
-            }
         }
-
 
     }
 
@@ -246,9 +234,9 @@ public class ShopPage {
     }
 
 
-    private class ShopUI {
+    class ShopUI {
 
-        private static final double SHOP_BOX_WIDTH = 3 * TILE_SIDE;
+        static final double SHOP_BOX_WIDTH = 3 * TILE_SIDE;
         private static final double SHOP_BOX_HEIGHT = 3 * TILE_SIDE;
 
         private static final Box[] SHOP_BOXES = new Box[] {
@@ -272,14 +260,12 @@ public class ShopPage {
         private static final double BUY_BOX_HEIGHT = 0.6 * TILE_SIDE;
 
         private static final Box[][] ARROW_BOXES = new Box[N][2];
-        private static final Box[] INFO_BOXES = new Box[N];
+        private static final Box[] DESCRIPTION_BOXES = new Box[N];
+        private static final Box[] STATS_BOXES = new Box[N];
         private static final Box[] NAME_BOXES = new Box[N];
         private static final Box[] LABEL_BOXES = new Box[N];
         private static final Box[] PRICE_BOXES = new Box[N];
         private static final Box[] BUY_BOXES = new Box[N];
-
-        private static final Color shopColor = new Color(0, 88, 188);
-        private static final Color infoColor = new Color(45, 192, 145);
 
         static {
             for (int i = 0; i < N; i++) {
@@ -292,8 +278,6 @@ public class ShopPage {
                 ARROW_BOXES[i][0] = new Box(x - xShiftArrow, y, ARROWS_SIDE, ARROWS_SIDE);
                 ARROW_BOXES[i][1] = new Box(x + xShiftArrow, y, ARROWS_SIDE, ARROWS_SIDE);
 
-                INFO_BOXES[i] = new Box(x + SHOP_BOX_WIDTH/2, y - SHOP_BOX_HEIGHT/2, INFO_SIDE, INFO_SIDE);
-
                 double yShiftSmall = SHOP_BOX_HEIGHT / 2 + BOX_GAP + NAME_BOX_HEIGHT / 2;
                 double yShiftBig = yShiftSmall + NAME_BOX_HEIGHT/2 + BOX_GAP + LABEL_BOX_HEIGHT/2;
 
@@ -301,6 +285,9 @@ public class ShopPage {
                 LABEL_BOXES[i] = new Box(x, y - yShiftBig, LABEL_BOX_WIDTH, LABEL_BOX_HEIGHT);
                 PRICE_BOXES[i] = new Box(x, y + yShiftSmall, PRICE_BOX_WIDTH, PRICE_BOX_HEIGHT);
                 BUY_BOXES[i] = new Box(x, y + yShiftBig, BUY_BOX_WIDTH, BUY_BOX_HEIGHT);
+
+                DESCRIPTION_BOXES[i] = new Box(x + NAME_BOX_WIDTH/2 + BOX_GAP + INFO_SIDE/2, NAME_BOXES[i].getCenterY(), INFO_SIDE, INFO_SIDE);
+                STATS_BOXES[i] = new Box(x - NAME_BOX_WIDTH/2 - BOX_GAP - INFO_SIDE/2, NAME_BOXES[i].getCenterY(), INFO_SIDE, INFO_SIDE);
             }
         }
 
@@ -324,9 +311,8 @@ public class ShopPage {
 
                 for (int i = 0; i < N; i++) {
 
+                    ShopEntry shopEntry = getShopEntry(i);
                     if (isIn(mouseX, mouseY, BUY_BOXES[i])) {
-
-                        ShopEntry shopEntry = getShopEntry(i);
                         if (shopEntry == null) return;
                         if (shopEntry.isSold()) return;
                         if (!gameState.canAfford(shopEntry)) return;
@@ -334,8 +320,17 @@ public class ShopPage {
                         selected[i] = true;
                         gameState.setState(STATE.PAUSE);
                         break;
-                    } else if (isIn(mouseX, mouseY, INFO_BOXES[i])) {
-                        infoDisplayed[i] = !infoDisplayed[i];
+                    } else if (isIn(mouseX, mouseY, DESCRIPTION_BOXES[i])) {
+                        if (shopEntry == null) return;
+                        if (shopEntry.isSold()) return;
+                        if (infoModes[i] != modes.DESCRIPTION) infoModes[i] = modes.DESCRIPTION;
+                        else infoModes[i] = modes.ZERO;
+                        break;
+                    } else if (isIn(mouseX, mouseY, STATS_BOXES[i])) {
+                        if (shopEntry == null) return;
+                        if (shopEntry.isSold()) return;
+                        if (infoModes[i] != modes.STATS) infoModes[i] = modes.STATS;
+                        else infoModes[i] = modes.ZERO;
                         break;
                     }
 
@@ -344,10 +339,10 @@ public class ShopPage {
 
                     int len = buyables.get(i).size();
 
-                    if (isIn(mouseX, mouseY, ARROW_BOXES[i][0]) && !infoDisplayed[i]) {
+                    if (isIn(mouseX, mouseY, ARROW_BOXES[i][0]) && infoModes[i] == modes.ZERO) {
                         indexes[i] = ((indexes[i] - 1) + len) % len;
                         break;
-                    } else if (isIn(mouseX, mouseY, ARROW_BOXES[i][1]) && !infoDisplayed[i]) {
+                    } else if (isIn(mouseX, mouseY, ARROW_BOXES[i][1]) && infoModes[i] == modes.ZERO) {
                         indexes[i] = ((indexes[i] + 1) + len) % len;
                         break;
                     }
@@ -362,6 +357,10 @@ public class ShopPage {
             Font bigFont = new Font("Monospaced", Font.BOLD, 25);
             Font smallFont = new Font("Monospaced", Font.BOLD, 20);
             Color outlineColor = StdDraw.BLACK;
+
+            Color shopColor = new Color(0, 88, 188);
+            Color descriptionColor = new Color(230, 114, 230);
+            Color statsColor = new Color(244, 157, 8);
 
             Color textColor = StdDraw.WHITE;
             Color labelColor = new Color(34, 171, 160);
@@ -395,14 +394,28 @@ public class ShopPage {
                 String name = shopEntry.getName().split("/")[0];
                 textInsideBox(NAME_BOXES[i], capitalize(name), textColor, smallFont);
 
-                if (!infoDisplayed[i]) {
+                if (infoModes[i] == modes.ZERO) {
                     drawRectWithOutline(SHOP_BOXES[i], shopColor, outlineColor);
-                    drawRectWithOutline(INFO_BOXES[i], infoColor, outlineColor);
+                    drawRectWithOutline(DESCRIPTION_BOXES[i], descriptionColor, outlineColor);
+                    drawRectWithOutline(STATS_BOXES[i], statsColor, outlineColor);
+                    shopEntry.getItem().drawBig(DRAW_BIG_MULTIPLIER);
+                } else if (infoModes[i] == modes.DESCRIPTION) {
+                    drawRectWithOutline(SHOP_BOXES[i], descriptionColor, outlineColor);
+                    drawRectWithOutline(DESCRIPTION_BOXES[i], shopColor, outlineColor);
+                    drawRectWithOutline(STATS_BOXES[i], statsColor, outlineColor);
+                    ShopInfo info = shopEntry.getInfo();
+                    info.setMode(infoModes[i]);
+                    info.draw();
                 } else {
-                    drawRectWithOutline(SHOP_BOXES[i], infoColor, outlineColor);
-                    drawRectWithOutline(INFO_BOXES[i], shopColor, outlineColor);
+                    drawRectWithOutline(SHOP_BOXES[i], statsColor, outlineColor);
+                    drawRectWithOutline(DESCRIPTION_BOXES[i], descriptionColor, outlineColor);
+                    drawRectWithOutline(STATS_BOXES[i], shopColor, outlineColor);
+                    ShopInfo info = shopEntry.getInfo();
+                    info.setMode(infoModes[i]);
+                    info.draw();
                 }
-                textInsideBox(INFO_BOXES[i], "ⓘ", StdDraw.BLACK, smallFont);
+                textInsideBox(DESCRIPTION_BOXES[i], "ⓘ", StdDraw.BLACK, smallFont);
+                textInsideBox(STATS_BOXES[i], "∑", StdDraw.BLACK, smallFont);
 
                 drawRectWithOutline(PRICE_BOXES[i], buyColor, outlineColor);
 

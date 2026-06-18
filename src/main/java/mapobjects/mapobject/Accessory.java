@@ -1,6 +1,10 @@
 package mapobjects.mapobject;
 
+import game.Main;
 import mapobjects.category.MapObject;
+
+import java.io.*;
+import java.util.ArrayList;
 
 import static helpers.HelperMethods.getDirectionString;
 import static mapobjects.category.GridObject.TILE_SIDE;
@@ -98,6 +102,11 @@ public abstract class Accessory extends MapObject {
             // if it was on the player, put it back to player
             // if not, put it back to where it is
         }
+    }
+
+    @Override
+    public String[] getStats() {
+        return super.getStats();
     }
 
     //------------------------------------------------------------------------------------------

@@ -7,7 +7,10 @@ import mapobjects.category.MapObject;
 import mapobjects.component.Spawner;
 import mapobjects.component.Timer;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Set;
+
+import static mapobjects.category.GridObject.TILE_SIDE;
 import static mapobjects.mapobject.Projectile.ProjectileBlueprint;
 import static mapobjects.mapobject.Projectile.ProjectileType;
 
@@ -39,6 +42,8 @@ public abstract class Gun extends MapObject implements Generator {
     protected Set<HealthBearer> targets;
 
     protected Gun(ProjectileType projectileType, int maxAmmo, int reloadTime, int unloadTime) {
+        super(0, 0, 0, TILE_SIDE, TILE_SIDE);
+        setName(getClass().getName().split("\\$")[1].toLowerCase(Locale.ROOT));
         this.projectileType = projectileType;
         this.projectileBlueprint = new ProjectileBlueprint(projectileType);
 
@@ -502,7 +507,7 @@ public abstract class Gun extends MapObject implements Generator {
 
     /// Spawns a giant rocket - slow
     /// Upgrade types: damage, reload, bullet speed
-    public static class RocketLauncher extends Gun {
+    public static class Launcher extends Gun {
 
         private static final int MAX_AMMO = 1;
         private static final int RELOAD_TIME = 2000;
@@ -512,7 +517,7 @@ public abstract class Gun extends MapObject implements Generator {
         private static final double RELOAD_BUFF = 0.1;
         private static final double SPEED_BUFF = 0.1;
 
-        protected RocketLauncher() {
+        public Launcher() {
             super(ProjectileType.BIG, MAX_AMMO, RELOAD_TIME, UNLOAD_TIME);
         }
 
@@ -570,6 +575,97 @@ public abstract class Gun extends MapObject implements Generator {
 
         }
 
+    }
+
+
+    @Override
+    public String[] getStats() {
+
+        String reloadCategory;
+        if (defaultReloadTime < 300) {
+            reloadCategory = "very fast";
+        } else if (defaultReloadTime < 600) {
+            reloadCategory = "fast";
+        } else if (defaultReloadTime < 1000) {
+            reloadCategory = "normal";
+        } else if (defaultReloadTime < 1500) {
+            reloadCategory = "slow";
+        } else {
+            reloadCategory = "very slow";
+        }
+
+
+        String unloadCategory;
+        if (defaultUnloadTime <= 100) {
+            unloadCategory = "very fast";
+        } else if (defaultUnloadTime <= 300) {
+            unloadCategory = "fast";
+        } else if (defaultUnloadTime <= 600) {
+            unloadCategory = "normal";
+        } else if (defaultUnloadTime <= 1000) {
+            unloadCategory = "slow";
+        } else {
+            unloadCategory = "very slow";
+        }
+
+
+        double speed = projectileType.getSpeed();
+        String speedCategory;
+        if (speed < 5) {
+            speedCategory = "very slow";
+        } else if (speed < 10) {
+            speedCategory = "slow";
+        } else if (speed < 15) {
+            speedCategory = "normal";
+        } else if (speed < 25) {
+            speedCategory = "fast";
+        } else {
+            speedCategory = "very fast";
+        }
+
+        double range = projectileType.getRange() / TILE_SIDE;
+        String rangeCategory;
+        if (range < 3) {
+            rangeCategory = "very short";
+        } else if (range < 5) {
+            rangeCategory = "short";
+        } else if (range < 8) {
+            rangeCategory = "medium";
+        } else if (range < 10) {
+            rangeCategory = "long";
+        } else {
+            rangeCategory = "very long";
+        }
+
+
+        String sizeCategory;
+        double area = projectileType.getWidth() * projectileType.getHeight();
+        double normalArea = Projectile.DEFAULT_WIDTH * Projectile.DEFAULT_HEIGHT;
+
+        if (area < normalArea / 2) {
+            sizeCategory = "very small";
+        } else  if (area < normalArea * 3 / 4) {
+            sizeCategory = "small";
+        } else if (area < normalArea * 5 / 4) {
+            sizeCategory = "normal";
+        } else if (area < normalArea * 3 / 2) {
+            sizeCategory = "large";
+        } else {
+            sizeCategory = "very large";
+        }
+
+
+        return new String[] {
+            "Max Ammo: " + defaultMaxAmmo,
+            "Reload: " + reloadCategory,
+            "Fire Rate: " + unloadCategory,
+            "Projectile:",
+            "\t\tType: " + projectileType.name().toLowerCase(Locale.ROOT),
+            "\t\tDamage: " + projectileType.getDamage(),
+            "\t\tSpeed: " + speedCategory,
+            "\t\tRange: " + rangeCategory,
+            "\t\tSize: " + sizeCategory,
+        };
     }
 
 }

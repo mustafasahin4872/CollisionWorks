@@ -1,0 +1,1 @@
+When equipped, the player can collect coins from further away.

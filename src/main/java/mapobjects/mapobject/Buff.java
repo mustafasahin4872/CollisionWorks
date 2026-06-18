@@ -1,5 +1,6 @@
 package mapobjects.mapobject;
 
+import helpers.HelperMethods;
 import mapobjects.category.GridObject;
 import mapobjects.category.OnEffector;
 import mapobjects.category.Timed;
@@ -60,6 +61,20 @@ public abstract class Buff extends GridObject implements OnEffector, Timed {
         } else {
             drawAnimated();
         }
+    }
+
+    @Override
+    public String[] getStats() {
+        String effect = "Temporary Effect";
+        if (this instanceof Buff.SpeedBuff) effect = "Increases Speed";
+        else if (this instanceof Buff.ShieldBuff) effect = "Invulnerability";
+        else if (this instanceof Buff.ShrinkBuff) effect = "Shrinks Hitbox";
+        else if (this instanceof Buff.MagnetBuff) effect = "Attracts Items";
+        else if (this instanceof Buff.VisionBuff) effect = "Increases Sight";
+        return new String[]{
+            HelperMethods.capitalize(getName()),
+            effect
+        };
     }
 
 
