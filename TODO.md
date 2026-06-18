@@ -26,9 +26,10 @@ FOR GODS SAKE DECOUPLE PLAYER FROM EVERYTHING
   - [x] move the spawn logic to guns from the player
   - [x] the basic initiation of guns are done in playerDefaults class
   - [X] add gun types, different spawn logics
-  - [ ] add guns to the shop
+  - [x] add guns to the shop
   - [x] fix spawner class!
-- [ ] New button - screen in shop: Info about player and buff stats.
+  - [ ] player should be able to select guns - add to selection screen
+- [x] New button - screen in shop: Info about player and buff stats.
 - [ ] Lock levels and keep the last unlocked level index inside gamestate
   - [ ] draw chains on locked level boxes
   - [ ] keep passed level indexes in gamestate
