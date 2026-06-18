@@ -8,6 +8,8 @@ import mapobjects.category.MapObject;
 import mapobjects.component.Box;
 import helpers.InputHandler;
 import mapobjects.mapobject.Accessory;
+import mapobjects.mapobject.Buff;
+import mapobjects.mapobject.Gun;
 import mapobjects.mapobject.Player;
 
 import java.awt.*;
@@ -54,6 +56,7 @@ public class ShopPage {
     private static final double DRAW_BIG_MULTIPLIER = 2.0;
 
     private final List<List<ShopEntry>> buyables = new ArrayList<>(N);
+    private final String[] LABELS = new String[N];
 
     public ShopPage(InputHandler inputHandler, GameState gameState) {
         this.inputHandler = inputHandler;
@@ -71,6 +74,7 @@ public class ShopPage {
 
         buyables.clear();
         displayNum = displays.length;
+        String[] labels = LABELS;
 
         if (displayNum == 0) {
             buyables.add(0, null);
@@ -81,12 +85,15 @@ public class ShopPage {
             buyables.add(0, null);
             buyables.add(1, displays[0]);
             buyables.add(2, null);
+            labels[1] = getLabel(1);
         } else if (displayNum == 2) {
             configureMapObjects(displays[0], 0);
             configureMapObjects(displays[1], 2);
             buyables.add(0, displays[0]);
             buyables.add(1, null);
             buyables.add(2, displays[1]);
+            labels[0] = getLabel(0);
+            labels[2] = getLabel(2);
         } else {
             configureMapObjects(displays[0], 0);
             configureMapObjects(displays[1], 1);
@@ -94,6 +101,9 @@ public class ShopPage {
             buyables.add(0, displays[0]);
             buyables.add(1, displays[1]);
             buyables.add(2, displays[2]);
+            labels[0] = getLabel(0);
+            labels[1] = getLabel(1);
+            labels[2] = getLabel(2);
         }
 
         configureShopInfos();
@@ -169,6 +179,19 @@ public class ShopPage {
             }
         }
     }
+
+    private String getLabel(int index) {
+
+        MapObject mapObject = buyables.get(index).getFirst().getItem();
+        if (mapObject instanceof Player) return "Skins";
+        else if (mapObject instanceof Accessory) return "Accessories";
+        else if (mapObject instanceof Buff) return "Buffs";
+        else if (mapObject instanceof Gun) return "Guns";
+
+        System.out.println("GET_LABEL ERROR - INVALID???");
+        return "";
+    }
+
 
     public void shopLoop() throws Exception {
 
@@ -297,9 +320,6 @@ public class ShopPage {
 
         private static final Box GEM_BOX = new Box(GEMS_X, CURRENCY_Y, TILE_SIDE, TILE_SIDE);
         private static final Box COIN_BOX = new Box(COINS_X, CURRENCY_Y, TILE_SIDE, TILE_SIDE);
-
-        // TODO: FIX THE LABELS!
-        private static final String[] LABELS = { "Skins", "Accessories", "Buffs"};
 
         private void processInput(MouseData mouseData) {
 

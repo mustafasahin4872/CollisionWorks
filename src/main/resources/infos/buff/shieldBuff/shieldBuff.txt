@@ -1,1 +1,1 @@
-When equipped, the player can takes less damage.
+When equipped, the player takes less damage.

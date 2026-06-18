@@ -99,6 +99,9 @@ Based on the development tracking:
 
 Designed and developed by **Mustafa Şahin**
 
+## AI Usage
+AI assistance is used solely for repetitive text creations, small helper logic implementations, and game design guidance.
+
 ---
 
 ## Future Work (Planned)
