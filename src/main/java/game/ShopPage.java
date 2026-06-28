@@ -1,12 +1,9 @@
 package game;
 
-import helpers.MapType;
-import helpers.ShopEntry;
-import helpers.ShopInfo;
+import helpers.*;
 import lib.StdDraw;
 import mapobjects.category.MapObject;
 import mapobjects.component.Box;
-import helpers.InputHandler;
 import mapobjects.mapobject.Accessory;
 import mapobjects.mapobject.Buff;
 import mapobjects.mapobject.Gun;
@@ -19,15 +16,12 @@ import java.util.List;
 
 import static game.Main.IMAGES_ROOT;
 import static helpers.CollisionMethods.isIn;
-import static helpers.DrawMethods.drawRectWithOutline;
-import static helpers.DrawMethods.textInsideBox;
-import static helpers.FrameBox.CENTER_X;
-import static helpers.FrameBox.CENTER_Y;
+import static helpers.DrawMethods.*;
+import static helpers.FrameBox.*;
 import static mapobjects.category.GridObject.TILE_SIDE;
 import static helpers.InputHandler.MouseData;
 import static game.GameState.STATE;
 import static helpers.HelperMethods.capitalize;
-import static helpers.ShopInfo.modes;
 
 
 // The shop screen in selection phase
@@ -48,6 +42,11 @@ public class ShopPage {
     private final NavigationUI navigationUI = new NavigationUI();
     private final ShopUI shopUI = new ShopUI();
     private final BuyScreen buyScreen = new BuyScreen();
+
+    private final TextDisplay[][] descriptions = new TextDisplay[N][];
+    private final TextDisplay[][] stats = new TextDisplay[N][];
+
+    public enum modes {ZERO, DESCRIPTION, STATS}
 
     private final int[] indexes = new int[N];
     private final boolean[] selected = new boolean[N];
@@ -152,31 +151,36 @@ public class ShopPage {
 
     private void configureShopInfos() {
 
-        Box[] shopBoxes = ShopUI.SHOP_BOXES;
-
         if (displayNum == 0) return;
 
+        final int LINE_HEIGHT = 15;
+        int size = getFontSizeForHeight(LINE_HEIGHT, new Font("Arial", Font.PLAIN, 100));
+        Color color = StdDraw.BLACK;
+        Font font = new Font("Arial", Font.PLAIN, size);
+
+        FrameBox.updateCenter(Frame.X_SCALE/2, Frame.Y_SCALE/2);
         if (displayNum == 1) {
-            for (ShopEntry shopEntry : buyables.get(1)) {
-                shopEntry.getInfo().configure(shopBoxes[1]);
-            }
+            fillInfo(1, color, font);
         } else if (displayNum == 2) {
-            for (ShopEntry shopEntry : buyables.get(0)) {
-                shopEntry.getInfo().configure(shopBoxes[0]);
-            }
-            for (ShopEntry shopEntry : buyables.get(2)) {
-                shopEntry.getInfo().configure(shopBoxes[2]);
-            }
-        } else if (displayNum==3) {
-            for (ShopEntry shopEntry : buyables.get(0)) {
-                shopEntry.getInfo().configure(shopBoxes[0]);
-            }
-            for (ShopEntry shopEntry : buyables.get(1)) {
-                shopEntry.getInfo().configure(shopBoxes[1]);
-            }
-            for (ShopEntry shopEntry : buyables.get(2)) {
-                shopEntry.getInfo().configure(shopBoxes[2]);
-            }
+            fillInfo(0, color, font);
+            fillInfo(2, color, font);
+        } else if (displayNum == 3) {
+            fillInfo(0, color, font);
+            fillInfo(1, color, font);
+            fillInfo(2, color, font);
+        }
+
+    }
+
+    private void fillInfo(int index, Color color, Font font) {
+        descriptions[index] = new TextDisplay[buyables.get(index).size()];
+        stats[index] = new TextDisplay[buyables.get(index).size()];
+
+        Box[] shopBoxes = ShopUI.SHOP_BOXES;
+        for (int i = 0; i<buyables.get(index).size(); i++) {
+            MapObject item = buyables.get(index).get(i).getItem();
+            descriptions[index][i] = new TextDisplay(shopBoxes[index], item.getDescription(), color, font, true);
+            stats[index][i] = new TextDisplay(shopBoxes[index], item.getStats(), color, font, true);
         }
     }
 
@@ -423,24 +427,20 @@ public class ShopPage {
                     drawRectWithOutline(SHOP_BOXES[i], descriptionColor, outlineColor);
                     drawRectWithOutline(DESCRIPTION_BOXES[i], shopColor, outlineColor);
                     drawRectWithOutline(STATS_BOXES[i], statsColor, outlineColor);
-                    ShopInfo info = shopEntry.getInfo();
-                    info.setMode(infoModes[i]);
-                    info.draw();
+                    descriptions[i][indexes[i]].draw();
                 } else {
                     drawRectWithOutline(SHOP_BOXES[i], statsColor, outlineColor);
                     drawRectWithOutline(DESCRIPTION_BOXES[i], descriptionColor, outlineColor);
                     drawRectWithOutline(STATS_BOXES[i], shopColor, outlineColor);
-                    ShopInfo info = shopEntry.getInfo();
-                    info.setMode(infoModes[i]);
-                    info.draw();
+                    stats[i][indexes[i]].draw();
                 }
                 textInsideBox(DESCRIPTION_BOXES[i], "ⓘ", StdDraw.BLACK, smallFont);
                 textInsideBox(STATS_BOXES[i], "∑", StdDraw.BLACK, smallFont);
 
                 drawRectWithOutline(PRICE_BOXES[i], buyColor, outlineColor);
 
-                String price = " " + shopEntry.getCost(); // 1 space to right to offset the gem's space
-                String fileName = (shopEntry.isCosmetic()) ? gemFile : coinFile;
+                String price = " " + shopEntry.getCoinCost(); // 1 space to right to offset the gem's space
+                String fileName = coinFile; // TODO: DISPLAY BOTH CURRENCIES
                 double side = PRICE_BOX_HEIGHT * 0.8;
                 double textWidth = 0.6 * smallFont.getSize() * price.length();
 

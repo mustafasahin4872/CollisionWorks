@@ -22,6 +22,21 @@ FOR GODS SAKE DECOUPLE PLAYER FROM EVERYTHING
 
 ### New Elements
 
+- [ ] Accessory logic enhancements:
+  - [ ] accessories work like trinkets, they give stat buffs or something
+  - [ ] accessory types separation, cannot hold two of the same accessory types at the same time
+  - [ ] edit selection screen as a result:
+    - [ ] accessory type selections
+    - [x] the isCosmetic in shopentry is no longer needed
+    - [ ] shopentry prices display should show both coin and gem.
+- [ ] Drawing logic redesign
+  - [ ] Drawable interface
+  - [ ] Drawer component: draws picture or colored rectangle or text
+  - [ ] Display helper: sign and ShopUI logics collect
+    - [x] sign logic to display
+    - [x] shopui logic to display
+    - [ ] signs tremble a bit, why?
+    - [ ] texts are drawn towards the upper-left corner even when centered, why?
 - [ ] ADD GUNS!!!
   - [x] move the spawn logic to guns from the player
   - [x] the basic initiation of guns are done in playerDefaults class
@@ -29,17 +44,20 @@ FOR GODS SAKE DECOUPLE PLAYER FROM EVERYTHING
   - [x] add guns to the shop
   - [x] fix spawner class!
   - [ ] player should be able to select guns - add to selection screen
+  - [ ] gun upgrades in shop - dont forget the stats page
 - [x] New button - screen in shop: Info about player and buff stats.
 - [ ] Lock levels and keep the last unlocked level index inside gamestate
   - [ ] draw chains on locked level boxes
   - [ ] keep passed level indexes in gamestate
   - [ ] disable coin collection on already passed levels
+    - [ ] remember the collected coin amount each level, if more is collected, then add. 
 - [ ] Add buff system
   - [x] Buff shrinking and growing animation is vibrating
   - [x] Buff shrinking and growing animation should stop when bought
   - [x] Buff buying logic - calls playerontop -> change to calling buff.expire() only
   - [x] Add buffs to shop
   - [x] Display permanentbuffs in skinselection
+  - [ ] ADD BUFFS LOGIC
   - [ ] Add buffs to mapmaker
   - [ ] BUFFS IDEA: (decide whether to implement or not)
       - [ ] player should hold a in-game buffs list (not gamestate)

@@ -168,14 +168,14 @@ public class GameScreen {
             Color buttons = new Color(23, 148, 9);
             Color outline1 = Color.BLACK;
             Color outline2 = Color.WHITE;
-            int fontSize = 30;
+            Font font = new Font("Arial", Font.PLAIN, 30);
             drawRectWithOutline(PAUSE_SCREEN.getFrameBox(), background, outline1);
             drawRectWithOutline(RESUME_BUTTON.getFrameBox(), buttons, outline2);
-            textInsideBox(RESUME_BUTTON.getFrameBox(), "RESUME", outline2, fontSize);
+            textInsideBox(RESUME_BUTTON.getFrameBox(), "RESUME", outline2, font);
             drawRectWithOutline(RESTART_BUTTON.getFrameBox(), buttons, outline2);
-            textInsideBox(RESTART_BUTTON.getFrameBox(), "RESTART", outline2, fontSize);
+            textInsideBox(RESTART_BUTTON.getFrameBox(), "RESTART", outline2, font);
             drawRectWithOutline(EXIT_BUTTON.getFrameBox(), buttons, outline2);
-            textInsideBox(EXIT_BUTTON.getFrameBox(), "EXIT", outline2, fontSize);
+            textInsideBox(EXIT_BUTTON.getFrameBox(), "EXIT", outline2, font);
 
         }
 
@@ -224,14 +224,14 @@ public class GameScreen {
             Color buttons = new Color(202, 60, 60);
             Color outline1 = Color.WHITE;
             Color outline2 = Color.BLACK;
-            int fontSize = 30;
+            Font font = new Font("Arial", Font.PLAIN, 30);
             drawRectWithOutline(DEAD_SCREEN.getFrameBox(), background, outline1);
             drawRectWithOutline(RESTART_BUTTON.getFrameBox(), buttons, outline2);
-            textInsideBox(RESTART_BUTTON.getFrameBox(), "RESTART", outline2, fontSize);
+            textInsideBox(RESTART_BUTTON.getFrameBox(), "RESTART", outline2, font);
             drawRectWithOutline(EXIT_BUTTON.getFrameBox(), buttons, outline2);
-            textInsideBox(EXIT_BUTTON.getFrameBox(), "EXIT", outline2, fontSize);
+            textInsideBox(EXIT_BUTTON.getFrameBox(), "EXIT", outline2, font);
             drawRectWithOutline(YOU_DIED.getFrameBox(), buttons, outline2);
-            textInsideBox(YOU_DIED.getFrameBox(), "YOU DIED!", outline2, fontSize);
+            textInsideBox(YOU_DIED.getFrameBox(), "YOU DIED!", outline2, font);
         }
 
     }

@@ -161,7 +161,8 @@ public class LevelSelection {
                 StdDraw.setPenColor(outlineColor);
                 drawRectangleOutline(currentButton, THICKNESS.THIN);
 
-                textInsideBox(currentButton, String.valueOf(i + 1), StdDraw.WHITE, 16);
+                Font font = new Font("Arial", Font.PLAIN, 16);
+                textInsideBox(currentButton, String.valueOf(i + 1), StdDraw.WHITE, font);
             }
         }
     }

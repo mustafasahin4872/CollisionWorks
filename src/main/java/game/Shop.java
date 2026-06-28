@@ -52,37 +52,37 @@ public class Shop {
     // ------------------------------------------------------------------------------------------------------------------
 
     private final List<ShopEntry> buyableSkins = List.of(
-        new ShopEntry(new Player("Bob"), 0, true),
-        new ShopEntry(new Player("Mike"), 0, true),
-        new ShopEntry(new Player("Sakura"), 0, true)
+        new ShopEntry(new Player("Bob"), 0, 0),
+        new ShopEntry(new Player("Mike"), 0, 0),
+        new ShopEntry(new Player("Sakura"), 0, 0)
     );
 
     private final List<ShopEntry> buyableAccessories = List.of(
-        new ShopEntry(new Accessory.Hat("fedora"), 0, true),
-        new ShopEntry(new Accessory.Tie("tie"), 100, true),
-        new ShopEntry(new Accessory.Headpiece("coquette"), 0, true),
-        new ShopEntry(new Accessory.Necklace("dollar"), 200, true),
-        new ShopEntry(new Accessory.Necklace("sorcerer"), 250, true),
-        new ShopEntry(new Accessory.Pin("star"), 50000, true),
-        new ShopEntry(new Accessory.Pin("sheriff"), 1075, true)
+        new ShopEntry(new Accessory.Hat("fedora"), 0, 0),
+        new ShopEntry(new Accessory.Tie("tie"), 100, 0),
+        new ShopEntry(new Accessory.Headpiece("coquette"), 0, 0),
+        new ShopEntry(new Accessory.Necklace("dollar"), 200, 0),
+        new ShopEntry(new Accessory.Necklace("sorcerer"), 250, 0),
+        new ShopEntry(new Accessory.Pin("star"), 50000, 0),
+        new ShopEntry(new Accessory.Pin("sheriff"), 1075, 0)
     );
 
     private final List<ShopEntry> buyableBuffs = List.of(
-        new ShopEntry(new Buff.SpeedBuff(0, 0), 1, false),
-        new ShopEntry(new Buff.ShieldBuff(0, 0), 0, false),
-        new ShopEntry(new Buff.ShrinkBuff(0, 0), 0, false),
-        new ShopEntry(new Buff.MagnetBuff(0, 0), 0, false),
-        new ShopEntry(new Buff.VisionBuff(0, 0), 0, false)
+        new ShopEntry(new Buff.SpeedBuff(0, 0), 1, 0),
+        new ShopEntry(new Buff.ShieldBuff(0, 0), 0, 0),
+        new ShopEntry(new Buff.ShrinkBuff(0, 0), 0, 0),
+        new ShopEntry(new Buff.MagnetBuff(0, 0), 0, 0),
+        new ShopEntry(new Buff.VisionBuff(0, 0), 0, 0)
     );
 
     private final List<ShopEntry> buyableGuns = List.of(
-        new ShopEntry(new Gun.Handgun(), 0, false),
-        new ShopEntry(new Gun.Uzi(), 0, false),
-        new ShopEntry(new Gun.Shotgun(), 0, false),
-        new ShopEntry(new Gun.MachineGun(), 0, false),
-        new ShopEntry(new Gun.Staff(), 0, false),
-        new ShopEntry(new Gun.Launcher(), 0, false),
-        new ShopEntry(new Gun.Pacifist(), 0, false)
+        new ShopEntry(new Gun.Handgun(), 0, 0),
+        new ShopEntry(new Gun.Uzi(), 0, 0),
+        new ShopEntry(new Gun.Shotgun(), 0, 0),
+        new ShopEntry(new Gun.MachineGun(), 0, 0),
+        new ShopEntry(new Gun.Staff(), 0, 0),
+        new ShopEntry(new Gun.Launcher(), 0, 0),
+        new ShopEntry(new Gun.Pacifist(), 0, 0)
     );
 
 

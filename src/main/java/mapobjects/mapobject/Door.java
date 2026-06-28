@@ -94,7 +94,7 @@ public class Door extends GridObject implements Collidable {
     @Override
     public void draw() {
         StdDraw.setPenColor(color);
-        drawRectangle(positionBox.getCorners());
+        drawRectangle(positionBox);
     }
 
 }

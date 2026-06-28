@@ -61,7 +61,6 @@ public class Game {
             }
 
             double[] frameCenter = frame.setFrameCenter(player.getX(), player.getY());
-            Sign.updateDisplayCenter(frameCenter[0], frameCenter[1]);
             gameScreen.updateValues(frameCenter[0], frameCenter[1]);
             gameMap.setFrameTileRange();
 

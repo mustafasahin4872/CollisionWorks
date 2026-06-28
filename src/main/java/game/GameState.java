@@ -219,29 +219,27 @@ public class GameState {
     //------------------------------------------------------------------------------------------------------------------
 
     public boolean canAfford(ShopEntry shopEntry) {
-        int cost = shopEntry.getCost();
-        if (shopEntry.isCosmetic()) return cost <= gemAmount;
-        else return cost <= coinAmount;
+        int coinCost = shopEntry.getCoinCost();
+        int gemCost = shopEntry.getGemCost();
+        return (coinCost<=coinAmount && gemCost<=gemAmount);
     }
 
     public void buy(ShopEntry shopEntry) {
         shopEntry.sell();
-        int cost = shopEntry.getCost();
+
         MapObject item = shopEntry.getItem();
-        if (shopEntry.isCosmetic()) {
-            spendGem(shopEntry.getCost());
-            if (item instanceof Player s) {
-                addOwnedSkin(s);
-            } else if (item instanceof Accessory a) {
-                addOwnedAccessory(a);
-            }
-        } else {
-            spendCoin(cost);
-            if (item instanceof Buff b) {
-                b.expire(); // stops the animation
-                addOwnedBuff(b);
-            }
+        spendGem(shopEntry.getCoinCost());
+        spendCoin(shopEntry.getGemCost());
+
+        if (item instanceof Player s) {
+            addOwnedSkin(s);
+        } else if (item instanceof Accessory a) {
+            addOwnedAccessory(a);
+        } else if (item instanceof Buff b) {
+            b.expire(); // stops the animation
+            addOwnedBuff(b);
         }
+
     }
 
 }

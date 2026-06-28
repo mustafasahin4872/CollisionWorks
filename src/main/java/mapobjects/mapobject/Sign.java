@@ -1,5 +1,6 @@
 package mapobjects.mapobject;
 
+import helpers.TextDisplay;
 import lib.StdDraw;
 
 import java.awt.*;
@@ -12,16 +13,16 @@ import static helpers.DrawMethods.*;
 
 public class Sign extends GridObject implements OnEffector {
 
-    private final Box effectBox;
-    private final String[] messages;
-    private final boolean displaySign;
-    private boolean displayMessage;
-    private static final double SPACE_ON_SIDE = 10, CHAR_WIDTH = 0.43*32, CHAR_HEIGHT=32;
-    private final double displayHalfWidth, displayHalfHeight;
-    private static final double[] DISPLAY_CENTER = new double[2];
-    private final double[] displayCoordinates = new double[4];
     private static final Font FONT = new Font("Arial", Font.PLAIN, 32);
     private static final Color COLOR = new Color(103, 2, 9);
+
+    private final Box effectBox;
+
+    private final boolean displaySign;
+    private boolean displayMessage;
+
+    private final TextDisplay textDisplay;
+
 
     public Sign(int worldIndex, int xNum, int yNum, String[] messages) {
         this(worldIndex, xNum, yNum, messages, true);
@@ -29,26 +30,27 @@ public class Sign extends GridObject implements OnEffector {
 
     public Sign(int worldIndex, int xNum, int yNum, String[] messages, boolean displaySign) {
         super(worldIndex, xNum, yNum);
-        this.messages = messages;
+        effectBox = positionBox.clone();
+
         this.displaySign = displaySign;
 
         double[] dimensions = calculateDimensions(messages);
-        this.displayHalfWidth = dimensions[0];
-        this.displayHalfHeight = dimensions[1];
-        effectBox = positionBox.clone();
+        Box displayBox = new Box(Frame.X_SCALE / 2, 0.3 * Frame.Y_SCALE / 2, dimensions[0], dimensions[1]);
+        textDisplay = new TextDisplay(displayBox, messages, StdDraw.BLACK, FONT);
     }
 
 
     private static double[] calculateDimensions(String[] messages) {
-        int maxLength = 0;
+        double maxLength = 0;
         for (String message : messages) {
-            maxLength = Math.max(maxLength, message.length());
+            maxLength = Math.max(maxLength, getTextWidth(message, FONT));
         }
+        double charHeight = getFontHeight(FONT);
 
-        double halfWidth = SPACE_ON_SIDE + maxLength / 2.0 * CHAR_WIDTH;
-        double halfHeight = SPACE_ON_SIDE + messages.length / 2.0 * CHAR_HEIGHT;
+        double width = maxLength;
+        double height = messages.length * charHeight;
 
-        return new double[]{halfWidth, halfHeight};
+        return new double[]{width, height};
     }
 
     public void setDisplay() {
@@ -68,7 +70,7 @@ public class Sign extends GridObject implements OnEffector {
     @Override
     public void call(Player player) {
         if (displayMessage) {
-            updateDisplayCoordinates();
+            textDisplay.update();
         }
     }
 
@@ -78,18 +80,8 @@ public class Sign extends GridObject implements OnEffector {
             super.draw();
         }
         if (displayMessage) {
-
-            StdDraw.setPenColor(COLOR);
-            drawRectangle(displayCoordinates);
-            StdDraw.setPenColor(StdDraw.BLACK);
-            drawRectangleOutline(displayCoordinates, THICKNESS.DEFAULT);
-            StdDraw.setFont(FONT);
-
-            double baseHeight = DISPLAY_CENTER[1] - displayHalfHeight + SPACE_ON_SIDE + CHAR_HEIGHT / 2;
-            for (int i = 0; i < messages.length; i++) {
-                StdDraw.text(DISPLAY_CENTER[0], baseHeight + i * CHAR_HEIGHT, messages[i]);
-            }
-
+            drawRectWithOutline(textDisplay.getDisplayBox(), COLOR, StdDraw.BLACK, THICKNESS.DEFAULT);
+            textDisplay.draw();
             displayMessage = false;
         }
     }
@@ -97,19 +89,6 @@ public class Sign extends GridObject implements OnEffector {
     @Override
     public void playerIsOn(Player player) {
         setDisplay();
-    }
-
-
-    public static void updateDisplayCenter(double frameX, double frameY) {
-        DISPLAY_CENTER[0] = frameX;
-        DISPLAY_CENTER[1] = frameY - Frame.Y_SCALE * (.3);
-    }
-
-    private void updateDisplayCoordinates() {
-        displayCoordinates[0] = DISPLAY_CENTER[0] - displayHalfWidth;
-        displayCoordinates[1] = DISPLAY_CENTER[1] - displayHalfHeight;
-        displayCoordinates[2] = DISPLAY_CENTER[0] + displayHalfWidth;
-        displayCoordinates[3] = DISPLAY_CENTER[1] + displayHalfHeight;
     }
 
 }

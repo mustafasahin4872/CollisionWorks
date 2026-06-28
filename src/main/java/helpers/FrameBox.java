@@ -34,6 +34,4 @@ public class FrameBox extends Box {
         return frameBox;
     }
 
-
-
 }

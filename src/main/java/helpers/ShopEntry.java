@@ -3,25 +3,16 @@ package helpers;
 import mapobjects.category.MapObject;
 
 public class ShopEntry {
-    private final MapObject item;
-    private final int cost;
-    private final boolean isCosmetic;
-    private final ShopInfo info;
 
+    private final MapObject item;
+    private final int coinCost;
+    private final int gemCost;
     private boolean isSold;
 
-    public ShopEntry(MapObject item, int cost, boolean isCosmetic, ShopInfo info) {
+    public ShopEntry(MapObject item, int coinCost, int gemCost) {
         this.item = item;
-        this.cost = cost;
-        this.isCosmetic = isCosmetic;
-        this.info = info;
-    }
-
-    public ShopEntry(MapObject item, int cost, boolean isCosmetic) {
-        this.item = item;
-        this.cost = cost;
-        this.isCosmetic = isCosmetic;
-        this.info = new ShopInfo(item);
+        this.coinCost = coinCost;
+        this.gemCost = gemCost;
     }
 
     public boolean isSold() {
@@ -32,16 +23,12 @@ public class ShopEntry {
         isSold = true;
     }
 
-    public int getCost() {
-        return cost;
+    public int getCoinCost() {
+        return coinCost;
     }
 
-    public boolean isCosmetic() {
-        return isCosmetic;
-    }
-
-    public ShopInfo getInfo() {
-        return info;
+    public int getGemCost() {
+        return gemCost;
     }
 
     public MapObject getItem() {
