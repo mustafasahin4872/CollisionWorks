@@ -22,11 +22,15 @@ FOR GODS SAKE DECOUPLE PLAYER FROM EVERYTHING
 
 ### New Elements
 
+- [ ] Add a wrapper buyable class inheriting mapobject
+  - [ ] items that are buyable in shop inherit this
+  - [ ] add rarity system to this class
+  - [ ] maybe tie rarity with pricing or effects
 - [ ] Accessory logic enhancements:
   - [ ] accessories work like trinkets, they give stat buffs or something
-  - [ ] accessory types separation, cannot hold two of the same accessory types at the same time
+  - [x] accessory types separation, cannot hold two of the same accessory types at the same time
   - [ ] edit selection screen as a result:
-    - [ ] accessory type selections
+    - [x] accessory type selections
     - [x] the isCosmetic in shopentry is no longer needed
     - [ ] shopentry prices display should show both coin and gem.
 - [ ] Drawing logic redesign

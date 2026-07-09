@@ -19,7 +19,7 @@ public class GameState {
     //------------------------------------------------------------------------------------------------------------------
 
     public enum STATE {
-        SELECTION, GAME, DEAD, PASSED, NEXT, SHOP, ALTERNATE1, ALTERNATE2, PAUSE, QUIT
+        SELECTION, ACCESSORY, GAME, DEAD, PASSED, NEXT, SHOP, ALTERNATE1, ALTERNATE2, PAUSE, QUIT
     }
     private STATE state = STATE.SELECTION;
 
@@ -33,6 +33,8 @@ public class GameState {
     private int collectedCoins = 0;
     private int collectedGems = 0;
 
+    private Accessory[] equipped = new Accessory[3];
+
     //------------------------------------------------------------------------------------------------------------------
     //------------------------------------------------------------------------------------------------------------------
     // OWNED ITEMS
@@ -42,9 +44,7 @@ public class GameState {
     private final ArrayList<Player> skins = new ArrayList<>(List.of(new Player()));
     private final ArrayList<Accessory> accessories = new ArrayList<>();
     private final ArrayList<Buff> permanentBuffs = new ArrayList<>();
-    private final  ArrayList<Gun> guns = new ArrayList<>();
-
-
+    private final  ArrayList<Gun> guns = new ArrayList<>(List.of(new Gun.Handgun(), new Gun.MachineGun()));
 
     //------------------------------------------------------------------------------------------------------------------
     //------------------------------------------------------------------------------------------------------------------
@@ -138,6 +138,14 @@ public class GameState {
 
     public void setState(STATE state) {
         this.state = state;
+    }
+
+    public Accessory[] getEquipped() {
+        return equipped;
+    }
+
+    public void setEquipped(Accessory[] equipped) {
+        this.equipped = equipped;
     }
 
     public void addOwnedSkin(Player skin) {
@@ -238,6 +246,8 @@ public class GameState {
         } else if (item instanceof Buff b) {
             b.expire(); // stops the animation
             addOwnedBuff(b);
+        } else if (item instanceof Gun g) {
+            addOwnedGun(g);
         }
 
     }

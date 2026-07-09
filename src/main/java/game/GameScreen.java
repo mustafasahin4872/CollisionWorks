@@ -103,9 +103,9 @@ public class GameScreen {
         private void processInput(MouseData mouseData) {
             double mouseX = mouseData.mouseX;
             double mouseY = mouseData.mouseY;
-            boolean pressed = mouseData.pressed;
+            boolean clicked = mouseData.clicked;
 
-            if (!pressed) return;
+            if (!clicked) return;
 
             if (gameState.getState() == STATE.GAME) {
                 // check for pause button clicks
@@ -144,9 +144,9 @@ public class GameScreen {
         private void processInput(MouseData mouseData) {
             double mouseX = mouseData.mouseX;
             double mouseY = mouseData.mouseY;
-            boolean pressed = mouseData.pressed;
+            boolean clicked = mouseData.clicked;
 
-            if (!pressed) return;
+            if (!clicked) return;
 
             if (gameState.getState() == STATE.PAUSE) {
                 if (isIn(mouseX, mouseY, RESUME_BUTTON.getFrameBox())) {
@@ -203,9 +203,9 @@ public class GameScreen {
         private void processInput(MouseData mouseData) {
             double mouseX = mouseData.mouseX;
             double mouseY = mouseData.mouseY;
-            boolean pressed = mouseData.pressed;
+            boolean clicked = mouseData.clicked;
 
-            if (!pressed) return;
+            if (!clicked) return;
 
             if (gameState.getState() == STATE.DEAD) { // STATE.PAUSE
                 if (isIn(mouseX, mouseY, EXIT_BUTTON.getFrameBox())) {

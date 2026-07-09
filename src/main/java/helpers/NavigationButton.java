@@ -1,0 +1,180 @@
+package helpers;
+
+import game.GameState;
+import mapobjects.component.Box;
+import helpers.InputHandler.*;
+
+import static helpers.CollisionMethods.isIn;
+
+public abstract class NavigationButton {
+
+    public abstract boolean triggered(MouseData mouseData, ArrowData arrowData);
+    public abstract void action();
+
+    public void processInput(MouseData mouseData, ArrowData arrowData) {
+
+        if (triggered(mouseData, arrowData)) {
+            action();
+        }
+    }
+
+    public static class StateButton extends NavigationButton {
+
+        private final Box BOX;
+        private final GameState.STATE nextState;
+        private final GameState gameState;
+
+        public StateButton(Box BOX, GameState gameState, GameState.STATE nextState) {
+            this.BOX = BOX;
+            this.gameState = gameState;
+            this.nextState = nextState;
+        }
+
+        @Override
+        public boolean triggered(MouseData mouseData, ArrowData arrowData) {
+            double mouseX = mouseData.mouseX;
+            double mouseY = mouseData.mouseY;
+            boolean clicked = mouseData.clicked;
+
+            return clicked && isIn(mouseX, mouseY, BOX);
+        }
+
+        @Override
+        public void action() {
+            gameState.setState(nextState);
+        }
+    }
+
+    public static class Index {
+
+        private int i = 0;
+        private int select = 0;
+        private int N;
+
+        public Index(int N) {
+            this.N = N;
+        }
+
+        public void setN(int n) {
+            N = n;
+        }
+
+        public void increment(int n) {
+            if (n < 0) {
+                System.out.println("INCREMENT OPERATION USED WITH NEGATIVE VALUE");
+                return;
+            }
+            i+=n;
+            i%=N;
+        }
+
+        public void increment() {
+            increment(1);
+        }
+
+        public void decrement(int n) {
+            if (n < 0) {
+                System.out.println("DECREMENT OPERATION USED WITH NEGATIVE VALUE");
+                return;
+            }
+            i-=n;
+            i%=N;
+            i+=N;
+            i%=N;
+        }
+
+        public void decrement() {
+            decrement(1);
+        }
+
+        public void setValue(int i) {
+            this.i = i;
+        }
+
+        public int getValue() {
+            return i;
+        }
+
+        public int getSelect() {
+            return select;
+        }
+
+        public void select() {
+            select = i;
+        }
+    }
+
+    public static class IndexButton extends NavigationButton {
+
+        public enum TYPE {INCREMENT, SELECT, DECREMENT}
+
+        private final Box BOX;
+        private final Index index;
+        private final TYPE type;
+
+        public IndexButton(Box BOX, Index index, TYPE type) {
+            this.BOX = BOX;
+            this.index = index;
+            this.type = type;
+        }
+
+        @Override
+        public boolean triggered(MouseData mouseData, ArrowData arrowData) {
+            double mouseX = mouseData.mouseX;
+            double mouseY = mouseData.mouseY;
+            boolean clicked = mouseData.clicked;
+
+            return clicked && isIn(mouseX, mouseY, BOX);
+        }
+
+        @Override
+        public void action() {
+            switch (type) {
+                case DECREMENT -> index.decrement();
+                case INCREMENT -> index.increment();
+                case SELECT -> index.select();
+            }
+        }
+
+    }
+
+    public static class ArrowKey extends NavigationButton {
+
+        public enum TYPE {INCREMENT, DECREMENT}
+
+        private final Index index;
+        private final TYPE type;
+
+        public ArrowKey(Index index, TYPE type) {
+            this.index = index;
+            this.type = type;
+        }
+
+        @Override
+        public boolean triggered(MouseData mouseData, ArrowData arrowData) {
+            int dir = arrowData.xDirection;
+            switch (type) {
+                case INCREMENT -> {
+                    return dir == 1;
+                }
+                case DECREMENT -> {
+                    return dir == -1;
+                }
+                case null -> {
+                    System.out.println("ERROR: ARROWKEY TYPE IS NULL");
+                    return false;
+                }
+            }
+        }
+
+        @Override
+        public void action() {
+            switch (type) {
+                case INCREMENT -> index.increment();
+                case DECREMENT -> index.decrement();
+            }
+        }
+
+    }
+
+}

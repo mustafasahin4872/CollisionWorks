@@ -2,6 +2,8 @@ package game;
 
 import helpers.InputHandler;
 import helpers.MapType;
+import helpers.NavigationButton;
+import helpers.NavigationButton.*;
 import lib.StdDraw;
 import mapobjects.component.Box;
 
@@ -34,15 +36,50 @@ public class LevelSelection {
             new Color(244, 157, 8)
     };
 
-    private int currentWorldIndex = 0;
-    private int currentLevelIndex = 0;
+    private static final int LEVELS_PER_ROW = 4;
+    private static final int LEVEL_ROW_NUM = 3;
 
-    private final NavigationUI navigationUI = new NavigationUI();
+    private final Index worldIndex = new Index(WORLDS.length);
+    private final Index levelIndex = new Index(LEVEL_ROW_NUM * LEVELS_PER_ROW);
+
+    private final NavigationButton[] leftButtons = new NavigationButton[WORLDS.length];
+    private final NavigationButton[] rightButtons = new NavigationButton[WORLDS.length - 1];
     private final LevelsUI levelsUI = new LevelsUI();
 
     public LevelSelection(InputHandler inputHandler, GameState gameState) {
         this.inputHandler = inputHandler;
         this.gameState = gameState;
+        configureNavigationButtons();
+    }
+
+    private void configureNavigationButtons() {
+        final double ARROW_BOX_SIZE = 2.0 * TILE_SIDE;
+
+        final Box[] LEFT_ARROW_BOXES = {
+            new Box(1 * TILE_SIDE, 5 * TILE_SIDE, ARROW_BOX_SIZE, ARROW_BOX_SIZE),
+            new Box(1 * TILE_SIDE, 5 * TILE_SIDE, ARROW_BOX_SIZE, ARROW_BOX_SIZE),
+            new Box(1 * TILE_SIDE, 5 * TILE_SIDE, ARROW_BOX_SIZE, ARROW_BOX_SIZE),
+            new Box(1 * TILE_SIDE, 8 * TILE_SIDE, ARROW_BOX_SIZE, ARROW_BOX_SIZE)
+        };
+
+        final Box[] RIGHT_ARROW_BOXES = {
+            new Box(Frame.X_SCALE - 1 * TILE_SIDE, 8 * TILE_SIDE, ARROW_BOX_SIZE, ARROW_BOX_SIZE),
+            new Box(Frame.X_SCALE - 1 * TILE_SIDE, 7 * TILE_SIDE, ARROW_BOX_SIZE, ARROW_BOX_SIZE),
+            new Box(Frame.X_SCALE - 1 * TILE_SIDE, 4 * TILE_SIDE, ARROW_BOX_SIZE, ARROW_BOX_SIZE)
+            // last world, no more levels
+        };
+
+        for (int i = 0; i<LEFT_ARROW_BOXES.length; i++) {
+            if (i == 0) {
+                leftButtons[0] = new StateButton(LEFT_ARROW_BOXES[0], gameState, GameState.STATE.SELECTION);
+            } else {
+                leftButtons[i] = new IndexButton(LEFT_ARROW_BOXES[i], worldIndex, IndexButton.TYPE.DECREMENT);
+            }
+        }
+
+        for (int i = 0; i<RIGHT_ARROW_BOXES.length; i++) {
+            rightButtons[i] = new IndexButton(RIGHT_ARROW_BOXES[i], worldIndex, IndexButton.TYPE.INCREMENT);
+        }
     }
 
     public void levelSelectionLoop() {
@@ -58,7 +95,7 @@ public class LevelSelection {
 
             StdDraw.clear();
 
-            GameMap currentWorld = WORLDS[currentWorldIndex];
+            GameMap currentWorld = WORLDS[worldIndex.getValue()];
             currentWorld.draw();
 
             draw();
@@ -68,16 +105,19 @@ public class LevelSelection {
         }
 
         if (gameState.getState() == GameState.STATE.NEXT) {
-            gameState.setWorldIndex(currentWorldIndex + 1);
-            gameState.setLevelIndex(currentLevelIndex + 1);
+            gameState.setWorldIndex(worldIndex.getValue() + 1);
+            gameState.setLevelIndex(levelIndex.getValue() + 1);
             if (gameState.getPlayer() != null) {
-                gameState.getPlayer().setWorldIndex(currentWorldIndex + 1);
+                gameState.getPlayer().setWorldIndex(worldIndex.getValue() + 1);
             }
         }
     }
 
     public void processInput(MouseData mouseData, ArrowData arrowData) {
-        navigationUI.processInput(mouseData);
+        leftButtons[worldIndex.getValue()].processInput(mouseData, arrowData);
+        if (worldIndex.getValue() != WORLDS.length - 1) {
+            rightButtons[worldIndex.getValue()].processInput(mouseData, arrowData);
+        }
         levelsUI.processInput(mouseData, arrowData);
     }
 
@@ -102,9 +142,9 @@ public class LevelSelection {
         public static final Box[] LEVEL_BOXES = new Box[12];
 
         static {
-            for (int i = 0; i < 3; i++) {
-                for (int j = 0; j < 4; j++) {
-                    LEVEL_BOXES[i * 4 + j] = new Box(
+            for (int i = 0; i < LEVEL_ROW_NUM; i++) {
+                for (int j = 0; j < LEVELS_PER_ROW; j++) {
+                    LEVEL_BOXES[i * LEVELS_PER_ROW + j] = new Box(
                             LEVEL_BOX_START_X + j * LEVEL_BOX_X_GAP,
                             LEVEL_BOX_START_Y_OFFSET + i * LEVEL_BOX_Y_GAP,
                             LEVEL_BOX_SIZE, LEVEL_BOX_SIZE);
@@ -120,27 +160,25 @@ public class LevelSelection {
             boolean downArrowPressed = arrowData.yDirection == 1;
 
             if (rightArrowPressed)
-                currentLevelIndex++;
+                levelIndex.increment();
             if (leftArrowPressed)
-                currentLevelIndex--;
+                levelIndex.decrement();
             if (downArrowPressed)
-                currentLevelIndex += 4;
+                levelIndex.increment(4);
             if (upArrowPressed)
-                currentLevelIndex -= 4;
+                levelIndex.decrement(4);
 
             double mouseX = mouseData.mouseX;
             double mouseY = mouseData.mouseY;
-            boolean mousePressed = mouseData.pressed;
+            boolean clicked = mouseData.clicked;
 
-            if (mousePressed) {
+            if (clicked) {
                 for (int i = 0; i < LEVEL_BOXES.length; i++) {
                     if (isIn(mouseX, mouseY, LEVEL_BOXES[i])) {
-                        currentLevelIndex = i;
+                        levelIndex.setValue(i);
                     }
                 }
             }
-
-            currentLevelIndex = (currentLevelIndex + 12) % 12;
 
             if (arrowData.space) {
                 gameState.setState(GameState.STATE.NEXT);
@@ -151,59 +189,18 @@ public class LevelSelection {
         public void draw() {
 
             Font titleFont = new Font("Monospaced", Font.BOLD, 30);
-            drawText(WORLD_NAMES[currentWorldIndex], Frame.X_SCALE / 2.0, WORLD_NAME_Y_OFFSET, titleFont,
-                    WORLD_COLORS[currentWorldIndex]);
+            drawText(WORLD_NAMES[worldIndex.getValue()], Frame.X_SCALE / 2.0, WORLD_NAME_Y_OFFSET, titleFont,
+                    WORLD_COLORS[worldIndex.getValue()]);
 
             for (int i = 0; i < LEVEL_BOXES.length; i++) {
                 Box currentButton = LEVEL_BOXES[i];
 
-                Color outlineColor = (i == currentLevelIndex) ? StdDraw.WHITE : WORLD_COLORS[currentWorldIndex];
-                StdDraw.setPenColor(outlineColor);
-                drawRectangleOutline(currentButton, THICKNESS.THIN);
+                Color outlineColor = (i == levelIndex.getValue()) ? StdDraw.WHITE : WORLD_COLORS[worldIndex.getValue()];
+                drawRectangleOutline(currentButton, outlineColor, THICKNESS.THIN);
 
                 Font font = new Font("Arial", Font.PLAIN, 16);
                 textInsideBox(currentButton, String.valueOf(i + 1), StdDraw.WHITE, font);
             }
-        }
-    }
-
-    private class NavigationUI {
-
-        public static final double ARROW_BOX_SIZE = 2.0 * TILE_SIDE;
-
-        public static final Box[] LEFT_ARROW_BOX = {
-                new Box(1 * TILE_SIDE, 5 * TILE_SIDE, ARROW_BOX_SIZE, ARROW_BOX_SIZE),
-                new Box(1 * TILE_SIDE, 5 * TILE_SIDE, ARROW_BOX_SIZE, ARROW_BOX_SIZE),
-                new Box(1 * TILE_SIDE, 5 * TILE_SIDE, ARROW_BOX_SIZE, ARROW_BOX_SIZE),
-                new Box(1 * TILE_SIDE, 8 * TILE_SIDE, ARROW_BOX_SIZE, ARROW_BOX_SIZE)
-        };
-
-        public static final Box[] RIGHT_ARROW_BOX = {
-                new Box(Frame.X_SCALE - 1 * TILE_SIDE, 8 * TILE_SIDE, ARROW_BOX_SIZE, ARROW_BOX_SIZE),
-                new Box(Frame.X_SCALE - 1 * TILE_SIDE, 7 * TILE_SIDE, ARROW_BOX_SIZE, ARROW_BOX_SIZE),
-                new Box(Frame.X_SCALE - 1 * TILE_SIDE, 4 * TILE_SIDE, ARROW_BOX_SIZE, ARROW_BOX_SIZE),
-                null // last world, no more levels
-        };
-
-        private void processInput(InputHandler.MouseData mouseData) {
-            double mouseX = mouseData.mouseX;
-            double mouseY = mouseData.mouseY;
-            boolean mousePressed = mouseData.pressed;
-            if (mousePressed) {
-                if (isIn(mouseX, mouseY, LEFT_ARROW_BOX[currentWorldIndex])) {
-                    if (LevelSelection.this.currentWorldIndex == 0) {
-                        gameState.setState(GameState.STATE.SELECTION);
-                    } else {
-                        LevelSelection.this.currentWorldIndex--;
-                        currentLevelIndex = 0;
-                    }
-                } else if (RIGHT_ARROW_BOX[currentWorldIndex] != null
-                        && isIn(mouseX, mouseY, RIGHT_ARROW_BOX[currentWorldIndex])) {
-                    LevelSelection.this.currentWorldIndex++;
-                    currentLevelIndex = 0;
-                }
-            }
-
         }
     }
 

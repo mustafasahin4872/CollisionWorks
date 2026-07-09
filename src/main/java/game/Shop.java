@@ -4,6 +4,7 @@ import helpers.InputHandler;
 import game.GameState.STATE;
 import helpers.ShopEntry;
 import mapobjects.mapobject.Accessory;
+import mapobjects.mapobject.Accessory.RARITY;
 import mapobjects.mapobject.Buff;
 import mapobjects.mapobject.Gun;
 import mapobjects.mapobject.Player;
@@ -58,13 +59,13 @@ public class Shop {
     );
 
     private final List<ShopEntry> buyableAccessories = List.of(
-        new ShopEntry(new Accessory.Hat("fedora"), 0, 0),
-        new ShopEntry(new Accessory.Tie("tie"), 100, 0),
-        new ShopEntry(new Accessory.Headpiece("coquette"), 0, 0),
-        new ShopEntry(new Accessory.Necklace("dollar"), 200, 0),
-        new ShopEntry(new Accessory.Necklace("sorcerer"), 250, 0),
-        new ShopEntry(new Accessory.Pin("star"), 50000, 0),
-        new ShopEntry(new Accessory.Pin("sheriff"), 1075, 0)
+        new ShopEntry(new Accessory.Hat("fedora", RARITY.RARE), 0, 0),
+        new ShopEntry(new Accessory.Tie("tie", RARITY.EPIC), 100, 0),
+        new ShopEntry(new Accessory.Headpiece("coquette", RARITY.MYTHIC), 0, 0),
+        new ShopEntry(new Accessory.Necklace("dollar", RARITY.RARE), 200, 0),
+        new ShopEntry(new Accessory.Necklace("sorcerer", RARITY.MYTHIC), 250, 0),
+        new ShopEntry(new Accessory.Pin("star", RARITY.LEGENDARY), 50000, 0),
+        new ShopEntry(new Accessory.Pin("sheriff", RARITY.RARE), 1075, 0)
     );
 
     private final List<ShopEntry> buyableBuffs = List.of(

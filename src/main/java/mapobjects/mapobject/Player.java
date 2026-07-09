@@ -41,7 +41,7 @@ public class Player extends MapObject implements MovingCollidable, HealthBearer 
     // player's collision, spawn, health, time components
     private final Box collisionBox;
     protected final HPBar hpBar;
-    private final Gun gun;
+    private Gun gun;
 
     // owned objects
     protected Accessory[] accessories;
@@ -137,7 +137,7 @@ public class Player extends MapObject implements MovingCollidable, HealthBearer 
         yCollided = false;
 
         for (Accessory accessory : accessories) {
-            accessory.update();
+            if (accessory != null) accessory.update();
         }
     }
 
@@ -231,6 +231,9 @@ public class Player extends MapObject implements MovingCollidable, HealthBearer 
         return gun.getAmmo();
     }
 
+    public void setGun(Gun gun) {
+        this.gun = gun;
+    }
 
     //COLLISION
 
@@ -445,7 +448,7 @@ public class Player extends MapObject implements MovingCollidable, HealthBearer 
     public void drawAccessories() {
         if (accessories != null) {
             for (Accessory accessory : accessories) {
-                accessory.draw();
+                if (accessory != null) accessory.draw();
             }
         }
     }

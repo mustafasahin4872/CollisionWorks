@@ -29,16 +29,17 @@ public class DrawMethods {
                 (region[2] - region[0]) / 2.0, (region[3] - region[1]) / 2.0);
     }
 
-    public static void drawRectangleOutline(Box box, THICKNESS thickness) {
+    public static void drawRectangleOutline(Box box, Color color, THICKNESS thickness) {
+        StdDraw.setPenColor(color);
         StdDraw.setPenRadius(thickness.thickness);
         double[] region = box.getCorners();
         StdDraw.rectangle((region[0] + region[2]) / 2.0, (region[1] + region[3]) / 2.0,
-                (region[2] - region[0]) / 2.0, (region[3] - region[1]) / 2.0);
+            (region[2] - region[0]) / 2.0, (region[3] - region[1]) / 2.0);
     }
 
     public static void drawRectWithOutline(Box box, Color boxColor, Color outColor, THICKNESS thickness) {
         StdDraw.setPenColor(outColor);
-        drawRectangleOutline(box, thickness);
+        drawRectangleOutline(box, outColor, thickness);
         StdDraw.setPenColor(boxColor);
         drawRectangle(box);
     }

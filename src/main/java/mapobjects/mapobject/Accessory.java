@@ -1,30 +1,49 @@
 package mapobjects.mapobject;
-
-import game.Main;
 import mapobjects.category.MapObject;
 
-import java.io.*;
-import java.util.ArrayList;
+import java.awt.*;
 
 import static helpers.HelperMethods.getDirectionString;
 import static mapobjects.category.GridObject.TILE_SIDE;
 
-// different accessories are placed on different locations on player.
-// therefore, we created many subclasses, each having their unique setCoordinates() function
-// also, each accessory has 9 images, and their names change depending on the player's direction.
+/// different accessories are placed on different locations on player.
+/// therefore, we created many subclasses, each having their unique setCoordinates() function
+/// also, each accessory has 9 images, and their names change depending on the player's direction.
+/// there are 3 main accessory interfaces: Hat, Necklace and Pin. these interfaces categorize the different subclasses.
 public abstract class Accessory extends MapObject {
 
+    public enum RARITY {
+        RARE(new Color(111, 217, 110)),
+        EPIC(new Color(51, 216, 187)),
+        MYTHIC(new Color(185, 0, 0)),
+        LEGENDARY(new Color(241, 241, 241))
+        ;
+
+        private final Color color;
+
+        RARITY(Color color) {
+            this.color = color;
+        }
+
+        public Color getColor() {
+            return color;
+        }
+
+    }
+
+    private final RARITY rarity;
     protected Player player;
     private final String accessoryName;
     private final double defaultWidth, defaultHeight;
     private boolean alone;
 
-    public Accessory(String accessoryName, double defaultWidth, double defaultHeight) {
+    public Accessory(String accessoryName, double defaultWidth, double defaultHeight, RARITY rarity) {
         super(0, 0, 0, defaultWidth, defaultHeight, accessoryName+"/0");
         this.player = new Player(); // replaced later
         this.accessoryName = accessoryName;
         this.defaultWidth = defaultWidth;
         this.defaultHeight = defaultHeight;
+        this.rarity = rarity;
         update();
     }
 
@@ -38,6 +57,10 @@ public abstract class Accessory extends MapObject {
 
     public String getAccessoryName() {
         return accessoryName;
+    }
+
+    public RARITY getRarity() {
+        return rarity;
     }
 
     public void resetSize() {
@@ -112,10 +135,26 @@ public abstract class Accessory extends MapObject {
     //------------------------------------------------------------------------------------------
     //------------------------------------------------------------------------------------------
 
+    public abstract static class Headwear extends Accessory{
+        public Headwear(String accessoryName, double defaultWidth, double defaultHeight, RARITY rarity) {
+            super(accessoryName, defaultWidth, defaultHeight, rarity);
+        }
+    }
+    public abstract static class Brooch extends Accessory {
+        public Brooch(String accessoryName, double defaultWidth, double defaultHeight, RARITY rarity) {
+            super(accessoryName, defaultWidth, defaultHeight, rarity);
+        }
+    }
+    public abstract static class Neckwear extends Accessory {
+        public Neckwear(String accessoryName, double defaultWidth, double defaultHeight, RARITY rarity) {
+            super(accessoryName, defaultWidth, defaultHeight, rarity);
+        }
+    }
+
     //Stays on the middle top of the player, does not change as player moves.
-    public static class Hat extends Accessory {
-        public Hat(String name) {
-            super(name, 65, 25);
+    public static class Hat extends Headwear {
+        public Hat(String name, RARITY rarity) {
+            super(name, 65, 25, rarity);
         }
 
         @Override
@@ -130,10 +169,10 @@ public abstract class Accessory extends MapObject {
     }
 
     //Stays in the center of the player, does not change as player moves.
-    public static class Necklace extends Accessory {
+    public static class Necklace extends Neckwear {
 
-        public Necklace(String name) {
-            super(name, 50, 25);
+        public Necklace(String name, RARITY rarity) {
+            super(name, 50, 25, rarity);
         }
 
         @Override
@@ -152,10 +191,10 @@ public abstract class Accessory extends MapObject {
     }
 
     //sits on lower half of player, moves to the direction player moves to (stays right below the eyes)
-    public static class Tie extends Accessory {
+    public static class Tie extends Neckwear {
 
-        public Tie(String name) {
-            super(name, 50, 30);
+        public Tie(String name, RARITY rarity) {
+            super(name, 50, 30, rarity);
         }
 
         @Override
@@ -178,10 +217,10 @@ public abstract class Accessory extends MapObject {
     }
 
     //Stays on top of the player, moves to the left side when going right.
-    public static class Pin extends Accessory {
+    public static class Pin extends Brooch {
 
-        public Pin(String name) {
-            super(name, 10, 10);
+        public Pin(String name, RARITY rarity) {
+            super(name, 10, 10, rarity);
         }
 
         @Override
@@ -201,10 +240,10 @@ public abstract class Accessory extends MapObject {
     }
 
     //Stays on top of the player, moves to the left side when going right.
-    public static class Headpiece extends Accessory {
+    public static class Headpiece extends Headwear {
 
-        public Headpiece(String name) {
-            super(name, 20, 20);
+        public Headpiece(String name, RARITY rarity) {
+            super(name, 20, 20, rarity);
         }
 
         @Override

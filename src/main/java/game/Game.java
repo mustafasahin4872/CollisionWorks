@@ -55,23 +55,16 @@ public class Game {
                 gameMap.callMapObjects();
                 //updates player position and other attributes at last
                 player.update();
-
-                //sets the frame to center player if it is not in the edges of gameMap
-                //if the frame would get out of the gameMap, set frame to show up to edge
             }
 
+            //sets the frame to center player if it is not in the edges of gameMap
+            //if the frame would get out of the gameMap, set frame to show up to edge
             double[] frameCenter = frame.setFrameCenter(player.getX(), player.getY());
             gameScreen.updateValues(frameCenter[0], frameCenter[1]);
             gameMap.setFrameTileRange();
 
             //draws everything
-            StdDraw.clear();
-            gameMap.draw();
-            player.draw();
-            player.drawProjectiles();
-            player.drawAccessories();
-            gameScreen.draw();
-            StdDraw.show();
+            draw(gameMap, player, gameScreen);
 
             player.resetInput();
 
@@ -88,7 +81,15 @@ public class Game {
 
     }
 
-
+    private static void draw(GameMap gameMap, Player player, GameScreen gameScreen) {
+        StdDraw.clear();
+        gameMap.draw();
+        player.draw();
+        player.drawProjectiles();
+        player.drawAccessories();
+        gameScreen.draw();
+        StdDraw.show();
+    }
 
 
 }

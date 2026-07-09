@@ -52,10 +52,7 @@ public abstract class Button extends GridObject implements OnEffector {
 
     @Override
     public void draw() {
-        StdDraw.setPenColor(color);
-        drawRectangle(positionBox);
-        StdDraw.setPenColor(FRAME_COLOR);
-        drawRectangleOutline(positionBox, THICKNESS.DEFAULT);
+        drawRectWithOutline(positionBox, color, FRAME_COLOR, THICKNESS.DEFAULT);
     }
 
 

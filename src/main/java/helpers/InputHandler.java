@@ -34,8 +34,6 @@ public class InputHandler {
         public int xDirection, yDirection;
         public boolean space;
 
-        public ArrowData() {}
-
         private void handleInput() {
 
             int xDirection = 0, yDirection = 0;
@@ -80,24 +78,29 @@ public class InputHandler {
 
     public static class MouseData {
         public double mouseX, mouseY;
-        public boolean pressed;
+        public boolean clicked;
+        private boolean pressed = false;
 
         private static final int COOLDOWN = 100; // in milliseconds
-        private final Timer timer = new Timer(Integer.MAX_VALUE, COOLDOWN);
-
-        public MouseData() {}
+        private final Timer clickCooldown = new Timer(Integer.MAX_VALUE, COOLDOWN);
 
         private void handleInput() {
 
-            if (timer.inCooldown()) {
-                timer.tick();
-                pressed = false;
-            } else {
-                pressed = StdDraw.isMousePressed();
+            if (clickCooldown.inCooldown()) {
+
+                clickCooldown.tick();
+                clicked = false;
                 mouseX = StdDraw.mouseX();
                 mouseY = StdDraw.mouseY();
 
-                timer.startCooldown();
+            } else {
+                clicked = pressed && !StdDraw.isMousePressed();
+                pressed = StdDraw.isMousePressed();
+
+                mouseX = StdDraw.mouseX();
+                mouseY = StdDraw.mouseY();
+
+                if (clicked) clickCooldown.startCooldown();
             }
 
         }
