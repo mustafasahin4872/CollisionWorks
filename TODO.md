@@ -11,8 +11,9 @@
     - GameState vs player stats
     - UI rendering vs map rendering
     - Selection screens separation
+    - Addition of in-game UI
+    - Addition of shop and selection uis
 - Added helper classes for better encapsulation and scoping
-- Added in game Shop
 
 ---
 
@@ -33,40 +34,39 @@ FOR GODS SAKE DECOUPLE PLAYER FROM EVERYTHING
     - [x] accessory type selections
     - [x] the isCosmetic in shopentry is no longer needed
     - [ ] shopentry prices display should show both coin and gem.
-- [ ] Drawing logic redesign
-  - [ ] Drawable interface
-  - [ ] Drawer component: draws picture or colored rectangle or text
-  - [ ] Display helper: sign and ShopUI logics collect
-    - [x] sign logic to display
-    - [x] shopui logic to display
-    - [ ] signs tremble a bit, why?
-    - [ ] texts are drawn towards the upper-left corner even when centered, why?
 - [ ] ADD GUNS!!!
   - [x] move the spawn logic to guns from the player
   - [x] the basic initiation of guns are done in playerDefaults class
   - [X] add gun types, different spawn logics
   - [x] add guns to the shop
   - [x] fix spawner class!
-  - [ ] player should be able to select guns - add to selection screen
+  - [x] player should be able to select guns - add to selection screen
   - [ ] gun upgrades in shop - dont forget the stats page
-- [x] New button - screen in shop: Info about player and buff stats.
+- [ ] Add buff system
+    - [x] Buff shrinking and growing animation is vibrating
+    - [x] Buff shrinking and growing animation should stop when bought
+    - [x] Buff buying logic - calls playerontop -> change to calling buff.expire() only
+    - [x] Add buffs to shop
+    - [x] Display permanentbuffs in skinselection
+    - [ ] ADD BUFFS LOGIC
+    - [ ] Add buffs to mapmaker
+    - [ ] BUFFS IDEA: (decide whether to implement or not)
+        - [ ] player should hold a in-game buffs list (not gamestate)
+        - [ ] buffs should have an apply(Player player) and revert(Player player) function that applies/reverts the effects
+        - [ ] playerIsOn should only add the buff to the List
+- [ ] Drawing logic redesign
+    - [ ] Drawable interface
+    - [ ] Drawer component: draws picture or colored rectangle or text
+    - [ ] Display helper: sign and ShopUI logics collect
+        - [x] sign logic to display
+        - [x] shopui logic to display
+        - [ ] signs tremble a bit, why?
+        - [ ] texts are drawn towards the upper-left corner even when centered, why?
 - [ ] Lock levels and keep the last unlocked level index inside gamestate
   - [ ] draw chains on locked level boxes
   - [ ] keep passed level indexes in gamestate
   - [ ] disable coin collection on already passed levels
-    - [ ] remember the collected coin amount each level, if more is collected, then add. 
-- [ ] Add buff system
-  - [x] Buff shrinking and growing animation is vibrating
-  - [x] Buff shrinking and growing animation should stop when bought
-  - [x] Buff buying logic - calls playerontop -> change to calling buff.expire() only
-  - [x] Add buffs to shop
-  - [x] Display permanentbuffs in skinselection
-  - [ ] ADD BUFFS LOGIC
-  - [ ] Add buffs to mapmaker
-  - [ ] BUFFS IDEA: (decide whether to implement or not)
-      - [ ] player should hold a in-game buffs list (not gamestate)
-      - [ ] buffs should have an apply(Player player) and revert(Player player) function that applies/reverts the effects
-      - [ ] playerIsOn should only add the buff to the List
+    - [ ] remember the collected coin amount each level, if more is collected, then add.
 - [ ] in-between levels content
     - [ ] add shop
     - [ ] add random rewards
@@ -74,6 +74,7 @@ FOR GODS SAKE DECOUPLE PLAYER FROM EVERYTHING
     - [x] in-game collected currencies add to the gamestate currencies
     - [x] add a gem counter into in-game ui as well
     - [x] add gems in mapmaker as well
+- [x] New button/screen in shop: Info about player and buff stats.
 - [x] Create a separate SelectionScreen similar to GameScreen
 
 ### Core Refactoring

@@ -3,6 +3,7 @@ package helpers;
 import game.GameState;
 import mapobjects.component.Box;
 import helpers.InputHandler.*;
+import mapobjects.component.Timer;
 
 import static helpers.CollisionMethods.isIn;
 
@@ -145,26 +146,34 @@ public abstract class NavigationButton {
         private final Index index;
         private final TYPE type;
 
+        private static final double COOLDOWN = 200; // in milliseconds
+        private final Timer arrowCooldown = new Timer(Long.MAX_VALUE, COOLDOWN);
+
         public ArrowKey(Index index, TYPE type) {
             this.index = index;
             this.type = type;
+            arrowCooldown.activate();
         }
 
         @Override
         public boolean triggered(MouseData mouseData, ArrowData arrowData) {
+
+            if (arrowCooldown.inCooldown()) {
+                arrowCooldown.tick();
+                return false;
+            }
+
             int dir = arrowData.xDirection;
-            switch (type) {
-                case INCREMENT -> {
-                    return dir == 1;
-                }
-                case DECREMENT -> {
-                    return dir == -1;
-                }
+            boolean result = switch (type) {
+                case INCREMENT -> dir == 1;
+                case DECREMENT -> dir == -1;
                 case null -> {
                     System.out.println("ERROR: ARROWKEY TYPE IS NULL");
-                    return false;
+                    yield  false;
                 }
-            }
+            };
+            if (result) arrowCooldown.startCooldown();
+            return result;
         }
 
         @Override

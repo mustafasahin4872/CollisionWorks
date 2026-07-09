@@ -81,27 +81,13 @@ public class InputHandler {
         public boolean clicked;
         private boolean pressed = false;
 
-        private static final int COOLDOWN = 100; // in milliseconds
-        private final Timer clickCooldown = new Timer(Integer.MAX_VALUE, COOLDOWN);
-
         private void handleInput() {
 
-            if (clickCooldown.inCooldown()) {
-
-                clickCooldown.tick();
-                clicked = false;
-                mouseX = StdDraw.mouseX();
-                mouseY = StdDraw.mouseY();
-
-            } else {
                 clicked = pressed && !StdDraw.isMousePressed();
                 pressed = StdDraw.isMousePressed();
 
                 mouseX = StdDraw.mouseX();
                 mouseY = StdDraw.mouseY();
-
-                if (clicked) clickCooldown.startCooldown();
-            }
 
         }
     }
