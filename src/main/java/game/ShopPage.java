@@ -73,7 +73,6 @@ public class ShopPage {
         displayNum = displays.length;
 
         updateBuyables(displays);
-        updateShopInfos();
 
         configured = true;
 
@@ -126,29 +125,6 @@ public class ShopPage {
             uis[1].configure(displays[1]);
             uis[2].configure(displays[2]);
         }
-    }
-
-    private void updateShopInfos() {
-
-        if (displayNum == 0) return;
-
-        final int LINE_HEIGHT = 15;
-        int size = getFontSizeForHeight(LINE_HEIGHT, new Font("Arial", Font.PLAIN, 100));
-        Color color = StdDraw.BLACK;
-        Font font = new Font("Arial", Font.PLAIN, size);
-
-        FrameBox.updateCenter(Frame.X_SCALE/2, Frame.Y_SCALE/2);
-        if (displayNum == 1) {
-            uis[1].fillInfo(color, font);
-        } else if (displayNum == 2) {
-            uis[0].fillInfo(color, font);
-            uis[2].fillInfo(color, font);
-        } else if (displayNum == 3) {
-            uis[0].fillInfo(color, font);
-            uis[1].fillInfo(color, font);
-            uis[2].fillInfo(color, font);
-        }
-
     }
 
 
@@ -283,20 +259,23 @@ public class ShopPage {
         }
 
         public void configure(List<ShopEntry> buyables) {
+
+            FrameBox.updateCenter(Frame.X_SCALE/2, Frame.Y_SCALE/2);
+
+            final int LINE_HEIGHT = 15;
+            final int size = getFontSizeForHeight(LINE_HEIGHT, new Font("Arial", Font.PLAIN, 100));
+            final Font infoFont = new Font("Arial", Font.PLAIN, size);
+
             this.buyables = buyables;
             index.setN(buyables.size());
-            for (ShopEntry shopEntry : buyables) {
-                MapObject item = shopEntry.getItem();
+            descriptions.clear();
+            stats.clear();
+            for (ShopEntry buyable : buyables) {
+                MapObject item = buyable.getItem();
                 item.setCenterCoordinates(SHOP_BOX.getCenterX(), SHOP_BOX.getCenterY());
                 if (item instanceof Accessory a) a.setAlone(true);
-            }
-        }
-
-        public void fillInfo(Color color, Font font) {
-            for (int i = 0; i<buyables.size(); i++) {
-                MapObject item = buyables.get(i).getItem();
-                descriptions.add(i, new TextDisplay(SHOP_BOX, item.getDescription(), color, font, true));
-                stats.add(i, new TextDisplay(SHOP_BOX, item.getStats(), color, font, true));
+                descriptions.add(new TextDisplay(SHOP_BOX, item.getDescription(), infoFont, true));
+                stats.add(new TextDisplay(SHOP_BOX, item.getStats(), infoFont, true));
             }
         }
 
@@ -319,11 +298,11 @@ public class ShopPage {
         }
 
         private ShopEntry getCurrentShopEntry() {
-            return buyables.get(index.getValue());
+            return buyables.get(index.getCurrent());
         }
 
         private String getLabel() {
-            MapObject mapObject = buyables.get(index.getValue()).getItem();
+            MapObject mapObject = buyables.get(index.getCurrent()).getItem();
             return switch (mapObject) {
                 case Player p -> "Skins";
                 case Accessory.Headwear _ -> "Headwears";
@@ -376,20 +355,24 @@ public class ShopPage {
                 drawRectWithOutline(SHOP_BOX, descriptionColor, outlineColor);
                 drawRectWithOutline(DESCRIPTION_BOX, shopColor, outlineColor);
                 drawRectWithOutline(STATS_BOX, statsColor, outlineColor);
-                descriptions.get(index.getValue()).draw();
+                textInsideBox(DESCRIPTION_BOX, "↩", StdDraw.BLACK, smallFont);
+                textInsideBox(STATS_BOX, "∑", StdDraw.BLACK, smallFont);
+                descriptions.get(index.getCurrent()).draw();
             } else if (statsButton.isPressed()){
                 drawRectWithOutline(SHOP_BOX, statsColor, outlineColor);
                 drawRectWithOutline(DESCRIPTION_BOX, descriptionColor, outlineColor);
                 drawRectWithOutline(STATS_BOX, shopColor, outlineColor);
-                stats.get(index.getValue()).draw();
+                textInsideBox(DESCRIPTION_BOX, "ⓘ", StdDraw.BLACK, smallFont);
+                textInsideBox(STATS_BOX, "↩", StdDraw.BLACK, smallFont);
+                stats.get(index.getCurrent()).draw();
             } else {
                 drawRectWithOutline(SHOP_BOX, shopColor, outlineColor);
                 drawRectWithOutline(DESCRIPTION_BOX, descriptionColor, outlineColor);
                 drawRectWithOutline(STATS_BOX, statsColor, outlineColor);
+                textInsideBox(DESCRIPTION_BOX, "ⓘ", StdDraw.BLACK, smallFont);
+                textInsideBox(STATS_BOX, "∑", StdDraw.BLACK, smallFont);
                 shopEntry.getItem().drawBig(DRAW_BIG_MULTIPLIER);
             }
-            textInsideBox(DESCRIPTION_BOX, "ⓘ", StdDraw.BLACK, smallFont);
-            textInsideBox(STATS_BOX, "∑", StdDraw.BLACK, smallFont);
 
             drawRectWithOutline(PRICE_BOX, buyColor, outlineColor);
 

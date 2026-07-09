@@ -160,7 +160,7 @@ public class AccessorySelection {
         private void draw() {
 
             Color boxColor;
-            Accessory accessory = accessories.get(index.getValue());
+            Accessory accessory = accessories.get(index.getCurrent());
             if (accessory == null) {
                 boxColor = new Color(208, 146, 95);
             }
@@ -177,7 +177,7 @@ public class AccessorySelection {
 
             textInsideBox(LEFT_BOX, "<", color, font);
             textInsideBox(RIGHT_BOX, ">", color, font);
-            if (index.getValue() == index.getSelect()) {
+            if (index.getCurrent() == index.getSelect()) {
                 textInsideBox(SELECT_BOX, "✅", color, font);
             } else {
                 textInsideBox(SELECT_BOX, "❎", color, font);

@@ -95,7 +95,7 @@ public class LevelSelection {
 
             StdDraw.clear();
 
-            GameMap currentWorld = WORLDS[worldIndex.getValue()];
+            GameMap currentWorld = WORLDS[worldIndex.getCurrent()];
             currentWorld.draw();
 
             draw();
@@ -105,18 +105,18 @@ public class LevelSelection {
         }
 
         if (gameState.getState() == GameState.STATE.NEXT) {
-            gameState.setWorldIndex(worldIndex.getValue() + 1);
-            gameState.setLevelIndex(levelIndex.getValue() + 1);
+            gameState.setWorldIndex(worldIndex.getCurrent() + 1);
+            gameState.setLevelIndex(levelIndex.getCurrent() + 1);
             if (gameState.getPlayer() != null) {
-                gameState.getPlayer().setWorldIndex(worldIndex.getValue() + 1);
+                gameState.getPlayer().setWorldIndex(worldIndex.getCurrent() + 1);
             }
         }
     }
 
     public void processInput(MouseData mouseData, ArrowData arrowData) {
-        leftButtons[worldIndex.getValue()].processInput(mouseData, arrowData);
-        if (worldIndex.getValue() != WORLDS.length - 1) {
-            rightButtons[worldIndex.getValue()].processInput(mouseData, arrowData);
+        leftButtons[worldIndex.getCurrent()].processInput(mouseData, arrowData);
+        if (worldIndex.getCurrent() != WORLDS.length - 1) {
+            rightButtons[worldIndex.getCurrent()].processInput(mouseData, arrowData);
         }
         levelsUI.processInput(mouseData, arrowData);
     }
@@ -189,13 +189,13 @@ public class LevelSelection {
         public void draw() {
 
             Font titleFont = new Font("Monospaced", Font.BOLD, 30);
-            drawText(WORLD_NAMES[worldIndex.getValue()], Frame.X_SCALE / 2.0, WORLD_NAME_Y_OFFSET, titleFont,
-                    WORLD_COLORS[worldIndex.getValue()]);
+            drawText(WORLD_NAMES[worldIndex.getCurrent()], Frame.X_SCALE / 2.0, WORLD_NAME_Y_OFFSET, titleFont,
+                    WORLD_COLORS[worldIndex.getCurrent()]);
 
             for (int i = 0; i < LEVEL_BOXES.length; i++) {
                 Box currentButton = LEVEL_BOXES[i];
 
-                Color outlineColor = (i == levelIndex.getValue()) ? StdDraw.WHITE : WORLD_COLORS[worldIndex.getValue()];
+                Color outlineColor = (i == levelIndex.getCurrent()) ? StdDraw.WHITE : WORLD_COLORS[worldIndex.getCurrent()];
                 drawRectangleOutline(currentButton, outlineColor, THICKNESS.THIN);
 
                 Font font = new Font("Arial", Font.PLAIN, 16);

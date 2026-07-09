@@ -1,9 +1,11 @@
 package game;
 
+import helpers.FrameBox;
 import helpers.InputHandler;
 import helpers.InputHandler.MouseData;
 import helpers.InputHandler.ArrowData;
 import game.GameState.STATE;
+import helpers.TextDisplay;
 import helpers.UIButton;
 import helpers.UIButton.StateButton;
 import lib.StdDraw;
@@ -13,6 +15,7 @@ import mapobjects.mapobject.Player;
 import helpers.UIButton.*;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -136,7 +139,7 @@ public class MainSelection {
         }
 
         public Player getCurrentSkin() {
-            return skins.get(skinIndex.getValue());
+            return skins.get(skinIndex.getCurrent());
         }
 
         public void draw() {
@@ -171,57 +174,89 @@ public class MainSelection {
         private static final Box LEFT_BOX = new Box(CENTER_X - BUTTON_SIDE - GAP, CENTER_Y + SIDE/2 + GAP + BUTTON_SIDE/2, BUTTON_SIDE, BUTTON_SIDE);
         private static final Box SELECT_BOX = new Box(CENTER_X, CENTER_Y + SIDE/2 + GAP + BUTTON_SIDE/2, BUTTON_SIDE, BUTTON_SIDE);
         private static final Box RIGHT_BOX = new Box(CENTER_X + BUTTON_SIDE + GAP, CENTER_Y + SIDE/2 + GAP + BUTTON_SIDE/2, BUTTON_SIDE, BUTTON_SIDE);
-        private static final Box STATS_BOX = new Box(CENTER_X + SIDE/2, CENTER_Y - SIDE/2, STATS_SIDE, STATS_SIDE);
+        private static final Box STATS_BOX = new Box(CENTER_X - SIDE/2 - GAP - STATS_SIDE/2, CENTER_Y - SIDE/2 + STATS_SIDE/2, STATS_SIDE, STATS_SIDE);
+
+        private final BooleanButton statsButton;
+        private final Set<IndexButton> indexButtons = new HashSet<>();
+        private final IndexButton selectButton;
+        private final List<TextDisplay> displays = new ArrayList<>();
 
         private List<Gun> guns;
         private final Index gunIndex = new Index(1);
-        private final Set<UIButton> UIButtons = new HashSet<>();
 
         public GunSelectionUI() {
             configureUIButtons();
+            statsButton = new BooleanButton(STATS_BOX);
+            selectButton = new IndexButton(SELECT_BOX, gunIndex, IndexButton.TYPE.SELECT);
         }
 
         public void configure() {
+
+            FrameBox.updateCenter(Frame.X_SCALE/2, Frame.Y_SCALE/2);
+
+            final int LINE_HEIGHT = 15;
+            final int size = getFontSizeForHeight(LINE_HEIGHT, new Font("Arial", Font.PLAIN, 100));
+            final Font infoFont = new Font("Arial", Font.PLAIN, size);
+
             guns = gameState.getGuns();
             gunIndex.setN(guns.size());
+            displays.clear();
+            for (Gun gun : guns) {
+                displays.add(new TextDisplay(BOX, gun.getStats(), infoFont, true));
+            }
+
         }
 
         private void configureUIButtons() {
 
-            UIButtons.add(new IndexButton(LEFT_BOX, gunIndex, IndexButton.TYPE.DECREMENT));
-            UIButtons.add(new IndexButton(RIGHT_BOX, gunIndex, IndexButton.TYPE.INCREMENT));
-            UIButtons.add(new IndexButton(SELECT_BOX, gunIndex, IndexButton.TYPE.SELECT));
-            UIButtons.add(new BooleanButton(STATS_BOX));
-
+            indexButtons.add(new IndexButton(LEFT_BOX, gunIndex, IndexButton.TYPE.DECREMENT));
+            indexButtons.add(new IndexButton(RIGHT_BOX, gunIndex, IndexButton.TYPE.INCREMENT));
         }
 
         private void processInput(MouseData mouseData, ArrowData arrowData) {
-            for (UIButton button : UIButtons) button.processInput(mouseData, arrowData);
+            statsButton.processInput(mouseData, arrowData);
+            selectButton.processInput(mouseData, arrowData);
+            if (!statsButton.isPressed()) {
+                for (UIButton button : indexButtons) button.processInput(mouseData, arrowData);
+            }
         }
 
         private void draw() {
 
-            Color boxColor = new Color(208, 146, 95);
-            Color color = StdDraw.BLACK;
+            Color boxColor = new Color(0, 88, 188);
+            Color black = StdDraw.BLACK;
+            Color statsColor = new Color(244, 157, 8);
             Font font = new Font("Monospaced", Font.BOLD, 30);
+            Font smallFont = new Font("Monospaced", Font.BOLD, 20);
 
-            drawRectWithOutline(BOX, boxColor, color);
-            drawRectWithOutline(LEFT_BOX, boxColor, color);
-            drawRectWithOutline(RIGHT_BOX, boxColor, color);
-
-            textInsideBox(LEFT_BOX, "<", color, font);
-            textInsideBox(RIGHT_BOX, ">", color, font);
-            if (gunIndex.getValue() == gunIndex.getSelect()) {
-                textInsideBox(SELECT_BOX, "✅", color, font);
+            if (!statsButton.isPressed()) {
+                drawRectWithOutline(BOX, boxColor, black);
+                getCurrentGun().drawBigAt(BOX.getCenterX(), BOX.getCenterY(), DRAW_BIG_MULTIPLIER);
+                drawRectWithOutline(STATS_BOX, statsColor, black);
+                textInsideBox(STATS_BOX, "∑", StdDraw.BLACK, smallFont);
             } else {
-                textInsideBox(SELECT_BOX, "❎", color, font);
+                drawRectWithOutline(BOX, statsColor, black);
+                drawRectWithOutline(STATS_BOX, boxColor, black);
+                textInsideBox(STATS_BOX, "↩", StdDraw.BLACK, smallFont);
+                displays.get(gunIndex.getCurrent()).draw();
             }
-            getCurrentGun().drawBigAt(BOX.getCenterX(), BOX.getCenterY(), DRAW_BIG_MULTIPLIER);
+
+            drawRectWithOutline(LEFT_BOX, boxColor, black);
+            drawRectWithOutline(RIGHT_BOX, boxColor, black);
+
+            textInsideBox(LEFT_BOX, "<", black, font);
+            textInsideBox(RIGHT_BOX, ">", black, font);
+
+            if (gunIndex.getCurrent() == gunIndex.getSelect()) {
+                textInsideBox(SELECT_BOX, "✅", black, font);
+            } else {
+                textInsideBox(SELECT_BOX, "❎", black, font);
+            }
 
         }
 
         private Gun getCurrentGun() {
-            return guns.get(gunIndex.getValue());
+            return guns.get(gunIndex.getCurrent());
         }
 
     }

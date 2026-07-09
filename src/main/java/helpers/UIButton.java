@@ -6,7 +6,6 @@ import helpers.InputHandler.*;
 import mapobjects.component.Timer;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import static helpers.CollisionMethods.isIn;
@@ -96,7 +95,7 @@ public abstract class UIButton {
             this.i = i;
         }
 
-        public int getValue() {
+        public int getCurrent() {
             return i;
         }
 
@@ -105,7 +104,8 @@ public abstract class UIButton {
         }
 
         public void select() {
-            select = i;
+            if (select == i) select = 0;
+            else select = i;
         }
     }
 
@@ -193,7 +193,7 @@ public abstract class UIButton {
     public static class BooleanButton extends UIButton {
         private final Box BOX;
         private boolean pressed = false;
-        private Set<BooleanButton> linkedButtons = new HashSet<>();
+        private final Set<BooleanButton> linkedButtons = new HashSet<>();
 
         public BooleanButton(Box BOX) {
             this.BOX = BOX;

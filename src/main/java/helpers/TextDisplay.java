@@ -1,6 +1,7 @@
 package helpers;
 
 import game.Frame;
+import lib.StdDraw;
 import mapobjects.component.Box;
 
 import java.awt.*;
@@ -55,6 +56,13 @@ public class TextDisplay {
         this.leftAligned = leftAligned;
     }
 
+    public TextDisplay(Box box, String[] lines, Font font, boolean leftAligned) {
+        this(box, lines, Color.BLACK, font, leftAligned);
+    }
+
+    public TextDisplay(Box box, String text, Font font, boolean leftAligned) {
+        this(box, text, Color.BLACK, font, leftAligned);
+    }
 
     public void update() {
         box.update();
