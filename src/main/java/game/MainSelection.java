@@ -4,13 +4,13 @@ import helpers.InputHandler;
 import helpers.InputHandler.MouseData;
 import helpers.InputHandler.ArrowData;
 import game.GameState.STATE;
-import helpers.NavigationButton;
-import helpers.NavigationButton.StateButton;
+import helpers.UIButton;
+import helpers.UIButton.StateButton;
 import lib.StdDraw;
 import mapobjects.component.Box;
 import mapobjects.mapobject.Gun;
 import mapobjects.mapobject.Player;
-import helpers.NavigationButton.*;
+import helpers.UIButton.*;
 
 import java.awt.*;
 import java.util.HashSet;
@@ -34,7 +34,7 @@ public class MainSelection {
     private final SkinSelectionUI skinSelectionUI = new SkinSelectionUI();
     private final GunSelectionUI gunSelectionUI = new GunSelectionUI();
 
-    private final Set<NavigationButton> navigationButtons = new HashSet<>();
+    private final Set<UIButton> UIButtons = new HashSet<>();
 
     public MainSelection(InputHandler inputHandler, GameState gameState) {
         this.inputHandler = inputHandler;
@@ -49,14 +49,14 @@ public class MainSelection {
         final Box SHOP_BOX = new Box(8 * TILE_SIDE, 11 * TILE_SIDE, SIDE, SIDE);
         final Box ACCESSORY_BOX = new Box(TILE_SIDE, 6 * TILE_SIDE, SIDE, SIDE);
 
-        navigationButtons.add(new StateButton(ARROW_BOX, gameState, STATE.GAME));
-        navigationButtons.add(new StateButton(SHOP_BOX, gameState, STATE.SHOP));
-        navigationButtons.add(new StateButton(ACCESSORY_BOX, gameState, STATE.ACCESSORY));
+        UIButtons.add(new StateButton(ARROW_BOX, gameState, STATE.GAME));
+        UIButtons.add(new StateButton(SHOP_BOX, gameState, STATE.SHOP));
+        UIButtons.add(new StateButton(ACCESSORY_BOX, gameState, STATE.ACCESSORY));
 
     }
 
     public void processInput(MouseData mouseData, ArrowData arrowData) {
-        for (NavigationButton button : navigationButtons) button.processInput(mouseData, arrowData);
+        for (UIButton button : UIButtons) button.processInput(mouseData, arrowData);
         skinSelectionUI.processInput(mouseData, arrowData);
         gunSelectionUI.processInput(mouseData, arrowData);
     }
@@ -111,7 +111,7 @@ public class MainSelection {
 
         private List<Player> skins;
         private final Index skinIndex = new Index(1);
-        private final Set<NavigationButton> navigationButtons = new HashSet<>();
+        private final Set<UIButton> UIButtons = new HashSet<>();
 
         public SkinSelectionUI() {
             configureNavigationButtons();
@@ -119,10 +119,10 @@ public class MainSelection {
 
         private void configureNavigationButtons() {
 
-            navigationButtons.add(new IndexButton(LEFT_BOX, skinIndex, IndexButton.TYPE.DECREMENT));
-            navigationButtons.add(new IndexButton(RIGHT_BOX, skinIndex, IndexButton.TYPE.INCREMENT));
-            navigationButtons.add(new ArrowKey(skinIndex, ArrowKey.TYPE.INCREMENT));
-            navigationButtons.add(new ArrowKey(skinIndex, ArrowKey.TYPE.DECREMENT));
+            UIButtons.add(new IndexButton(LEFT_BOX, skinIndex, IndexButton.TYPE.DECREMENT));
+            UIButtons.add(new IndexButton(RIGHT_BOX, skinIndex, IndexButton.TYPE.INCREMENT));
+            UIButtons.add(new ArrowKey(skinIndex, ArrowKey.TYPE.INCREMENT));
+            UIButtons.add(new ArrowKey(skinIndex, ArrowKey.TYPE.DECREMENT));
 
         }
 
@@ -132,7 +132,7 @@ public class MainSelection {
         }
 
         private void processInput(MouseData mouseData, ArrowData arrowData) {
-            for (NavigationButton button : navigationButtons) button.processInput(mouseData, arrowData);
+            for (UIButton button : UIButtons) button.processInput(mouseData, arrowData);
         }
 
         public Player getCurrentSkin() {
@@ -161,22 +161,24 @@ public class MainSelection {
 
     private class GunSelectionUI {
 
-        private static final double CENTER_X = 13.0 * TILE_SIDE;
-        private static final double CENTER_Y = 4.0 * TILE_SIDE;
+        private static final double CENTER_X = 14.0 * TILE_SIDE;
+        private static final double CENTER_Y = 2.0 * TILE_SIDE;
         private static final double SIDE = 2.5 * TILE_SIDE;
         private static final double GAP = 0.5 * TILE_SIDE;
         private static final double BUTTON_SIDE = 0.5 * TILE_SIDE;
+        private static final double STATS_SIDE = 0.5 * TILE_SIDE;
         private static final Box BOX = new Box(CENTER_X, CENTER_Y, SIDE, SIDE);
         private static final Box LEFT_BOX = new Box(CENTER_X - BUTTON_SIDE - GAP, CENTER_Y + SIDE/2 + GAP + BUTTON_SIDE/2, BUTTON_SIDE, BUTTON_SIDE);
         private static final Box SELECT_BOX = new Box(CENTER_X, CENTER_Y + SIDE/2 + GAP + BUTTON_SIDE/2, BUTTON_SIDE, BUTTON_SIDE);
         private static final Box RIGHT_BOX = new Box(CENTER_X + BUTTON_SIDE + GAP, CENTER_Y + SIDE/2 + GAP + BUTTON_SIDE/2, BUTTON_SIDE, BUTTON_SIDE);
+        private static final Box STATS_BOX = new Box(CENTER_X + SIDE/2, CENTER_Y - SIDE/2, STATS_SIDE, STATS_SIDE);
 
         private List<Gun> guns;
         private final Index gunIndex = new Index(1);
-        private final Set<NavigationButton> navigationButtons = new HashSet<>();
+        private final Set<UIButton> UIButtons = new HashSet<>();
 
         public GunSelectionUI() {
-            configureNavigationButtons();
+            configureUIButtons();
         }
 
         public void configure() {
@@ -184,16 +186,17 @@ public class MainSelection {
             gunIndex.setN(guns.size());
         }
 
-        private void configureNavigationButtons() {
+        private void configureUIButtons() {
 
-            navigationButtons.add(new IndexButton(LEFT_BOX, gunIndex, IndexButton.TYPE.DECREMENT));
-            navigationButtons.add(new IndexButton(RIGHT_BOX, gunIndex, IndexButton.TYPE.INCREMENT));
-            navigationButtons.add(new IndexButton(SELECT_BOX, gunIndex, IndexButton.TYPE.SELECT));
+            UIButtons.add(new IndexButton(LEFT_BOX, gunIndex, IndexButton.TYPE.DECREMENT));
+            UIButtons.add(new IndexButton(RIGHT_BOX, gunIndex, IndexButton.TYPE.INCREMENT));
+            UIButtons.add(new IndexButton(SELECT_BOX, gunIndex, IndexButton.TYPE.SELECT));
+            UIButtons.add(new BooleanButton(STATS_BOX));
 
         }
 
         private void processInput(MouseData mouseData, ArrowData arrowData) {
-            for (NavigationButton button : navigationButtons) button.processInput(mouseData, arrowData);
+            for (UIButton button : UIButtons) button.processInput(mouseData, arrowData);
         }
 
         private void draw() {

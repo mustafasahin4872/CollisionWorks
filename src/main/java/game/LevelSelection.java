@@ -2,8 +2,8 @@ package game;
 
 import helpers.InputHandler;
 import helpers.MapType;
-import helpers.NavigationButton;
-import helpers.NavigationButton.*;
+import helpers.UIButton;
+import helpers.UIButton.*;
 import lib.StdDraw;
 import mapobjects.component.Box;
 
@@ -42,8 +42,8 @@ public class LevelSelection {
     private final Index worldIndex = new Index(WORLDS.length);
     private final Index levelIndex = new Index(LEVEL_ROW_NUM * LEVELS_PER_ROW);
 
-    private final NavigationButton[] leftButtons = new NavigationButton[WORLDS.length];
-    private final NavigationButton[] rightButtons = new NavigationButton[WORLDS.length - 1];
+    private final UIButton[] leftButtons = new UIButton[WORLDS.length];
+    private final UIButton[] rightButtons = new UIButton[WORLDS.length - 1];
     private final LevelsUI levelsUI = new LevelsUI();
 
     public LevelSelection(InputHandler inputHandler, GameState gameState) {
@@ -139,7 +139,7 @@ public class LevelSelection {
         public static final double LEVEL_BOX_START_Y_OFFSET = 4.5 * TILE_SIDE;
         public static final double LEVEL_BOX_Y_GAP = 2.0 * TILE_SIDE;
 
-        public static final Box[] LEVEL_BOXES = new Box[12];
+        public static final Box[] LEVEL_BOXES = new Box[LEVELS_PER_ROW * LEVEL_ROW_NUM];
 
         static {
             for (int i = 0; i < LEVEL_ROW_NUM; i++) {

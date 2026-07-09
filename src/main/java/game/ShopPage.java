@@ -8,7 +8,7 @@ import mapobjects.mapobject.Accessory;
 import mapobjects.mapobject.Buff;
 import mapobjects.mapobject.Gun;
 import mapobjects.mapobject.Player;
-import helpers.NavigationButton.*;
+import helpers.UIButton.*;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -38,7 +38,7 @@ public class ShopPage {
 
     private GameMap backgroundMap;
 
-    private final NavigationButton[] navigationButtons = new NavigationButton[2];
+    private final UIButton[] UIButtons = new UIButton[2];
     private final BuyScreen buyScreen = new BuyScreen();
     private final DisplayUI[] uis = new DisplayUI[N];
     private final CurrencyUI currencyUI = new CurrencyUI();
@@ -68,7 +68,7 @@ public class ShopPage {
         }
 
         configureState(from, current, to);
-        configureNavigationButtons();
+        configureUIButtons();
 
         displayNum = displays.length;
 
@@ -92,7 +92,7 @@ public class ShopPage {
 
     }
 
-    private void configureNavigationButtons() {
+    private void configureUIButtons() {
         final double BOX_SIZE = 4.0 * TILE_SIDE;
 
         final double BOX_X = 9 * TILE_SIDE;
@@ -102,8 +102,8 @@ public class ShopPage {
         final Box BACK_BOX = new Box(BOX_X, BACK_BOX_Y, BOX_SIZE, BOX_SIZE);
         final Box FORWARD_BOX = new Box(BOX_X, FORWARD_BOX_Y, BOX_SIZE, BOX_SIZE);
 
-        navigationButtons[0] = new NavigationButton.StateButton(BACK_BOX, gameState, from);
-        navigationButtons[1] = new NavigationButton.StateButton(FORWARD_BOX, gameState, to);
+        UIButtons[0] = new UIButton.StateButton(BACK_BOX, gameState, from);
+        UIButtons[1] = new UIButton.StateButton(FORWARD_BOX, gameState, to);
     }
 
     /// IMPORTANT: UPDATE METHODS MUST BE CALLED IF NEW DISPLAYS OR ITEMS ARE ADDED!
@@ -178,7 +178,7 @@ public class ShopPage {
 
     private void processInput(MouseData mouseData, ArrowData arrowData) {
         if (gameState.getState() == current) {
-            for (NavigationButton button : navigationButtons) button.processInput(mouseData, arrowData);
+            for (UIButton button : UIButtons) button.processInput(mouseData, arrowData);
             for (DisplayUI ui : uis) {
                 if (ui != null) ui.processInput(mouseData, arrowData);
             }
@@ -204,16 +204,16 @@ public class ShopPage {
 
     }
 
-    private ShopEntry getSelectedItem() {
+    private ShopEntry getToBeBoughtEntry() {
         for (DisplayUI ui : uis) {
-            if (ui != null && ui.buyScreenTriggered) return ui.getCurrentShopEntry();
+            if (ui != null && ui.buyButton.isPressed()) return ui.getCurrentShopEntry();
         }
         return null;
     }
 
     private void resetBuyScreenTriggered() {
         for (DisplayUI ui : uis) {
-            if (ui != null) ui.buyScreenTriggered = false;
+            if (ui != null) ui.buyButton.reset();
         }
     }
 
@@ -225,10 +225,9 @@ public class ShopPage {
         private List<ShopEntry> buyables = new ArrayList<>();
         private final Index index = new Index(1);
         private final IndexButton[] INDEX_BUTTONS = new IndexButton[2];
-
-        public enum MODE {ZERO, DESCRIPTION, STATS}
-        private MODE mode = MODE.ZERO;
-        private boolean buyScreenTriggered = false;
+        private final BooleanButton statsButton;
+        private final BooleanButton descriptionButton;
+        private final BooleanButton buyButton;
 
         private final List<TextDisplay> descriptions = new ArrayList<>();
         private final List<TextDisplay> stats = new ArrayList<>();
@@ -274,6 +273,13 @@ public class ShopPage {
 
             INDEX_BUTTONS[0] = new IndexButton(ARROW_BOXES[0], index, IndexButton.TYPE.DECREMENT);
             INDEX_BUTTONS[1] = new IndexButton(ARROW_BOXES[1], index, IndexButton.TYPE.INCREMENT);
+
+            statsButton = new BooleanButton(STATS_BOX);
+            descriptionButton = new BooleanButton(DESCRIPTION_BOX);
+            statsButton.linkButton(descriptionButton);
+            descriptionButton.linkButton(statsButton);
+
+            buyButton = new BooleanButton(BUY_BOX);
         }
 
         public void configure(List<ShopEntry> buyables) {
@@ -296,37 +302,18 @@ public class ShopPage {
 
         public void processInput(MouseData mouseData, ArrowData arrowData) {
 
-            boolean clicked = mouseData.clicked;
-            double mouseX = mouseData.mouseX;
-            double mouseY = mouseData.mouseY;
+            ShopEntry shopEntry = getCurrentShopEntry();
 
-            if (clicked) {
+            if (shopEntry != null && !shopEntry.isSold()) {
+                if (gameState.canAfford(shopEntry)) buyButton.processInput(mouseData, arrowData);
+                if (buyButton.isPressed()) gameState.setState(STATE.PAUSE);
+                descriptionButton.processInput(mouseData, arrowData);
+                statsButton.processInput(mouseData, arrowData);
+            }
 
-                ShopEntry shopEntry = getCurrentShopEntry();
-                if (isIn(mouseX, mouseY, BUY_BOX)) {
-                    if (shopEntry == null) return;
-                    if (shopEntry.isSold()) return;
-                    if (!gameState.canAfford(shopEntry)) return;
-
-                    buyScreenTriggered = true;
-                    gameState.setState(STATE.PAUSE);
-                } else if (isIn(mouseX, mouseY, DESCRIPTION_BOX)) {
-                    if (shopEntry == null) return;
-                    if (shopEntry.isSold()) return;
-                    if (mode != MODE.DESCRIPTION) mode = MODE.DESCRIPTION;
-                    else mode = MODE.ZERO;
-                } else if (isIn(mouseX, mouseY, STATS_BOX)) {
-                    if (shopEntry == null) return;
-                    if (shopEntry.isSold()) return;
-                    if (mode != MODE.STATS) mode = MODE.STATS;
-                    else mode = MODE.ZERO;
-                }
-
-                if (mode == MODE.ZERO) {
-                    INDEX_BUTTONS[0].processInput(mouseData, arrowData);
-                    INDEX_BUTTONS[1].processInput(mouseData, arrowData);
-                }
-
+            if (!descriptionButton.isPressed() && !statsButton.isPressed()) {
+                INDEX_BUTTONS[0].processInput(mouseData, arrowData);
+                INDEX_BUTTONS[1].processInput(mouseData, arrowData);
             }
 
         }
@@ -385,21 +372,21 @@ public class ShopPage {
             String name = shopEntry.getName().split("/")[0];
             textInsideBox(NAME_BOX, capitalize(name), textColor, smallFont);
 
-            if (mode == MODE.ZERO) {
-                drawRectWithOutline(SHOP_BOX, shopColor, outlineColor);
-                drawRectWithOutline(DESCRIPTION_BOX, descriptionColor, outlineColor);
-                drawRectWithOutline(STATS_BOX, statsColor, outlineColor);
-                shopEntry.getItem().drawBig(DRAW_BIG_MULTIPLIER);
-            } else if (mode == MODE.DESCRIPTION) {
+            if (descriptionButton.isPressed()) {
                 drawRectWithOutline(SHOP_BOX, descriptionColor, outlineColor);
                 drawRectWithOutline(DESCRIPTION_BOX, shopColor, outlineColor);
                 drawRectWithOutline(STATS_BOX, statsColor, outlineColor);
                 descriptions.get(index.getValue()).draw();
-            } else {
+            } else if (statsButton.isPressed()){
                 drawRectWithOutline(SHOP_BOX, statsColor, outlineColor);
                 drawRectWithOutline(DESCRIPTION_BOX, descriptionColor, outlineColor);
                 drawRectWithOutline(STATS_BOX, shopColor, outlineColor);
                 stats.get(index.getValue()).draw();
+            } else {
+                drawRectWithOutline(SHOP_BOX, shopColor, outlineColor);
+                drawRectWithOutline(DESCRIPTION_BOX, descriptionColor, outlineColor);
+                drawRectWithOutline(STATS_BOX, statsColor, outlineColor);
+                shopEntry.getItem().drawBig(DRAW_BIG_MULTIPLIER);
             }
             textInsideBox(DESCRIPTION_BOX, "ⓘ", StdDraw.BLACK, smallFont);
             textInsideBox(STATS_BOX, "∑", StdDraw.BLACK, smallFont);
@@ -435,7 +422,7 @@ public class ShopPage {
         private static final double COINS_X = 13.5 * TILE_SIDE;
         private static final double CURRENCY_Y = TILE_SIDE;
 
-        private static final Box GEM_BOX = new Box(GEMS_X, CURRENCY_Y, TILE_SIDE, TILE_SIDE);;
+        private static final Box GEM_BOX = new Box(GEMS_X, CURRENCY_Y, TILE_SIDE, TILE_SIDE);
         private static final Box COIN_BOX = new Box(COINS_X, CURRENCY_Y, TILE_SIDE, TILE_SIDE);
 
         private void draw() {
@@ -494,19 +481,19 @@ public class ShopPage {
 
             if (clicked) {
                 if (isIn(mouseX, mouseY, YES_BOX)) {
-                    gameState.buy(getSelectedItem());
-                    resetBuyScreenTriggered();
+                    gameState.buy(getToBeBoughtEntry());
                     gameState.setState(current);
+                    resetBuyScreenTriggered();
                 } else if (isIn(mouseX, mouseY, NO_BOX)) {
-                    resetBuyScreenTriggered();
                     gameState.setState(current);
+                    resetBuyScreenTriggered();
                 }
             }
         }
 
         private void draw() {
 
-            ShopEntry buyable = getSelectedItem();
+            ShopEntry buyable = getToBeBoughtEntry();
             if (buyable == null) return;
 
             String name = buyable.getName().split("/")[0];

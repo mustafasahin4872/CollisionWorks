@@ -5,12 +5,16 @@ import mapobjects.component.Box;
 import helpers.InputHandler.*;
 import mapobjects.component.Timer;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import static helpers.CollisionMethods.isIn;
 
-public abstract class NavigationButton {
+public abstract class UIButton {
 
-    public abstract boolean triggered(MouseData mouseData, ArrowData arrowData);
-    public abstract void action();
+    protected abstract boolean triggered(MouseData mouseData, ArrowData arrowData);
+    protected abstract void action();
 
     public void processInput(MouseData mouseData, ArrowData arrowData) {
 
@@ -19,7 +23,7 @@ public abstract class NavigationButton {
         }
     }
 
-    public static class StateButton extends NavigationButton {
+    public static class StateButton extends UIButton {
 
         private final Box BOX;
         private final GameState.STATE nextState;
@@ -105,7 +109,7 @@ public abstract class NavigationButton {
         }
     }
 
-    public static class IndexButton extends NavigationButton {
+    public static class IndexButton extends UIButton {
 
         public enum TYPE {INCREMENT, SELECT, DECREMENT}
 
@@ -139,7 +143,7 @@ public abstract class NavigationButton {
 
     }
 
-    public static class ArrowKey extends NavigationButton {
+    public static class ArrowKey extends UIButton {
 
         public enum TYPE {INCREMENT, DECREMENT}
 
@@ -182,6 +186,44 @@ public abstract class NavigationButton {
                 case INCREMENT -> index.increment();
                 case DECREMENT -> index.decrement();
             }
+        }
+
+    }
+
+    public static class BooleanButton extends UIButton {
+        private final Box BOX;
+        private boolean pressed = false;
+        private Set<BooleanButton> linkedButtons = new HashSet<>();
+
+        public BooleanButton(Box BOX) {
+            this.BOX = BOX;
+        }
+
+        public void linkButton(BooleanButton button) {
+            linkedButtons.add(button);
+        }
+
+        @Override
+        public boolean triggered(MouseData mouseData, ArrowData arrowData) {
+            double mouseX = mouseData.mouseX;
+            double mouseY = mouseData.mouseY;
+            boolean clicked = mouseData.clicked;
+
+            return clicked && isIn(mouseX, mouseY, BOX);
+        }
+
+        @Override
+        public void action() {
+            pressed = !pressed;
+            for (BooleanButton button : linkedButtons) button.reset();
+        }
+
+        public boolean isPressed() {
+            return pressed;
+        }
+
+        public void reset() {
+            pressed = false;
         }
 
     }

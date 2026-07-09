@@ -3,8 +3,8 @@ package game;
 import game.GameState.STATE;
 import helpers.InputHandler;
 import helpers.InputHandler.*;
-import helpers.NavigationButton;
-import helpers.NavigationButton.*;
+import helpers.UIButton;
+import helpers.UIButton.*;
 import lib.StdDraw;
 import mapobjects.component.Box;
 import mapobjects.mapobject.Accessory;
@@ -27,7 +27,7 @@ public class AccessorySelection {
 
     private final GameMap backgroundMap = new GameMap(new GameState(1, -2), helpers.MapType.SELECTION);
 
-    private final Set<NavigationButton> navigationButtons = new HashSet<>();
+    private final Set<UIButton> UIButtons = new HashSet<>();
 
     private final List<AccessorySelectionUI> uis = new ArrayList<>();
     private final MannequinUI mannequinUI = new MannequinUI();
@@ -46,11 +46,11 @@ public class AccessorySelection {
         uis.add(new AccessorySelectionUI(4 * TILE_SIDE, startY + yShift));
         uis.add(new AccessorySelectionUI(4 * TILE_SIDE, startY + 2 * yShift));
         Box box = new Box(Frame.X_SCALE - TILE_SIDE ,6 * TILE_SIDE ,2 * TILE_SIDE ,2 * TILE_SIDE);
-        navigationButtons.add(new StateButton(box, gameState, STATE.SELECTION));
+        UIButtons.add(new StateButton(box, gameState, STATE.SELECTION));
     }
 
     public void processInput(InputHandler.MouseData mouseData, InputHandler.ArrowData arrowData) {
-        for (NavigationButton button : navigationButtons) button.processInput(mouseData, arrowData);
+        for (UIButton button : UIButtons) button.processInput(mouseData, arrowData);
         for (AccessorySelectionUI ui : uis) ui.processInput(mouseData, arrowData);
     }
 
