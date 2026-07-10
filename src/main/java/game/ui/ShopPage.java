@@ -7,6 +7,7 @@ import game.core.MapMaker;
 import game.data.ShopEntry;
 import game.io.InputHandler;
 import helpers.utils.FrameBox;
+import helpers.utils.Index;
 import helpers.utils.TextDisplay;
 import helpers.utils.UIButton;
 import lib.StdDraw;

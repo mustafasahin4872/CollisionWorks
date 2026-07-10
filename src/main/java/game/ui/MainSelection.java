@@ -9,6 +9,7 @@ import game.io.InputHandler;
 import game.io.InputHandler.MouseData;
 import game.io.InputHandler.ArrowData;
 import game.core.GameState.STATE;
+import helpers.utils.Index;
 import helpers.utils.TextDisplay;
 import helpers.utils.UIButton;
 import helpers.utils.UIButton.StateButton;
@@ -128,8 +129,8 @@ public class MainSelection {
 
             UIButtons.add(new IndexButton(LEFT_BOX, skinIndex, IndexButton.TYPE.DECREMENT));
             UIButtons.add(new IndexButton(RIGHT_BOX, skinIndex, IndexButton.TYPE.INCREMENT));
-            UIButtons.add(new ArrowKey(skinIndex, ArrowKey.TYPE.INCREMENT));
-            UIButtons.add(new ArrowKey(skinIndex, ArrowKey.TYPE.DECREMENT));
+            UIButtons.add(new GenericIndexKey(GenericIndexKey.GenericKey.LEFT_ARROW, skinIndex, -1));
+            UIButtons.add(new GenericIndexKey(GenericIndexKey.GenericKey.RIGHT_ARROW, skinIndex, 1));
 
         }
 

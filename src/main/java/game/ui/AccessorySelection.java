@@ -7,6 +7,7 @@ import game.core.GameState.STATE;
 import game.core.MapMaker;
 import game.io.InputHandler;
 import game.io.InputHandler.*;
+import helpers.utils.Index;
 import helpers.utils.UIButton;
 import helpers.utils.UIButton.*;
 import lib.StdDraw;

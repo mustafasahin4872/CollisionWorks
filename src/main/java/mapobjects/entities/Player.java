@@ -5,6 +5,7 @@ import game.core.GameState;
 import game.io.InputHandler.ArrowData;
 import game.core.Main;
 
+import helpers.utils.Direction;
 import mapobjects.data.PlayerDefaults;
 import mapobjects.components.*;
 import mapobjects.traits.*;
@@ -142,8 +143,8 @@ public class Player extends MapObject implements MovingCollidable, HealthBearer 
     }
 
     public void acceptInput(ArrowData arrowData) {
-        xDirection = arrowData.xDirection;
-        yDirection = arrowData.yDirection;
+        xDirection = (arrowData.xDirection == Direction.RIGHT) ? 1 : -1;
+        yDirection = (arrowData.yDirection == Direction.UP) ? -1 : 1;
         shoot = arrowData.space;
     }
 

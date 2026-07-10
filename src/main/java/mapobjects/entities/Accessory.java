@@ -1,4 +1,5 @@
 package mapobjects.entities;
+import mapobjects.traits.Equippable;
 import mapobjects.traits.MapObject;
 
 import java.awt.*;
@@ -10,40 +11,19 @@ import static mapobjects.traits.GridObject.TILE_SIDE;
 /// therefore, we created many subclasses, each having their unique setCoordinates() function
 /// also, each accessory has 9 images, and their names change depending on the player's direction.
 /// there are 3 main accessory interfaces: Hat, Necklace and Pin. these interfaces categorize the different subclasses.
-public abstract class Accessory extends MapObject {
+public abstract class Accessory extends Equippable {
 
-    public enum RARITY {
-        RARE(new Color(111, 217, 110)),
-        EPIC(new Color(51, 216, 187)),
-        MYTHIC(new Color(185, 0, 0)),
-        LEGENDARY(new Color(241, 241, 241))
-        ;
-
-        private final Color color;
-
-        RARITY(Color color) {
-            this.color = color;
-        }
-
-        public Color getColor() {
-            return color;
-        }
-
-    }
-
-    private final RARITY rarity;
     protected Player player;
     private final String accessoryName;
     private final double defaultWidth, defaultHeight;
     private boolean alone;
 
     public Accessory(String accessoryName, double defaultWidth, double defaultHeight, RARITY rarity) {
-        super(0, 0, 0, defaultWidth, defaultHeight, accessoryName+"/0");
+        super(0, 0, 0, defaultWidth, defaultHeight, accessoryName+"/0", rarity);
         this.player = new Player(); // replaced later
         this.accessoryName = accessoryName;
         this.defaultWidth = defaultWidth;
         this.defaultHeight = defaultHeight;
-        this.rarity = rarity;
         update();
     }
 
@@ -57,10 +37,6 @@ public abstract class Accessory extends MapObject {
 
     public String getAccessoryName() {
         return accessoryName;
-    }
-
-    public RARITY getRarity() {
-        return rarity;
     }
 
     public void resetSize() {

@@ -5,12 +5,15 @@ import game.core.GameMap;
 import game.core.GameState;
 import game.core.MapMaker;
 import game.io.InputHandler;
+import helpers.utils.Index;
 import helpers.utils.UIButton;
 import helpers.utils.UIButton.*;
 import lib.StdDraw;
 import mapobjects.components.Box;
 
 import java.awt.*;
+import java.util.HashSet;
+import java.util.Set;
 
 import static helpers.methods.CollisionMethods.isIn;
 import static helpers.methods.DrawMethods.*;
@@ -43,10 +46,10 @@ public class LevelSelection {
     private static final int LEVEL_ROW_NUM = 3;
 
     private final Index worldIndex = new Index(WORLDS.length);
-    private final Index levelIndex = new Index(LEVEL_ROW_NUM * LEVELS_PER_ROW);
 
     private final UIButton[] leftButtons = new UIButton[WORLDS.length];
     private final UIButton[] rightButtons = new UIButton[WORLDS.length - 1];
+
     private final LevelsUI levelsUI = new LevelsUI();
 
     public LevelSelection(InputHandler inputHandler, GameState gameState) {
@@ -109,7 +112,7 @@ public class LevelSelection {
 
         if (gameState.getState() == GameState.STATE.NEXT) {
             gameState.setWorldIndex(worldIndex.getCurrent() + 1);
-            gameState.setLevelIndex(levelIndex.getCurrent() + 1);
+            gameState.setLevelIndex(levelsUI.getLevelIndex() + 1);
             if (gameState.getPlayer() != null) {
                 gameState.getPlayer().setWorldIndex(worldIndex.getCurrent() + 1);
             }
@@ -155,21 +158,21 @@ public class LevelSelection {
             }
         }
 
+        private final Index levelIndex = new Index(LEVEL_ROW_NUM * LEVELS_PER_ROW);
+        private final Set<GenericIndexKey> arrowKeys = new HashSet<>(Set.of(
+            new GenericIndexKey(GenericIndexKey.GenericKey.RIGHT_ARROW, levelIndex, 1),
+            new GenericIndexKey(GenericIndexKey.GenericKey.LEFT_ARROW, levelIndex, -1),
+            new GenericIndexKey(GenericIndexKey.GenericKey.UP_ARROW, levelIndex, -4),
+            new GenericIndexKey(GenericIndexKey.GenericKey.DOWN_ARROW, levelIndex, 4)
+        ));
+
+        private int getLevelIndex() {
+            return levelIndex.getCurrent();
+        }
+
         public void processInput(MouseData mouseData, ArrowData arrowData) {
 
-            boolean rightArrowPressed = arrowData.xDirection == 1;
-            boolean leftArrowPressed = arrowData.xDirection == -1;
-            boolean upArrowPressed = arrowData.yDirection == -1;
-            boolean downArrowPressed = arrowData.yDirection == 1;
-
-            if (rightArrowPressed)
-                levelIndex.increment();
-            if (leftArrowPressed)
-                levelIndex.decrement();
-            if (downArrowPressed)
-                levelIndex.increment(4);
-            if (upArrowPressed)
-                levelIndex.decrement(4);
+            for (GenericIndexKey arrowKey : arrowKeys) arrowKey.processInput(mouseData, arrowData);
 
             double mouseX = mouseData.mouseX;
             double mouseY = mouseData.mouseY;

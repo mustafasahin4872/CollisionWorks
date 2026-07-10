@@ -1,5 +1,6 @@
 package game.io;
 
+import helpers.utils.Direction;
 import lib.StdDraw;
 
 import java.awt.event.KeyEvent;
@@ -30,35 +31,37 @@ public class InputHandler {
         private static final int[] DOWN_CODES = {KeyEvent.VK_DOWN, KeyEvent.VK_S};
         private static final int[] SHOOT_CODES = {KeyEvent.VK_SPACE};
 
-        public int xDirection, yDirection;
+        public Direction xDirection;
+        public Direction yDirection;
         public boolean space;
 
         private void handleInput() {
 
-            int xDirection = 0, yDirection = 0;
             boolean space = false;
+            Direction xDirection = Direction.ZERO;
+            Direction yDirection = Direction.ZERO;
 
             for (int RIGHT_CODE : RIGHT_CODES) {
                 if (StdDraw.isKeyPressed(RIGHT_CODE)) {
-                    xDirection = 1;
+                    xDirection = Direction.RIGHT;
                     break;
                 }
             }
             for (int LEFT_CODE : LEFT_CODES) {
                 if (StdDraw.isKeyPressed(LEFT_CODE)) {
-                    xDirection = -1;
+                    xDirection = Direction.LEFT;
                     break;
                 }
             }
             for (int UP_CODE : UP_CODES) {
                 if (StdDraw.isKeyPressed(UP_CODE)) {
-                    yDirection = -1;
+                    yDirection = Direction.UP;
                     break;
                 }
             }
             for (int DOWN_CODE : DOWN_CODES) {
                 if (StdDraw.isKeyPressed(DOWN_CODE)) {
-                    yDirection = 1;
+                    yDirection = Direction.DOWN;
                     break;
                 }
             }

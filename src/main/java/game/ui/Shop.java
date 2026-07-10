@@ -5,7 +5,7 @@ import game.io.InputHandler;
 import game.core.GameState.STATE;
 import game.data.ShopEntry;
 import mapobjects.entities.Accessory;
-import mapobjects.entities.Accessory.RARITY;
+import mapobjects.traits.Equippable.RARITY;
 import mapobjects.entities.Buff;
 import mapobjects.entities.Gun;
 import mapobjects.entities.Player;

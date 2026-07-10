@@ -49,66 +49,6 @@ public abstract class UIButton {
         }
     }
 
-    public static class Index {
-
-        private int i = 0;
-        private int select = 0;
-        private int N;
-
-        public Index(int N) {
-            this.N = N;
-        }
-
-        public void setN(int n) {
-            N = n;
-        }
-
-        public void increment(int n) {
-            if (n < 0) {
-                System.out.println("INCREMENT OPERATION USED WITH NEGATIVE VALUE");
-                return;
-            }
-            i+=n;
-            i%=N;
-        }
-
-        public void increment() {
-            increment(1);
-        }
-
-        public void decrement(int n) {
-            if (n < 0) {
-                System.out.println("DECREMENT OPERATION USED WITH NEGATIVE VALUE");
-                return;
-            }
-            i-=n;
-            i%=N;
-            i+=N;
-            i%=N;
-        }
-
-        public void decrement() {
-            decrement(1);
-        }
-
-        public void setValue(int i) {
-            this.i = i;
-        }
-
-        public int getCurrent() {
-            return i;
-        }
-
-        public int getSelect() {
-            return select;
-        }
-
-        public void select() {
-            if (select == i) select = 0;
-            else select = i;
-        }
-    }
-
     public static class IndexButton extends UIButton {
 
         public enum TYPE {INCREMENT, SELECT, DECREMENT}
@@ -143,49 +83,56 @@ public abstract class UIButton {
 
     }
 
-    public static class ArrowKey extends UIButton {
+    /// wire keys with index shifts for an Index object
+    public static class GenericIndexKey extends UIButton {
 
-        public enum TYPE {INCREMENT, DECREMENT}
+        public enum GenericKey {
+            RIGHT_ARROW,
+            LEFT_ARROW,
+            DOWN_ARROW,
+            UP_ARROW,
+            SPACE
+        }
 
+        private final GenericKey key;
         private final Index index;
-        private final TYPE type;
+        private final int indexShift; // can be positive or negative!
 
         private static final double COOLDOWN = 200; // in milliseconds
-        private final Timer arrowCooldown = new Timer(Long.MAX_VALUE, COOLDOWN);
+        private final Timer cooldown = new Timer(Long.MAX_VALUE, COOLDOWN);
 
-        public ArrowKey(Index index, TYPE type) {
+        public GenericIndexKey(GenericKey key, Index index, int indexShift) {
+            this.key = key;
             this.index = index;
-            this.type = type;
-            arrowCooldown.activate();
+            this.indexShift = indexShift;
+            cooldown.activate();
         }
 
         @Override
-        public boolean triggered(MouseData mouseData, ArrowData arrowData) {
+        protected boolean triggered(MouseData mouseData, ArrowData arrowData) {
 
-            if (arrowCooldown.inCooldown()) {
-                arrowCooldown.tick();
+            if (cooldown.inCooldown()) {
+                cooldown.tick();
                 return false;
             }
 
-            int dir = arrowData.xDirection;
-            boolean result = switch (type) {
-                case INCREMENT -> dir == 1;
-                case DECREMENT -> dir == -1;
-                case null -> {
-                    System.out.println("ERROR: ARROWKEY TYPE IS NULL");
-                    yield  false;
-                }
+            boolean result = switch (key) {
+                case RIGHT_ARROW -> arrowData.xDirection == Direction.RIGHT;
+                case LEFT_ARROW -> arrowData.xDirection == Direction.LEFT;
+                case UP_ARROW -> arrowData.yDirection == Direction.UP;
+                case DOWN_ARROW -> arrowData.yDirection == Direction.DOWN;
+                case SPACE -> arrowData.space;
+                case null, default -> false;
             };
-            if (result) arrowCooldown.startCooldown();
+
+            if (result) cooldown.startCooldown();
             return result;
+
         }
 
         @Override
-        public void action() {
-            switch (type) {
-                case INCREMENT -> index.increment();
-                case DECREMENT -> index.decrement();
-            }
+        protected void action() {
+            index.add(indexShift);
         }
 
     }
