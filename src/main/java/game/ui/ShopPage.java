@@ -12,8 +12,11 @@ import helpers.utils.TextDisplay;
 import helpers.utils.UIButton;
 import lib.StdDraw;
 import mapobjects.traits.Equippable;
-import mapobjects.traits.MapObject;
 import mapobjects.components.Box;
+import helpers.utils.Drawer.OutlinedBoxDrawer;
+import helpers.utils.Drawer.ClassicButtonDrawer;
+import helpers.utils.Drawer.TextDrawer;
+import helpers.utils.Drawer.THICKNESS;
 import mapobjects.entities.Accessory;
 import mapobjects.entities.Buff;
 import mapobjects.entities.Gun;
@@ -26,13 +29,12 @@ import java.util.List;
 
 import static game.core.Main.IMAGES_ROOT;
 import static helpers.methods.CollisionMethods.isIn;
-import static helpers.methods.DrawMethods.*;
+import static helpers.methods.TextMethods.*;
 import static helpers.utils.FrameBox.*;
 import static mapobjects.traits.GridObject.TILE_SIDE;
 import static game.io.InputHandler.*;
 import static game.core.GameState.STATE;
-import static helpers.methods.HelperMethods.capitalize;
-
+import static helpers.methods.TextMethods.capitalize;
 
 // The shop screen in selection phase
 // Displays 3(hardcoded) different item types to buy
@@ -58,12 +60,12 @@ public class ShopPage {
     public ShopPage(InputHandler inputHandler, GameState gameState) {
         this.inputHandler = inputHandler;
         this.gameState = gameState;
-        final double[][] CENTERS = new double[][]{
-            new double[]{4.5 * TILE_SIDE, 6 * TILE_SIDE},
-            new double[]{9 * TILE_SIDE, 6 * TILE_SIDE},
-            new double[]{13.5 * TILE_SIDE, 6 * TILE_SIDE}
+        final double[][] CENTERS = new double[][] {
+                new double[] { 4.5 * TILE_SIDE, 6 * TILE_SIDE },
+                new double[] { 9 * TILE_SIDE, 6 * TILE_SIDE },
+                new double[] { 13.5 * TILE_SIDE, 6 * TILE_SIDE }
         };
-        for (int i = 0; i<N; i++) {
+        for (int i = 0; i < N; i++) {
             uis[i] = new DisplayUI(gameState, CENTERS[i][0], CENTERS[i][1]);
         }
 
@@ -137,10 +139,10 @@ public class ShopPage {
         }
     }
 
-
     public void shopLoop() throws Exception {
 
-        if (!configured) throw new Exception("CANNOT RUN SHOP PAGE WITHOUT CONFIGURATION");
+        if (!configured)
+            throw new Exception("CANNOT RUN SHOP PAGE WITHOUT CONFIGURATION");
 
         StdDraw.setXscale(0, game.core.Frame.X_SCALE);
         StdDraw.setYscale(game.core.Frame.Y_SCALE, 0);
@@ -164,9 +166,11 @@ public class ShopPage {
 
     private void processInput(MouseData mouseData, ArrowData arrowData) {
         if (gameState.getState() == current) {
-            for (UIButton button : UIButtons) button.processInput(mouseData, arrowData);
+            for (UIButton button : UIButtons)
+                button.processInput(mouseData, arrowData);
             for (DisplayUI ui : uis) {
-                if (ui != null) ui.processInput(mouseData, arrowData);
+                if (ui != null)
+                    ui.processInput(mouseData, arrowData);
             }
         } else if (gameState.getState() == STATE.PAUSE) {
             buyScreen.processInput(mouseData);
@@ -179,7 +183,8 @@ public class ShopPage {
         backgroundMap.draw();
 
         for (DisplayUI ui : uis) {
-            if (ui != null) ui.draw();
+            if (ui != null)
+                ui.draw();
         }
 
         currencyUI.draw();
@@ -192,17 +197,18 @@ public class ShopPage {
 
     private ShopEntry getToBeBoughtEntry() {
         for (DisplayUI ui : uis) {
-            if (ui != null && ui.buyButton.isPressed()) return ui.getCurrentShopEntry();
+            if (ui != null && ui.buyButton.isPressed())
+                return ui.getCurrentShopEntry();
         }
         return null;
     }
 
     private void resetBuyScreenTriggered() {
         for (DisplayUI ui : uis) {
-            if (ui != null) ui.buyButton.reset();
+            if (ui != null)
+                ui.buyButton.reset();
         }
     }
-
 
     private static class DisplayUI {
 
@@ -227,6 +233,33 @@ public class ShopPage {
         private final Box DESCRIPTION_BOX;
         private final Box STATS_BOX;
 
+        private static final Color SHOP_COLOR = new Color(0, 88, 188);
+        private static final Color DESCRIPTION_COLOR = new Color(230, 114, 230);
+        private static final Color STATS_COLOR = new Color(244, 157, 8);
+        private static final Color TEXT_COLOR = Color.WHITE;
+        private static final Color LABEL_COLOR = new Color(34, 171, 160);
+        private static final Color NAME_COLOR = new Color(21, 106, 132);
+        private static final Color OUTLINE_COLOR = Color.BLACK;
+        private static final Color CAN_BUY_COLOR = new Color(16, 78, 6);
+        private static final Color CANT_BUY_COLOR = new Color(113, 6, 6);
+
+        private static final Font BIG_FONT = new Font("Monospaced", Font.BOLD, 25);
+        private static final Font SMALL_FONT = new Font("Monospaced", Font.BOLD, 20);
+
+        private static final String DESCRIPTION_SYMBOL = "ⓘ";
+        private static final String STATS_SYMBOL = "∑";
+        private static final String RETURN_SYMBOL = "↩";
+
+        private final TextDrawer leftArrowDrawer;
+        private final TextDrawer rightArrowDrawer;
+        private final ClassicButtonDrawer labelDrawer;
+        private final ClassicButtonDrawer nameDrawer;
+        private final OutlinedBoxDrawer shopBoxDrawer;
+        private final ClassicButtonDrawer descriptionDrawer;
+        private final ClassicButtonDrawer statsDrawer;
+        private final OutlinedBoxDrawer priceDrawer;
+        private final ClassicButtonDrawer buyDrawer;
+
         public DisplayUI(GameState gameState, double centerX, double centerY) {
             this.gameState = gameState;
 
@@ -245,17 +278,17 @@ public class ShopPage {
             final double BOX_GAP = 0.25 * TILE_SIDE;
 
             this.SHOP_BOX = new Box(centerX, centerY, SHOP_BOX_WIDTH, SHOP_BOX_HEIGHT);
-            this.ARROW_BOXES = new Box[]{
-                new Box(centerX - (SHOP_BOX_WIDTH / 2 + BOX_GAP + ARROWS_SIDE/2), centerY, ARROWS_SIDE, ARROWS_SIDE),
-                new Box(centerX + (SHOP_BOX_WIDTH / 2 + BOX_GAP + ARROWS_SIDE/2), centerY, ARROWS_SIDE, ARROWS_SIDE)
+            this.ARROW_BOXES = new Box[] {
+                    new Box(centerX - (SHOP_BOX_WIDTH / 2 + BOX_GAP + ARROWS_SIDE / 2), centerY, ARROWS_SIDE, ARROWS_SIDE),
+                    new Box(centerX + (SHOP_BOX_WIDTH / 2 + BOX_GAP + ARROWS_SIDE / 2), centerY, ARROWS_SIDE, ARROWS_SIDE)
             };
 
-            this.NAME_BOX = new Box(centerX, centerY - (SHOP_BOX_HEIGHT/2 + BOX_GAP + NAME_BOX_HEIGHT/2), NAME_BOX_WIDTH, NAME_BOX_HEIGHT);
-            this.LABEL_BOX = new Box(centerX, centerY - (SHOP_BOX_HEIGHT/2 + BOX_GAP + NAME_BOX_HEIGHT + BOX_GAP + LABEL_BOX_HEIGHT/2), LABEL_BOX_WIDTH, LABEL_BOX_HEIGHT);
-            this.PRICE_BOX = new Box(centerX, centerY + (SHOP_BOX_HEIGHT/2 + BOX_GAP + PRICE_BOX_HEIGHT / 2), PRICE_BOX_WIDTH, PRICE_BOX_HEIGHT);
-            this.BUY_BOX = new Box(centerX, centerY + (SHOP_BOX_HEIGHT/2 + BOX_GAP + PRICE_BOX_HEIGHT + BOX_GAP + BUY_BOX_HEIGHT/2), BUY_BOX_WIDTH, BUY_BOX_HEIGHT);
-            this.DESCRIPTION_BOX = new Box(centerX + (NAME_BOX_WIDTH/2 + BOX_GAP + INFO_SIDE/2), NAME_BOX.getCenterY(), INFO_SIDE, INFO_SIDE);
-            this.STATS_BOX = new Box(centerX - (NAME_BOX_WIDTH/2 + BOX_GAP + INFO_SIDE/2), NAME_BOX.getCenterY(), INFO_SIDE, INFO_SIDE);
+            this.NAME_BOX = new Box(centerX, centerY - (SHOP_BOX_HEIGHT / 2 + BOX_GAP + NAME_BOX_HEIGHT / 2), NAME_BOX_WIDTH, NAME_BOX_HEIGHT);
+            this.LABEL_BOX = new Box(centerX, centerY - (SHOP_BOX_HEIGHT / 2 + BOX_GAP + NAME_BOX_HEIGHT + BOX_GAP + LABEL_BOX_HEIGHT / 2), LABEL_BOX_WIDTH, LABEL_BOX_HEIGHT);
+            this.PRICE_BOX = new Box(centerX, centerY + (SHOP_BOX_HEIGHT / 2 + BOX_GAP + PRICE_BOX_HEIGHT / 2), PRICE_BOX_WIDTH, PRICE_BOX_HEIGHT);
+            this.BUY_BOX = new Box(centerX, centerY + (SHOP_BOX_HEIGHT / 2 + BOX_GAP + PRICE_BOX_HEIGHT + BOX_GAP + BUY_BOX_HEIGHT / 2), BUY_BOX_WIDTH, BUY_BOX_HEIGHT);
+            this.DESCRIPTION_BOX = new Box(centerX + (NAME_BOX_WIDTH / 2 + BOX_GAP + INFO_SIDE / 2), NAME_BOX.getCenterY(), INFO_SIDE, INFO_SIDE);
+            this.STATS_BOX = new Box(centerX - (NAME_BOX_WIDTH / 2 + BOX_GAP + INFO_SIDE / 2), NAME_BOX.getCenterY(), INFO_SIDE, INFO_SIDE);
 
             INDEX_BUTTONS[0] = new IndexButton(ARROW_BOXES[0], index, IndexButton.TYPE.DECREMENT);
             INDEX_BUTTONS[1] = new IndexButton(ARROW_BOXES[1], index, IndexButton.TYPE.INCREMENT);
@@ -266,11 +299,27 @@ public class ShopPage {
             descriptionButton.linkButton(statsButton);
 
             buyButton = new BooleanButton(BUY_BOX);
+
+            leftArrowDrawer = new TextDrawer(ARROW_BOXES[0], "<", OUTLINE_COLOR, BIG_FONT);
+            rightArrowDrawer = new TextDrawer(ARROW_BOXES[1], ">", OUTLINE_COLOR, BIG_FONT);
+
+            labelDrawer = new ClassicButtonDrawer(LABEL_BOX, LABEL_COLOR, Color.BLACK, THICKNESS.THIN, TEXT_COLOR, SMALL_FONT);
+            nameDrawer = new ClassicButtonDrawer(NAME_BOX, NAME_COLOR, Color.BLACK, THICKNESS.THIN, TEXT_COLOR, SMALL_FONT);
+
+            shopBoxDrawer = new OutlinedBoxDrawer(SHOP_BOX, SHOP_COLOR, OUTLINE_COLOR, THICKNESS.THIN);
+            descriptionDrawer = new ClassicButtonDrawer(DESCRIPTION_BOX, DESCRIPTION_COLOR, Color.BLACK, THICKNESS.THIN, DESCRIPTION_SYMBOL,
+                    StdDraw.BLACK, SMALL_FONT);
+            statsDrawer = new ClassicButtonDrawer(STATS_BOX, STATS_COLOR, Color.BLACK, THICKNESS.THIN, STATS_SYMBOL, StdDraw.BLACK, SMALL_FONT);
+
+            priceDrawer = new OutlinedBoxDrawer(PRICE_BOX, OUTLINE_COLOR, OUTLINE_COLOR, THICKNESS.THIN); // Color will be set
+                                                                                          // dynamically
+            buyDrawer = new ClassicButtonDrawer(BUY_BOX, OUTLINE_COLOR, Color.BLACK, THICKNESS.THIN, "BUY", TEXT_COLOR, BIG_FONT); // Color and text
+                                                                                                      // set dynamically
         }
 
         public void configure(List<ShopEntry> buyables) {
 
-            FrameBox.updateCenter(game.core.Frame.X_SCALE/2, Frame.Y_SCALE/2);
+            FrameBox.updateCenter(game.core.Frame.X_SCALE / 2, Frame.Y_SCALE / 2);
 
             final int LINE_HEIGHT = 15;
             final int size = getFontSizeForHeight(LINE_HEIGHT, new Font("Arial", Font.PLAIN, 100));
@@ -283,7 +332,8 @@ public class ShopPage {
             for (ShopEntry buyable : buyables) {
                 Equippable item = buyable.getItem();
                 item.setCenterCoordinates(SHOP_BOX.getCenterX(), SHOP_BOX.getCenterY());
-                if (item instanceof Accessory a) a.setAlone(true);
+                if (item instanceof Accessory a)
+                    a.setAlone(true);
                 descriptions.add(new TextDisplay(SHOP_BOX, item.getDescription(), infoFont, true));
                 stats.add(new TextDisplay(SHOP_BOX, item.getStats(), infoFont, true));
             }
@@ -294,8 +344,10 @@ public class ShopPage {
             ShopEntry shopEntry = getCurrentShopEntry();
 
             if (shopEntry != null && !shopEntry.isSold()) {
-                if (gameState.canAfford(shopEntry)) buyButton.processInput(mouseData, arrowData);
-                if (buyButton.isPressed()) gameState.setState(STATE.PAUSE);
+                if (gameState.canAfford(shopEntry))
+                    buyButton.processInput(mouseData, arrowData);
+                if (buyButton.isPressed())
+                    gameState.setState(STATE.PAUSE);
                 descriptionButton.processInput(mouseData, arrowData);
                 statsButton.processInput(mouseData, arrowData);
             }
@@ -330,76 +382,65 @@ public class ShopPage {
         }
 
         private void draw() {
-            Font bigFont = new Font("Monospaced", Font.BOLD, 25);
-            Font smallFont = new Font("Monospaced", Font.BOLD, 20);
-            Color outlineColor = StdDraw.BLACK;
-
-            Color shopColor = new Color(0, 88, 188);
-            Color descriptionColor = new Color(230, 114, 230);
-            Color statsColor = new Color(244, 157, 8);
-
-            Color textColor = StdDraw.WHITE;
-            Color labelColor = new Color(34, 171, 160);
-            Color nameColor = new Color(21, 106, 132);
-
-            Color canBuy = new Color(16, 78, 6);
-            Color cantBuy = new Color(113, 6, 6);
 
             ShopEntry shopEntry = getCurrentShopEntry();
-            if (shopEntry == null) return;
+            if (shopEntry == null)
+                return;
             boolean sold = shopEntry.isSold();
             boolean positive = gameState.canAfford(shopEntry) || sold;
-            Color buyColor = (positive) ? canBuy : cantBuy;
+            Color buyColor = (positive) ? CAN_BUY_COLOR : CANT_BUY_COLOR;
 
-            textInsideBox(ARROW_BOXES[0], "<", outlineColor, bigFont);
-            textInsideBox(ARROW_BOXES[1], ">", outlineColor, bigFont);
+            leftArrowDrawer.draw1();
+            rightArrowDrawer.draw1();
 
-            drawRectWithOutline(LABEL_BOX, labelColor, outlineColor);
-            textInsideBox(LABEL_BOX, getLabel(), textColor, smallFont);
+            labelDrawer.setText(getLabel());
+            labelDrawer.draw1();
 
-            drawRectWithOutline(NAME_BOX, nameColor, outlineColor);
             String name = shopEntry.getName().split("/")[0];
-            textInsideBox(NAME_BOX, capitalize(name), textColor, smallFont);
+            nameDrawer.setText(capitalize(name));
+            nameDrawer.draw1();
 
             if (descriptionButton.isPressed()) {
-                drawRectWithOutline(SHOP_BOX, descriptionColor, outlineColor);
-                drawRectWithOutline(DESCRIPTION_BOX, shopColor, outlineColor);
-                drawRectWithOutline(STATS_BOX, statsColor, outlineColor);
-                textInsideBox(DESCRIPTION_BOX, "↩", StdDraw.BLACK, smallFont);
-                textInsideBox(STATS_BOX, "∑", StdDraw.BLACK, smallFont);
+                shopBoxDrawer.setBoxColor(DESCRIPTION_COLOR);
+                shopBoxDrawer.draw1();
+                descriptionDrawer.setBoxColor(SHOP_COLOR);
+                descriptionDrawer.setText(RETURN_SYMBOL);
+                descriptionDrawer.draw1();
+                statsDrawer.setBoxColor(STATS_COLOR);
+                statsDrawer.setText(STATS_SYMBOL);
+                statsDrawer.draw1();
                 descriptions.get(index.getCurrent()).draw();
-            } else if (statsButton.isPressed()){
-                drawRectWithOutline(SHOP_BOX, statsColor, outlineColor);
-                drawRectWithOutline(DESCRIPTION_BOX, descriptionColor, outlineColor);
-                drawRectWithOutline(STATS_BOX, shopColor, outlineColor);
-                textInsideBox(DESCRIPTION_BOX, "ⓘ", StdDraw.BLACK, smallFont);
-                textInsideBox(STATS_BOX, "↩", StdDraw.BLACK, smallFont);
+            } else if (statsButton.isPressed()) {
+                shopBoxDrawer.setBoxColor(STATS_COLOR);
+                shopBoxDrawer.draw1();
+                descriptionDrawer.setBoxColor(DESCRIPTION_COLOR);
+                descriptionDrawer.setText(DESCRIPTION_SYMBOL);
+                descriptionDrawer.draw1();
+                statsDrawer.setBoxColor(SHOP_COLOR);
+                statsDrawer.setText(RETURN_SYMBOL);
+                statsDrawer.draw1();
                 stats.get(index.getCurrent()).draw();
             } else {
-                drawRectWithOutline(SHOP_BOX, shopColor, outlineColor);
-                drawRectWithOutline(DESCRIPTION_BOX, descriptionColor, outlineColor);
-                drawRectWithOutline(STATS_BOX, statsColor, outlineColor);
-                textInsideBox(DESCRIPTION_BOX, "ⓘ", StdDraw.BLACK, smallFont);
-                textInsideBox(STATS_BOX, "∑", StdDraw.BLACK, smallFont);
+                shopBoxDrawer.setBoxColor(SHOP_COLOR);
+                shopBoxDrawer.draw1();
+                descriptionDrawer.setBoxColor(DESCRIPTION_COLOR);
+                descriptionDrawer.setText(DESCRIPTION_SYMBOL);
+                descriptionDrawer.draw1();
+                statsDrawer.setBoxColor(STATS_COLOR);
+                statsDrawer.setText(STATS_SYMBOL);
+                statsDrawer.draw1();
                 shopEntry.getItem().drawBig(DRAW_BIG_MULTIPLIER);
             }
 
-            drawRectWithOutline(PRICE_BOX, buyColor, outlineColor);
+            priceDrawer.setBoxColor(buyColor);
+            priceDrawer.draw1();
 
-            String coinFile = IMAGES_ROOT + "ui/coin.png";
-            String gemFile = IMAGES_ROOT + "ui/gem.png";
-            String price = " " + shopEntry.getCoinCost(); // 1 space to right to offset the gem's space
-            String fileName = coinFile; // TODO: DISPLAY BOTH CURRENCIES
-            double side = PRICE_BOX.getHeight() * 0.8;
-            double textWidth = 0.6 * smallFont.getSize() * price.length();
+            // TODO: PRICE DISPLAY
 
-            Box box = new Box(PRICE_BOX.getCenterX() - side/2, PRICE_BOX.getCenterY(), PRICE_BOX.getWidth() - side, PRICE_BOX.getHeight());
-            textInsideBox(box, price, textColor, smallFont);
-            StdDraw.picture(PRICE_BOX.getCenterX() + textWidth/2, PRICE_BOX.getCenterY(), fileName, side, side);
-
-            drawRectWithOutline(BUY_BOX, buyColor, outlineColor);
+            buyDrawer.setBoxColor(buyColor);
             String text = (sold) ? "SOLD" : "BUY";
-            textInsideBox(BUY_BOX, text, textColor, bigFont);
+            buyDrawer.setText(text);
+            buyDrawer.draw1();
 
             if (sold) {
                 double s = SHOP_BOX.getWidth() * 1.5;
@@ -418,14 +459,21 @@ public class ShopPage {
         private static final Box GEM_BOX = new Box(GEMS_X, CURRENCY_Y, TILE_SIDE, TILE_SIDE);
         private static final Box COIN_BOX = new Box(COINS_X, CURRENCY_Y, TILE_SIDE, TILE_SIDE);
 
+        private final TextDrawer coinTextDrawer = new TextDrawer(COIN_BOX);
+        private final TextDrawer gemTextDrawer = new TextDrawer(GEM_BOX);
+
         private void draw() {
             String gemFile = IMAGES_ROOT + "ui/gem.png";
             String coinFile = IMAGES_ROOT + "ui/coin.png";
 
-            StdDraw.picture(GEM_BOX.getCenterX(), GEM_BOX.getCenterY(), gemFile, GEM_BOX.getWidth(), GEM_BOX.getHeight());
-            StdDraw.picture(COIN_BOX.getCenterX(), COIN_BOX.getCenterY(), coinFile, COIN_BOX.getWidth(), COIN_BOX.getHeight());
-            textInsideBox(GEM_BOX, gameState.getGemAmount() + "");
-            textInsideBox(COIN_BOX, gameState.getCoinAmount() + "");
+            StdDraw.picture(GEM_BOX.getCenterX(), GEM_BOX.getCenterY(), gemFile, GEM_BOX.getWidth(),
+                    GEM_BOX.getHeight());
+            StdDraw.picture(COIN_BOX.getCenterX(), COIN_BOX.getCenterY(), coinFile, COIN_BOX.getWidth(),
+                    COIN_BOX.getHeight());
+            coinTextDrawer.setText(gameState.getCoinAmount() + "");
+            gemTextDrawer.setText(gameState.getGemAmount() + "");
+            coinTextDrawer.draw1();
+            gemTextDrawer.draw1();
         }
 
     }
@@ -439,7 +487,8 @@ public class ShopPage {
         private static final double SHOP_BOX_SIDE = 3 * TILE_SIDE;
         private static final double SCREEN_UP_SPACE = 2 * TILE_SIDE;
         private static final double SCREEN_WIDTH = BUTTON_WIDTH + 2 * BUTTON_GAP;
-        private static final double SCREEN_HEIGHT = SHOP_BOX_SIDE + BUTTON_HEIGHT * 2 + BUTTON_GAP * 4 + SCREEN_UP_SPACE;
+        private static final double SCREEN_HEIGHT = SHOP_BOX_SIDE + BUTTON_HEIGHT * 2 + BUTTON_GAP * 4
+                + SCREEN_UP_SPACE;
 
         private static final Box SCREEN_BOX = new Box(CENTER_X, CENTER_Y, SCREEN_WIDTH, SCREEN_HEIGHT);
         private static final Box BOUGHT_BOX;
@@ -463,8 +512,28 @@ public class ShopPage {
         }
 
         static {
-            double y = ((CENTER_Y - SCREEN_HEIGHT / 2) + (QUESTION_BOX.getCenterY() - QUESTION_BOX.getHeight() / 2)) / 2;
+            double y = ((CENTER_Y - SCREEN_HEIGHT / 2) + (QUESTION_BOX.getCenterY() - QUESTION_BOX.getHeight() / 2))
+                    / 2;
             BOUGHT_BOX = new Box(CENTER_X, y, SHOP_BOX_SIDE, SHOP_BOX_SIDE);
+        }
+
+        private static final Color BUTTON_COLOR = new Color(23, 148, 9);
+        private static final Color TEXT_COLOR = StdDraw.BLACK;
+        private static final Color OUTLINE_COLOR = StdDraw.WHITE;
+        private static final Color BUY_COLOR = new Color(16, 78, 6);
+
+        private static final Font FONT = new Font("Monospaced", Font.BOLD, 25);
+
+        private final OutlinedBoxDrawer screenDrawer;
+        private final ClassicButtonDrawer noDrawer;
+        private final ClassicButtonDrawer yesDrawer;
+        private final ClassicButtonDrawer questionDrawer;
+
+        public BuyScreen() {
+            screenDrawer = new OutlinedBoxDrawer(SCREEN_BOX, BUY_COLOR, TEXT_COLOR, THICKNESS.THIN);
+            noDrawer = new ClassicButtonDrawer(NO_BOX, BUTTON_COLOR, OUTLINE_COLOR, THICKNESS.THIN, "NO", TEXT_COLOR, FONT);
+            yesDrawer = new ClassicButtonDrawer(YES_BOX, BUTTON_COLOR, OUTLINE_COLOR, THICKNESS.THIN, "YES", TEXT_COLOR, FONT);
+            questionDrawer = new ClassicButtonDrawer(QUESTION_BOX, BUTTON_COLOR, OUTLINE_COLOR, THICKNESS.THIN, TEXT_COLOR, FONT);
         }
 
         private void processInput(MouseData mouseData) {
@@ -487,24 +556,18 @@ public class ShopPage {
         private void draw() {
 
             ShopEntry buyable = getToBeBoughtEntry();
-            if (buyable == null) return;
+            if (buyable == null)
+                return;
 
             String name = buyable.getName().split("/")[0];
             String question = "Buy: " + name + "?";
-            Color buttonColor = new Color(23, 148, 9);
-            Font font = new Font("Monospaced", Font.BOLD, 25);
 
-            Color textColor = StdDraw.BLACK;
-            Color outlineColor = StdDraw.WHITE;
-            Color buyColor = new Color(16, 78, 6);
+            screenDrawer.draw1();
+            noDrawer.draw1();
+            yesDrawer.draw1();
 
-            drawRectWithOutline(SCREEN_BOX, buyColor, textColor);
-            drawRectWithOutline(NO_BOX, buttonColor, outlineColor);
-            textInsideBox(NO_BOX, "NO", textColor, font);
-            drawRectWithOutline(YES_BOX, buttonColor, outlineColor);
-            textInsideBox(YES_BOX, "YES", textColor, font);
-            drawRectWithOutline(QUESTION_BOX, buttonColor, outlineColor);
-            textInsideBox(QUESTION_BOX, question, textColor, font);
+            questionDrawer.setText(question);
+            questionDrawer.draw1();
 
             Equippable item = buyable.getItem();
 
@@ -524,4 +587,3 @@ public class ShopPage {
     }
 
 }
-

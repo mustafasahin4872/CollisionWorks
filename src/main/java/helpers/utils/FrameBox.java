@@ -9,11 +9,16 @@ public class FrameBox extends Box {
     public static final double CENTER_X = Frame.X_SCALE/2;
     public static final double CENTER_Y = Frame.Y_SCALE/2;
     public static double frameX, frameY;
-    private Box frameBox;
+    private final Box frameBox;
 
     public FrameBox(double centerX, double centerY, double width, double height) {
         super(centerX, centerY, width, height);
-        update();
+        frameBox = new Box(
+            frameX - CENTER_X + getCenterX(),
+            frameY - CENTER_Y + getCenterY(),
+            getWidth(),
+            getHeight()
+        );
     }
 
     public static void updateCenter(double frameX, double frameY) {
@@ -22,12 +27,10 @@ public class FrameBox extends Box {
     }
 
     public void update() {
-        frameBox = new Box(
-            frameX - CENTER_X + getCenterX(),
-            frameY - CENTER_Y + getCenterY(),
-            getWidth(),
-            getHeight()
-        );
+        frameBox.setCenterX(frameX - CENTER_X + getCenterX());
+        frameBox.setCenterY(frameY - CENTER_Y + getCenterY());
+        frameBox.setWidth(getWidth());
+        frameBox.setHeight(getHeight());
     }
 
     public Box getFrameBox() {

@@ -1,6 +1,5 @@
 package game.core;
 
-import helpers.methods.HelperMethods;
 import mapobjects.traits.*;
 import mapobjects.entities.*;
 
@@ -26,6 +25,7 @@ public class GameMap {
     private final Set<MovingCollidable> movingCollidableObjects = new HashSet<>();
     private final Set<HealthBearer> healthBearers = new HashSet<>();
     private final Set<MapObject> alwaysCalledObjects = new HashSet<>();
+    private final Set<Drawable> drawables = new HashSet<>();
 
     //private final int totalCoinOnMap;
 
@@ -60,6 +60,7 @@ public class GameMap {
                     if (gridObject instanceof Door || gridObject instanceof Shooter || gridObject instanceof Moving) {
                         alwaysCalledObjects.add(gridObject);
                     }
+                    if (gridObject instanceof Drawable d) drawables.add(d);
                 }
             }
         }
@@ -124,17 +125,34 @@ public class GameMap {
     }
 
     public void draw() {
-        iterateCurrentFrameObjects(GridObject::draw);
-        iterateAlwaysCalledObjects(MapObject::draw);
+        drawCurrentFrameObjects();
+        drawAlwaysCalledObjects();
     }
 
-    private void iterateCurrentFrameObjects(Consumer<GridObject> action) {
-        HelperMethods.iterateThroughLayers(layers, tileRange[0], tileRange[1], tileRange[2], tileRange[3], action);
+    private void drawCurrentFrameObjects() {
+        Consumer<GridObject> action = GridObject::draw;
+        int startX = tileRange[0];
+        int startY = tileRange[1];
+        int endX = tileRange[2];
+        int endY = tileRange[3];
+        for (GridObject[][] layer : layers) {
+            for (int i = startY; i<=endY; i++) {
+                for (int j = startX; j<=endX; j++) {
+                    GridObject gridObject = layer[i-1][j-1];
+                    if (gridObject!=null) {
+                        action.accept(gridObject);
+                        if (gridObject instanceof Drawable d) d.draw1();
+                    }
+                }
+            }
+        }
     }
 
-    private void iterateAlwaysCalledObjects(Consumer<MapObject> action) {
+    private void drawAlwaysCalledObjects() {
+        Consumer<MapObject> action = MapObject::draw;
         for (MapObject mapObject : alwaysCalledObjects) {
             action.accept(mapObject);
+            if (mapObject instanceof Drawable d) d.draw1();
         }
 
     }

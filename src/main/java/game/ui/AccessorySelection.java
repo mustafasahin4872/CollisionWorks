@@ -12,6 +12,9 @@ import helpers.utils.UIButton;
 import helpers.utils.UIButton.*;
 import lib.StdDraw;
 import mapobjects.components.Box;
+import helpers.utils.Drawer.THICKNESS;
+import helpers.utils.Drawer.OutlinedBoxDrawer;
+import helpers.utils.Drawer.ClassicButtonDrawer;
 import mapobjects.entities.Accessory;
 import mapobjects.entities.Player;
 
@@ -21,8 +24,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static helpers.methods.DrawMethods.drawRectWithOutline;
-import static helpers.methods.DrawMethods.textInsideBox;
 import static mapobjects.traits.GridObject.TILE_SIDE;
 
 public class AccessorySelection {
@@ -126,12 +127,21 @@ public class AccessorySelection {
         private static final double SIDE = 3 * BUTTON_SIDE + 2 * GAP;
         private static final double DRAW_BIG_MULTIPLIER = SIDE / TILE_SIDE;
 
+        private static final Color DEFAULT_BOX_COLOR = new Color(208, 146, 95);
+        private static final String SELECTED_SYMBOL = "✅";
+        private static final String UNSELECTED_SYMBOL = "❎";
+
         private final Box BOX;
         private final Box RIGHT_BOX;
         private final Box LEFT_BOX;
         private final Box SELECT_BOX;
         private final IndexButton[] indexButtons = new IndexButton[3];
         private final Index index;
+
+        private final OutlinedBoxDrawer boxDrawer;
+        private final ClassicButtonDrawer leftButtonDrawer;
+        private final ClassicButtonDrawer rightButtonDrawer;
+        private final ClassicButtonDrawer selectButtonDrawer;
 
         public AccessorySelectionUI(double centerX, double centerY) {
             this.BOX = new Box(centerX, centerY, SIDE, SIDE);
@@ -140,6 +150,12 @@ public class AccessorySelection {
             this.RIGHT_BOX = new Box(centerX + GAP + BUTTON_SIDE, centerY + SIDE/2 + GAP + BUTTON_SIDE/2, BUTTON_SIDE, BUTTON_SIDE);
             this.index = new Index(1);
             configureNavigationButtons();
+
+            Font font = new Font("Monospaced", Font.BOLD, 20);
+            boxDrawer = new OutlinedBoxDrawer(BOX, DEFAULT_BOX_COLOR, Color.BLACK, THICKNESS.THIN);
+            leftButtonDrawer = new ClassicButtonDrawer(LEFT_BOX, DEFAULT_BOX_COLOR, Color.BLACK, THICKNESS.THIN, "<", Color.BLACK, font);
+            rightButtonDrawer = new ClassicButtonDrawer(RIGHT_BOX, DEFAULT_BOX_COLOR, Color.BLACK, THICKNESS.THIN, ">", Color.BLACK, font);
+            selectButtonDrawer = new ClassicButtonDrawer(SELECT_BOX, DEFAULT_BOX_COLOR, Color.BLACK, THICKNESS.THIN, UNSELECTED_SYMBOL, Color.BLACK, font);
         }
 
         private void setAccessories(List<? extends Accessory> accessories) {
@@ -167,26 +183,22 @@ public class AccessorySelection {
             Color boxColor;
             Accessory accessory = accessories.get(index.getCurrent());
             if (accessory == null) {
-                boxColor = new Color(208, 146, 95);
+                boxColor = DEFAULT_BOX_COLOR;
             }
             else {
                 boxColor = accessory.getRarity().getColor();
             }
 
-            Color color = StdDraw.BLACK;
-            Font font = new Font("Monospaced", Font.BOLD, 20);
-
-            drawRectWithOutline(BOX, boxColor, color);
-            drawRectWithOutline(LEFT_BOX, boxColor, color);
-            drawRectWithOutline(RIGHT_BOX, boxColor, color);
-
-            textInsideBox(LEFT_BOX, "<", color, font);
-            textInsideBox(RIGHT_BOX, ">", color, font);
-            if (index.getCurrent() == index.getSelect()) {
-                textInsideBox(SELECT_BOX, "✅", color, font);
-            } else {
-                textInsideBox(SELECT_BOX, "❎", color, font);
-            }
+            boxDrawer.setBoxColor(boxColor);
+            leftButtonDrawer.setBoxColor(boxColor);
+            rightButtonDrawer.setBoxColor(boxColor);
+            selectButtonDrawer.setBoxColor(boxColor);
+            boxDrawer.draw1();
+            leftButtonDrawer.draw1();
+            rightButtonDrawer.draw1();
+            String symbol = (index.getCurrent() == index.getSelect()) ? SELECTED_SYMBOL : UNSELECTED_SYMBOL;
+            selectButtonDrawer.setText(symbol);
+            selectButtonDrawer.draw1();
             if (accessory == null) return;
             accessory.drawBigAt(BOX.getCenterX(), BOX.getCenterY(), DRAW_BIG_MULTIPLIER);
 

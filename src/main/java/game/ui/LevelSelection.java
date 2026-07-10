@@ -10,13 +10,15 @@ import helpers.utils.UIButton;
 import helpers.utils.UIButton.*;
 import lib.StdDraw;
 import mapobjects.components.Box;
+import helpers.utils.Drawer.THICKNESS;
+import helpers.utils.Drawer.TextDrawer;
+import helpers.utils.Drawer.OutlineDrawer;
 
 import java.awt.*;
 import java.util.HashSet;
 import java.util.Set;
 
 import static helpers.methods.CollisionMethods.isIn;
-import static helpers.methods.DrawMethods.*;
 import static game.io.InputHandler.MouseData;
 import static game.io.InputHandler.ArrowData;
 import static mapobjects.traits.GridObject.TILE_SIDE;
@@ -138,6 +140,7 @@ public class LevelSelection {
         };
 
         public static final double WORLD_NAME_Y_OFFSET = 2.5 * TILE_SIDE;
+        private static final Box WORLD_NAME_BOX = new Box(Frame.X_SCALE / 2.0, WORLD_NAME_Y_OFFSET, 0, 0);
 
         public static final double LEVEL_BOX_SIZE = TILE_SIDE;
         public static final double LEVEL_BOX_START_X = 4.5 * TILE_SIDE;
@@ -165,6 +168,18 @@ public class LevelSelection {
             new GenericIndexKey(GenericIndexKey.GenericKey.UP_ARROW, levelIndex, -4),
             new GenericIndexKey(GenericIndexKey.GenericKey.DOWN_ARROW, levelIndex, 4)
         ));
+
+        private final OutlineDrawer[] outlineDrawers = new OutlineDrawer[LEVELS_PER_ROW*LEVEL_ROW_NUM];
+        private static final Font TITLE_FONT = new Font("Monospaced", Font.BOLD, 30);
+        private final TextDrawer worldNameDrawer = new TextDrawer(WORLD_NAME_BOX, TITLE_FONT);
+
+        public LevelsUI() {
+
+            for (int i = 0; i<LEVELS_PER_ROW * LEVEL_ROW_NUM; i++) {
+                outlineDrawers[i] = new OutlineDrawer(LEVEL_BOXES[i], Color.BLACK, THICKNESS.THIN);
+            }
+
+        }
 
         private int getLevelIndex() {
             return levelIndex.getCurrent();
@@ -194,18 +209,20 @@ public class LevelSelection {
 
         public void draw() {
 
-            Font titleFont = new Font("Monospaced", Font.BOLD, 30);
-            drawText(WORLD_NAMES[worldIndex.getCurrent()], Frame.X_SCALE / 2.0, WORLD_NAME_Y_OFFSET, titleFont,
-                    WORLD_COLORS[worldIndex.getCurrent()]);
+            worldNameDrawer.setText(WORLD_NAMES[worldIndex.getCurrent()]);
+            worldNameDrawer.setTextColor(WORLD_COLORS[worldIndex.getCurrent()]);
+            worldNameDrawer.draw1();
 
             for (int i = 0; i < LEVEL_BOXES.length; i++) {
                 Box currentButton = LEVEL_BOXES[i];
 
-                Color outlineColor = (i == levelIndex.getCurrent()) ? StdDraw.WHITE : WORLD_COLORS[worldIndex.getCurrent()];
-                drawRectangleOutline(currentButton, outlineColor, THICKNESS.THIN);
+                Color outlineColor = (i == levelIndex.getCurrent()) ? Color.WHITE : WORLD_COLORS[worldIndex.getCurrent()];
+                outlineDrawers[i].setOutlineColor(outlineColor);
+                outlineDrawers[i].draw1();
 
                 Font font = new Font("Arial", Font.PLAIN, 16);
-                textInsideBox(currentButton, String.valueOf(i + 1), StdDraw.WHITE, font);
+                TextDrawer textDrawer = new TextDrawer(currentButton, String.valueOf(i + 1), StdDraw.WHITE, font);
+                textDrawer.draw1();
             }
         }
     }

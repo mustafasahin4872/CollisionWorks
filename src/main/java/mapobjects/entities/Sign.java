@@ -6,10 +6,11 @@ import lib.StdDraw;
 import java.awt.*;
 import game.core.Frame;
 import mapobjects.components.Box;
+import helpers.utils.Drawer.OutlinedBoxDrawer;
 import mapobjects.traits.GridObject;
 import mapobjects.traits.OnEffector;
 
-import static helpers.methods.DrawMethods.*;
+import static helpers.methods.TextMethods.*;
 
 public class Sign extends GridObject implements OnEffector {
 
@@ -22,7 +23,7 @@ public class Sign extends GridObject implements OnEffector {
     private boolean displayMessage;
 
     private final TextDisplay textDisplay;
-
+    private final OutlinedBoxDrawer displayDrawer;
 
     public Sign(int worldIndex, int xNum, int yNum, String[] messages) {
         this(worldIndex, xNum, yNum, messages, true);
@@ -37,6 +38,8 @@ public class Sign extends GridObject implements OnEffector {
         double[] dimensions = calculateDimensions(messages);
         Box displayBox = new Box(Frame.X_SCALE / 2, 0.3 * Frame.Y_SCALE / 2, dimensions[0], dimensions[1]);
         textDisplay = new TextDisplay(displayBox, messages, StdDraw.BLACK, FONT);
+
+        displayDrawer = new OutlinedBoxDrawer(textDisplay.getDisplayBox(), COLOR);
     }
 
 
@@ -80,7 +83,7 @@ public class Sign extends GridObject implements OnEffector {
             super.draw();
         }
         if (displayMessage) {
-            drawRectWithOutline(textDisplay.getDisplayBox(), COLOR, StdDraw.BLACK, THICKNESS.DEFAULT);
+            displayDrawer.draw1();
             textDisplay.draw();
             displayMessage = false;
         }

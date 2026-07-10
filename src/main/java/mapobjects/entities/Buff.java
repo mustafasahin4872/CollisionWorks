@@ -1,6 +1,6 @@
 package mapobjects.entities;
 
-import helpers.methods.HelperMethods;
+import helpers.methods.TextMethods;
 import mapobjects.traits.*;
 import mapobjects.components.Box;
 import mapobjects.components.Timer;
@@ -72,7 +72,7 @@ public abstract class Buff extends Equippable implements OnEffector, Timed {
         else if (this instanceof Buff.MagnetBuff) effect = "Attracts Items";
         else if (this instanceof Buff.VisionBuff) effect = "Increases Sight";
         return new String[]{
-            HelperMethods.capitalize(getName()),
+            TextMethods.capitalize(getName()),
             effect
         };
     }

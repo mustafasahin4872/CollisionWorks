@@ -1,12 +1,13 @@
 package helpers.utils;
 
 import mapobjects.components.Box;
+import helpers.utils.Drawer.TextDrawer;
 
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import static helpers.methods.DrawMethods.*;
+import static helpers.methods.TextMethods.*;
 
 /// displays lines of texts, either left or center aligned to the box
 /// two ways to use:
@@ -75,11 +76,8 @@ public class TextDisplay {
         for (int i = 0; i<lines.length; i++) {
             if (lines[i] == null) return;
             Box subBox = new Box(frameBox.getCenterX(), frameBox.getCenterY() - frameBox.getHeight()/2 + i * lineHeight + lineHeight/2, frameBox.getWidth(), lineHeight);
-            if (leftAligned) {
-                leftAlignTextInsideBox(subBox, lines[i], color, font);
-            } else {
-                textInsideBox(subBox, lines[i], color, font);
-            }
+            TextDrawer textDrawer = new TextDrawer(subBox, lines[i], color, font, leftAligned);
+            textDrawer.draw1();
         }
     }
 

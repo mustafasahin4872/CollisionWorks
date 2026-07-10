@@ -40,14 +40,14 @@ public abstract class MapObject {
         this.worldIndex = worldIndex;
         this.name = name;
         this.imageType = imageType;
-        directory = getDirectory();
+        directory = getDirectory(this);
         setName(name);
 
         positionBox = new Box(x, y, width, height);
     }
 
-    private String getDirectory() {
-        String fullName = this.getClass().getName();  // e.g. mapobjects.mapobject.Chest.WoodenChest
+    private static String getDirectory(Object o) {
+        String fullName = o.getClass().getName();  // e.g. mapobjects.entities.Chest.WoodenChest
         // Remove the package prefix first
         String prefix = "mapobjects.entities.";
         if (!fullName.startsWith(prefix)) {

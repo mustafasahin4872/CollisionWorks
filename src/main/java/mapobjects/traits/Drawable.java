@@ -1,11 +1,11 @@
 package mapobjects.traits;
 
-import mapobjects.components.Drawer;
+import helpers.utils.Drawer;
 
 public interface Drawable {
 
     Drawer getDrawer();
 
-    default void draw() {getDrawer().draw();}
+    default void draw1() {getDrawer().draw1();}
 
 }

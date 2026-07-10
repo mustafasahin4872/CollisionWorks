@@ -3,15 +3,14 @@ package mapobjects.entities;
 import java.awt.*;
 import java.util.Arrays;
 
-import lib.StdDraw;
 import game.core.Frame;
 import mapobjects.components.Box;
+import helpers.utils.Drawer;
 import mapobjects.traits.Collidable;
+import mapobjects.traits.Drawable;
 import mapobjects.traits.GridObject;
 
-import static helpers.methods.DrawMethods.drawRectangle;
-
-public class Door extends GridObject implements Collidable {
+public class Door extends GridObject implements Collidable, Drawable {
 
     private final Box collisionBox;
     private final char alignment;
@@ -23,6 +22,7 @@ public class Door extends GridObject implements Collidable {
             THICKNESS = 0.8, SPACE_ON_SIDE = (1-THICKNESS)/2, SPEED = 2,  // in tiles
             DELTA = SPEED * Frame.DT; // in pixels
 
+    private final Drawer drawer = new Drawer.BoxDrawer(positionBox, color);
 
     public Door(int worldIndex, int xNum, int yNum, char alignment) {
         this(worldIndex, xNum, yNum, alignment, 4);
@@ -48,6 +48,11 @@ public class Door extends GridObject implements Collidable {
 
     private static double getHeight(char alignment, int length) {
         return (alignment == VERTICAL) ? length : THICKNESS;
+    }
+
+    @Override
+    public Drawer getDrawer() {
+        return drawer;
     }
 
     @Override
@@ -93,8 +98,7 @@ public class Door extends GridObject implements Collidable {
 
     @Override
     public void draw() {
-        StdDraw.setPenColor(color);
-        drawRectangle(positionBox);
+        // TODO: REMOVE
     }
 
 }

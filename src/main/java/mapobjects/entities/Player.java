@@ -142,8 +142,16 @@ public class Player extends Equippable implements MovingCollidable, HealthBearer
     }
 
     public void acceptInput(ArrowData arrowData) {
-        xDirection = (arrowData.xDirection == Direction.RIGHT) ? 1 : -1;
-        yDirection = (arrowData.yDirection == Direction.UP) ? -1 : 1;
+        xDirection = switch (arrowData.xDirection) {
+            case RIGHT -> 1;
+            case LEFT -> -1;
+            default -> 0;
+        };
+        yDirection = switch (arrowData.yDirection) {
+            case UP -> -1;
+            case DOWN -> 1;
+            default -> 0;
+        };
         shoot = arrowData.space;
     }
 

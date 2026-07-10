@@ -6,6 +6,10 @@ import game.core.GameState.STATE;
 import helpers.utils.FrameBox;
 import lib.StdDraw;
 import mapobjects.components.Box;
+import helpers.utils.Drawer.BoxDrawer;
+import helpers.utils.Drawer.TextDrawer;
+import helpers.utils.Drawer.ClassicButtonDrawer;
+import helpers.utils.Drawer.OutlinedBoxDrawer;
 import mapobjects.components.HPBar;
 import mapobjects.entities.Player;
 
@@ -13,7 +17,6 @@ import java.awt.*;
 
 import static game.core.Main.IMAGES_ROOT;
 import static helpers.methods.CollisionMethods.isIn;
-import static helpers.methods.DrawMethods.*;
 import static helpers.utils.FrameBox.*;
 
 // the drawing and input handling of buttons and stats on in-game screen
@@ -135,6 +138,14 @@ public class GameScreen {
         private static final FrameBox EXIT_BUTTON = new FrameBox(CENTER_X, CENTER_Y+BUTTON_HEIGHT+ DISTANCE, SCREEN_SIDE-2* DISTANCE, BUTTON_HEIGHT);
 
         private static final FrameBox[] BOXES = {PAUSE_SCREEN, RESUME_BUTTON, EXIT_BUTTON, RESTART_BUTTON};
+        private static final Color BACKGROUND_COLOR = new Color(16, 78, 6);
+        private static final Color BUTTON_COLOR = new Color(23, 148, 9);
+        private static final Font FONT = new Font("Arial", Font.PLAIN, 30);
+        private static final OutlinedBoxDrawer PAUSE_DRAWER = new OutlinedBoxDrawer(PAUSE_SCREEN.getFrameBox(), BACKGROUND_COLOR, Color.BLACK);
+        private static final ClassicButtonDrawer RESUME_DRAWER = new ClassicButtonDrawer(RESUME_BUTTON.getFrameBox(), BUTTON_COLOR, Color.WHITE, "RESUME", Color.WHITE, FONT);
+        private static final ClassicButtonDrawer RESTART_DRAWER = new ClassicButtonDrawer(RESTART_BUTTON.getFrameBox(), BUTTON_COLOR, Color.WHITE, "RESTART", Color.WHITE, FONT);
+        private static final ClassicButtonDrawer EXIT_DRAWER = new ClassicButtonDrawer(EXIT_BUTTON.getFrameBox(), BUTTON_COLOR, Color.WHITE, "EXIT", Color.WHITE, FONT);
+
 
         private void update() {
             for (FrameBox frameBox : BOXES) {
@@ -164,20 +175,10 @@ public class GameScreen {
         }
 
         private void draw() {
-            // draw pause screen: resume, restart, exit
-            Color background = new Color(16, 78, 6);
-            Color buttons = new Color(23, 148, 9);
-            Color outline1 = Color.BLACK;
-            Color outline2 = Color.WHITE;
-            Font font = new Font("Arial", Font.PLAIN, 30);
-            drawRectWithOutline(PAUSE_SCREEN.getFrameBox(), background, outline1);
-            drawRectWithOutline(RESUME_BUTTON.getFrameBox(), buttons, outline2);
-            textInsideBox(RESUME_BUTTON.getFrameBox(), "RESUME", outline2, font);
-            drawRectWithOutline(RESTART_BUTTON.getFrameBox(), buttons, outline2);
-            textInsideBox(RESTART_BUTTON.getFrameBox(), "RESTART", outline2, font);
-            drawRectWithOutline(EXIT_BUTTON.getFrameBox(), buttons, outline2);
-            textInsideBox(EXIT_BUTTON.getFrameBox(), "EXIT", outline2, font);
-
+            PAUSE_DRAWER.draw1();
+            RESUME_DRAWER.draw1();
+            RESTART_DRAWER.draw1();
+            EXIT_DRAWER.draw1();
         }
 
     }
@@ -194,6 +195,15 @@ public class GameScreen {
         private static final FrameBox YOU_DIED = new FrameBox(CENTER_X, CENTER_Y - SCREEN_HEIGHT/2 - DISTANCE*2, SCREEN_WIDTH, BUTTON_HEIGHT);
 
         private static final FrameBox[] BOXES = {EXIT_BUTTON, RESTART_BUTTON, DEAD_SCREEN, YOU_DIED};
+
+        private static final Color BACKGROUND_COLOR = new Color(137, 10, 10);
+        private static final Color BUTTON_COLOR = new Color(202, 60, 60);
+        private static final Font FONT = new Font("Arial", Font.PLAIN, 30);
+
+        private static final OutlinedBoxDrawer DEAD_DRAWER = new OutlinedBoxDrawer(DEAD_SCREEN.getFrameBox(), BACKGROUND_COLOR, Color.WHITE);
+        private static final ClassicButtonDrawer RESTART_DRAWER = new ClassicButtonDrawer(RESTART_BUTTON.getFrameBox(), BUTTON_COLOR, "RESTART", Color.BLACK, FONT);
+        private static final ClassicButtonDrawer EXIT_DRAWER = new ClassicButtonDrawer(EXIT_BUTTON.getFrameBox(), BUTTON_COLOR, "EXIT", Color.BLACK, FONT);
+        private static final ClassicButtonDrawer YOU_DIED_DRAWER = new ClassicButtonDrawer(YOU_DIED.getFrameBox(), BUTTON_COLOR, Color.WHITE, "YOU DIED!", Color.BLACK, FONT);
 
         private void update() {
             for (FrameBox frameBox : BOXES) {
@@ -220,19 +230,10 @@ public class GameScreen {
         }
 
         private void draw() {
-
-            Color background = new Color(137, 10, 10);
-            Color buttons = new Color(202, 60, 60);
-            Color outline1 = Color.WHITE;
-            Color outline2 = Color.BLACK;
-            Font font = new Font("Arial", Font.PLAIN, 30);
-            drawRectWithOutline(DEAD_SCREEN.getFrameBox(), background, outline1);
-            drawRectWithOutline(RESTART_BUTTON.getFrameBox(), buttons, outline2);
-            textInsideBox(RESTART_BUTTON.getFrameBox(), "RESTART", outline2, font);
-            drawRectWithOutline(EXIT_BUTTON.getFrameBox(), buttons, outline2);
-            textInsideBox(EXIT_BUTTON.getFrameBox(), "EXIT", outline2, font);
-            drawRectWithOutline(YOU_DIED.getFrameBox(), buttons, outline2);
-            textInsideBox(YOU_DIED.getFrameBox(), "YOU DIED!", outline2, font);
+            DEAD_DRAWER.draw1();
+            RESTART_DRAWER.draw1();
+            EXIT_DRAWER.draw1();
+            YOU_DIED_DRAWER.draw1();
         }
 
     }
@@ -259,6 +260,10 @@ public class GameScreen {
 
         private double hp, maxHp;
 
+        private final BoxDrawer inDrawer = new BoxDrawer(inBox.getFrameBox(), Color.GREEN);
+        private final BoxDrawer outDrawer = new BoxDrawer(outBox.getFrameBox(), Color.BLACK);
+        private final TextDrawer healthTextDrawer = new TextDrawer(outBox.getFrameBox(), Color.WHITE, new Font("Ariel", Font.BOLD, (int)HEIGHT/2));
+
         private void update(double maxHp, double hp) {
             this.hp = hp;
             this.maxHp = maxHp;
@@ -272,16 +277,13 @@ public class GameScreen {
         }
 
         private void draw() {
-            StdDraw.setPenColor(StdDraw.BLACK);
-            drawRectangle(outBox.getFrameBox());
+            outDrawer.draw1();
 
-            //the hp inside the outline
-            StdDraw.setPenColor(StdDraw.GREEN);
-            drawRectangle(inBox.getFrameBox());
+            inDrawer.draw1();
 
-            Font font = new Font("Ariel", Font.BOLD, (int)HEIGHT/2);
             String health = "%d/%d".formatted((int)hp, (int)maxHp);
-            textInsideBox(outBox.getFrameBox(), health, StdDraw.WHITE, font);
+            healthTextDrawer.setText(health);
+            healthTextDrawer.draw1();
 
         }
 
@@ -296,6 +298,8 @@ public class GameScreen {
         private int coinsCollected;
         private String fileName = IMAGES_ROOT+"currency/singleCoin.png";
 
+        private final TextDrawer textDrawer = new TextDrawer(frameBox.getFrameBox());
+
         private void update(int coinsCollected) {
             frameBox.update();
             this.coinsCollected = coinsCollected;
@@ -307,7 +311,8 @@ public class GameScreen {
         private void draw() {
             Box box = frameBox.getFrameBox();
             StdDraw.picture(box.getCenterX(), box.getCenterY(), fileName, SIDE, SIDE);
-            textInsideBox(box, "%d".formatted(coinsCollected));
+            textDrawer.setText("%d".formatted(coinsCollected));
+            textDrawer.draw1();
         }
 
     }
@@ -319,17 +324,23 @@ public class GameScreen {
 
         private final FrameBox frameBox = new FrameBox(2*CENTER_X - 3*SIDE, DISTANCE, SIDE, SIDE);
         private int gemsCollected;
+        private String fileName = IMAGES_ROOT + "ui/gem.png";
+
+        private final TextDrawer textDrawer = new TextDrawer(frameBox.getFrameBox());
 
         private void update(int gemsCollected) {
             frameBox.update();
             this.gemsCollected = gemsCollected;
+
+            if (this.gemsCollected >= 10) fileName = IMAGES_ROOT+"currency/tripleGem.png";
+            if (this.gemsCollected >= 50) fileName = IMAGES_ROOT+"currency/gemBag.png";
         }
 
         private void draw() {
             Box box = frameBox.getFrameBox();
-            String fileName = IMAGES_ROOT + "ui/gem.png";
             StdDraw.picture(box.getCenterX(), box.getCenterY(), fileName, SIDE, SIDE);
-            textInsideBox(box, "%d".formatted(gemsCollected));
+            textDrawer.setText("%d".formatted(gemsCollected));
+            textDrawer.draw1();
         }
 
     }
@@ -342,6 +353,8 @@ public class GameScreen {
         private final FrameBox frameBox = new FrameBox(2*CENTER_X - 4*SIDE, DISTANCE, SIDE, SIDE);
         private int lives;
 
+        private final TextDrawer textDrawer = new TextDrawer(frameBox.getFrameBox());
+
         private void update(int lives) {
             frameBox.update();
             this.lives = lives;
@@ -350,7 +363,8 @@ public class GameScreen {
         private void draw() {
             Box box = frameBox.getFrameBox();
             StdDraw.picture(box.getCenterX(), box.getCenterY(), IMAGES_ROOT+"ui/heart.png", SIDE, SIDE);
-            textInsideBox(box, "%d".formatted(lives));
+            textDrawer.setText("%d".formatted(lives));
+            textDrawer.draw1();
         }
 
     }
@@ -378,6 +392,7 @@ public class GameScreen {
             HealthBar.DISTANCE + HealthBar.WIDTH + DISTANCE + EFF_W / 2 + (MAX_AMMO_DRAWN - 1) * EFF_W,
             HealthBar.DISTANCE + EFF_H / 2,
             EFF_W, EFF_H);
+        private final TextDrawer extraAmmoTextDrawer = new TextDrawer(lastAmmoBox.getFrameBox(), Color.BLACK, new Font("Ariel", Font.BOLD, (int)EFF_H/2));
 
         private void update(int ammo) {
             this.ammo = ammo;
@@ -393,8 +408,8 @@ public class GameScreen {
                     StdDraw.picture(box.getCenterX() + EFF_W*i, box.getCenterY(), IMAGES_ROOT+"ui/projectile.png", WIDTH, HEIGHT, 45);
             }
             if (ammo>MAX_AMMO_DRAWN) { // does not display +0 or +1, starts from +2.
-                Font font = new Font("Ariel", Font.BOLD, (int)EFF_H/2);
-                textInsideBox(lastAmmoBox.getFrameBox(), "+" + (ammo - MAX_AMMO_DRAWN + 1), StdDraw.BLACK, font);
+                extraAmmoTextDrawer.setText("+" + (ammo - MAX_AMMO_DRAWN + 1));
+                extraAmmoTextDrawer.draw1();
             }
 
         }

@@ -15,6 +15,11 @@ import helpers.utils.UIButton;
 import helpers.utils.UIButton.StateButton;
 import lib.StdDraw;
 import mapobjects.components.Box;
+import helpers.utils.Drawer.THICKNESS;
+import helpers.utils.Drawer.TextDrawer;
+import helpers.utils.Drawer.OutlinedBoxDrawer;
+import helpers.utils.Drawer.ClassicButtonDrawer;
+import helpers.utils.Drawer.OutlineDrawer;
 import mapobjects.entities.Gun;
 import mapobjects.entities.Player;
 import helpers.utils.UIButton.*;
@@ -25,9 +30,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static helpers.methods.DrawMethods.*;
+import static helpers.methods.TextMethods.*;
 import static mapobjects.traits.GridObject.TILE_SIDE;
-
 
 // governs skin selection, accessory selection, gun selection and moving to level selection - shop
 public class MainSelection {
@@ -64,7 +68,8 @@ public class MainSelection {
     }
 
     public void processInput(MouseData mouseData, ArrowData arrowData) {
-        for (UIButton button : UIButtons) button.processInput(mouseData, arrowData);
+        for (UIButton button : UIButtons)
+            button.processInput(mouseData, arrowData);
         skinSelectionUI.processInput(mouseData, arrowData);
         gunSelectionUI.processInput(mouseData, arrowData);
     }
@@ -113,13 +118,21 @@ public class MainSelection {
         private static final double BUTTON_SIDE = TILE_SIDE;
 
         private static final Box BOX = new Box(CENTER_X, CENTER_Y, SIDE, SIDE);
-        private static final Box NAME_BOX = new Box(CENTER_X, CENTER_Y - SIDE/2 - GAP - BUTTON_SIDE /2, NAME_WIDTH, BUTTON_SIDE);
-        private static final Box LEFT_BOX = new Box(CENTER_X - GAP/2 - BUTTON_SIDE/2, CENTER_Y + SIDE/2 + GAP + BUTTON_SIDE /2, BUTTON_SIDE, BUTTON_SIDE);
-        private static final Box RIGHT_BOX = new Box(CENTER_X + GAP/2 + BUTTON_SIDE/2, CENTER_Y + SIDE/2 + GAP + BUTTON_SIDE /2, BUTTON_SIDE, BUTTON_SIDE);
+        private static final Box NAME_BOX = new Box(CENTER_X, CENTER_Y - SIDE / 2 - GAP - BUTTON_SIDE / 2, NAME_WIDTH,
+                BUTTON_SIDE);
+        private static final Box LEFT_BOX = new Box(CENTER_X - GAP / 2 - BUTTON_SIDE / 2,
+                CENTER_Y + SIDE / 2 + GAP + BUTTON_SIDE / 2, BUTTON_SIDE, BUTTON_SIDE);
+        private static final Box RIGHT_BOX = new Box(CENTER_X + GAP / 2 + BUTTON_SIDE / 2,
+                CENTER_Y + SIDE / 2 + GAP + BUTTON_SIDE / 2, BUTTON_SIDE, BUTTON_SIDE);
 
         private List<Player> skins;
         private final Index skinIndex = new Index(1);
         private final Set<UIButton> UIButtons = new HashSet<>();
+        OutlineDrawer leftOutline = new OutlineDrawer(LEFT_BOX, Color.BLACK, THICKNESS.THIN);
+        OutlineDrawer rightOutline = new OutlineDrawer(RIGHT_BOX, Color.BLACK, THICKNESS.THIN);
+        TextDrawer nameDrawer = new TextDrawer(NAME_BOX, Color.BLACK, new Font("Monospaced", Font.BOLD, 50));
+        TextDrawer leftDrawer = new TextDrawer(LEFT_BOX, "<", Color.BLACK, new Font("Monospaced", Font.BOLD, 30));
+        TextDrawer rightDrawer = new TextDrawer(RIGHT_BOX, ">", Color.BLACK, new Font("Monospaced", Font.BOLD, 30));
 
         public SkinSelectionUI() {
             configureNavigationButtons();
@@ -140,7 +153,8 @@ public class MainSelection {
         }
 
         private void processInput(MouseData mouseData, ArrowData arrowData) {
-            for (UIButton button : UIButtons) button.processInput(mouseData, arrowData);
+            for (UIButton button : UIButtons)
+                button.processInput(mouseData, arrowData);
         }
 
         public Player getCurrentSkin() {
@@ -150,16 +164,14 @@ public class MainSelection {
         public void draw() {
 
             Player currentSkin = getCurrentSkin();
-            Color color = StdDraw.BLACK;
 
-            Font nameFont = new Font("Monospaced", Font.BOLD, 50);
-            textInsideBox(NAME_BOX, currentSkin.getPlayerName(), color, nameFont);
+            nameDrawer.setText(currentSkin.getPlayerName());
+            nameDrawer.draw1();
 
-            Font font = new Font("Monospaced", Font.BOLD, 30);
-            drawRectangleOutline(LEFT_BOX, color, THICKNESS.THIN);
-            drawRectangleOutline(RIGHT_BOX, color, THICKNESS.THIN);
-            textInsideBox(LEFT_BOX, "<", color, font);
-            textInsideBox(RIGHT_BOX, ">", color, font);
+            leftOutline.draw1();
+            rightOutline.draw1();
+            leftDrawer.draw1();
+            rightDrawer.draw1();
 
             currentSkin.drawBigAt(BOX.getCenterX(), BOX.getCenterY(), DRAW_BIG_MULTIPLIER);
 
@@ -175,16 +187,34 @@ public class MainSelection {
         private static final double GAP = 0.5 * TILE_SIDE;
         private static final double BUTTON_SIDE = 0.5 * TILE_SIDE;
         private static final double STATS_SIDE = 0.5 * TILE_SIDE;
+        private static final double STATS_GAP = 0.25 * TILE_SIDE;
         private static final Box BOX = new Box(CENTER_X, CENTER_Y, SIDE, SIDE);
-        private static final Box LEFT_BOX = new Box(CENTER_X - BUTTON_SIDE - GAP, CENTER_Y + SIDE/2 + GAP + BUTTON_SIDE/2, BUTTON_SIDE, BUTTON_SIDE);
-        private static final Box SELECT_BOX = new Box(CENTER_X, CENTER_Y + SIDE/2 + GAP + BUTTON_SIDE/2, BUTTON_SIDE, BUTTON_SIDE);
-        private static final Box RIGHT_BOX = new Box(CENTER_X + BUTTON_SIDE + GAP, CENTER_Y + SIDE/2 + GAP + BUTTON_SIDE/2, BUTTON_SIDE, BUTTON_SIDE);
-        private static final Box STATS_BOX = new Box(CENTER_X - SIDE/2 - GAP - STATS_SIDE/2, CENTER_Y - SIDE/2 + STATS_SIDE/2, STATS_SIDE, STATS_SIDE);
+        private static final Box LEFT_BOX = new Box(CENTER_X - BUTTON_SIDE - GAP,
+                CENTER_Y + SIDE / 2 + GAP + BUTTON_SIDE / 2, BUTTON_SIDE, BUTTON_SIDE);
+        private static final Box SELECT_BOX = new Box(CENTER_X, CENTER_Y + SIDE / 2 + GAP + BUTTON_SIDE / 2,
+                BUTTON_SIDE, BUTTON_SIDE);
+        private static final Box RIGHT_BOX = new Box(CENTER_X + BUTTON_SIDE + GAP,
+                CENTER_Y + SIDE / 2 + GAP + BUTTON_SIDE / 2, BUTTON_SIDE, BUTTON_SIDE);
+        private static final Box STATS_BOX = new Box(CENTER_X - SIDE / 2 - STATS_GAP - STATS_SIDE / 2,
+                CENTER_Y - SIDE / 2 + STATS_SIDE / 2, STATS_SIDE, STATS_SIDE);
 
         private final BooleanButton statsButton;
         private final Set<IndexButton> indexButtons = new HashSet<>();
         private final IndexButton selectButton;
         private final List<TextDisplay> displays = new ArrayList<>();
+
+        private static final Color BOX_COLOR = new Color(0, 88, 188);
+        private static final Color STATS_COLOR = new Color(244, 157, 8);
+        private static final String STATS_SYMBOL = "∑";
+        private static final String BACK_SYMBOL = "↩";
+        private static final String SELECTED_SYMBOL = "✅";
+        private static final String UNSELECTED_SYMBOL = "❎";
+
+        private final OutlinedBoxDrawer boxDrawer;
+        private final ClassicButtonDrawer leftBoxDrawer;
+        private final ClassicButtonDrawer rightBoxDrawer;
+        private final ClassicButtonDrawer selectBoxDrawer;
+        private final ClassicButtonDrawer statsButtonDrawer;
 
         private List<Gun> guns;
         private final Index gunIndex = new Index(1);
@@ -193,11 +223,22 @@ public class MainSelection {
             configureUIButtons();
             statsButton = new BooleanButton(STATS_BOX);
             selectButton = new IndexButton(SELECT_BOX, gunIndex, IndexButton.TYPE.SELECT);
+
+            Font buttonFont = new Font("Monospaced", Font.BOLD, 25);
+            boxDrawer = new OutlinedBoxDrawer(BOX, BOX_COLOR, Color.BLACK, THICKNESS.THIN);
+            leftBoxDrawer = new ClassicButtonDrawer(LEFT_BOX, BOX_COLOR, Color.BLACK, THICKNESS.THIN, "<", Color.BLACK,
+                    buttonFont);
+            rightBoxDrawer = new ClassicButtonDrawer(RIGHT_BOX, BOX_COLOR, Color.BLACK, THICKNESS.THIN, ">",
+                    Color.BLACK, buttonFont);
+            selectBoxDrawer = new ClassicButtonDrawer(SELECT_BOX, BOX_COLOR, Color.BLACK, THICKNESS.THIN,
+                    UNSELECTED_SYMBOL, Color.BLACK, buttonFont);
+            statsButtonDrawer = new ClassicButtonDrawer(STATS_BOX, STATS_COLOR, Color.BLACK, THICKNESS.THIN,
+                    STATS_SYMBOL, Color.BLACK, new Font("Monospaced", Font.BOLD, 20));
         }
 
         public void configure() {
 
-            FrameBox.updateCenter(game.core.Frame.X_SCALE/2, Frame.Y_SCALE/2);
+            FrameBox.updateCenter(game.core.Frame.X_SCALE / 2, Frame.Y_SCALE / 2);
 
             final int LINE_HEIGHT = 15;
             final int size = getFontSizeForHeight(LINE_HEIGHT, new Font("Arial", Font.PLAIN, 100));
@@ -222,41 +263,38 @@ public class MainSelection {
             statsButton.processInput(mouseData, arrowData);
             selectButton.processInput(mouseData, arrowData);
             if (!statsButton.isPressed()) {
-                for (UIButton button : indexButtons) button.processInput(mouseData, arrowData);
+                for (UIButton button : indexButtons)
+                    button.processInput(mouseData, arrowData);
             }
         }
 
         private void draw() {
 
-            Color boxColor = new Color(0, 88, 188);
             Color black = StdDraw.BLACK;
-            Color statsColor = new Color(244, 157, 8);
-            Font font = new Font("Monospaced", Font.BOLD, 30);
-            Font smallFont = new Font("Monospaced", Font.BOLD, 20);
 
             if (!statsButton.isPressed()) {
-                drawRectWithOutline(BOX, boxColor, black);
+                boxDrawer.setBoxColor(BOX_COLOR);
+                boxDrawer.draw1();
                 getCurrentGun().drawBigAt(BOX.getCenterX(), BOX.getCenterY(), DRAW_BIG_MULTIPLIER);
-                drawRectWithOutline(STATS_BOX, statsColor, black);
-                textInsideBox(STATS_BOX, "∑", StdDraw.BLACK, smallFont);
+
+                statsButtonDrawer.setBoxColor(STATS_COLOR);
+                statsButtonDrawer.setText(STATS_SYMBOL);
+                statsButtonDrawer.draw1();
             } else {
-                drawRectWithOutline(BOX, statsColor, black);
-                drawRectWithOutline(STATS_BOX, boxColor, black);
-                textInsideBox(STATS_BOX, "↩", StdDraw.BLACK, smallFont);
+                boxDrawer.setBoxColor(STATS_COLOR);
+                boxDrawer.draw1();
+                statsButtonDrawer.setBoxColor(BOX_COLOR);
+                statsButtonDrawer.setText(BACK_SYMBOL);
+                statsButtonDrawer.draw1();
                 displays.get(gunIndex.getCurrent()).draw();
             }
 
-            drawRectWithOutline(LEFT_BOX, boxColor, black);
-            drawRectWithOutline(RIGHT_BOX, boxColor, black);
+            leftBoxDrawer.draw1();
+            rightBoxDrawer.draw1();
 
-            textInsideBox(LEFT_BOX, "<", black, font);
-            textInsideBox(RIGHT_BOX, ">", black, font);
-
-            if (gunIndex.getCurrent() == gunIndex.getSelect()) {
-                textInsideBox(SELECT_BOX, "✅", black, font);
-            } else {
-                textInsideBox(SELECT_BOX, "❎", black, font);
-            }
+            String symbol = (gunIndex.getCurrent() == gunIndex.getSelect()) ? SELECTED_SYMBOL : UNSELECTED_SYMBOL;
+            selectBoxDrawer.setText(symbol);
+            selectBoxDrawer.draw1();
 
         }
 

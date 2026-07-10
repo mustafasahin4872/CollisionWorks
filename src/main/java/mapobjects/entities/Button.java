@@ -1,20 +1,22 @@
 package mapobjects.entities;
 
 import mapobjects.components.Box;
+import helpers.utils.Drawer;
+import helpers.utils.Drawer.OutlinedBoxDrawer;
+import mapobjects.traits.Drawable;
 import mapobjects.traits.OnEffector;
 import mapobjects.traits.GridObject;
 
 import java.awt.*;
-import static helpers.methods.DrawMethods.*;
 
-public abstract class Button extends GridObject implements OnEffector {
+public abstract class Button extends GridObject implements OnEffector, Drawable {
 
     private final Box effectBox;
     private boolean pressed;
-    private Color unpressedColor = new Color(178, 23, 23); // Default color
-    private Color color = unpressedColor;
     private static final Color PRESSED_COLOR = new Color(106, 192, 45),
             FRAME_COLOR = new Color(226, 125, 125);
+
+    private final OutlinedBoxDrawer drawer = new OutlinedBoxDrawer(positionBox, Color.BLACK, FRAME_COLOR);
 
     public Button(int worldIndex, int xNum, int yNum, double width, double height, boolean cornerAligned) {
         super(worldIndex, xNum, yNum, width, height, cornerAligned);
@@ -31,12 +33,17 @@ public abstract class Button extends GridObject implements OnEffector {
     }
 
     public void setUnpressedColor(Color unpressedColor) {
-        this.unpressedColor = unpressedColor;
+        drawer.setBoxColor(unpressedColor);
     }
 
     public void press() {
         pressed = true;
-        color = PRESSED_COLOR;
+        drawer.setBoxColor(PRESSED_COLOR);
+    }
+
+    @Override
+    public Drawer getDrawer() {
+        return drawer;
     }
 
     @Override
@@ -51,7 +58,7 @@ public abstract class Button extends GridObject implements OnEffector {
 
     @Override
     public void draw() {
-        drawRectWithOutline(positionBox, color, FRAME_COLOR, THICKNESS.DEFAULT);
+        // TODO: REMOVE
     }
 
 
