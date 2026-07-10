@@ -32,8 +32,8 @@ FOR GODS SAKE DECOUPLE PLAYER FROM EVERYTHING
   - [x] accessory types separation, cannot hold two of the same accessory types at the same time
   - [ ] edit selection screen as a result:
     - [x] accessory type selections
-    - [x] the isCosmetic in shopentry is no longer needed
-    - [ ] shopentry prices display should show both coin and gem.
+    - [x] the isCosmetic in ShopEntry is no longer needed
+    - [ ] ShopEntry prices display should show both coin and gem.
 - [ ] ADD GUNS!!!
   - [x] move the spawn logic to guns from the player
   - [x] the basic initiation of guns are done in playerDefaults class
