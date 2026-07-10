@@ -1,6 +1,9 @@
 package mapobjects.traits;
 
+import game.core.Main;
+
 import java.awt.*;
+import java.io.*;
 
 public abstract class Equippable extends MapObject {
 
@@ -47,6 +50,28 @@ public abstract class Equippable extends MapObject {
 
     public RARITY getRarity() {
         return rarity;
+    }
+
+    public abstract String[] getStats();
+
+    public String getDescription() {
+        String pathname = Main.RESOURCES_ROOT + "infos/"  + directory + name.split("/")[0] + ".txt";
+        File infoFile = new File(pathname);
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(infoFile));
+            String line = reader.readLine();
+            if (line == null || line.isEmpty()) {
+                System.out.println("info file is empty");
+                return "no description";
+            }
+            return line;
+        } catch (FileNotFoundException e) {
+            System.out.println("info file not found: " + pathname);
+            return "no description";
+        } catch (IOException e) {
+            System.out.println("I/O exception");
+            return "no description";
+        }
     }
 
 }

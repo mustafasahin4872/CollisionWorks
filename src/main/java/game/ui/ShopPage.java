@@ -11,6 +11,7 @@ import helpers.utils.Index;
 import helpers.utils.TextDisplay;
 import helpers.utils.UIButton;
 import lib.StdDraw;
+import mapobjects.traits.Equippable;
 import mapobjects.traits.MapObject;
 import mapobjects.components.Box;
 import mapobjects.entities.Accessory;
@@ -280,7 +281,7 @@ public class ShopPage {
             descriptions.clear();
             stats.clear();
             for (ShopEntry buyable : buyables) {
-                MapObject item = buyable.getItem();
+                Equippable item = buyable.getItem();
                 item.setCenterCoordinates(SHOP_BOX.getCenterX(), SHOP_BOX.getCenterY());
                 if (item instanceof Accessory a) a.setAlone(true);
                 descriptions.add(new TextDisplay(SHOP_BOX, item.getDescription(), infoFont, true));
@@ -311,7 +312,7 @@ public class ShopPage {
         }
 
         private String getLabel() {
-            MapObject mapObject = buyables.get(index.getCurrent()).getItem();
+            Equippable mapObject = buyables.get(index.getCurrent()).getItem();
             return switch (mapObject) {
                 case Player p -> "Skins";
                 case Accessory.Headwear _ -> "Headwears";
@@ -505,9 +506,9 @@ public class ShopPage {
             drawRectWithOutline(QUESTION_BOX, buttonColor, outlineColor);
             textInsideBox(QUESTION_BOX, question, textColor, font);
 
-            MapObject mapObject = buyable.getItem();
+            Equippable item = buyable.getItem();
 
-            if (mapObject instanceof Accessory accessory) {
+            if (item instanceof Accessory accessory) {
                 accessory.setAlone(false);
                 Player player = gameState.getPlayer();
                 accessory.setPlayer(player);
@@ -515,7 +516,7 @@ public class ShopPage {
                 accessory.drawBigAt(BOUGHT_BOX.getCenterX(), BOUGHT_BOX.getCenterY(), DRAW_BIG_MULTIPLIER);
                 accessory.setAlone(true);
             } else {
-                mapObject.drawBigAt(BOUGHT_BOX.getCenterX(), BOUGHT_BOX.getCenterY(), DRAW_BIG_MULTIPLIER);
+                item.drawBigAt(BOUGHT_BOX.getCenterX(), BOUGHT_BOX.getCenterY(), DRAW_BIG_MULTIPLIER);
             }
 
         }

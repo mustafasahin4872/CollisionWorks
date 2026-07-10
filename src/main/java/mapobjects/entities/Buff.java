@@ -1,13 +1,13 @@
 package mapobjects.entities;
 
 import helpers.methods.HelperMethods;
-import mapobjects.traits.GridObject;
-import mapobjects.traits.OnEffector;
-import mapobjects.traits.Timed;
+import mapobjects.traits.*;
 import mapobjects.components.Box;
 import mapobjects.components.Timer;
 
-public abstract class Buff extends GridObject implements OnEffector, Timed {
+import static mapobjects.traits.GridObject.TILE_SIDE;
+
+public abstract class Buff extends Equippable implements OnEffector, Timed {
 
     private static final int BUFF_DURATION = 10 * 1000;
     private final boolean permanent;
@@ -16,7 +16,7 @@ public abstract class Buff extends GridObject implements OnEffector, Timed {
     private final Timer timer;
 
     public Buff(int xNum, int yNum, String name, boolean permanent) {
-        super(0, xNum, yNum, name);
+        super(0, xNum * TILE_SIDE, yNum * TILE_SIDE, TILE_SIDE, TILE_SIDE, name, RARITY.RARE);
         this.permanent = permanent;
 
         effectBox = positionBox.clone();

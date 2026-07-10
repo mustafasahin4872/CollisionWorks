@@ -1,13 +1,12 @@
 package mapobjects.data;
 
-import mapobjects.entities.Gun;
-import mapobjects.entities.Gun.*;
+import mapobjects.traits.Equippable.RARITY;
 
 public enum PlayerDefaults {
 
-    Bob(false, "jpg", 50, MovingTypes.DEFAULT, HealthTypes.DEFAULT, new MachineGun()),
-    Mike(true, "png", 50, MovingTypes.FAST, HealthTypes.FRAGILE, new Uzi()),
-    Sakura(true, "png", 40, MovingTypes.DEFAULT, HealthTypes.RECURRING, new Shotgun());
+    Bob(false, "jpg", 50, MovingTypes.DEFAULT, HealthTypes.DEFAULT, RARITY.RARE),
+    Mike(true, "png", 50, MovingTypes.FAST, HealthTypes.FRAGILE, RARITY.LEGENDARY),
+    Sakura(true, "png", 40, MovingTypes.DEFAULT, HealthTypes.RECURRING, RARITY.EPIC);
 
     private enum MovingTypes {
 
@@ -79,7 +78,6 @@ public enum PlayerDefaults {
 
     }
 
-
     private final boolean animated;
     private final String imageType;
     private final double side;
@@ -89,9 +87,9 @@ public enum PlayerDefaults {
     private final int maxLives;
     private final double maxHP;
     private final double defence;
-    private final Gun gun;
+    private final RARITY rarity;
 
-    PlayerDefaults(boolean animated, String imageType, double side, MovingTypes movingTypes, HealthTypes healthTypes, Gun gun) {
+    PlayerDefaults(boolean animated, String imageType, double side, MovingTypes movingTypes, HealthTypes healthTypes, RARITY rarity) {
         this.animated = animated;
         this.imageType = imageType;
         this.side = side;
@@ -101,7 +99,7 @@ public enum PlayerDefaults {
         this.maxLives = healthTypes.maxLives;
         this.maxHP = healthTypes.maxHP;
         this.defence = healthTypes.defence;
-        this.gun = gun;
+        this.rarity = rarity;
     }
 
     public boolean isAnimated() {
@@ -140,7 +138,7 @@ public enum PlayerDefaults {
         return defence;
     }
 
-    public Gun getGun() {
-        return gun;
+    public RARITY getRarity() {
+        return rarity;
     }
 }

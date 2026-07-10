@@ -15,7 +15,7 @@ import java.util.Set;
 import static helpers.methods.HelperMethods.*;
 import static mapobjects.traits.GridObject.TILE_SIDE;
 
-public class Player extends MapObject implements MovingCollidable, HealthBearer {
+public class Player extends Equippable implements MovingCollidable, HealthBearer {
 
     // initial fields that are unique to the player type
     private final String playerName;
@@ -42,7 +42,7 @@ public class Player extends MapObject implements MovingCollidable, HealthBearer 
     // player's collision, spawn, health, time components
     private final Box collisionBox;
     protected final HPBar hpBar;
-    private Gun gun;
+    private Gun gun = new Gun.Handgun();
 
     // owned objects
     protected Accessory[] accessories;
@@ -56,7 +56,7 @@ public class Player extends MapObject implements MovingCollidable, HealthBearer 
     }
 
     public Player(String playerName) {
-        super(0,0, 0, 0, 0, playerName);
+        super(0,0, 0, 0, 0, playerName, PlayerDefaults.valueOf(playerName).getRarity());
         this.playerName = playerName;
 
         PlayerDefaults playerDefaults = PlayerDefaults.valueOf(playerName);
@@ -81,7 +81,6 @@ public class Player extends MapObject implements MovingCollidable, HealthBearer 
         hpBar = new HPBar(defaultMaxHP, defaultMaxLives, defaultDef);
 
         collisionBox = positionBox.clone();
-        gun = playerDefaults.getGun();
 
         respawn();
     }

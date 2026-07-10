@@ -1,6 +1,7 @@
 package game.core;
 
 import game.data.ShopEntry;
+import mapobjects.traits.Equippable;
 import mapobjects.traits.MapObject;
 import mapobjects.entities.Accessory;
 import mapobjects.entities.Buff;
@@ -235,7 +236,7 @@ public class GameState {
     public void buy(ShopEntry shopEntry) {
         shopEntry.sell();
 
-        MapObject item = shopEntry.getItem();
+        Equippable item = shopEntry.getItem();
         spendGem(shopEntry.getCoinCost());
         spendCoin(shopEntry.getGemCost());
 

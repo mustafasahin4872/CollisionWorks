@@ -105,7 +105,7 @@ public abstract class Accessory extends Equippable {
 
     @Override
     public String[] getStats() {
-        return super.getStats();
+        return new String[]{};
     }
 
     //------------------------------------------------------------------------------------------

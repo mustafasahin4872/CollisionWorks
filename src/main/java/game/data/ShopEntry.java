@@ -1,15 +1,15 @@
 package game.data;
 
-import mapobjects.traits.MapObject;
+import mapobjects.traits.Equippable;
 
 public class ShopEntry {
 
-    private final MapObject item;
+    private final Equippable item;
     private final int coinCost;
     private final int gemCost;
     private boolean isSold;
 
-    public ShopEntry(MapObject item, int coinCost, int gemCost) {
+    public ShopEntry(Equippable item, int coinCost, int gemCost) {
         this.item = item;
         this.coinCost = coinCost;
         this.gemCost = gemCost;
@@ -31,7 +31,7 @@ public class ShopEntry {
         return gemCost;
     }
 
-    public MapObject getItem() {
+    public Equippable getItem() {
         return item;
     }
 

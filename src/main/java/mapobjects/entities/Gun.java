@@ -1,6 +1,7 @@
 package mapobjects.entities;
 
 import mapobjects.factories.Blueprint;
+import mapobjects.traits.Equippable;
 import mapobjects.traits.Generator;
 import mapobjects.traits.HealthBearer;
 import mapobjects.traits.MapObject;
@@ -15,7 +16,7 @@ import static mapobjects.traits.GridObject.TILE_SIDE;
 import mapobjects.factories.ProjectileBlueprint;
 import static mapobjects.entities.Projectile.ProjectileType;
 
-public abstract class Gun extends MapObject implements Generator {
+public abstract class Gun extends Equippable implements Generator {
 
     private static final int MAX_LEVEL = 5;
     private static final int UPGRADABLE_NUM = 3;
@@ -42,8 +43,8 @@ public abstract class Gun extends MapObject implements Generator {
     protected final Set<Projectile> projectiles = new HashSet<>();
     protected Set<HealthBearer> targets;
 
-    protected Gun(ProjectileType projectileType, int maxAmmo, int reloadTime, int unloadTime) {
-        super(0, 0, 0, TILE_SIDE, TILE_SIDE);
+    protected Gun(ProjectileType projectileType, int maxAmmo, int reloadTime, int unloadTime, RARITY rarity) {
+        super(0, 0, 0, TILE_SIDE, TILE_SIDE, rarity);
         setName(getClass().getName().split("\\$")[1].toLowerCase(Locale.ROOT));
         this.projectileType = projectileType;
         this.projectileBlueprint = new ProjectileBlueprint(projectileType);
@@ -197,7 +198,7 @@ public abstract class Gun extends MapObject implements Generator {
         private static final int AMMO_BUFF = MAX_AMMO / 5; // 20 percent each upgrade
 
         public Handgun() {
-            super(ProjectileType.REGULAR, MAX_AMMO, RELOAD_TIME, UNLOAD_TIME);
+            super(ProjectileType.REGULAR, MAX_AMMO, RELOAD_TIME, UNLOAD_TIME, RARITY.RARE);
         }
 
         @Override
@@ -252,7 +253,7 @@ public abstract class Gun extends MapObject implements Generator {
         private int shiftIndex = 0;
 
         public Uzi() {
-            super(ProjectileType.SMALL, MAX_AMMO, RELOAD_TIME, UNLOAD_TIME);
+            super(ProjectileType.SMALL, MAX_AMMO, RELOAD_TIME, UNLOAD_TIME, RARITY.RARE);
         }
 
         @Override
@@ -307,7 +308,7 @@ public abstract class Gun extends MapObject implements Generator {
         private double coneWidth = INITIAL_SPREAD * (projectileCount - 1);
 
         public Shotgun() {
-            super(ProjectileType.SHOTGUN, MAX_AMMO, RELOAD_TIME, UNLOAD_TIME);
+            super(ProjectileType.SHOTGUN, MAX_AMMO, RELOAD_TIME, UNLOAD_TIME, RARITY.EPIC);
         }
 
         @Override
@@ -386,7 +387,7 @@ public abstract class Gun extends MapObject implements Generator {
         private int shiftIndex;
 
         public MachineGun() {
-            super(ProjectileType.SMALL, MAX_AMMO, RELOAD_TIME, UNLOAD_TIME);
+            super(ProjectileType.SMALL, MAX_AMMO, RELOAD_TIME, UNLOAD_TIME, RARITY.EPIC);
         }
 
         @Override
@@ -456,7 +457,7 @@ public abstract class Gun extends MapObject implements Generator {
         private double coneWidth;
 
         public Staff() {
-            super(ProjectileType.HOMING, MAX_AMMO, RELOAD_TIME, UNLOAD_TIME);
+            super(ProjectileType.HOMING, MAX_AMMO, RELOAD_TIME, UNLOAD_TIME, RARITY.MYTHIC);
         }
 
         @Override
@@ -519,7 +520,7 @@ public abstract class Gun extends MapObject implements Generator {
         private static final double SPEED_BUFF = 0.1;
 
         public Launcher() {
-            super(ProjectileType.LAUNCHER, MAX_AMMO, RELOAD_TIME, UNLOAD_TIME);
+            super(ProjectileType.LAUNCHER, MAX_AMMO, RELOAD_TIME, UNLOAD_TIME, RARITY.LEGENDARY);
         }
 
         @Override
@@ -553,7 +554,7 @@ public abstract class Gun extends MapObject implements Generator {
     public static class Pacifist extends Gun {
 
         public Pacifist() {
-            super(ProjectileType.REGULAR, 0, 1000, 1000);
+            super(ProjectileType.REGULAR, 0, 1000, 1000, RARITY.RARE);
         }
 
         @Override
