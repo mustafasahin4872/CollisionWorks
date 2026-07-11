@@ -77,7 +77,7 @@ public class TextDisplay {
             if (lines[i] == null) return;
             Box subBox = new Box(frameBox.getCenterX(), frameBox.getCenterY() - frameBox.getHeight()/2 + i * lineHeight + lineHeight/2, frameBox.getWidth(), lineHeight);
             TextDrawer textDrawer = new TextDrawer(subBox, lines[i], color, font, leftAligned);
-            textDrawer.draw1();
+            textDrawer.draw();
         }
     }
 

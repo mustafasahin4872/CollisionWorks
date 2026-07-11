@@ -83,7 +83,7 @@ public class Game {
     private static void draw(GameMap gameMap, Player player, GameScreen gameScreen) {
         StdDraw.clear();
         gameMap.draw();
-        player.draw1();
+        player.draw();
         player.drawProjectiles();
         player.drawAccessories();
         gameScreen.draw();

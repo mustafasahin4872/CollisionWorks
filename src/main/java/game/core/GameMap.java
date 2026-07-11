@@ -6,7 +6,6 @@ import mapobjects.entities.*;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.function.Consumer;
 
 import static helpers.methods.CollisionMethods.isIn;
 
@@ -139,7 +138,7 @@ public class GameMap {
                 for (int j = startX; j<=endX; j++) {
                     GridObject gridObject = layer[i-1][j-1];
                     if (gridObject!=null) {
-                        if (gridObject instanceof Drawable d) d.draw1();
+                        if (gridObject instanceof Drawable d) d.draw();
                     }
                 }
             }
@@ -148,7 +147,7 @@ public class GameMap {
 
     private void drawAlwaysCalledObjects() {
         for (MapObject mapObject : alwaysCalledObjects) {
-            if (mapObject instanceof Drawable d) d.draw1();
+            if (mapObject instanceof Drawable d) d.draw();
         }
 
     }

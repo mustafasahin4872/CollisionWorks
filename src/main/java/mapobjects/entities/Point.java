@@ -4,7 +4,6 @@ import game.core.GameState;
 import game.core.GameState.STATE;
 import game.core.Main;
 import helpers.utils.Drawer.PictureDrawer;
-import lib.StdDraw;
 import mapobjects.components.Box;
 import mapobjects.traits.Drawable;
 import mapobjects.traits.OnEffector;
@@ -41,10 +40,10 @@ public abstract class Point extends GridObject implements OnEffector, Drawable {
     /// TODO: FIX THIS MESS
     //special override for the selection screen
     @Override
-    public void draw1() {
+    public void draw() {
         setWidth(DEFAULT_SIDE);
         setHeight(DEFAULT_SIDE);
-        drawer.draw1();
+        drawer.draw();
     }
 
     public static class WinPoint extends Point implements OnEffector {
@@ -133,9 +132,9 @@ public abstract class Point extends GridObject implements OnEffector, Drawable {
         }
 
         @Override
-        public void draw1() {
-            super.draw1();
-            ERROR_SIGN.draw1();
+        public void draw() {
+            super.draw();
+            ERROR_SIGN.draw();
         }
 
         public void setPrev(CheckPoint prev) {

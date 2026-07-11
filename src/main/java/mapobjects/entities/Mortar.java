@@ -68,10 +68,10 @@ public class Mortar extends GridObject implements Collidable, Ranged, Timed, Gen
     }
 
     @Override
-    public void draw1() {
-        drawer.draw1();
+    public void draw() {
+        drawer.draw();
         for (Mine mine : mines) {
-            if (mine!=null) mine.draw1();
+            if (mine!=null) mine.draw();
         }
         HPBar.drawHPBar(this);
     }

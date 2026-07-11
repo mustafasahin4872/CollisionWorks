@@ -420,13 +420,6 @@ public class Player extends Equippable implements MovingCollidable, HealthBearer
         gun.setTargets(targets);
     }
 
-
-    //DRAW METHODS
-
-    public void draw() {
-        // TODO: REMOVE
-    }
-
     private void updateName() {
         String base = playerName + "/" + getDirectionString(getXDirection(), getYDirection());
         String plus = (animated) ? ("_" + getCurrentAnimationNum()) : "";
@@ -457,13 +450,13 @@ public class Player extends Equippable implements MovingCollidable, HealthBearer
     }
 
     public void drawProjectiles() {
-        for (Projectile projectile : gun.getProjectiles()) projectile.draw1();
+        for (Projectile projectile : gun.getProjectiles()) projectile.draw();
     }
 
     public void drawAccessories() {
         if (accessories != null) {
             for (Accessory accessory : accessories) {
-                if (accessory != null) accessory.draw1();
+                if (accessory != null) accessory.draw();
             }
         }
     }

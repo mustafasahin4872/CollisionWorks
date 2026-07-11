@@ -11,7 +11,6 @@ import helpers.utils.Index;
 import helpers.utils.TextDisplay;
 import helpers.utils.UIButton;
 import lib.StdDraw;
-import mapobjects.traits.Drawable;
 import mapobjects.traits.Equippable;
 import mapobjects.components.Box;
 import helpers.utils.Drawer.OutlinedBoxDrawer;
@@ -23,12 +22,12 @@ import mapobjects.entities.Buff;
 import mapobjects.entities.Gun;
 import mapobjects.entities.Player;
 import helpers.utils.UIButton.*;
+import helpers.utils.Drawer.PictureDrawer;
 
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import static game.core.Main.IMAGES_ROOT;
 import static helpers.methods.CollisionMethods.isIn;
 import static helpers.methods.TextMethods.*;
 import static helpers.utils.FrameBox.*;
@@ -260,6 +259,7 @@ public class ShopPage {
         private final ClassicButtonDrawer statsDrawer;
         private final OutlinedBoxDrawer priceDrawer;
         private final ClassicButtonDrawer buyDrawer;
+        private final PictureDrawer soldIconDrawer;
 
         public DisplayUI(GameState gameState, double centerX, double centerY) {
             this.gameState = gameState;
@@ -280,16 +280,26 @@ public class ShopPage {
 
             this.SHOP_BOX = new Box(centerX, centerY, SHOP_BOX_WIDTH, SHOP_BOX_HEIGHT);
             this.ARROW_BOXES = new Box[] {
-                    new Box(centerX - (SHOP_BOX_WIDTH / 2 + BOX_GAP + ARROWS_SIDE / 2), centerY, ARROWS_SIDE, ARROWS_SIDE),
-                    new Box(centerX + (SHOP_BOX_WIDTH / 2 + BOX_GAP + ARROWS_SIDE / 2), centerY, ARROWS_SIDE, ARROWS_SIDE)
+                    new Box(centerX - (SHOP_BOX_WIDTH / 2 + BOX_GAP + ARROWS_SIDE / 2), centerY, ARROWS_SIDE,
+                            ARROWS_SIDE),
+                    new Box(centerX + (SHOP_BOX_WIDTH / 2 + BOX_GAP + ARROWS_SIDE / 2), centerY, ARROWS_SIDE,
+                            ARROWS_SIDE)
             };
 
-            this.NAME_BOX = new Box(centerX, centerY - (SHOP_BOX_HEIGHT / 2 + BOX_GAP + NAME_BOX_HEIGHT / 2), NAME_BOX_WIDTH, NAME_BOX_HEIGHT);
-            this.LABEL_BOX = new Box(centerX, centerY - (SHOP_BOX_HEIGHT / 2 + BOX_GAP + NAME_BOX_HEIGHT + BOX_GAP + LABEL_BOX_HEIGHT / 2), LABEL_BOX_WIDTH, LABEL_BOX_HEIGHT);
-            this.PRICE_BOX = new Box(centerX, centerY + (SHOP_BOX_HEIGHT / 2 + BOX_GAP + PRICE_BOX_HEIGHT / 2), PRICE_BOX_WIDTH, PRICE_BOX_HEIGHT);
-            this.BUY_BOX = new Box(centerX, centerY + (SHOP_BOX_HEIGHT / 2 + BOX_GAP + PRICE_BOX_HEIGHT + BOX_GAP + BUY_BOX_HEIGHT / 2), BUY_BOX_WIDTH, BUY_BOX_HEIGHT);
-            this.DESCRIPTION_BOX = new Box(centerX + (NAME_BOX_WIDTH / 2 + BOX_GAP + INFO_SIDE / 2), NAME_BOX.getCenterY(), INFO_SIDE, INFO_SIDE);
-            this.STATS_BOX = new Box(centerX - (NAME_BOX_WIDTH / 2 + BOX_GAP + INFO_SIDE / 2), NAME_BOX.getCenterY(), INFO_SIDE, INFO_SIDE);
+            this.NAME_BOX = new Box(centerX, centerY - (SHOP_BOX_HEIGHT / 2 + BOX_GAP + NAME_BOX_HEIGHT / 2),
+                    NAME_BOX_WIDTH, NAME_BOX_HEIGHT);
+            this.LABEL_BOX = new Box(centerX,
+                    centerY - (SHOP_BOX_HEIGHT / 2 + BOX_GAP + NAME_BOX_HEIGHT + BOX_GAP + LABEL_BOX_HEIGHT / 2),
+                    LABEL_BOX_WIDTH, LABEL_BOX_HEIGHT);
+            this.PRICE_BOX = new Box(centerX, centerY + (SHOP_BOX_HEIGHT / 2 + BOX_GAP + PRICE_BOX_HEIGHT / 2),
+                    PRICE_BOX_WIDTH, PRICE_BOX_HEIGHT);
+            this.BUY_BOX = new Box(centerX,
+                    centerY + (SHOP_BOX_HEIGHT / 2 + BOX_GAP + PRICE_BOX_HEIGHT + BOX_GAP + BUY_BOX_HEIGHT / 2),
+                    BUY_BOX_WIDTH, BUY_BOX_HEIGHT);
+            this.DESCRIPTION_BOX = new Box(centerX + (NAME_BOX_WIDTH / 2 + BOX_GAP + INFO_SIDE / 2),
+                    NAME_BOX.getCenterY(), INFO_SIDE, INFO_SIDE);
+            this.STATS_BOX = new Box(centerX - (NAME_BOX_WIDTH / 2 + BOX_GAP + INFO_SIDE / 2), NAME_BOX.getCenterY(),
+                    INFO_SIDE, INFO_SIDE);
 
             INDEX_BUTTONS[0] = new IndexButton(ARROW_BOXES[0], index, IndexButton.TYPE.DECREMENT);
             INDEX_BUTTONS[1] = new IndexButton(ARROW_BOXES[1], index, IndexButton.TYPE.INCREMENT);
@@ -304,18 +314,26 @@ public class ShopPage {
             leftArrowDrawer = new TextDrawer(ARROW_BOXES[0], "<", OUTLINE_COLOR, BIG_FONT);
             rightArrowDrawer = new TextDrawer(ARROW_BOXES[1], ">", OUTLINE_COLOR, BIG_FONT);
 
-            labelDrawer = new ClassicButtonDrawer(LABEL_BOX, LABEL_COLOR, Color.BLACK, THICKNESS.THIN, TEXT_COLOR, SMALL_FONT);
-            nameDrawer = new ClassicButtonDrawer(NAME_BOX, NAME_COLOR, Color.BLACK, THICKNESS.THIN, TEXT_COLOR, SMALL_FONT);
+            labelDrawer = new ClassicButtonDrawer(LABEL_BOX, LABEL_COLOR, Color.BLACK, THICKNESS.THIN, TEXT_COLOR,
+                    SMALL_FONT);
+            nameDrawer = new ClassicButtonDrawer(NAME_BOX, NAME_COLOR, Color.BLACK, THICKNESS.THIN, TEXT_COLOR,
+                    SMALL_FONT);
 
             shopBoxDrawer = new OutlinedBoxDrawer(SHOP_BOX, SHOP_COLOR, OUTLINE_COLOR, THICKNESS.THIN);
-            descriptionDrawer = new ClassicButtonDrawer(DESCRIPTION_BOX, DESCRIPTION_COLOR, Color.BLACK, THICKNESS.THIN, DESCRIPTION_SYMBOL,
-                    StdDraw.BLACK, SMALL_FONT);
-            statsDrawer = new ClassicButtonDrawer(STATS_BOX, STATS_COLOR, Color.BLACK, THICKNESS.THIN, STATS_SYMBOL, StdDraw.BLACK, SMALL_FONT);
+            descriptionDrawer = new ClassicButtonDrawer(DESCRIPTION_BOX, DESCRIPTION_COLOR, Color.BLACK, THICKNESS.THIN,
+                    DESCRIPTION_SYMBOL,
+                    Color.BLACK, SMALL_FONT);
+            statsDrawer = new ClassicButtonDrawer(STATS_BOX, STATS_COLOR, Color.BLACK, THICKNESS.THIN, STATS_SYMBOL,
+                    Color.BLACK, SMALL_FONT);
 
-            priceDrawer = new OutlinedBoxDrawer(PRICE_BOX, OUTLINE_COLOR, OUTLINE_COLOR, THICKNESS.THIN); // Color will be set
-                                                                                          // dynamically
-            buyDrawer = new ClassicButtonDrawer(BUY_BOX, OUTLINE_COLOR, Color.BLACK, THICKNESS.THIN, "BUY", TEXT_COLOR, BIG_FONT); // Color and text
-                                                                                                      // set dynamically
+            priceDrawer = new OutlinedBoxDrawer(PRICE_BOX, OUTLINE_COLOR, OUTLINE_COLOR, THICKNESS.THIN); // Color will
+                                                                                                          // be set
+            // dynamically
+            buyDrawer = new ClassicButtonDrawer(BUY_BOX, OUTLINE_COLOR, Color.BLACK, THICKNESS.THIN, "BUY", TEXT_COLOR,
+                    BIG_FONT); // Color and text
+            // set dynamically
+
+            soldIconDrawer = new PictureDrawer(new Box(SHOP_BOX.getCenterX(), SHOP_BOX.getCenterY(), SHOP_BOX.getWidth() * 1.5, SHOP_BOX.getWidth() * 1.5), "ui/", "sold");
         }
 
         public void configure(List<ShopEntry> buyables) {
@@ -385,66 +403,67 @@ public class ShopPage {
         private void draw() {
 
             ShopEntry shopEntry = getCurrentShopEntry();
-            if (shopEntry == null) return;
+            if (shopEntry == null)
+                return;
             boolean sold = shopEntry.isSold();
             boolean positive = gameState.canAfford(shopEntry) || sold;
             Color buyColor = (positive) ? CAN_BUY_COLOR : CANT_BUY_COLOR;
 
-            leftArrowDrawer.draw1();
-            rightArrowDrawer.draw1();
+            leftArrowDrawer.draw();
+            rightArrowDrawer.draw();
 
             labelDrawer.setText(getLabel());
-            labelDrawer.draw1();
+            labelDrawer.draw();
 
             String name = shopEntry.getName().split("/")[0];
             nameDrawer.setText(capitalize(name));
-            nameDrawer.draw1();
+            nameDrawer.draw();
 
             if (descriptionButton.isPressed()) {
                 shopBoxDrawer.setBoxColor(DESCRIPTION_COLOR);
-                shopBoxDrawer.draw1();
+                shopBoxDrawer.draw();
                 descriptionDrawer.setBoxColor(SHOP_COLOR);
                 descriptionDrawer.setText(RETURN_SYMBOL);
-                descriptionDrawer.draw1();
+                descriptionDrawer.draw();
                 statsDrawer.setBoxColor(STATS_COLOR);
                 statsDrawer.setText(STATS_SYMBOL);
-                statsDrawer.draw1();
+                statsDrawer.draw();
                 descriptions.get(index.getCurrent()).draw();
             } else if (statsButton.isPressed()) {
                 shopBoxDrawer.setBoxColor(STATS_COLOR);
-                shopBoxDrawer.draw1();
+                shopBoxDrawer.draw();
                 descriptionDrawer.setBoxColor(DESCRIPTION_COLOR);
                 descriptionDrawer.setText(DESCRIPTION_SYMBOL);
-                descriptionDrawer.draw1();
+                descriptionDrawer.draw();
                 statsDrawer.setBoxColor(SHOP_COLOR);
                 statsDrawer.setText(RETURN_SYMBOL);
-                statsDrawer.draw1();
+                statsDrawer.draw();
                 stats.get(index.getCurrent()).draw();
             } else {
                 shopBoxDrawer.setBoxColor(SHOP_COLOR);
-                shopBoxDrawer.draw1();
+                shopBoxDrawer.draw();
                 descriptionDrawer.setBoxColor(DESCRIPTION_COLOR);
                 descriptionDrawer.setText(DESCRIPTION_SYMBOL);
-                descriptionDrawer.draw1();
+                descriptionDrawer.draw();
                 statsDrawer.setBoxColor(STATS_COLOR);
                 statsDrawer.setText(STATS_SYMBOL);
-                statsDrawer.draw1();
-                shopEntry.getItem().drawBig1(DRAW_BIG_MULTIPLIER);
+                statsDrawer.draw();
+                Equippable item = shopEntry.getItem();
+                item.drawBigAt(item.getX(), item.getY(), DRAW_BIG_MULTIPLIER);
             }
 
             priceDrawer.setBoxColor(buyColor);
-            priceDrawer.draw1();
+            priceDrawer.draw();
 
             // TODO: PRICE DISPLAY
 
             buyDrawer.setBoxColor(buyColor);
             String text = (sold) ? "SOLD" : "BUY";
             buyDrawer.setText(text);
-            buyDrawer.draw1();
+            buyDrawer.draw();
 
             if (sold) {
-                double s = SHOP_BOX.getWidth() * 1.5;
-                StdDraw.picture(SHOP_BOX.getCenterX(), SHOP_BOX.getCenterY(), IMAGES_ROOT + "ui/sold.png", s, s);
+                soldIconDrawer.draw();
             }
 
         }
@@ -462,18 +481,16 @@ public class ShopPage {
         private final TextDrawer coinTextDrawer = new TextDrawer(COIN_BOX);
         private final TextDrawer gemTextDrawer = new TextDrawer(GEM_BOX);
 
-        private void draw() {
-            String gemFile = IMAGES_ROOT + "ui/gem.png";
-            String coinFile = IMAGES_ROOT + "ui/coin.png";
+        private final PictureDrawer coinIconDrawer = new PictureDrawer(COIN_BOX, "ui/", "coin");
+        private final PictureDrawer gemIconDrawer = new PictureDrawer(GEM_BOX, "ui/", "gem");
 
-            StdDraw.picture(GEM_BOX.getCenterX(), GEM_BOX.getCenterY(), gemFile, GEM_BOX.getWidth(),
-                    GEM_BOX.getHeight());
-            StdDraw.picture(COIN_BOX.getCenterX(), COIN_BOX.getCenterY(), coinFile, COIN_BOX.getWidth(),
-                    COIN_BOX.getHeight());
+        private void draw() {
+            gemIconDrawer.draw();
+            coinIconDrawer.draw();
             coinTextDrawer.setText(gameState.getCoinAmount() + "");
             gemTextDrawer.setText(gameState.getGemAmount() + "");
-            coinTextDrawer.draw1();
-            gemTextDrawer.draw1();
+            coinTextDrawer.draw();
+            gemTextDrawer.draw();
         }
 
     }
@@ -518,8 +535,8 @@ public class ShopPage {
         }
 
         private static final Color BUTTON_COLOR = new Color(23, 148, 9);
-        private static final Color TEXT_COLOR = StdDraw.BLACK;
-        private static final Color OUTLINE_COLOR = StdDraw.WHITE;
+        private static final Color TEXT_COLOR = Color.BLACK;
+        private static final Color OUTLINE_COLOR = Color.WHITE;
         private static final Color BUY_COLOR = new Color(16, 78, 6);
 
         private static final Font FONT = new Font("Monospaced", Font.BOLD, 25);
@@ -531,9 +548,12 @@ public class ShopPage {
 
         public BuyScreen() {
             screenDrawer = new OutlinedBoxDrawer(SCREEN_BOX, BUY_COLOR, TEXT_COLOR, THICKNESS.THIN);
-            noDrawer = new ClassicButtonDrawer(NO_BOX, BUTTON_COLOR, OUTLINE_COLOR, THICKNESS.THIN, "NO", TEXT_COLOR, FONT);
-            yesDrawer = new ClassicButtonDrawer(YES_BOX, BUTTON_COLOR, OUTLINE_COLOR, THICKNESS.THIN, "YES", TEXT_COLOR, FONT);
-            questionDrawer = new ClassicButtonDrawer(QUESTION_BOX, BUTTON_COLOR, OUTLINE_COLOR, THICKNESS.THIN, TEXT_COLOR, FONT);
+            noDrawer = new ClassicButtonDrawer(NO_BOX, BUTTON_COLOR, OUTLINE_COLOR, THICKNESS.THIN, "NO", TEXT_COLOR,
+                    FONT);
+            yesDrawer = new ClassicButtonDrawer(YES_BOX, BUTTON_COLOR, OUTLINE_COLOR, THICKNESS.THIN, "YES", TEXT_COLOR,
+                    FONT);
+            questionDrawer = new ClassicButtonDrawer(QUESTION_BOX, BUTTON_COLOR, OUTLINE_COLOR, THICKNESS.THIN,
+                    TEXT_COLOR, FONT);
         }
 
         private void processInput(MouseData mouseData) {
@@ -562,12 +582,12 @@ public class ShopPage {
             String name = buyable.getName().split("/")[0];
             String question = "Buy: " + name + "?";
 
-            screenDrawer.draw1();
-            noDrawer.draw1();
-            yesDrawer.draw1();
+            screenDrawer.draw();
+            noDrawer.draw();
+            yesDrawer.draw();
 
             questionDrawer.setText(question);
-            questionDrawer.draw1();
+            questionDrawer.draw();
 
             Equippable item = buyable.getItem();
 
@@ -575,11 +595,11 @@ public class ShopPage {
                 accessory.setAlone(false);
                 Player player = gameState.getPlayer();
                 accessory.setPlayer(player);
-                player.drawBigAt1(BOUGHT_BOX.getCenterX(), BOUGHT_BOX.getCenterY(), DRAW_BIG_MULTIPLIER);
-                accessory.drawBigAt1(BOUGHT_BOX.getCenterX(), BOUGHT_BOX.getCenterY(), DRAW_BIG_MULTIPLIER);
+                player.drawBigAt(BOUGHT_BOX.getCenterX(), BOUGHT_BOX.getCenterY(), DRAW_BIG_MULTIPLIER);
+                accessory.drawBigAt(BOUGHT_BOX.getCenterX(), BOUGHT_BOX.getCenterY(), DRAW_BIG_MULTIPLIER);
                 accessory.setAlone(true);
             } else {
-                item.drawBigAt1(BOUGHT_BOX.getCenterX(), BOUGHT_BOX.getCenterY(), DRAW_BIG_MULTIPLIER);
+                item.drawBigAt(BOUGHT_BOX.getCenterX(), BOUGHT_BOX.getCenterY(), DRAW_BIG_MULTIPLIER);
             }
 
         }

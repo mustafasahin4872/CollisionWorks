@@ -120,12 +120,12 @@ public class Mine extends GridObject implements OnEffector, Ranged, Timed, Damag
     }
 
     @Override
-    public void draw1() {
+    public void draw() {
         if (!timer.isActive()) return;
-        outlineDrawer.draw1();
+        outlineDrawer.draw();
         //for a more realistic effect, the ratio will be 1 when 85% is completed
         drawer.setRadius(Math.min(timer.progressRatio()*100/85, 1)*HALF_SIDE);
-        drawer.draw1();
+        drawer.draw();
     }
 
 }

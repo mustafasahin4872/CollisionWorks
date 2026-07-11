@@ -106,11 +106,11 @@ public abstract class Shooter extends GridObject implements Collidable, Timed, G
     }
 
     @Override
-    public void draw1() {
-        drawer.draw1();
+    public void draw() {
+        drawer.draw();
         HPBar.drawHPBar(this);
         for (Projectile projectile : projectiles) {
-            projectile.draw1();
+            projectile.draw();
         }
     }
 

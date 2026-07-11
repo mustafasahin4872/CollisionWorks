@@ -4,12 +4,12 @@ import game.core.GameState;
 import game.io.InputHandler.MouseData;
 import game.core.GameState.STATE;
 import helpers.utils.FrameBox;
-import lib.StdDraw;
 import mapobjects.components.Box;
 import helpers.utils.Drawer.BoxDrawer;
 import helpers.utils.Drawer.TextDrawer;
 import helpers.utils.Drawer.ClassicButtonDrawer;
 import helpers.utils.Drawer.OutlinedBoxDrawer;
+import helpers.utils.Drawer.PictureDrawer;
 import mapobjects.components.HPBar;
 import mapobjects.entities.Player;
 
@@ -120,9 +120,10 @@ public class GameScreen {
 
         }
 
+        private final PictureDrawer drawer = new PictureDrawer(PAUSE_BUTTON.getFrameBox(), "ui/", "pause");
+
         private void draw() {
-            Box pauseBox = PAUSE_BUTTON.getFrameBox();
-            StdDraw.picture(pauseBox.getCenterX(), pauseBox.getCenterY(), IMAGES_ROOT+"ui/pause.png", pauseBox.getWidth(), pauseBox.getHeight());
+            drawer.draw();
         }
 
     }
@@ -175,10 +176,10 @@ public class GameScreen {
         }
 
         private void draw() {
-            PAUSE_DRAWER.draw1();
-            RESUME_DRAWER.draw1();
-            RESTART_DRAWER.draw1();
-            EXIT_DRAWER.draw1();
+            PAUSE_DRAWER.draw();
+            RESUME_DRAWER.draw();
+            RESTART_DRAWER.draw();
+            EXIT_DRAWER.draw();
         }
 
     }
@@ -230,10 +231,10 @@ public class GameScreen {
         }
 
         private void draw() {
-            DEAD_DRAWER.draw1();
-            RESTART_DRAWER.draw1();
-            EXIT_DRAWER.draw1();
-            YOU_DIED_DRAWER.draw1();
+            DEAD_DRAWER.draw();
+            RESTART_DRAWER.draw();
+            EXIT_DRAWER.draw();
+            YOU_DIED_DRAWER.draw();
         }
 
     }
@@ -277,13 +278,13 @@ public class GameScreen {
         }
 
         private void draw() {
-            outDrawer.draw1();
+            outDrawer.draw();
 
-            inDrawer.draw1();
+            inDrawer.draw();
 
             String health = "%d/%d".formatted((int)hp, (int)maxHp);
             healthTextDrawer.setText(health);
-            healthTextDrawer.draw1();
+            healthTextDrawer.draw();
 
         }
 
@@ -296,7 +297,7 @@ public class GameScreen {
 
         private final FrameBox frameBox = new FrameBox(2*CENTER_X - 2*SIDE, DISTANCE, SIDE, SIDE);
         private int coinsCollected;
-        private String fileName = IMAGES_ROOT+"currency/singleCoin.png";
+        private PictureDrawer drawer = new PictureDrawer(frameBox.getFrameBox(), "currency/", "singleCoin");
 
         private final TextDrawer textDrawer = new TextDrawer(frameBox.getFrameBox());
 
@@ -304,15 +305,19 @@ public class GameScreen {
             frameBox.update();
             this.coinsCollected = coinsCollected;
 
-            if (this.coinsCollected >= 10) fileName = IMAGES_ROOT+"currency/tripleCoin.png";
-            if (this.coinsCollected >= 50) fileName = IMAGES_ROOT+"currency/coinBag.png";
+            if (this.coinsCollected >= 50) {
+                drawer = new PictureDrawer(frameBox.getFrameBox(), "currency/", "coinBag");
+            } else if (this.coinsCollected >= 10) {
+                drawer = new PictureDrawer(frameBox.getFrameBox(), "currency/", "tripleCoin");
+            } else {
+                drawer = new PictureDrawer(frameBox.getFrameBox(), "currency/", "singleCoin");
+            }
         }
 
         private void draw() {
-            Box box = frameBox.getFrameBox();
-            StdDraw.picture(box.getCenterX(), box.getCenterY(), fileName, SIDE, SIDE);
+            drawer.draw();
             textDrawer.setText("%d".formatted(coinsCollected));
-            textDrawer.draw1();
+            textDrawer.draw();
         }
 
     }
@@ -324,7 +329,7 @@ public class GameScreen {
 
         private final FrameBox frameBox = new FrameBox(2*CENTER_X - 3*SIDE, DISTANCE, SIDE, SIDE);
         private int gemsCollected;
-        private String fileName = IMAGES_ROOT + "ui/gem.png";
+        private PictureDrawer drawer = new PictureDrawer(frameBox.getFrameBox(), "ui/", "gem");
 
         private final TextDrawer textDrawer = new TextDrawer(frameBox.getFrameBox());
 
@@ -332,15 +337,19 @@ public class GameScreen {
             frameBox.update();
             this.gemsCollected = gemsCollected;
 
-            if (this.gemsCollected >= 10) fileName = IMAGES_ROOT+"currency/tripleGem.png";
-            if (this.gemsCollected >= 50) fileName = IMAGES_ROOT+"currency/gemBag.png";
+            if (this.gemsCollected >= 50) {
+                drawer = new PictureDrawer(frameBox.getFrameBox(), "currency/", "gemBag");
+            } else if (this.gemsCollected >= 10) {
+                drawer = new PictureDrawer(frameBox.getFrameBox(), "currency/", "tripleGem");
+            } else {
+                drawer = new PictureDrawer(frameBox.getFrameBox(), "ui/", "gem");
+            }
         }
 
         private void draw() {
-            Box box = frameBox.getFrameBox();
-            StdDraw.picture(box.getCenterX(), box.getCenterY(), fileName, SIDE, SIDE);
+            drawer.draw();
             textDrawer.setText("%d".formatted(gemsCollected));
-            textDrawer.draw1();
+            textDrawer.draw();
         }
 
     }
@@ -360,11 +369,12 @@ public class GameScreen {
             this.lives = lives;
         }
 
+        private final PictureDrawer drawer = new PictureDrawer(frameBox.getFrameBox(), "ui/", "heart");
+
         private void draw() {
-            Box box = frameBox.getFrameBox();
-            StdDraw.picture(box.getCenterX(), box.getCenterY(), IMAGES_ROOT+"ui/heart.png", SIDE, SIDE);
+            drawer.draw();
             textDrawer.setText("%d".formatted(lives));
-            textDrawer.draw1();
+            textDrawer.draw();
         }
 
     }
@@ -394,6 +404,16 @@ public class GameScreen {
             EFF_W, EFF_H);
         private final TextDrawer extraAmmoTextDrawer = new TextDrawer(lastAmmoBox.getFrameBox(), Color.BLACK, new Font("Ariel", Font.BOLD, (int)EFF_H/2));
 
+        private final PictureDrawer[] ammoDrawers = new PictureDrawer[MAX_AMMO_DRAWN];
+
+        {
+            for (int i = 0; i<MAX_AMMO_DRAWN; i++) {
+                Box projectileBox = new Box(0, 0, WIDTH, HEIGHT);
+                ammoDrawers[i] = new PictureDrawer(projectileBox, "ui/", "projectile");
+                ammoDrawers[i].setDegrees(45);
+            }
+        }
+
         private void update(int ammo) {
             this.ammo = ammo;
             firstAmmoBox.update();
@@ -405,11 +425,13 @@ public class GameScreen {
             int ammoDrawn = Math.min(ammo, MAX_AMMO_DRAWN);
 
             for (int i = 0; i<ammoDrawn; i++) {
-                    StdDraw.picture(box.getCenterX() + EFF_W*i, box.getCenterY(), IMAGES_ROOT+"ui/projectile.png", WIDTH, HEIGHT, 45);
+                ammoDrawers[i].setX(box.getCenterX() + EFF_W*i);
+                ammoDrawers[i].setY(box.getCenterY());
+                ammoDrawers[i].draw();
             }
             if (ammo>MAX_AMMO_DRAWN) { // does not display +0 or +1, starts from +2.
                 extraAmmoTextDrawer.setText("+" + (ammo - MAX_AMMO_DRAWN + 1));
-                extraAmmoTextDrawer.draw1();
+                extraAmmoTextDrawer.draw();
             }
 
         }
@@ -423,6 +445,20 @@ public class GameScreen {
         private double hpPercantage;
 
         private final FrameBox frameBox = new FrameBox(CENTER_X, CENTER_Y, 2*CENTER_X, 2*CENTER_Y);
+
+        private final BoxDrawer[] leftDrawers = new BoxDrawer[MAX_RECT_COUNT];
+        private final BoxDrawer[] rightDrawers = new BoxDrawer[MAX_RECT_COUNT];
+        private final BoxDrawer[] bottomDrawers = new BoxDrawer[MAX_RECT_COUNT];
+        private final BoxDrawer[] topDrawers = new BoxDrawer[MAX_RECT_COUNT];
+
+        {
+            for (int i = 0; i < MAX_RECT_COUNT; i++) {
+                leftDrawers[i] = new BoxDrawer(new Box(0, 0, 2 * HALF_THICKNESS, 2 * CENTER_Y), Color.BLACK);
+                rightDrawers[i] = new BoxDrawer(new Box(0, 0, 2 * HALF_THICKNESS, 2 * CENTER_Y), Color.BLACK);
+                bottomDrawers[i] = new BoxDrawer(new Box(0, 0, 2 * CENTER_X, 2 * HALF_THICKNESS), Color.BLACK);
+                topDrawers[i] = new BoxDrawer(new Box(0, 0, 2 * CENTER_X, 2 * HALF_THICKNESS), Color.BLACK);
+            }
+        }
 
         private void update(double hpPercantage) {
             this.hpPercantage = hpPercantage;
@@ -440,19 +476,30 @@ public class GameScreen {
                 double fadeFactor = 1 - (i / (double) rectangleCount); // linear fade
                 int alpha = (int) (fadeFactor * 255);
                 Color color = new Color(123, 9, 9, alpha);
-                StdDraw.setPenColor(color);
 
                 // LEFT side
-                StdDraw.filledRectangle(centerX - CENTER_X + (2 * i + 1) * HALF_THICKNESS, centerY, HALF_THICKNESS, CENTER_Y);
+                leftDrawers[i].setBoxColor(color);
+                leftDrawers[i].setX(centerX - CENTER_X + (2 * i + 1) * HALF_THICKNESS);
+                leftDrawers[i].setY(centerY);
+                leftDrawers[i].draw();
 
                 // RIGHT side
-                StdDraw.filledRectangle(centerX + CENTER_X - (2 * i + 1) * HALF_THICKNESS, centerY, HALF_THICKNESS, CENTER_Y);
+                rightDrawers[i].setBoxColor(color);
+                rightDrawers[i].setX(centerX + CENTER_X - (2 * i + 1) * HALF_THICKNESS);
+                rightDrawers[i].setY(centerY);
+                rightDrawers[i].draw();
 
                 // BOTTOM side
-                StdDraw.filledRectangle(centerX, centerY + CENTER_Y - (2 * i + 1) * HALF_THICKNESS, CENTER_X, HALF_THICKNESS);
+                bottomDrawers[i].setBoxColor(color);
+                bottomDrawers[i].setX(centerX);
+                bottomDrawers[i].setY(centerY + CENTER_Y - (2 * i + 1) * HALF_THICKNESS);
+                bottomDrawers[i].draw();
 
                 // TOP side
-                StdDraw.filledRectangle(centerX, centerY - CENTER_Y + (2 * i + 1) * HALF_THICKNESS, CENTER_X, HALF_THICKNESS);
+                topDrawers[i].setBoxColor(color);
+                topDrawers[i].setX(centerX);
+                topDrawers[i].setY(centerY - CENTER_Y + (2 * i + 1) * HALF_THICKNESS);
+                topDrawers[i].draw();
             }
 
         }

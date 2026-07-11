@@ -2,7 +2,6 @@ package mapobjects.entities;
 
 import game.core.Frame;
 import helpers.utils.Drawer.PictureDrawer;
-import lib.StdDraw;
 import mapobjects.components.Box;
 import mapobjects.components.Damager;
 import mapobjects.components.Direction;
@@ -228,9 +227,9 @@ public class Projectile extends MapObject implements MovingCollidable, Damaging,
     }
 
     @Override
-    public void draw1() {
+    public void draw() {
         drawer.setDegrees(direction.getDegreeDirection());
-        drawer.draw1();
+        drawer.draw();
     }
 
 }

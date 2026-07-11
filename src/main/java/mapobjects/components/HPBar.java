@@ -1,7 +1,6 @@
 package mapobjects.components;
 
 import helpers.utils.Drawer.BoxDrawer;
-import lib.StdDraw;
 import mapobjects.traits.MapObject;
 
 import java.awt.*;
@@ -124,8 +123,8 @@ public class HPBar {
         Color inColor = new Color((int) ((maxHP-HP)/maxHP*255), (int) (HP/maxHP*255), 30);
         BoxDrawer inBoxDrawer = new BoxDrawer(inBox, inColor);
 
-        outBoxDrawer.draw1();
-        inBoxDrawer.draw1();
+        outBoxDrawer.draw();
+        inBoxDrawer.draw();
     }
 
 }

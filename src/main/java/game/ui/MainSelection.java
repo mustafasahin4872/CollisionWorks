@@ -166,14 +166,14 @@ public class MainSelection {
             Player currentSkin = getCurrentSkin();
 
             nameDrawer.setText(currentSkin.getPlayerName());
-            nameDrawer.draw1();
+            nameDrawer.draw();
 
-            leftOutline.draw1();
-            rightOutline.draw1();
-            leftDrawer.draw1();
-            rightDrawer.draw1();
+            leftOutline.draw();
+            rightOutline.draw();
+            leftDrawer.draw();
+            rightDrawer.draw();
 
-            currentSkin.drawBigAt1(BOX.getCenterX(), BOX.getCenterY(), DRAW_BIG_MULTIPLIER);
+            currentSkin.drawBigAt(BOX.getCenterX(), BOX.getCenterY(), DRAW_BIG_MULTIPLIER);
 
         }
 
@@ -272,27 +272,27 @@ public class MainSelection {
 
             if (!statsButton.isPressed()) {
                 boxDrawer.setBoxColor(BOX_COLOR);
-                boxDrawer.draw1();
-                getCurrentGun().drawBigAt1(BOX.getCenterX(), BOX.getCenterY(), DRAW_BIG_MULTIPLIER);
+                boxDrawer.draw();
+                getCurrentGun().drawBigAt(BOX.getCenterX(), BOX.getCenterY(), DRAW_BIG_MULTIPLIER);
 
                 statsButtonDrawer.setBoxColor(STATS_COLOR);
                 statsButtonDrawer.setText(STATS_SYMBOL);
-                statsButtonDrawer.draw1();
+                statsButtonDrawer.draw();
             } else {
                 boxDrawer.setBoxColor(STATS_COLOR);
-                boxDrawer.draw1();
+                boxDrawer.draw();
                 statsButtonDrawer.setBoxColor(BOX_COLOR);
                 statsButtonDrawer.setText(BACK_SYMBOL);
-                statsButtonDrawer.draw1();
+                statsButtonDrawer.draw();
                 displays.get(gunIndex.getCurrent()).draw();
             }
 
-            leftBoxDrawer.draw1();
-            rightBoxDrawer.draw1();
+            leftBoxDrawer.draw();
+            rightBoxDrawer.draw();
 
             String symbol = (gunIndex.getCurrent() == gunIndex.getSelect()) ? SELECTED_SYMBOL : UNSELECTED_SYMBOL;
             selectBoxDrawer.setText(symbol);
-            selectBoxDrawer.draw1();
+            selectBoxDrawer.draw();
 
         }
 

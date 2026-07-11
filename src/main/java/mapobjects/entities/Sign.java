@@ -2,8 +2,6 @@ package mapobjects.entities;
 
 import helpers.utils.Drawer.PictureDrawer;
 import helpers.utils.TextDisplay;
-import lib.StdDraw;
-
 import java.awt.*;
 import game.core.Frame;
 import mapobjects.components.Box;
@@ -40,7 +38,7 @@ public class Sign extends GridObject implements OnEffector, Drawable {
 
         double[] dimensions = calculateDimensions(messages);
         Box displayBox = new Box(Frame.X_SCALE / 2, 0.3 * Frame.Y_SCALE / 2, dimensions[0], dimensions[1]);
-        textDisplay = new TextDisplay(displayBox, messages, StdDraw.BLACK, FONT);
+        textDisplay = new TextDisplay(displayBox, messages, Color.BLACK, FONT);
 
         displayDrawer = new OutlinedBoxDrawer(textDisplay.getDisplayBox(), COLOR);
         drawer = new PictureDrawer(positionBox, getDirectory1());
@@ -88,12 +86,12 @@ public class Sign extends GridObject implements OnEffector, Drawable {
     }
 
     @Override
-    public void draw1() {
+    public void draw() {
         if (displaySign) {
-            drawer.draw1();
+            drawer.draw();
         }
         if (displayMessage) {
-            displayDrawer.draw1();
+            displayDrawer.draw();
             textDisplay.draw();
             displayMessage = false;
         }

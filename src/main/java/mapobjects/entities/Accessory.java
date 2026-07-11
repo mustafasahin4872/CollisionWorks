@@ -56,31 +56,21 @@ public abstract class Accessory extends Equippable implements Drawable {
 
     public void update() {
         setCoordinates();
-        changeName();
+        updateName();
     }
 
     //sets coordinates using player's position. different coordinates for each accessory type
     protected abstract void setCoordinates();
 
-    private void changeName() {
+    private void updateName() {
         String direction = getDirectionString(player.getXDirection(), player.getYDirection());
         drawer.setName(accessoryName + "/" + direction);
     }
 
     @Override
-    public void drawBig1(double multiplier) {
-        resize(multiplier);
-        player.resize(multiplier);
-        if (!alone) update();
-        draw1();
-        resetSize();
-        player.resetSize();
-    }
-
-    @Override
-    public void drawBigAt1(double x, double y, double multiplier) {
+    public void drawBigAt(double x, double y, double multiplier) {
         if (alone) {
-            super.drawBigAt1(x, y, multiplier);
+            super.drawBigAt(x, y, multiplier);
         } else { // still, draw ONLY ACCESSORY, update it accordingly.
             double oldX = getX();
             double oldY = getY();
@@ -92,7 +82,7 @@ public abstract class Accessory extends Equippable implements Drawable {
             player.resize(multiplier);
             update();
 
-            draw1();
+            draw();
 
             resetSize();
             player.resetSize();

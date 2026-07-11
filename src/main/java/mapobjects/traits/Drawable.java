@@ -6,25 +6,21 @@ public interface Drawable {
 
     Drawer getDrawer();
 
-    default void draw1() {getDrawer().draw1();}
+    default void draw() {getDrawer().draw();}
 
-    default void drawBig1(double multiplier) {
-        double width = getDrawer().getWidth();
-        double height = getDrawer().getHeight();
-        getDrawer().resize(multiplier);
-        draw1();
-        getDrawer().setWidth(width);
-        getDrawer().setHeight(height);
-    }
-
-    default void drawBigAt1(double x, double y, double multiplier) {
+    default void drawBigAt(double x, double y, double multiplier) {
         double oldX = getDrawer().getX();
         double oldY = getDrawer().getY();
 
         getDrawer().setX(x);
         getDrawer().setY(y);
 
-        drawBig1(multiplier);
+        double width = getDrawer().getWidth();
+        double height = getDrawer().getHeight();
+        getDrawer().resize(multiplier);
+        draw();
+        getDrawer().setWidth(width);
+        getDrawer().setHeight(height);
 
         getDrawer().setX(oldX);
         getDrawer().setY(oldY);

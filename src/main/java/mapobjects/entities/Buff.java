@@ -64,11 +64,11 @@ public abstract class Buff extends Equippable implements OnEffector, Timed, Draw
     }
 
     @Override
-    public void draw1() {
+    public void draw() {
         if (expired) {
-            drawer.draw1();
+            drawer.draw();
         } else {
-            drawer.drawAnimated1();
+            drawer.drawAnimated();
         }
     }
 

@@ -58,11 +58,11 @@ public abstract class Drawer {
         return "";
     }
 
-    public abstract void draw1();
+    public abstract void draw();
 
     /// All animated draws use the same current time and start time, so they are synced.
     /// Draws shrinking - enlarging animations using current time.
-    public void drawAnimated1() {
+    public void drawAnimated() {
         double maxDiff = 0.1; // between 0 and 1 always!
         double period = 3000; // in milliseconds
 
@@ -79,7 +79,7 @@ public abstract class Drawer {
         double width = getWidth();
         double height = getHeight();
         resize(multiplier);
-        draw1();
+        draw();
         setWidth(width);
         setHeight(height);
     }
@@ -87,7 +87,6 @@ public abstract class Drawer {
     public enum THICKNESS {
         THIN(0.01),
         DEFAULT(0.015),
-        THICK(0.025)
         ;
 
         THICKNESS(double thickness) {
@@ -159,7 +158,7 @@ public abstract class Drawer {
         }
 
         @Override
-        public void draw1() {
+        public void draw() {
             StdDraw.setPenColor(textColor);
             StdDraw.setFont(font);
             double yOffset = 0.05 * box.getHeight();
@@ -181,7 +180,7 @@ public abstract class Drawer {
         }
 
         @Override
-        public void draw1() {
+        public void draw() {
             StdDraw.setPenColor(boxColor);
             double[] region = box.getCorners();
             StdDraw.filledRectangle((region[0] + region[2]) / 2.0, (region[1] + region[3]) / 2.0,
@@ -214,7 +213,7 @@ public abstract class Drawer {
         }
 
         @Override
-        public void draw1() {
+        public void draw() {
             StdDraw.setPenColor(outlineColor);
             StdDraw.setPenRadius(thickness.thickness);
             double[] region = box.getCorners();
@@ -250,9 +249,9 @@ public abstract class Drawer {
         }
 
         @Override
-        public void draw1() {
-            boxDrawer.draw1();
-            outlineDrawer.draw1();
+        public void draw() {
+            boxDrawer.draw();
+            outlineDrawer.draw();
         }
 
     }
@@ -311,10 +310,10 @@ public abstract class Drawer {
 
 
         @Override
-        public void draw1() {
-            boxDrawer.draw1();
-            textDrawer.draw1();
-            outlineDrawer.draw1();
+        public void draw() {
+            boxDrawer.draw();
+            textDrawer.draw();
+            outlineDrawer.draw();
         }
 
     }
@@ -363,7 +362,7 @@ public abstract class Drawer {
         }
 
         @Override
-        public void draw1() {
+        public void draw() {
             StdDraw.picture(box.getCenterX(), box.getCenterY(), fileName, box.getWidth(), box.getHeight(), degrees);
         }
 
@@ -391,7 +390,7 @@ public abstract class Drawer {
         }
 
         @Override
-        public void draw1() {
+        public void draw() {
             StdDraw.setPenColor(circleColor);
             StdDraw.setPenRadius(thickness.thickness);
             StdDraw.circle(box.getCenterX(), box.getCenterY(), radius);
@@ -415,7 +414,7 @@ public abstract class Drawer {
         }
 
         @Override
-        public void draw1() {
+        public void draw() {
             StdDraw.setPenColor(circleColor);
             StdDraw.filledCircle(box.getCenterX(), box.getCenterY(), radius);
         }

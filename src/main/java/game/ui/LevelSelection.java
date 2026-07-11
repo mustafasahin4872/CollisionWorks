@@ -211,18 +211,18 @@ public class LevelSelection {
 
             worldNameDrawer.setText(WORLD_NAMES[worldIndex.getCurrent()]);
             worldNameDrawer.setTextColor(WORLD_COLORS[worldIndex.getCurrent()]);
-            worldNameDrawer.draw1();
+            worldNameDrawer.draw();
 
             for (int i = 0; i < LEVEL_BOXES.length; i++) {
                 Box currentButton = LEVEL_BOXES[i];
 
                 Color outlineColor = (i == levelIndex.getCurrent()) ? Color.WHITE : WORLD_COLORS[worldIndex.getCurrent()];
                 outlineDrawers[i].setOutlineColor(outlineColor);
-                outlineDrawers[i].draw1();
+                outlineDrawers[i].draw();
 
                 Font font = new Font("Arial", Font.PLAIN, 16);
-                TextDrawer textDrawer = new TextDrawer(currentButton, String.valueOf(i + 1), StdDraw.WHITE, font);
-                textDrawer.draw1();
+                TextDrawer textDrawer = new TextDrawer(currentButton, String.valueOf(i + 1), Color.WHITE, font);
+                textDrawer.draw();
             }
         }
     }
