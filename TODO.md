@@ -22,6 +22,8 @@
 - [x] DECOUPLING OF STDDRAW AND NON-IO CLASSES
 - [x] DECOUPLING OF DRAWING AND MAPOBJECTS
 - [x] DECOUPLING OF DRAWING AND UI
+- [x] UNIFY FRAGMENTED DATA PACKAGES AND MOVE `Main` TO ROOT
+- [x] CLEAN UP `HelperMethods` (Moved logic to `GameMap` & `Player`)
 - [ ] DECOUPLING OF BUYABLES AND MAPOBJECTS
 - [ ] DECOUPLING OF PLAYER AND MAPOBJECT CALLS
 - [ ] DECOUPLING OF PLAYER AND INPUT TAKING
@@ -67,9 +69,9 @@
         - [ ] buffs should have an apply(Player player) and revert(Player player) function that applies/reverts the effects
         - [ ] playerIsOn should only add the buff to the List
 - [ ] Drawing logic redesign
-    - [ ] Drawable interface
-    - [ ] Drawer component: draws picture or colored rectangle or text
-    - [ ] Display helper: sign and ShopUI logics collect
+    - [x] Drawable interface
+    - [x] Drawer component: draws picture or colored rectangle or text
+    - [x] Display helper: sign and ShopUI logics collect
         - [x] sign logic to display
         - [x] shopui logic to display
         - [ ] signs tremble a bit, why?
@@ -106,7 +108,7 @@
   - [x] Fill shop logic
   - [x] Add ShopEntry to tidy shop logic
   - [x] Finalize shop logic
-
+  - [x] Extract buyables arrays out of Shop.java into ShopData
 
 ### Rendering Architecture
 - [ ] Fix Player drawing responsibility (currently draws too much)
