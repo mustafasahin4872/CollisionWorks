@@ -168,13 +168,16 @@ public class LevelSelection {
         ));
 
         private final OutlineDrawer[] outlineDrawers = new OutlineDrawer[LEVELS_PER_ROW*LEVEL_ROW_NUM];
+        private final TextDrawer[] textDrawers = new TextDrawer[LEVELS_PER_ROW*LEVEL_ROW_NUM];
         private static final Font TITLE_FONT = new Font("Monospaced", Font.BOLD, 30);
         private final TextDrawer worldNameDrawer = new TextDrawer(WORLD_NAME_BOX, TITLE_FONT);
 
         public LevelsUI() {
 
+            Font textFont = new Font("Arial", Font.PLAIN, 16);
             for (int i = 0; i<LEVELS_PER_ROW * LEVEL_ROW_NUM; i++) {
                 outlineDrawers[i] = new OutlineDrawer(LEVEL_BOXES[i], Color.BLACK, THICKNESS.THIN);
+                textDrawers[i] = new TextDrawer(LEVEL_BOXES[i], String.valueOf(i + 1), Color.WHITE, textFont);
             }
 
         }
@@ -217,10 +220,7 @@ public class LevelSelection {
                 Color outlineColor = (i == levelIndex.getCurrent()) ? Color.WHITE : WORLD_COLORS[worldIndex.getCurrent()];
                 outlineDrawers[i].setOutlineColor(outlineColor);
                 outlineDrawers[i].draw();
-
-                Font font = new Font("Arial", Font.PLAIN, 16);
-                TextDrawer textDrawer = new TextDrawer(currentButton, String.valueOf(i + 1), Color.WHITE, font);
-                textDrawer.draw();
+                textDrawers[i].draw();
             }
         }
     }

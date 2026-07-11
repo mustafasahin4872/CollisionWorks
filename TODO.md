@@ -31,6 +31,10 @@
 
 ### New Elements
 
+- [ ] gun reload cooldown ideas:
+  - [ ] variable reload speed depending on how low on ammo you are left with 
+  - [ ] increasing reload as more ammo is being reloaded
+  - [ ] YAĞIZ: yeniden reload etmeye başlayınca cooldown etkisi, aralıklı sıkmayı cezalandırıyor
 - [ ] Equippable class improvements
 - [x] Add a wrapper buyable class inheriting mapobject
   - [x] items that are buyable in shop inherit this

@@ -4,7 +4,7 @@ import game.io.Frame;
 import game.core.GameMap;
 import game.core.GameState;
 import game.core.MapMaker;
-import data.ShopEntry;
+import game.ui.components.ShopEntry;
 import game.io.InputHandler;
 import game.ui.components.FrameBox;
 import game.ui.components.Index;

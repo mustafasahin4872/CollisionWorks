@@ -1,6 +1,6 @@
 package game.core;
 
-import data.ShopEntry;
+import game.ui.components.ShopEntry;
 import mapobjects.traits.Equippable;
 import mapobjects.entities.Accessory;
 import mapobjects.entities.Buff;
