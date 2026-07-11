@@ -1,12 +1,13 @@
 package mapobjects.data;
 
+import helpers.utils.Drawer.PictureDrawer.FILE_TYPE;
 import mapobjects.traits.Equippable.RARITY;
 
 public enum PlayerDefaults {
 
-    Bob(false, "jpg", 50, MovingTypes.DEFAULT, HealthTypes.DEFAULT, RARITY.RARE),
-    Mike(true, "png", 50, MovingTypes.FAST, HealthTypes.FRAGILE, RARITY.LEGENDARY),
-    Sakura(true, "png", 40, MovingTypes.DEFAULT, HealthTypes.RECURRING, RARITY.EPIC);
+    Bob(false, FILE_TYPE.jpg, 50, MovingTypes.DEFAULT, HealthTypes.DEFAULT, RARITY.RARE),
+    Mike(true, FILE_TYPE.png, 50, MovingTypes.FAST, HealthTypes.FRAGILE, RARITY.LEGENDARY),
+    Sakura(true, FILE_TYPE.png, 40, MovingTypes.DEFAULT, HealthTypes.RECURRING, RARITY.EPIC);
 
     private enum MovingTypes {
 
@@ -79,7 +80,7 @@ public enum PlayerDefaults {
     }
 
     private final boolean animated;
-    private final String imageType;
+    private final FILE_TYPE imageType;
     private final double side;
     private final double maxSpeed;
     private final double acceleration;
@@ -89,7 +90,7 @@ public enum PlayerDefaults {
     private final double defence;
     private final RARITY rarity;
 
-    PlayerDefaults(boolean animated, String imageType, double side, MovingTypes movingTypes, HealthTypes healthTypes, RARITY rarity) {
+    PlayerDefaults(boolean animated, FILE_TYPE imageType, double side, MovingTypes movingTypes, HealthTypes healthTypes, RARITY rarity) {
         this.animated = animated;
         this.imageType = imageType;
         this.side = side;
@@ -106,7 +107,7 @@ public enum PlayerDefaults {
         return animated;
     }
 
-    public String getImageType() {
+    public FILE_TYPE getImageType() {
         return imageType;
     }
 

@@ -200,7 +200,7 @@ public class AccessorySelection {
             selectButtonDrawer.setText(symbol);
             selectButtonDrawer.draw1();
             if (accessory == null) return;
-            accessory.drawBigAt(BOX.getCenterX(), BOX.getCenterY(), DRAW_BIG_MULTIPLIER);
+            accessory.drawBigAt1(BOX.getCenterX(), BOX.getCenterY(), DRAW_BIG_MULTIPLIER);
 
         }
 
@@ -214,13 +214,13 @@ public class AccessorySelection {
 
         public void draw() {
             Player player = gameState.getPlayer();
-            player.drawBigAt(CENTER_X, CENTER_Y, DRAW_BIG_MULTIPLIER);
+            player.drawBigAt1(CENTER_X, CENTER_Y, DRAW_BIG_MULTIPLIER);
             for (AccessorySelectionUI ui : uis) {
                 Accessory accessory = ui.getSelectedAccessory();
                 if (accessory == null) continue;
                 accessory.setAlone(false);
                 accessory.setPlayer(player);
-                accessory.drawBigAt(CENTER_X, CENTER_Y, DRAW_BIG_MULTIPLIER);
+                accessory.drawBigAt1(CENTER_X, CENTER_Y, DRAW_BIG_MULTIPLIER);
                 accessory.setAlone(true);
             }
         }

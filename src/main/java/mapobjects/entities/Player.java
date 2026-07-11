@@ -5,7 +5,7 @@ import game.core.GameState;
 import game.io.InputHandler.ArrowData;
 import game.core.Main;
 
-import helpers.utils.Direction;
+import helpers.utils.Drawer.PictureDrawer;
 import mapobjects.data.PlayerDefaults;
 import mapobjects.components.*;
 import mapobjects.traits.*;
@@ -47,6 +47,7 @@ public class Player extends Equippable implements MovingCollidable, HealthBearer
     // owned objects
     protected Accessory[] accessories;
 
+    private PictureDrawer drawer;
 
     //CONSTRUCTORS
 
@@ -62,7 +63,7 @@ public class Player extends Equippable implements MovingCollidable, HealthBearer
         PlayerDefaults playerDefaults = PlayerDefaults.valueOf(playerName);
 
         animated = playerDefaults.isAnimated();
-        imageType = playerDefaults.getImageType();
+        imageType = playerDefaults.getImageType().name();
 
         baseSide = playerDefaults.getSide();
         baseMaxSpeed = playerDefaults.getMaxSpeed();
@@ -83,6 +84,9 @@ public class Player extends Equippable implements MovingCollidable, HealthBearer
         collisionBox = positionBox.clone();
 
         respawn();
+
+        drawer = new PictureDrawer(positionBox, getDirectory1(), "", playerDefaults.getImageType());
+        updateName();
     }
 
 
@@ -111,6 +115,7 @@ public class Player extends Equippable implements MovingCollidable, HealthBearer
             projectile.call(new Player(), layers);
         }
         gun.getProjectiles().removeIf(MapObject::isExpired);
+        updateName();
     }
 
 
@@ -234,6 +239,10 @@ public class Player extends Equippable implements MovingCollidable, HealthBearer
         this.accessories = accessories;
     }
 
+    @Override
+    public PictureDrawer getDrawer() {
+        return drawer;
+    }
 
     public int getAmmo() {
         return gun.getAmmo();
@@ -416,14 +425,13 @@ public class Player extends Equippable implements MovingCollidable, HealthBearer
     //DRAW METHODS
 
     public void draw() {
-        updateName();
-        super.draw();
+        // TODO: REMOVE
     }
 
     private void updateName() {
-        String base = getPlayerName() + "/" + getDirectionString(getXDirection(), getYDirection());
+        String base = playerName + "/" + getDirectionString(getXDirection(), getYDirection());
         String plus = (animated) ? ("_" + getCurrentAnimationNum()) : "";
-        setName(base + plus);
+        drawer.setName(base + plus);
     }
 
     private int getCurrentAnimationNum() {

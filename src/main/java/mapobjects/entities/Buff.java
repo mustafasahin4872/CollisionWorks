@@ -1,22 +1,26 @@
 package mapobjects.entities;
 
 import helpers.methods.TextMethods;
+import helpers.utils.Drawer.PictureDrawer;
 import mapobjects.traits.*;
 import mapobjects.components.Box;
 import mapobjects.components.Timer;
 
 import static mapobjects.traits.GridObject.TILE_SIDE;
 
-public abstract class Buff extends Equippable implements OnEffector, Timed {
+public abstract class Buff extends Equippable implements OnEffector, Timed, Drawable {
 
     private static final int BUFF_DURATION = 10 * 1000;
     private final boolean permanent;
+    private static final double DEFAULT_SIDE = TILE_SIDE;
 
     private final Box effectBox;
     private final Timer timer;
 
+    private final PictureDrawer drawer;
+
     public Buff(int xNum, int yNum, String name, boolean permanent) {
-        super(0, xNum * TILE_SIDE, yNum * TILE_SIDE, TILE_SIDE, TILE_SIDE, name, RARITY.RARE);
+        super(0, xNum * TILE_SIDE, yNum * TILE_SIDE, DEFAULT_SIDE, DEFAULT_SIDE, name, RARITY.RARE);
         this.permanent = permanent;
 
         effectBox = positionBox.clone();
@@ -24,6 +28,7 @@ public abstract class Buff extends Equippable implements OnEffector, Timed {
         if (permanent) timer = null;
         else timer = new Timer(BUFF_DURATION, 0);
 
+        drawer = new PictureDrawer(positionBox, getDirectory1(), name);
     }
 
     public Buff(int xNum, int yNum, String name) {
@@ -53,14 +58,30 @@ public abstract class Buff extends Equippable implements OnEffector, Timed {
     @Override
     public void timeIsUp(Player player) {} // unused
 
+    @Override
+    public PictureDrawer getDrawer() {
+        return drawer;
+    }
 
     @Override
     public void draw() {
+        // TODO: REMOVE
+    }
+
+    @Override
+    public void draw1() {
         if (expired) {
-            super.draw();
+            drawer.draw1();
         } else {
-            drawAnimated();
+            drawer.drawAnimated1();
         }
+    }
+
+    @Override
+    public void expire() {
+        super.expire();
+        setWidth(DEFAULT_SIDE);
+        setHeight(DEFAULT_SIDE);
     }
 
     @Override

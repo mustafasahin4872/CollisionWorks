@@ -91,51 +91,6 @@ public abstract class MapObject {
         StdDraw.picture(getX(), getY(), imageFileName, getWidth(), getHeight());
     }
 
-    public void drawBig(double multiplier) {
-        double width = getWidth();
-        double height = getHeight();
-        resize(multiplier);
-        draw();
-        setWidth(width);
-        setHeight(height);
-    }
-
-    public void drawBigAt(double x, double y, double scale) {
-        double oldX = getX();
-        double oldY = getY();
-
-        setX(x);
-        setY(y);
-
-        drawBig(scale);
-
-        setX(oldX);
-        setY(oldY);
-    }
-
-    /// All animated draws use the same current time and start time, so they are synced.
-    /// Draws shrinking - enlarging animations using current time.
-    public void drawAnimated() {
-        double maxDiff = 0.1; // between 0 and 1 always!
-        double period = 3000; // in milliseconds
-
-        double ratio = ((System.currentTimeMillis() - Main.GAME_START) % period) / period;
-        double multiplier;
-        if (ratio > 0.5) {
-            multiplier = 1 + maxDiff - 2 * maxDiff * ((ratio - 0.5) / 0.5);
-        } else {
-            multiplier = 1 - maxDiff + 2 * maxDiff * (ratio / 0.5);
-        }
-        // round to the second decimal, otherwise StdDraw goes insane (the image vibrated)
-        multiplier = Math.round(multiplier * 100) / 100.0;
-
-        double width = getWidth();
-        double height = getHeight();
-        resize(multiplier);
-        StdDraw.picture(getX(), getY(), imageFileName, getWidth(), getHeight());
-        setWidth(width);
-        setHeight(height);
-    }
 
     public void expire() {
         expired = true;

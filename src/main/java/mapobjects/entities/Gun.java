@@ -1,10 +1,8 @@
 package mapobjects.entities;
 
+import helpers.utils.Drawer.PictureDrawer;
 import mapobjects.factories.Blueprint;
-import mapobjects.traits.Equippable;
-import mapobjects.traits.Generator;
-import mapobjects.traits.HealthBearer;
-import mapobjects.traits.MapObject;
+import mapobjects.traits.*;
 import mapobjects.components.Spawner;
 import mapobjects.components.Timer;
 import java.util.HashSet;
@@ -16,7 +14,7 @@ import static mapobjects.traits.GridObject.TILE_SIDE;
 import mapobjects.factories.ProjectileBlueprint;
 import static mapobjects.entities.Projectile.ProjectileType;
 
-public abstract class Gun extends Equippable implements Generator {
+public abstract class Gun extends Equippable implements Generator, Drawable {
 
     private static final int MAX_LEVEL = 5;
     private static final int UPGRADABLE_NUM = 3;
@@ -43,6 +41,8 @@ public abstract class Gun extends Equippable implements Generator {
     protected final Set<Projectile> projectiles = new HashSet<>();
     protected Set<HealthBearer> targets;
 
+    private final PictureDrawer drawer;
+
     protected Gun(ProjectileType projectileType, int maxAmmo, int reloadTime, int unloadTime, RARITY rarity) {
         super(0, 0, 0, TILE_SIDE, TILE_SIDE, rarity);
         setName(getClass().getName().split("\\$")[1].toLowerCase(Locale.ROOT));
@@ -59,6 +59,7 @@ public abstract class Gun extends Equippable implements Generator {
         unloadTimer = new Timer(0, unloadTime);
 
         spawner = new Spawner(worldIndex);
+        drawer = new PictureDrawer(positionBox, getDirectory1(), getClass().getName().split("\\$")[1].toLowerCase(Locale.ROOT));
     }
 
     public void setTargets(Set<HealthBearer> targets) {
@@ -184,6 +185,16 @@ public abstract class Gun extends Equippable implements Generator {
         projectileBlueprint.setSpeed(projectileType.getSpeed() * (1 + buff));
     }
 
+
+    @Override
+    public PictureDrawer getDrawer() {
+        return drawer;
+    }
+
+    @Override
+    public void draw() {
+        // TODO: REMOVE
+    }
 
     /// The default weapon
     /// Upgrades Types: reload speed, damage, ammo

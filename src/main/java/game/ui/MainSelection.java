@@ -173,7 +173,7 @@ public class MainSelection {
             leftDrawer.draw1();
             rightDrawer.draw1();
 
-            currentSkin.drawBigAt(BOX.getCenterX(), BOX.getCenterY(), DRAW_BIG_MULTIPLIER);
+            currentSkin.drawBigAt1(BOX.getCenterX(), BOX.getCenterY(), DRAW_BIG_MULTIPLIER);
 
         }
 
@@ -270,12 +270,10 @@ public class MainSelection {
 
         private void draw() {
 
-            Color black = StdDraw.BLACK;
-
             if (!statsButton.isPressed()) {
                 boxDrawer.setBoxColor(BOX_COLOR);
                 boxDrawer.draw1();
-                getCurrentGun().drawBigAt(BOX.getCenterX(), BOX.getCenterY(), DRAW_BIG_MULTIPLIER);
+                getCurrentGun().drawBigAt1(BOX.getCenterX(), BOX.getCenterY(), DRAW_BIG_MULTIPLIER);
 
                 statsButtonDrawer.setBoxColor(STATS_COLOR);
                 statsButtonDrawer.setText(STATS_SYMBOL);

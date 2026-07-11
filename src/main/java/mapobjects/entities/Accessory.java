@@ -1,8 +1,7 @@
 package mapobjects.entities;
+import helpers.utils.Drawer.PictureDrawer;
+import mapobjects.traits.Drawable;
 import mapobjects.traits.Equippable;
-import mapobjects.traits.MapObject;
-
-import java.awt.*;
 
 import static helpers.methods.HelperMethods.getDirectionString;
 import static mapobjects.traits.GridObject.TILE_SIDE;
@@ -11,12 +10,13 @@ import static mapobjects.traits.GridObject.TILE_SIDE;
 /// therefore, we created many subclasses, each having their unique setCoordinates() function
 /// also, each accessory has 9 images, and their names change depending on the player's direction.
 /// there are 3 main accessory interfaces: Hat, Necklace and Pin. these interfaces categorize the different subclasses.
-public abstract class Accessory extends Equippable {
+public abstract class Accessory extends Equippable implements Drawable {
 
     protected Player player;
     private final String accessoryName;
     private final double defaultWidth, defaultHeight;
     private boolean alone;
+    private final PictureDrawer drawer;
 
     public Accessory(String accessoryName, double defaultWidth, double defaultHeight, RARITY rarity) {
         super(0, 0, 0, defaultWidth, defaultHeight, accessoryName+"/0", rarity);
@@ -24,6 +24,7 @@ public abstract class Accessory extends Equippable {
         this.accessoryName = accessoryName;
         this.defaultWidth = defaultWidth;
         this.defaultHeight = defaultHeight;
+        this.drawer = new PictureDrawer(positionBox, getDirectory1(), accessoryName+"/0");
         update();
     }
 
@@ -35,8 +36,9 @@ public abstract class Accessory extends Equippable {
         this.player = player;
     }
 
-    public String getAccessoryName() {
-        return accessoryName;
+    @Override
+    public PictureDrawer getDrawer() {
+        return drawer;
     }
 
     public void resetSize() {
@@ -62,23 +64,23 @@ public abstract class Accessory extends Equippable {
 
     private void changeName() {
         String direction = getDirectionString(player.getXDirection(), player.getYDirection());
-        setName(accessoryName + "/" + direction);
+        drawer.setName(accessoryName + "/" + direction);
     }
 
     @Override
-    public void drawBig(double multiplier) {
+    public void drawBig1(double multiplier) {
         resize(multiplier);
         player.resize(multiplier);
         if (!alone) update();
-        draw();
+        draw1();
         resetSize();
         player.resetSize();
     }
 
     @Override
-    public void drawBigAt(double x, double y, double multiplier) {
+    public void drawBigAt1(double x, double y, double multiplier) {
         if (alone) {
-            super.drawBigAt(x, y, multiplier);
+            super.drawBigAt1(x, y, multiplier);
         } else { // still, draw ONLY ACCESSORY, update it accordingly.
             double oldX = getX();
             double oldY = getY();
@@ -90,7 +92,7 @@ public abstract class Accessory extends Equippable {
             player.resize(multiplier);
             update();
 
-            draw();
+            draw1();
 
             resetSize();
             player.resetSize();
@@ -103,6 +105,7 @@ public abstract class Accessory extends Equippable {
         }
     }
 
+    // TODO: ADD STATS TO EACH ACCESSORY TYPE
     @Override
     public String[] getStats() {
         return new String[]{};

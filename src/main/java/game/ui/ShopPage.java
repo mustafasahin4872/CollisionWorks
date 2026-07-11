@@ -11,6 +11,7 @@ import helpers.utils.Index;
 import helpers.utils.TextDisplay;
 import helpers.utils.UIButton;
 import lib.StdDraw;
+import mapobjects.traits.Drawable;
 import mapobjects.traits.Equippable;
 import mapobjects.components.Box;
 import helpers.utils.Drawer.OutlinedBoxDrawer;
@@ -384,8 +385,7 @@ public class ShopPage {
         private void draw() {
 
             ShopEntry shopEntry = getCurrentShopEntry();
-            if (shopEntry == null)
-                return;
+            if (shopEntry == null) return;
             boolean sold = shopEntry.isSold();
             boolean positive = gameState.canAfford(shopEntry) || sold;
             Color buyColor = (positive) ? CAN_BUY_COLOR : CANT_BUY_COLOR;
@@ -429,7 +429,7 @@ public class ShopPage {
                 statsDrawer.setBoxColor(STATS_COLOR);
                 statsDrawer.setText(STATS_SYMBOL);
                 statsDrawer.draw1();
-                shopEntry.getItem().drawBig(DRAW_BIG_MULTIPLIER);
+                shopEntry.getItem().drawBig1(DRAW_BIG_MULTIPLIER);
             }
 
             priceDrawer.setBoxColor(buyColor);
@@ -575,11 +575,11 @@ public class ShopPage {
                 accessory.setAlone(false);
                 Player player = gameState.getPlayer();
                 accessory.setPlayer(player);
-                player.drawBigAt(BOUGHT_BOX.getCenterX(), BOUGHT_BOX.getCenterY(), DRAW_BIG_MULTIPLIER);
-                accessory.drawBigAt(BOUGHT_BOX.getCenterX(), BOUGHT_BOX.getCenterY(), DRAW_BIG_MULTIPLIER);
+                player.drawBigAt1(BOUGHT_BOX.getCenterX(), BOUGHT_BOX.getCenterY(), DRAW_BIG_MULTIPLIER);
+                accessory.drawBigAt1(BOUGHT_BOX.getCenterX(), BOUGHT_BOX.getCenterY(), DRAW_BIG_MULTIPLIER);
                 accessory.setAlone(true);
             } else {
-                item.drawBigAt(BOUGHT_BOX.getCenterX(), BOUGHT_BOX.getCenterY(), DRAW_BIG_MULTIPLIER);
+                item.drawBigAt1(BOUGHT_BOX.getCenterX(), BOUGHT_BOX.getCenterY(), DRAW_BIG_MULTIPLIER);
             }
 
         }

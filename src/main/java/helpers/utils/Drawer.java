@@ -1,10 +1,12 @@
 package helpers.utils;
 
+import game.core.Main;
 import lib.StdDraw;
 import mapobjects.components.Box;
 
 import java.awt.*;
 
+import static game.core.Main.IMAGES_ROOT;
 import static helpers.methods.TextMethods.*;
 
 public abstract class Drawer {
@@ -15,8 +17,28 @@ public abstract class Drawer {
         this.box = box;
     }
 
-    public void updatePosition(double x, double y) {
-        box.setCenterCoordinates(x, y);
+    public double getX() {
+        return box.getCenterX();
+    }
+
+    public double getY() {
+        return box.getCenterY();
+    }
+
+    public void setX(double x) {
+        box.setCenterX(x);
+    }
+
+    public void setY(double y) {
+        box.setCenterY(y);
+    }
+
+    public double getWidth() {
+        return box.getWidth();
+    }
+
+    public double getHeight() {
+        return box.getHeight();
     }
 
     public void setWidth(double width) {
@@ -27,7 +49,36 @@ public abstract class Drawer {
         box.setHeight(height);
     }
 
+    public void resize(double multiplier) {
+        setWidth(getWidth()*multiplier);
+        setHeight(getHeight()*multiplier);
+    }
+
     public abstract void draw1();
+
+    /// All animated draws use the same current time and start time, so they are synced.
+    /// Draws shrinking - enlarging animations using current time.
+    public void drawAnimated1() {
+        double maxDiff = 0.1; // between 0 and 1 always!
+        double period = 3000; // in milliseconds
+
+        double ratio = ((System.currentTimeMillis() - Main.GAME_START) % period) / period;
+        double multiplier;
+        if (ratio > 0.5) {
+            multiplier = 1 + maxDiff - 2 * maxDiff * ((ratio - 0.5) / 0.5);
+        } else {
+            multiplier = 1 - maxDiff + 2 * maxDiff * (ratio / 0.5);
+        }
+        // round to the second decimal, otherwise StdDraw goes insane (the image vibrated)
+        multiplier = Math.round(multiplier * 100) / 100.0;
+
+        double width = getWidth();
+        double height = getHeight();
+        resize(multiplier);
+        draw1();
+        setWidth(width);
+        setHeight(height);
+    }
 
     public enum THICKNESS {
         THIN(0.01),
@@ -99,7 +150,7 @@ public abstract class Drawer {
         private void leftAlign() {
             double textWidth = getTextWidth(text, font);
             double newX = box.getCenterX() - box.getWidth()/2 + textWidth/2;
-            updatePosition(newX, box.getCenterY());
+            setX(newX);
             setWidth(textWidth);
         }
 
@@ -266,15 +317,36 @@ public abstract class Drawer {
 
     public static class PictureDrawer extends Drawer {
 
+        public enum FILE_TYPE {png, jpg}
+
+        private final String directory;
+        private final FILE_TYPE fileType;
+        private String name;
         private String fileName;
 
-        public PictureDrawer(Box box, String fileName) {
+        public PictureDrawer(Box box, String directory, String name, FILE_TYPE fileType) {
             super(box);
-            this.fileName = fileName;
+            this.directory = directory;
+            this.fileType = fileType;
+            setName(name);
         }
 
-        public void setFileName(String fileName) {
-            this.fileName = fileName;
+        public PictureDrawer(Box box, String directory, String name) {
+            this(box, directory, name, FILE_TYPE.png);
+        }
+
+        public PictureDrawer(Box box, String directory, FILE_TYPE fileType) {
+            this(box, directory, "0", fileType);
+        }
+
+        public PictureDrawer(Box box, String directory) {
+            this(box, directory, "0", FILE_TYPE.png);
+        }
+
+        public void setName(String name) {
+            this.name = name;
+            fileName = IMAGES_ROOT + directory + name + "." + fileType.name();
+
         }
 
         @Override

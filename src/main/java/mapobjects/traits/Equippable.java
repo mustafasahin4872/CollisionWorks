@@ -5,7 +5,7 @@ import game.core.Main;
 import java.awt.*;
 import java.io.*;
 
-public abstract class Equippable extends MapObject {
+public abstract class Equippable extends MapObject implements Drawable {
 
     public enum RARITY {
         RARE(new Color(111, 217, 110)),
