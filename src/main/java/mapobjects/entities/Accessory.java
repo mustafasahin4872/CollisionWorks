@@ -1,9 +1,9 @@
 package mapobjects.entities;
-import helpers.utils.Drawer.PictureDrawer;
+import game.io.Drawer.PictureDrawer;
 import mapobjects.traits.Drawable;
 import mapobjects.traits.Equippable;
 
-import static helpers.methods.HelperMethods.getDirectionString;
+import static helpers.HelperMethods.getDirectionString;
 import static mapobjects.traits.GridObject.TILE_SIDE;
 
 /// different accessories are placed on different locations on player.

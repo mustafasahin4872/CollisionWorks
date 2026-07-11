@@ -1,6 +1,6 @@
 package mapobjects.entities;
 
-import helpers.utils.Drawer.PictureDrawer;
+import game.io.Drawer.PictureDrawer;
 import mapobjects.components.Box;
 import mapobjects.traits.*;
 

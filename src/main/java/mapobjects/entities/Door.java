@@ -5,7 +5,7 @@ import java.util.Arrays;
 
 import game.io.Frame;
 import mapobjects.components.Box;
-import helpers.utils.Drawer;
+import game.io.Drawer;
 import mapobjects.traits.Collidable;
 import mapobjects.traits.Drawable;
 import mapobjects.traits.GridObject;

@@ -3,7 +3,7 @@ package mapobjects.traits;
 import mapobjects.entities.Player;
 import mapobjects.components.Box;
 
-import static helpers.methods.CollisionMethods.*;
+import static helpers.CollisionMethods.*;
 
 //casts custom effects to Player objects
 public interface OnEffector {

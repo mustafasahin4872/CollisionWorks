@@ -3,7 +3,7 @@ package mapobjects.entities;
 import game.core.GameState;
 import game.core.GameState.STATE;
 import game.core.Main;
-import helpers.utils.Drawer.PictureDrawer;
+import game.io.Drawer.PictureDrawer;
 import mapobjects.components.Box;
 import mapobjects.traits.Drawable;
 import mapobjects.traits.OnEffector;

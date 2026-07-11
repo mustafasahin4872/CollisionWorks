@@ -1,6 +1,6 @@
 package mapobjects.traits;
 
-import helpers.utils.Drawer;
+import game.io.Drawer;
 
 public interface Drawable {
 

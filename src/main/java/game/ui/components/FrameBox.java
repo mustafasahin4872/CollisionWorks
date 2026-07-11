@@ -1,4 +1,4 @@
-package helpers.utils;
+package game.ui.components;
 
 import game.io.Frame;
 import mapobjects.components.Box;

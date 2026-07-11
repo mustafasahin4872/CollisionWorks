@@ -5,14 +5,14 @@ import game.core.GameState;
 import game.io.InputHandler.ArrowData;
 import game.core.Main;
 
-import helpers.utils.Drawer.PictureDrawer;
+import game.io.Drawer.PictureDrawer;
 import mapobjects.data.PlayerDefaults;
 import mapobjects.components.*;
 import mapobjects.traits.*;
 
 import java.util.Set;
 
-import static helpers.methods.HelperMethods.*;
+import static helpers.HelperMethods.*;
 import static mapobjects.traits.GridObject.TILE_SIDE;
 
 public class Player extends Equippable implements MovingCollidable, HealthBearer {

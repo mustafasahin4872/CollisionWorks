@@ -1,6 +1,6 @@
 package mapobjects.entities;
 
-import helpers.utils.Drawer.PictureDrawer;
+import game.io.Drawer.PictureDrawer;
 import mapobjects.factories.Blueprint;
 import mapobjects.traits.*;
 import mapobjects.components.Spawner;

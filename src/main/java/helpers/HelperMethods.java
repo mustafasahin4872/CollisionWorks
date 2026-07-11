@@ -1,4 +1,4 @@
-package helpers.methods;
+package helpers;
 
 import mapobjects.traits.GridObject;
 

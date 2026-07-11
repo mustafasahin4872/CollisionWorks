@@ -2,7 +2,7 @@ package mapobjects.traits;
 
 import mapobjects.components.Box;
 
-import static helpers.methods.CollisionMethods.intersects;
+import static helpers.CollisionMethods.intersects;
 
 public interface Collidable {
 

@@ -1,6 +1,6 @@
 package mapobjects.data;
 
-import helpers.utils.Drawer.PictureDrawer.FILE_TYPE;
+import game.io.Drawer.PictureDrawer.FILE_TYPE;
 import mapobjects.traits.Equippable.RARITY;
 
 public enum PlayerDefaults {

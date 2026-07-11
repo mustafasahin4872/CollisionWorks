@@ -1,7 +1,7 @@
 package mapobjects.entities;
 
-import helpers.methods.TextMethods;
-import helpers.utils.Drawer.PictureDrawer;
+import helpers.TextMethods;
+import game.io.Drawer.PictureDrawer;
 import mapobjects.traits.*;
 import mapobjects.components.Box;
 import mapobjects.components.Timer;

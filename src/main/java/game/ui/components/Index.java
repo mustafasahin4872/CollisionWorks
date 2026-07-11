@@ -1,4 +1,4 @@
-package helpers.utils;
+package game.ui.components;
 
 public class Index {
 

@@ -1,7 +1,7 @@
 package mapobjects.entities;
 
 import game.io.Frame;
-import helpers.utils.Drawer.PictureDrawer;
+import game.io.Drawer.PictureDrawer;
 import mapobjects.traits.*;
 import mapobjects.components.Box;
 import mapobjects.components.Damager;
@@ -9,7 +9,7 @@ import mapobjects.components.Timer;
 
 import java.util.Set;
 
-import static helpers.methods.HelperMethods.*;
+import static helpers.HelperMethods.*;
 
 
 //passable ticking damager, moves

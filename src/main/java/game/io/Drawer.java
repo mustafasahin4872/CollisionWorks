@@ -1,4 +1,4 @@
-package helpers.utils;
+package game.io;
 
 import game.core.Main;
 import lib.StdDraw;
@@ -7,7 +7,7 @@ import mapobjects.components.Box;
 import java.awt.*;
 
 import static game.core.Main.IMAGES_ROOT;
-import static helpers.methods.TextMethods.*;
+import static helpers.TextMethods.*;
 
 public abstract class Drawer {
 

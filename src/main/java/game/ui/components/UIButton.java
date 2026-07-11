@@ -1,4 +1,4 @@
-package helpers.utils;
+package game.ui.components;
 
 import game.core.GameState;
 import mapobjects.components.Box;
@@ -8,7 +8,7 @@ import mapobjects.components.Timer;
 import java.util.HashSet;
 import java.util.Set;
 
-import static helpers.methods.CollisionMethods.isIn;
+import static helpers.CollisionMethods.isIn;
 
 public abstract class UIButton {
 

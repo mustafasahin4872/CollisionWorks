@@ -1,4 +1,4 @@
-package helpers.methods;
+package helpers;
 
 import mapobjects.data.PlayerDefaults;
 import mapobjects.entities.Ghost;
@@ -18,7 +18,7 @@ import mapobjects.entities.Ghost.ghostTypes;
 
 import static game.core.Main.IMAGES_ROOT;
 import static game.core.Main.RESOURCES_ROOT;
-import static helpers.methods.HelperMethods.getDirectionString;
+import static helpers.HelperMethods.getDirectionString;
 
 // uses a framework txt file to create a png
 // use once to create the files, not used as long as the created files are still intact

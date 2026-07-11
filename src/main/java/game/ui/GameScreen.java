@@ -3,21 +3,20 @@ package game.ui;
 import game.core.GameState;
 import game.io.InputHandler.MouseData;
 import game.core.GameState.STATE;
-import helpers.utils.FrameBox;
+import game.ui.components.FrameBox;
 import mapobjects.components.Box;
-import helpers.utils.Drawer.BoxDrawer;
-import helpers.utils.Drawer.TextDrawer;
-import helpers.utils.Drawer.ClassicButtonDrawer;
-import helpers.utils.Drawer.OutlinedBoxDrawer;
-import helpers.utils.Drawer.PictureDrawer;
+import game.io.Drawer.BoxDrawer;
+import game.io.Drawer.TextDrawer;
+import game.io.Drawer.ClassicButtonDrawer;
+import game.io.Drawer.OutlinedBoxDrawer;
+import game.io.Drawer.PictureDrawer;
 import mapobjects.components.HPBar;
 import mapobjects.entities.Player;
 
 import java.awt.*;
 
-import static game.core.Main.IMAGES_ROOT;
-import static helpers.methods.CollisionMethods.isIn;
-import static helpers.utils.FrameBox.*;
+import static helpers.CollisionMethods.isIn;
+import static game.ui.components.FrameBox.*;
 
 // the drawing and input handling of buttons and stats on in-game screen
 public class GameScreen {

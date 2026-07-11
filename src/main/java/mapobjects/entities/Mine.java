@@ -1,7 +1,7 @@
 package mapobjects.entities;
 
-import helpers.utils.Drawer.CircleDrawer;
-import helpers.utils.Drawer.FilledCircleDrawer;
+import game.io.Drawer.CircleDrawer;
+import game.io.Drawer.FilledCircleDrawer;
 import mapobjects.components.Box;
 import mapobjects.components.Damager;
 import mapobjects.components.Timer;

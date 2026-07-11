@@ -1,6 +1,5 @@
 package game.io;
 
-import helpers.utils.Direction;
 import lib.StdDraw;
 
 import java.awt.event.KeyEvent;
@@ -92,6 +91,10 @@ public class InputHandler {
                 mouseY = StdDraw.mouseY();
 
         }
+    }
+
+    public enum Direction {
+        RIGHT, LEFT, UP, DOWN, ZERO
     }
 
 }

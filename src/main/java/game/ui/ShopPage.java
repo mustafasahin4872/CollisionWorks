@@ -6,34 +6,34 @@ import game.core.GameState;
 import game.core.MapMaker;
 import game.data.ShopEntry;
 import game.io.InputHandler;
-import helpers.utils.FrameBox;
-import helpers.utils.Index;
-import helpers.utils.TextDisplay;
-import helpers.utils.UIButton;
+import game.ui.components.FrameBox;
+import game.ui.components.Index;
+import game.ui.components.TextDisplay;
+import game.ui.components.UIButton;
 import mapobjects.traits.Equippable;
 import mapobjects.components.Box;
-import helpers.utils.Drawer.OutlinedBoxDrawer;
-import helpers.utils.Drawer.ClassicButtonDrawer;
-import helpers.utils.Drawer.TextDrawer;
-import helpers.utils.Drawer.THICKNESS;
+import game.io.Drawer.OutlinedBoxDrawer;
+import game.io.Drawer.ClassicButtonDrawer;
+import game.io.Drawer.TextDrawer;
+import game.io.Drawer.THICKNESS;
 import mapobjects.entities.Accessory;
 import mapobjects.entities.Buff;
 import mapobjects.entities.Gun;
 import mapobjects.entities.Player;
-import helpers.utils.UIButton.*;
-import helpers.utils.Drawer.PictureDrawer;
+import game.ui.components.UIButton.*;
+import game.io.Drawer.PictureDrawer;
 
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import static helpers.methods.CollisionMethods.isIn;
-import static helpers.methods.TextMethods.*;
-import static helpers.utils.FrameBox.*;
+import static helpers.CollisionMethods.isIn;
+import static helpers.TextMethods.*;
+import static game.ui.components.FrameBox.*;
 import static mapobjects.traits.GridObject.TILE_SIDE;
 import static game.io.InputHandler.*;
 import static game.core.GameState.STATE;
-import static helpers.methods.TextMethods.capitalize;
+import static helpers.TextMethods.capitalize;
 
 // The shop screen in selection phase
 // Displays 3(hardcoded) different item types to buy

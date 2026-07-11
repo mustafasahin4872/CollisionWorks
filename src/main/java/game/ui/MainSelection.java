@@ -4,24 +4,24 @@ import game.io.Frame;
 import game.core.GameMap;
 import game.core.GameState;
 import game.core.MapMaker;
-import helpers.utils.FrameBox;
+import game.ui.components.FrameBox;
 import game.io.InputHandler;
 import game.io.InputHandler.MouseData;
 import game.io.InputHandler.ArrowData;
 import game.core.GameState.STATE;
-import helpers.utils.Index;
-import helpers.utils.TextDisplay;
-import helpers.utils.UIButton;
-import helpers.utils.UIButton.StateButton;
+import game.ui.components.Index;
+import game.ui.components.TextDisplay;
+import game.ui.components.UIButton;
+import game.ui.components.UIButton.StateButton;
 import mapobjects.components.Box;
-import helpers.utils.Drawer.THICKNESS;
-import helpers.utils.Drawer.TextDrawer;
-import helpers.utils.Drawer.OutlinedBoxDrawer;
-import helpers.utils.Drawer.ClassicButtonDrawer;
-import helpers.utils.Drawer.OutlineDrawer;
+import game.io.Drawer.THICKNESS;
+import game.io.Drawer.TextDrawer;
+import game.io.Drawer.OutlinedBoxDrawer;
+import game.io.Drawer.ClassicButtonDrawer;
+import game.io.Drawer.OutlineDrawer;
 import mapobjects.entities.Gun;
 import mapobjects.entities.Player;
-import helpers.utils.UIButton.*;
+import game.ui.components.UIButton.*;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -29,7 +29,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static helpers.methods.TextMethods.*;
+import static helpers.TextMethods.*;
 import static mapobjects.traits.GridObject.TILE_SIDE;
 
 // governs skin selection, accessory selection, gun selection and moving to level selection - shop

@@ -1,13 +1,13 @@
-package helpers.utils;
+package game.ui.components;
 
 import mapobjects.components.Box;
-import helpers.utils.Drawer.TextDrawer;
+import game.io.Drawer.TextDrawer;
 
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import static helpers.methods.TextMethods.*;
+import static helpers.TextMethods.*;
 
 /// displays lines of texts, either left or center aligned to the box
 /// two ways to use:

@@ -1,7 +1,7 @@
 package mapobjects.entities;
 
 import game.io.Frame;
-import helpers.utils.Drawer.PictureDrawer;
+import game.io.Drawer.PictureDrawer;
 import mapobjects.factories.Blueprint;
 import mapobjects.components.*;
 import mapobjects.traits.*;
@@ -10,7 +10,7 @@ import mapobjects.components.Spawner;
 import java.util.HashSet;
 import java.util.Set;
 
-import static helpers.methods.HelperMethods.outOfMapBounds;
+import static helpers.HelperMethods.outOfMapBounds;
 import mapobjects.entities.Projectile.ProjectileType;
 import mapobjects.factories.ProjectileBlueprint;
 

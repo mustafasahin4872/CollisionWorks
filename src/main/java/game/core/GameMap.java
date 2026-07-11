@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
-import static helpers.methods.CollisionMethods.isIn;
+import static helpers.CollisionMethods.isIn;
 
 public class GameMap {
 

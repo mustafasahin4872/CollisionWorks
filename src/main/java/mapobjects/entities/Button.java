@@ -1,8 +1,8 @@
 package mapobjects.entities;
 
 import mapobjects.components.Box;
-import helpers.utils.Drawer;
-import helpers.utils.Drawer.OutlinedBoxDrawer;
+import game.io.Drawer;
+import game.io.Drawer.OutlinedBoxDrawer;
 import mapobjects.traits.Drawable;
 import mapobjects.traits.OnEffector;
 import mapobjects.traits.GridObject;

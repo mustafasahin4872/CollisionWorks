@@ -1,7 +1,7 @@
 package mapobjects.entities;
 
 import game.io.Frame;
-import helpers.utils.Drawer.PictureDrawer;
+import game.io.Drawer.PictureDrawer;
 import mapobjects.components.Box;
 import mapobjects.components.Damager;
 import mapobjects.components.Direction;

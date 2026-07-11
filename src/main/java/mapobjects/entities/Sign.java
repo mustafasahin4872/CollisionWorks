@@ -1,16 +1,16 @@
 package mapobjects.entities;
 
-import helpers.utils.Drawer.PictureDrawer;
-import helpers.utils.TextDisplay;
+import game.io.Drawer.PictureDrawer;
+import game.ui.components.TextDisplay;
 import java.awt.*;
 import game.io.Frame;
 import mapobjects.components.Box;
-import helpers.utils.Drawer.OutlinedBoxDrawer;
+import game.io.Drawer.OutlinedBoxDrawer;
 import mapobjects.traits.Drawable;
 import mapobjects.traits.GridObject;
 import mapobjects.traits.OnEffector;
 
-import static helpers.methods.TextMethods.*;
+import static helpers.TextMethods.*;
 
 public class Sign extends GridObject implements OnEffector, Drawable {
 

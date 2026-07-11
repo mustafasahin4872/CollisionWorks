@@ -5,19 +5,19 @@ import game.core.GameMap;
 import game.core.GameState;
 import game.core.MapMaker;
 import game.io.InputHandler;
-import helpers.utils.Index;
-import helpers.utils.UIButton;
-import helpers.utils.UIButton.*;
+import game.ui.components.Index;
+import game.ui.components.UIButton;
+import game.ui.components.UIButton.*;
 import mapobjects.components.Box;
-import helpers.utils.Drawer.THICKNESS;
-import helpers.utils.Drawer.TextDrawer;
-import helpers.utils.Drawer.OutlineDrawer;
+import game.io.Drawer.THICKNESS;
+import game.io.Drawer.TextDrawer;
+import game.io.Drawer.OutlineDrawer;
 
 import java.awt.*;
 import java.util.HashSet;
 import java.util.Set;
 
-import static helpers.methods.CollisionMethods.isIn;
+import static helpers.CollisionMethods.isIn;
 import static game.io.InputHandler.MouseData;
 import static game.io.InputHandler.ArrowData;
 import static mapobjects.traits.GridObject.TILE_SIDE;
