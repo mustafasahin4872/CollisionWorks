@@ -1,5 +1,6 @@
 package mapobjects.entities;
 
+import helpers.utils.Drawer.PictureDrawer;
 import mapobjects.factories.Blueprint;
 import mapobjects.components.Spawner;
 import mapobjects.components.Box;
@@ -7,7 +8,7 @@ import mapobjects.components.HPBar;
 import mapobjects.components.Timer;
 import mapobjects.traits.*;
 
-public class Mortar extends GridObject implements Collidable, Ranged, Timed, Generator, HealthBearer {
+public class Mortar extends GridObject implements Collidable, Ranged, Timed, Generator, HealthBearer, Drawable {
 
     private final Box collisionBox;
     private final Timer timer;
@@ -24,6 +25,8 @@ public class Mortar extends GridObject implements Collidable, Ranged, Timed, Gen
     private final Mine[] mines;
     private final GridObject[][][] layers;
 
+    private PictureDrawer drawer;
+
     public Mortar(int worldIndex, int xNum, int yNum, GridObject[][][] layers) {
         this(worldIndex, xNum, yNum, layers, BASE_MINE_NUM*worldIndex);
     }
@@ -38,6 +41,7 @@ public class Mortar extends GridObject implements Collidable, Ranged, Timed, Gen
         spawner = new Spawner(this);
         HPBar = new HPBar(getWidth()*4);
         mines = new Mine[mineNum];
+        drawer = new PictureDrawer(positionBox, getDirectory1());
     }
 
     private boolean areMinesComplete() {
@@ -59,10 +63,15 @@ public class Mortar extends GridObject implements Collidable, Ranged, Timed, Gen
     }
 
     @Override
-    public void draw() {
-        super.draw();
+    public PictureDrawer getDrawer() {
+        return drawer;
+    }
+
+    @Override
+    public void draw1() {
+        drawer.draw1();
         for (Mine mine : mines) {
-            if (mine!=null) mine.draw();
+            if (mine!=null) mine.draw1();
         }
         HPBar.drawHPBar(this);
     }
@@ -94,7 +103,7 @@ public class Mortar extends GridObject implements Collidable, Ranged, Timed, Gen
     @Override
     public void ifNoLivesLeft() {
         broken = true;
-        setName("1");
+        drawer.setName("1");
     }
 
     @Override

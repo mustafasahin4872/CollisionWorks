@@ -63,7 +63,6 @@ public class Player extends Equippable implements MovingCollidable, HealthBearer
         PlayerDefaults playerDefaults = PlayerDefaults.valueOf(playerName);
 
         animated = playerDefaults.isAnimated();
-        imageType = playerDefaults.getImageType().name();
 
         baseSide = playerDefaults.getSide();
         baseMaxSpeed = playerDefaults.getMaxSpeed();
@@ -458,13 +457,13 @@ public class Player extends Equippable implements MovingCollidable, HealthBearer
     }
 
     public void drawProjectiles() {
-        for (Projectile projectile : gun.getProjectiles()) projectile.draw();
+        for (Projectile projectile : gun.getProjectiles()) projectile.draw1();
     }
 
     public void drawAccessories() {
         if (accessories != null) {
             for (Accessory accessory : accessories) {
-                if (accessory != null) accessory.draw();
+                if (accessory != null) accessory.draw1();
             }
         }
     }

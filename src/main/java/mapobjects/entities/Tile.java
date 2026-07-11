@@ -1,12 +1,15 @@
 package mapobjects.entities;
 
+import helpers.utils.Drawer.PictureDrawer;
 import mapobjects.components.Box;
 import mapobjects.traits.*;
 
-public abstract class Tile extends GridObject {
+public abstract class Tile extends GridObject implements Drawable {
 
+    private final PictureDrawer drawer;
     public Tile(int worldIndex, int xNum, int yNum) {
         super(worldIndex, xNum, yNum, worldIndex+"", "jpg");
+        drawer = new PictureDrawer(positionBox, getDirectory1(), worldIndex+"", PictureDrawer.FILE_TYPE.jpg);
     }
 
     protected void resetPlayerStats(Player player) {
@@ -15,6 +18,10 @@ public abstract class Tile extends GridObject {
         player.resetMaxSpeed();
     }
 
+    @Override
+    public PictureDrawer getDrawer() {
+        return drawer;
+    }
 
     public static abstract class ImpassableTile extends Tile implements Collidable {
 

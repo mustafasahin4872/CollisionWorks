@@ -52,7 +52,7 @@ public abstract class GridObject extends MapObject {
     }
 
     public GridObject(int worldIndex, int xNum, int yNum, double width, double height, String name, boolean cornerAligned) {
-        super(worldIndex, (xNum-0.5)*TILE_SIDE, (yNum-0.5)*TILE_SIDE, width*TILE_SIDE, height*TILE_SIDE, name);
+        super(worldIndex, (xNum-0.5)*TILE_SIDE, (yNum-0.5)*TILE_SIDE, width*TILE_SIDE, height*TILE_SIDE);
         this.xNum = xNum;
         this.yNum = yNum;
         this.cornerAligned = cornerAligned;
@@ -63,7 +63,7 @@ public abstract class GridObject extends MapObject {
     }
 
     public GridObject(int worldIndex, int xNum, int yNum, double width, double height, String name, String imageType, boolean cornerAligned) {
-        super(worldIndex, (xNum-0.5)*TILE_SIDE, (yNum-0.5)*TILE_SIDE, width*TILE_SIDE, height*TILE_SIDE, name, imageType);
+        super(worldIndex, (xNum-0.5)*TILE_SIDE, (yNum-0.5)*TILE_SIDE, width*TILE_SIDE, height*TILE_SIDE);
         this.xNum = xNum;
         this.yNum = yNum;
         this.cornerAligned = cornerAligned;

@@ -1,12 +1,14 @@
 package mapobjects.entities;
 
+import helpers.utils.Drawer.PictureDrawer;
 import mapobjects.components.Box;
+import mapobjects.traits.Drawable;
 import mapobjects.traits.OnEffector;
 import mapobjects.traits.GridObject;
 
 import static game.core.Main.gameState;
 
-public class Currency extends GridObject implements OnEffector {
+public class Currency extends GridObject implements OnEffector, Drawable {
 
     public enum CurrencyType {
         singleCoin(1, 0.6), tripleCoin(3, 0.8), coinBag(10, 1.2),
@@ -24,13 +26,14 @@ public class Currency extends GridObject implements OnEffector {
     private final Box effectBox;
     protected final int value;
     private final CurrencyType type;
+    private final PictureDrawer drawer;
 
     public Currency(int worldIndex, int xNum, int yNum, CurrencyType type) {
         super(worldIndex, xNum, yNum, type.side, type.side);
         effectBox = positionBox.clone();
         this.value = type.value;
         this.type = type;
-        setName(type.name());
+        drawer = new PictureDrawer(positionBox, getDirectory1(), type.name());
     }
 
     @Override
@@ -54,6 +57,11 @@ public class Currency extends GridObject implements OnEffector {
             case CurrencyType.singleGem, CurrencyType.tripleGem, CurrencyType.gemBag -> gameState.collectGem(value);
         }
         expire();
+    }
+
+    @Override
+    public PictureDrawer getDrawer() {
+        return drawer;
     }
 
 }

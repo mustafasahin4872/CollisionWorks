@@ -1,5 +1,6 @@
 package mapobjects.entities;
 
+import helpers.utils.Drawer.PictureDrawer;
 import helpers.utils.TextDisplay;
 import lib.StdDraw;
 
@@ -7,12 +8,13 @@ import java.awt.*;
 import game.core.Frame;
 import mapobjects.components.Box;
 import helpers.utils.Drawer.OutlinedBoxDrawer;
+import mapobjects.traits.Drawable;
 import mapobjects.traits.GridObject;
 import mapobjects.traits.OnEffector;
 
 import static helpers.methods.TextMethods.*;
 
-public class Sign extends GridObject implements OnEffector {
+public class Sign extends GridObject implements OnEffector, Drawable {
 
     private static final Font FONT = new Font("Arial", Font.PLAIN, 32);
     private static final Color COLOR = new Color(103, 2, 9);
@@ -24,6 +26,7 @@ public class Sign extends GridObject implements OnEffector {
 
     private final TextDisplay textDisplay;
     private final OutlinedBoxDrawer displayDrawer;
+    private final PictureDrawer drawer;
 
     public Sign(int worldIndex, int xNum, int yNum, String[] messages) {
         this(worldIndex, xNum, yNum, messages, true);
@@ -40,6 +43,7 @@ public class Sign extends GridObject implements OnEffector {
         textDisplay = new TextDisplay(displayBox, messages, StdDraw.BLACK, FONT);
 
         displayDrawer = new OutlinedBoxDrawer(textDisplay.getDisplayBox(), COLOR);
+        drawer = new PictureDrawer(positionBox, getDirectory1());
     }
 
 
@@ -77,10 +81,16 @@ public class Sign extends GridObject implements OnEffector {
         }
     }
 
+    // unused
     @Override
-    public void draw() {
+    public PictureDrawer getDrawer() {
+        return new PictureDrawer(new Box(0, 0, 0, 0), "");
+    }
+
+    @Override
+    public void draw1() {
         if (displaySign) {
-            super.draw();
+            drawer.draw1();
         }
         if (displayMessage) {
             displayDrawer.draw1();

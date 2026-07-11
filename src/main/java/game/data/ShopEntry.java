@@ -36,7 +36,7 @@ public class ShopEntry {
     }
 
     public String getName() {
-        return item.getName();
+        return item.getDrawer().getName();
     }
 
 }

@@ -1,19 +1,18 @@
 package mapobjects.entities;
 
 import game.core.Frame;
+import helpers.utils.Drawer.PictureDrawer;
 import lib.StdDraw;
 import mapobjects.components.Box;
 import mapobjects.components.Damager;
 import mapobjects.components.Direction;
 import mapobjects.traits.*;
-
-import java.util.Locale;
 import java.util.Set;
 
 import static mapobjects.traits.GridObject.TILE_SIDE;
 
 //projectiles are not grid objects, they are bullets that crash to collidables and pass through water and other tiles
-public class Projectile extends MapObject implements MovingCollidable, Damaging {
+public class Projectile extends MapObject implements MovingCollidable, Damaging, Drawable {
 
     public enum ProjectileType {
         REGULAR(DEFAULT_WIDTH, DEFAULT_HEIGHT, DEFAULT_SPEED, DEFAULT_DAMAGE, 7, false, 0, 0),
@@ -96,10 +95,11 @@ public class Projectile extends MapObject implements MovingCollidable, Damaging 
     public static final double DEFAULT_HEIGHT = 20;
     public static final double DEFAULT_DAMAGE = 20;
 
+    private final PictureDrawer drawer;
+
     /// accept direction in degrees
     public Projectile(int worldIndex, double x, double y, double width, double height, String name, double direction, double range, double damage, double speed, double inertia, double bounceFactor, boolean piercing) {
         super(worldIndex, x, y, width, height);
-        setName(name);
         this.direction = new Direction(direction);
         this.speed = speed;
         this.range = range;
@@ -109,6 +109,8 @@ public class Projectile extends MapObject implements MovingCollidable, Damaging 
 
         collisionBox = new Box(x, y, width, height);
         damager = new Damager(damage);
+
+        drawer = new PictureDrawer(positionBox, getDirectory1(), name);
 
     }
 
@@ -219,9 +221,16 @@ public class Projectile extends MapObject implements MovingCollidable, Damaging 
         return targets;
     }
 
+    // unused
     @Override
-    public void draw() {
-        StdDraw.picture(getX(), getY(), imageFileName, getWidth(), getHeight(), direction.getDegreeDirection());
+    public PictureDrawer getDrawer() {
+        return new PictureDrawer(new Box(0, 0, 0, 0), "");
+    }
+
+    @Override
+    public void draw1() {
+        drawer.setDegrees(direction.getDegreeDirection());
+        drawer.draw1();
     }
 
 }

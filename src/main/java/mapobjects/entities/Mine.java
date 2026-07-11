@@ -1,6 +1,7 @@
 package mapobjects.entities;
 
-import lib.StdDraw;
+import helpers.utils.Drawer.CircleDrawer;
+import helpers.utils.Drawer.FilledCircleDrawer;
 import mapobjects.components.Box;
 import mapobjects.components.Damager;
 import mapobjects.components.Timer;
@@ -9,7 +10,7 @@ import mapobjects.traits.*;
 import java.awt.*;
 import java.util.Set;
 
-public class Mine extends GridObject implements OnEffector, Ranged, Timed, Damaging {
+public class Mine extends GridObject implements OnEffector, Ranged, Timed, Damaging, Drawable {
 
     private final Box rangeBox;
     private final Box effectBox;
@@ -21,12 +22,19 @@ public class Mine extends GridObject implements OnEffector, Ranged, Timed, Damag
     private static final double DEFAULT_DAMAGE = 30;
     private static final double DEFAULT_PERIOD = 3000; //in milliseconds
 
+    private final CircleDrawer outlineDrawer;
+    private final FilledCircleDrawer drawer;
+
+    // TODO: FIX THE DUPLICATE CONSTRUCTORS AND MAKE MINE A MAPOBJECT, NOT A GRIDOBJECT
     public Mine(int worldIndex, int xNum, int yNum) {
         super(worldIndex, xNum, yNum);
         rangeBox = new Box(getCenterCoordinates(), RANGE*TILE_SIDE, RANGE*TILE_SIDE);
         effectBox = positionBox.clone();
         timer = new Timer(DEFAULT_PERIOD / worldIndex, -1);
         damager = new Damager(worldIndex* DEFAULT_DAMAGE);
+
+        outlineDrawer = new CircleDrawer(positionBox, HALF_SIDE, new Color(255, 150, 30, 200));
+        drawer = new FilledCircleDrawer(positionBox, 0, new Color(255, 0, 0, 100));
     }
 
     //non grid mine, cannot initialize in mapmaker
@@ -38,6 +46,9 @@ public class Mine extends GridObject implements OnEffector, Ranged, Timed, Damag
         effectBox = positionBox.clone();
         timer = new Timer(DEFAULT_PERIOD / worldIndex, -1);
         damager = new Damager(worldIndex* DEFAULT_DAMAGE);
+
+        outlineDrawer = new CircleDrawer(positionBox, HALF_SIDE, new Color(255, 150, 30, 200));
+        drawer = new FilledCircleDrawer(positionBox, 0, new Color(255, 0, 0, 100));
     }
 
     @Override
@@ -63,6 +74,12 @@ public class Mine extends GridObject implements OnEffector, Ranged, Timed, Damag
     @Override
     public Set<HealthBearer> getTargets() {
         return targets;
+    }
+
+    // unused
+    @Override
+    public FilledCircleDrawer getDrawer() {
+        return new FilledCircleDrawer(new Box(0, 0, 0, 0), 0, new Color(0, 0, 0));
     }
 
     @Override
@@ -103,15 +120,12 @@ public class Mine extends GridObject implements OnEffector, Ranged, Timed, Damag
     }
 
     @Override
-    public void draw() {
+    public void draw1() {
         if (!timer.isActive()) return;
-        StdDraw.setPenRadius();
-        StdDraw.setPenColor(new Color(255, 150, 30, 200));
-        StdDraw.circle(getX(), getY(), HALF_SIDE);
-        StdDraw.setPenColor(new Color(255, 0, 0, 100));
+        outlineDrawer.draw1();
         //for a more realistic effect, the ratio will be 1 when 85% is completed
-        StdDraw.filledCircle(getX(), getY(), Math.min(timer.progressRatio()*100/85, 1)*HALF_SIDE);
-
+        drawer.setRadius(Math.min(timer.progressRatio()*100/85, 1)*HALF_SIDE);
+        drawer.draw1();
     }
 
 }

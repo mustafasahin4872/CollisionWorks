@@ -12,6 +12,8 @@ import mapobjects.traits.GridObject;
 
 public class Door extends GridObject implements Collidable, Drawable {
 
+    protected static final char VERTICAL = '|', HORIZONTAL = '—';
+
     private final Box collisionBox;
     private final char alignment;
     private Button[] buttons;
@@ -94,11 +96,6 @@ public class Door extends GridObject implements Collidable, Drawable {
     @Override
     public Box getCollisionBox() {
         return collisionBox;
-    }
-
-    @Override
-    public void draw() {
-        // TODO: REMOVE
     }
 
 }

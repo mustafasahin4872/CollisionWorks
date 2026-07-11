@@ -56,11 +56,6 @@ public abstract class Button extends GridObject implements OnEffector, Drawable 
         press();
     }
 
-    @Override
-    public void draw() {
-        // TODO: REMOVE
-    }
-
 
     public static class LittleButton extends Button {
         public LittleButton(int worldIndex, int xNum, int yNum) {

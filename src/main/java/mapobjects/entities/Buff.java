@@ -64,11 +64,6 @@ public abstract class Buff extends Equippable implements OnEffector, Timed, Draw
     }
 
     @Override
-    public void draw() {
-        // TODO: REMOVE
-    }
-
-    @Override
     public void draw1() {
         if (expired) {
             drawer.draw1();
@@ -93,7 +88,7 @@ public abstract class Buff extends Equippable implements OnEffector, Timed, Draw
         else if (this instanceof Buff.MagnetBuff) effect = "Attracts Items";
         else if (this instanceof Buff.VisionBuff) effect = "Increases Sight";
         return new String[]{
-            TextMethods.capitalize(getName()),
+            TextMethods.capitalize(drawer.getName()),
             effect
         };
     }

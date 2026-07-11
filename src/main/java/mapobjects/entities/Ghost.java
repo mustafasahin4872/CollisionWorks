@@ -1,6 +1,7 @@
 package mapobjects.entities;
 
 import game.core.Frame;
+import helpers.utils.Drawer.PictureDrawer;
 import mapobjects.traits.*;
 import mapobjects.components.Box;
 import mapobjects.components.Damager;
@@ -13,13 +14,15 @@ import static helpers.methods.HelperMethods.*;
 
 //passable ticking damager, moves
 //collides with everything except player and other ghosts
-public class Ghost extends GridObject implements OnEffector, MovingCollidable, Damaging, Timed {
+public class Ghost extends GridObject implements OnEffector, MovingCollidable, Damaging, Timed, Drawable {
 
     public enum ghostTypes {
         DEMON, ANGEL, BLUE, WHITE, GOLD, SAKURA, RANDOM,
         DEFAULT1, DEFAULT2, DEFAULT3, DEFAULT4,
         SPECIAL1, SPECIAL2, SPECIAL3, SPECIAL4
     }
+
+    protected static final char VERTICAL = '|', HORIZONTAL = '—';
 
     private final ghostTypes type;
     private final Box collisionBox;
@@ -31,6 +34,7 @@ public class Ghost extends GridObject implements OnEffector, MovingCollidable, D
     private boolean xCollided, yCollided;
     private final GridObject[][][] layers;
     private Set<HealthBearer> targets;
+    private final PictureDrawer drawer;
 
     public Ghost(int worldIndex, int xNum, int yNum, char alignment, GridObject[][][] layers) {
         super(worldIndex, xNum, yNum);
@@ -46,8 +50,8 @@ public class Ghost extends GridObject implements OnEffector, MovingCollidable, D
 
         } else {
             yVelocity = speed;
-
         }
+        drawer = new PictureDrawer(positionBox, getDirectory1());
 
     }
 
@@ -141,7 +145,7 @@ public class Ghost extends GridObject implements OnEffector, MovingCollidable, D
             }
             default -> "";
         };
-        setName(type.name() + direction);
+        drawer.setName(type.name() + direction);
     }
 
     public void move() {
@@ -229,4 +233,8 @@ public class Ghost extends GridObject implements OnEffector, MovingCollidable, D
         yCollided = true;
     }
 
+    @Override
+    public PictureDrawer getDrawer() {
+        return drawer;
+    }
 }

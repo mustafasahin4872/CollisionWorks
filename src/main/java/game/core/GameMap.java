@@ -130,7 +130,6 @@ public class GameMap {
     }
 
     private void drawCurrentFrameObjects() {
-        Consumer<GridObject> action = GridObject::draw;
         int startX = tileRange[0];
         int startY = tileRange[1];
         int endX = tileRange[2];
@@ -140,7 +139,6 @@ public class GameMap {
                 for (int j = startX; j<=endX; j++) {
                     GridObject gridObject = layer[i-1][j-1];
                     if (gridObject!=null) {
-                        action.accept(gridObject);
                         if (gridObject instanceof Drawable d) d.draw1();
                     }
                 }
@@ -149,9 +147,7 @@ public class GameMap {
     }
 
     private void drawAlwaysCalledObjects() {
-        Consumer<MapObject> action = MapObject::draw;
         for (MapObject mapObject : alwaysCalledObjects) {
-            action.accept(mapObject);
             if (mapObject instanceof Drawable d) d.draw1();
         }
 

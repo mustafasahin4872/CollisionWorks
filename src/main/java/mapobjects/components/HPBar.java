@@ -1,7 +1,10 @@
 package mapobjects.components;
 
+import helpers.utils.Drawer.BoxDrawer;
 import lib.StdDraw;
 import mapobjects.traits.MapObject;
+
+import java.awt.*;
 
 public class HPBar {
 
@@ -73,10 +76,12 @@ public class HPBar {
     }
 
     public void die() {
+        if (noLivesLeft()) return;
         lives--;
     }
 
     public void heal(double healAmount) {
+        if (noLivesLeft()) return;
         HP += healAmount;
         if (HP>maxHP) {
             HP = maxHP;
@@ -84,6 +89,7 @@ public class HPBar {
     }
 
     public void takeDamage(double damageAmount) {
+        if (noLivesLeft() || isDead()) return;
         damageAmount = Math.max(damageAmount-defense, 0);
         HP -= damageAmount;
         if (HP<=0) {
@@ -111,13 +117,15 @@ public class HPBar {
         double leftMostX = centerX-halfWidth;
         double thickness = halfHeight*0.1;
 
-        //outline
-        StdDraw.setPenColor(StdDraw.BLACK);
-        StdDraw.filledRectangle(centerX, centerY, halfWidth+thickness, halfHeight+thickness);
-        //hp
-        StdDraw.setPenColor((int) ((maxHP-HP)/maxHP*255), (int) (HP/maxHP*255), 30);
-        StdDraw.filledRectangle(leftMostX+halfWidth*(HP/maxHP), centerY, halfWidth*(HP/maxHP), halfHeight);
+        Box outBox = new Box(centerX, centerY, 2*(halfWidth+thickness), 2*(halfHeight+thickness));
+        BoxDrawer outBoxDrawer = new BoxDrawer(outBox, Color.BLACK);
 
+        Box inBox = new Box(leftMostX+halfWidth*(HP/maxHP), centerY, halfWidth*(HP/maxHP)*2, halfHeight*2);
+        Color inColor = new Color((int) ((maxHP-HP)/maxHP*255), (int) (HP/maxHP*255), 30);
+        BoxDrawer inBoxDrawer = new BoxDrawer(inBox, inColor);
+
+        outBoxDrawer.draw1();
+        inBoxDrawer.draw1();
     }
 
 }

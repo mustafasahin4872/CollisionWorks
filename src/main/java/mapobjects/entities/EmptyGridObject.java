@@ -19,9 +19,6 @@ public class EmptyGridObject extends GridObject {
         if (linkedObject.isExpired()) {expire();}
     }
 
-    @Override
-    public void draw() {} //not drawn
-
 
     @Override
     public boolean isSolid() {

@@ -45,7 +45,6 @@ public abstract class Gun extends Equippable implements Generator, Drawable {
 
     protected Gun(ProjectileType projectileType, int maxAmmo, int reloadTime, int unloadTime, RARITY rarity) {
         super(0, 0, 0, TILE_SIDE, TILE_SIDE, rarity);
-        setName(getClass().getName().split("\\$")[1].toLowerCase(Locale.ROOT));
         this.projectileType = projectileType;
         this.projectileBlueprint = new ProjectileBlueprint(projectileType);
 
@@ -189,11 +188,6 @@ public abstract class Gun extends Equippable implements Generator, Drawable {
     @Override
     public PictureDrawer getDrawer() {
         return drawer;
-    }
-
-    @Override
-    public void draw() {
-        // TODO: REMOVE
     }
 
     /// The default weapon

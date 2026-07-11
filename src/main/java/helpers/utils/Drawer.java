@@ -54,6 +54,10 @@ public abstract class Drawer {
         setHeight(getHeight()*multiplier);
     }
 
+    public String getName() {
+        return "";
+    }
+
     public abstract void draw1();
 
     /// All animated draws use the same current time and start time, so they are synced.
@@ -323,6 +327,7 @@ public abstract class Drawer {
         private final FILE_TYPE fileType;
         private String name;
         private String fileName;
+        private double degrees = 0;
 
         public PictureDrawer(Box box, String directory, String name, FILE_TYPE fileType) {
             super(box);
@@ -343,15 +348,76 @@ public abstract class Drawer {
             this(box, directory, "0", FILE_TYPE.png);
         }
 
+        @Override
+        public String getName() {
+            return name;
+        }
+
         public void setName(String name) {
             this.name = name;
             fileName = IMAGES_ROOT + directory + name + "." + fileType.name();
+        }
 
+        public void setDegrees(double degrees) {
+            this.degrees = degrees;
         }
 
         @Override
         public void draw1() {
-            StdDraw.picture(box.getCenterX(), box.getCenterY(), fileName, box.getWidth(), box.getHeight());
+            StdDraw.picture(box.getCenterX(), box.getCenterY(), fileName, box.getWidth(), box.getHeight(), degrees);
+        }
+
+    }
+
+    public static class CircleDrawer extends Drawer {
+
+        private double radius;
+        private final Color circleColor;
+        private final THICKNESS thickness;
+
+        public CircleDrawer(Box box, double radius, Color circleColor, THICKNESS thickness) {
+            super(box);
+            this.radius = radius;
+            this.circleColor = circleColor;
+            this.thickness = thickness;
+        }
+
+        public CircleDrawer(Box box, double radius, Color circleColor) {
+            this(box, radius, circleColor, THICKNESS.THIN);
+        }
+
+        public void setRadius(double radius) {
+            this.radius = radius;
+        }
+
+        @Override
+        public void draw1() {
+            StdDraw.setPenColor(circleColor);
+            StdDraw.setPenRadius(thickness.thickness);
+            StdDraw.circle(box.getCenterX(), box.getCenterY(), radius);
+        }
+
+    }
+
+    public static class FilledCircleDrawer extends Drawer{
+
+        private double radius;
+        private final Color circleColor;
+
+        public FilledCircleDrawer(Box box, double radius, Color circleColor) {
+            super(box);
+            this.radius = radius;
+            this.circleColor = circleColor;
+        }
+
+        public void setRadius(double radius) {
+            this.radius = radius;
+        }
+
+        @Override
+        public void draw1() {
+            StdDraw.setPenColor(circleColor);
+            StdDraw.filledCircle(box.getCenterX(), box.getCenterY(), radius);
         }
 
     }

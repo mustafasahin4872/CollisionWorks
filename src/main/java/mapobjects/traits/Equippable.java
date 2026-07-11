@@ -39,12 +39,12 @@ public abstract class Equippable extends MapObject implements Drawable {
     }
 
     public Equippable(int worldIndex, double x, double y, double width, double height, String name, RARITY rarity) {
-        super(worldIndex, x, y, width, height, name);
+        super(worldIndex, x, y, width, height);
         this.rarity = rarity;
     }
 
     public Equippable(int worldIndex, double x, double y, double width, double height, String name, String imageType, RARITY rarity) {
-        super(worldIndex, x, y, width, height, name, imageType);
+        super(worldIndex, x, y, width, height);
         this.rarity = rarity;
     }
 
@@ -55,7 +55,7 @@ public abstract class Equippable extends MapObject implements Drawable {
     public abstract String[] getStats();
 
     public String getDescription() {
-        String pathname = Main.RESOURCES_ROOT + "infos/"  + directory + name.split("/")[0] + ".txt";
+        String pathname = Main.RESOURCES_ROOT + "infos/"  + getDirectory1() + getDrawer().getName().split("/")[0] + ".txt";
         File infoFile = new File(pathname);
         try {
             BufferedReader reader = new BufferedReader(new FileReader(infoFile));

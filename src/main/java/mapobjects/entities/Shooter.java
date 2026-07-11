@@ -1,6 +1,7 @@
 package mapobjects.entities;
 
 import game.core.Frame;
+import helpers.utils.Drawer.PictureDrawer;
 import mapobjects.factories.Blueprint;
 import mapobjects.components.*;
 import mapobjects.traits.*;
@@ -13,7 +14,10 @@ import static helpers.methods.HelperMethods.outOfMapBounds;
 import mapobjects.entities.Projectile.ProjectileType;
 import mapobjects.factories.ProjectileBlueprint;
 
-public abstract class Shooter extends GridObject implements Collidable, Timed, Generator, HealthBearer {
+public abstract class Shooter extends GridObject implements Collidable, Timed, Generator, HealthBearer, Drawable {
+
+    protected static final char ZERO = '0', VERTICAL = '|', HORIZONTAL = '—',
+        RIGHT = '>', LEFT = '<', UP = '^', DOWN = 'v';
 
     protected final ProjectileBlueprint projectileBlueprint;
     protected final Box collisionBox;
@@ -27,8 +31,10 @@ public abstract class Shooter extends GridObject implements Collidable, Timed, G
     protected boolean broken;
     protected Set<HealthBearer> targets;
 
+    private final PictureDrawer drawer;
+
     public Shooter(int worldIndex, int xNum, int yNum, char type, ProjectileType projectileType, GridObject[][][] layers) {
-        super(worldIndex, xNum, yNum, "0");
+        super(worldIndex, xNum, yNum);
         this.type = type;
         this.layers = layers;
         this.projectileBlueprint = new ProjectileBlueprint(projectileType);
@@ -36,6 +42,8 @@ public abstract class Shooter extends GridObject implements Collidable, Timed, G
         timer = new Timer(0, DEFAULT_COOLDOWN / worldIndex);
         spawner = new Spawner(this);
         HPBar = new HPBar(50);
+
+        drawer = new PictureDrawer(positionBox, getDirectory1());
     }
 
 
@@ -66,7 +74,7 @@ public abstract class Shooter extends GridObject implements Collidable, Timed, G
     @Override
     public void ifNoLivesLeft() {
         broken = true;
-        setName("1");
+        drawer.setName("1");
     }
 
     public void setTargets(Set<HealthBearer> targets) {
@@ -93,11 +101,16 @@ public abstract class Shooter extends GridObject implements Collidable, Timed, G
     }
 
     @Override
-    public void draw() {
-        super.draw();
+    public PictureDrawer getDrawer() {
+        return drawer;
+    }
+
+    @Override
+    public void draw1() {
+        drawer.draw1();
         HPBar.drawHPBar(this);
         for (Projectile projectile : projectiles) {
-            projectile.draw();
+            projectile.draw1();
         }
     }
 

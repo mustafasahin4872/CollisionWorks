@@ -3,20 +3,25 @@ package mapobjects.entities;
 import game.core.GameState;
 import game.core.GameState.STATE;
 import game.core.Main;
+import helpers.utils.Drawer.PictureDrawer;
 import lib.StdDraw;
 import mapobjects.components.Box;
+import mapobjects.traits.Drawable;
 import mapobjects.traits.OnEffector;
 import mapobjects.traits.GridObject;
 
-public abstract class Point extends GridObject implements OnEffector {
+public abstract class Point extends GridObject implements OnEffector, Drawable {
 
     protected final int index;
     protected boolean isBig;
+    protected final PictureDrawer drawer;
+    private static final double DEFAULT_SIDE = TILE_SIDE;
 
     public Point(int worldIndex, int xNum, int yNum, int index, boolean isBig) {
         super(worldIndex, xNum, yNum, getSize(isBig), getSize(isBig), index+"", isBig);
         this.index = index;
         this.isBig = isBig;
+        drawer = new PictureDrawer(positionBox, getDirectory1(), index+"");
     }
 
     private static int getSize(boolean isBig) {
@@ -28,10 +33,18 @@ public abstract class Point extends GridObject implements OnEffector {
         checkPlayerCornerIsOn(player);
     }
 
+    @Override
+    public PictureDrawer getDrawer() {
+        return drawer;
+    }
+
+    /// TODO: FIX THIS MESS
     //special override for the selection screen
     @Override
-    public void draw() {
-        StdDraw.picture(getX(), getY(), imageFileName, TILE_SIDE, TILE_SIDE);
+    public void draw1() {
+        setWidth(DEFAULT_SIDE);
+        setHeight(DEFAULT_SIDE);
+        drawer.draw1();
     }
 
     public static class WinPoint extends Point implements OnEffector {
@@ -113,16 +126,16 @@ public abstract class Point extends GridObject implements OnEffector {
 
         private void markVisited(Player player) {
             visited = true;
-            setName("0");
-            if (prev != null) prev.setName("-1");
+            drawer.setName("0");
+            if (prev != null) prev.getDrawer().setName("-1");
             lastCheckPointIndex++;
             player.setSpawnPoint(getCenterCoordinates());
         }
 
         @Override
-        public void draw() {
-            super.draw();
-            ERROR_SIGN.draw();
+        public void draw1() {
+            super.draw1();
+            ERROR_SIGN.draw1();
         }
 
         public void setPrev(CheckPoint prev) {
