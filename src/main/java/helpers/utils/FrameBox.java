@@ -1,6 +1,6 @@
 package helpers.utils;
 
-import game.core.Frame;
+import game.io.Frame;
 import mapobjects.components.Box;
 
 // a box, stays the same with respect to frame

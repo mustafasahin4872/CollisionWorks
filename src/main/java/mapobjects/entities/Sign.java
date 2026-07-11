@@ -3,7 +3,7 @@ package mapobjects.entities;
 import helpers.utils.Drawer.PictureDrawer;
 import helpers.utils.TextDisplay;
 import java.awt.*;
-import game.core.Frame;
+import game.io.Frame;
 import mapobjects.components.Box;
 import helpers.utils.Drawer.OutlinedBoxDrawer;
 import mapobjects.traits.Drawable;

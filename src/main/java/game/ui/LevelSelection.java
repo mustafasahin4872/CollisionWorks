@@ -1,6 +1,6 @@
 package game.ui;
 
-import game.core.Frame;
+import game.io.Frame;
 import game.core.GameMap;
 import game.core.GameState;
 import game.core.MapMaker;
@@ -8,7 +8,6 @@ import game.io.InputHandler;
 import helpers.utils.Index;
 import helpers.utils.UIButton;
 import helpers.utils.UIButton.*;
-import lib.StdDraw;
 import mapobjects.components.Box;
 import helpers.utils.Drawer.THICKNESS;
 import helpers.utils.Drawer.TextDrawer;
@@ -71,9 +70,9 @@ public class LevelSelection {
         };
 
         final Box[] RIGHT_ARROW_BOXES = {
-            new Box(game.core.Frame.X_SCALE - 1 * TILE_SIDE, 8 * TILE_SIDE, ARROW_BOX_SIZE, ARROW_BOX_SIZE),
-            new Box(game.core.Frame.X_SCALE - 1 * TILE_SIDE, 7 * TILE_SIDE, ARROW_BOX_SIZE, ARROW_BOX_SIZE),
-            new Box(game.core.Frame.X_SCALE - 1 * TILE_SIDE, 4 * TILE_SIDE, ARROW_BOX_SIZE, ARROW_BOX_SIZE)
+            new Box(Frame.X_SCALE - 1 * TILE_SIDE, 8 * TILE_SIDE, ARROW_BOX_SIZE, ARROW_BOX_SIZE),
+            new Box(Frame.X_SCALE - 1 * TILE_SIDE, 7 * TILE_SIDE, ARROW_BOX_SIZE, ARROW_BOX_SIZE),
+            new Box(Frame.X_SCALE - 1 * TILE_SIDE, 4 * TILE_SIDE, ARROW_BOX_SIZE, ARROW_BOX_SIZE)
             // last world, no more levels
         };
 
@@ -91,8 +90,7 @@ public class LevelSelection {
     }
 
     public void levelSelectionLoop() {
-        StdDraw.setXscale(0, game.core.Frame.X_SCALE);
-        StdDraw.setYscale(game.core.Frame.Y_SCALE, 0);
+        Frame.setDefaultScale();
 
         while (gameState.getState() == GameState.STATE.GAME) {
             inputHandler.takeInput();
@@ -101,15 +99,15 @@ public class LevelSelection {
 
             processInput(mouseData, arrowData);
 
-            StdDraw.clear();
+            Frame.clear();
 
             GameMap currentWorld = WORLDS[worldIndex.getCurrent()];
             currentWorld.draw();
 
             draw();
 
-            StdDraw.show();
-            StdDraw.pause(game.core.Frame.PAUSE);
+            Frame.show();
+            Frame.pause(Frame.PAUSE);
         }
 
         if (gameState.getState() == GameState.STATE.NEXT) {

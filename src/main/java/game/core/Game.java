@@ -1,8 +1,8 @@
 package game.core;
 
+import game.io.Frame;
 import game.ui.GameScreen;
 import game.io.InputHandler;
-import lib.StdDraw;
 import mapobjects.entities.Player;
 import game.core.GameState.STATE;
 import game.io.InputHandler.ArrowData;
@@ -69,7 +69,7 @@ public class Game {
 
             int timeElapsed = (int)(System.currentTimeMillis()- startTime);
             if (timeElapsed<Frame.PAUSE) {
-                StdDraw.pause(Frame.PAUSE-timeElapsed);
+                Frame.pause(Frame.PAUSE-timeElapsed);
             }
 
         }
@@ -81,13 +81,13 @@ public class Game {
     }
 
     private static void draw(GameMap gameMap, Player player, GameScreen gameScreen) {
-        StdDraw.clear();
+        Frame.clear();
         gameMap.draw();
         player.draw();
         player.drawProjectiles();
         player.drawAccessories();
         gameScreen.draw();
-        StdDraw.show();
+        Frame.show();
     }
 
 

@@ -1,6 +1,6 @@
 package game.ui;
 
-import game.core.Frame;
+import game.io.Frame;
 import game.core.GameMap;
 import game.core.GameState;
 import game.core.MapMaker;
@@ -13,7 +13,6 @@ import helpers.utils.Index;
 import helpers.utils.TextDisplay;
 import helpers.utils.UIButton;
 import helpers.utils.UIButton.StateButton;
-import lib.StdDraw;
 import mapobjects.components.Box;
 import helpers.utils.Drawer.THICKNESS;
 import helpers.utils.Drawer.TextDrawer;
@@ -57,7 +56,7 @@ public class MainSelection {
     private void configureNavigationButtons() {
 
         final double SIDE = 2.0 * TILE_SIDE;
-        final Box ARROW_BOX = new Box(game.core.Frame.X_SCALE - 1 * TILE_SIDE, 8 * TILE_SIDE, SIDE, SIDE);
+        final Box ARROW_BOX = new Box(Frame.X_SCALE - 1 * TILE_SIDE, 8 * TILE_SIDE, SIDE, SIDE);
         final Box SHOP_BOX = new Box(8 * TILE_SIDE, 11 * TILE_SIDE, SIDE, SIDE);
         final Box ACCESSORY_BOX = new Box(TILE_SIDE, 6 * TILE_SIDE, SIDE, SIDE);
 
@@ -84,19 +83,18 @@ public class MainSelection {
         skinSelectionUI.configure();
         gunSelectionUI.configure();
 
-        StdDraw.setXscale(0, game.core.Frame.X_SCALE);
-        StdDraw.setYscale(game.core.Frame.Y_SCALE, 0);
+        Frame.setDefaultScale();
         while (gameState.getState() == STATE.SELECTION) {
             inputHandler.takeInput();
             MouseData mouseData = inputHandler.getMouseData();
             ArrowData arrowData = inputHandler.getArrowData();
             processInput(mouseData, arrowData);
 
-            StdDraw.clear();
+            Frame.clear();
             backgroundMap.draw();
             draw();
-            StdDraw.show();
-            StdDraw.pause(game.core.Frame.PAUSE);
+            Frame.show();
+            Frame.pause(Frame.PAUSE);
         }
 
         if (gameState.getState() != GameState.STATE.QUIT) {
@@ -238,7 +236,7 @@ public class MainSelection {
 
         public void configure() {
 
-            FrameBox.updateCenter(game.core.Frame.X_SCALE / 2, Frame.Y_SCALE / 2);
+            FrameBox.updateCenter(Frame.X_SCALE / 2, Frame.Y_SCALE / 2);
 
             final int LINE_HEIGHT = 15;
             final int size = getFontSizeForHeight(LINE_HEIGHT, new Font("Arial", Font.PLAIN, 100));

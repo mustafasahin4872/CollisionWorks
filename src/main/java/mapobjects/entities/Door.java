@@ -3,7 +3,7 @@ package mapobjects.entities;
 import java.awt.*;
 import java.util.Arrays;
 
-import game.core.Frame;
+import game.io.Frame;
 import mapobjects.components.Box;
 import helpers.utils.Drawer;
 import mapobjects.traits.Collidable;

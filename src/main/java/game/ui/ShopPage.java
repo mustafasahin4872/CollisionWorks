@@ -1,6 +1,6 @@
 package game.ui;
 
-import game.core.Frame;
+import game.io.Frame;
 import game.core.GameMap;
 import game.core.GameState;
 import game.core.MapMaker;
@@ -10,7 +10,6 @@ import helpers.utils.FrameBox;
 import helpers.utils.Index;
 import helpers.utils.TextDisplay;
 import helpers.utils.UIButton;
-import lib.StdDraw;
 import mapobjects.traits.Equippable;
 import mapobjects.components.Box;
 import helpers.utils.Drawer.OutlinedBoxDrawer;
@@ -144,8 +143,7 @@ public class ShopPage {
         if (!configured)
             throw new Exception("CANNOT RUN SHOP PAGE WITHOUT CONFIGURATION");
 
-        StdDraw.setXscale(0, game.core.Frame.X_SCALE);
-        StdDraw.setYscale(game.core.Frame.Y_SCALE, 0);
+        Frame.setDefaultScale();
 
         while (gameState.getState() == current || gameState.getState() == STATE.PAUSE) {
 
@@ -154,12 +152,13 @@ public class ShopPage {
             ArrowData arrowData = inputHandler.getArrowData();
 
             processInput(mouseData, arrowData);
-            StdDraw.clear();
+            Frame.clear();
 
+            backgroundMap.draw();
             draw();
 
-            StdDraw.show();
-            StdDraw.pause(game.core.Frame.PAUSE);
+            Frame.show();
+            Frame.pause(Frame.PAUSE);
         }
 
     }
@@ -338,7 +337,7 @@ public class ShopPage {
 
         public void configure(List<ShopEntry> buyables) {
 
-            FrameBox.updateCenter(game.core.Frame.X_SCALE / 2, Frame.Y_SCALE / 2);
+            FrameBox.updateCenter(Frame.X_SCALE / 2, Frame.Y_SCALE / 2);
 
             final int LINE_HEIGHT = 15;
             final int size = getFontSizeForHeight(LINE_HEIGHT, new Font("Arial", Font.PLAIN, 100));

@@ -1,6 +1,6 @@
 package mapobjects.traits;
 
-import game.core.Frame;
+import game.io.Frame;
 
 public interface Moving {
 

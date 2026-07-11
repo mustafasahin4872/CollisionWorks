@@ -1,5 +1,6 @@
 package game.core;
 
+import game.io.Frame;
 import game.ui.AccessorySelection;
 import game.ui.LevelSelection;
 import game.ui.MainSelection;

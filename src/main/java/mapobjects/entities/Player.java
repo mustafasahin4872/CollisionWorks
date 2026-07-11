@@ -1,6 +1,6 @@
 package mapobjects.entities;
 
-import game.core.Frame;
+import game.io.Frame;
 import game.core.GameState;
 import game.io.InputHandler.ArrowData;
 import game.core.Main;

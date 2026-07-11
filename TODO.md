@@ -19,6 +19,7 @@
 
 ## 🚧 IMMEDIATE PRIORITIES
 
+- [x] DECOUPLING OF STDDRAW AND NON-IO CLASSES
 - [x] DECOUPLING OF DRAWING AND MAPOBJECTS
 - [x] DECOUPLING OF DRAWING AND UI
 - [ ] DECOUPLING OF BUYABLES AND MAPOBJECTS
@@ -30,10 +31,10 @@
 
 ### New Elements
 
-- [ ] Add a wrapper buyable class inheriting mapobject
-  - [ ] items that are buyable in shop inherit this
-  - [ ] add rarity system to this class
-  - [ ] maybe tie rarity with pricing or effects
+- [ ] Equippable class improvements
+- [x] Add a wrapper buyable class inheriting mapobject
+  - [x] items that are buyable in shop inherit this
+  - [x] add rarity system to this class
 - [ ] Accessory logic enhancements:
   - [ ] accessories work like trinkets, they give stat buffs or something
   - [x] accessory types separation, cannot hold two of the same accessory types at the same time

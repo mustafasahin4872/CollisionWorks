@@ -1,4 +1,4 @@
-package game.core;
+package game.io;
 
 import lib.StdDraw;
 
@@ -22,6 +22,23 @@ public class Frame {
     public static void setCanvas() {
         StdDraw.enableDoubleBuffering();
         StdDraw.setCanvasSize((int) X_SCALE, (int)Y_SCALE);
+    }
+
+    public static void setDefaultScale() {
+        StdDraw.setXscale(0, X_SCALE);
+        StdDraw.setYscale(Y_SCALE, 0);
+    }
+
+    public static void clear() {
+        StdDraw.clear();
+    }
+
+    public static void show() {
+        StdDraw.show();
+    }
+
+    public static void pause(int time) {
+        StdDraw.pause(time);
     }
 
     public double[] setFrameCenter(double targetX, double targetY) {

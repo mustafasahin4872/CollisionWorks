@@ -1,6 +1,6 @@
 package game.ui;
 
-import game.core.Frame;
+import game.io.Frame;
 import game.core.GameMap;
 import game.core.GameState;
 import game.core.GameState.STATE;
@@ -10,7 +10,6 @@ import game.io.InputHandler.*;
 import helpers.utils.Index;
 import helpers.utils.UIButton;
 import helpers.utils.UIButton.*;
-import lib.StdDraw;
 import mapobjects.components.Box;
 import helpers.utils.Drawer.THICKNESS;
 import helpers.utils.Drawer.OutlinedBoxDrawer;
@@ -51,7 +50,7 @@ public class AccessorySelection {
         uis.add(new AccessorySelectionUI(4 * TILE_SIDE, startY));
         uis.add(new AccessorySelectionUI(4 * TILE_SIDE, startY + yShift));
         uis.add(new AccessorySelectionUI(4 * TILE_SIDE, startY + 2 * yShift));
-        Box box = new Box(game.core.Frame.X_SCALE - TILE_SIDE ,6 * TILE_SIDE ,2 * TILE_SIDE ,2 * TILE_SIDE);
+        Box box = new Box(Frame.X_SCALE - TILE_SIDE ,6 * TILE_SIDE ,2 * TILE_SIDE ,2 * TILE_SIDE);
         UIButtons.add(new StateButton(box, gameState, STATE.SELECTION));
     }
 
@@ -91,8 +90,7 @@ public class AccessorySelection {
         uis.get(1).setAccessories(neckwears);
         uis.get(2).setAccessories(brooches);
 
-        StdDraw.setXscale(0, game.core.Frame.X_SCALE);
-        StdDraw.setYscale(game.core.Frame.Y_SCALE, 0);
+        Frame.setDefaultScale();
 
         while (gameState.getState() == GameState.STATE.ACCESSORY) {
             inputHandler.takeInput();
@@ -101,10 +99,10 @@ public class AccessorySelection {
 
             processInput(mouseData, arrowData);
 
-            StdDraw.clear();
+            Frame.clear();
             draw();
-            StdDraw.show();
-            StdDraw.pause(Frame.PAUSE);
+            Frame.show();
+            Frame.pause(Frame.PAUSE);
         }
 
         ArrayList<Accessory> selected = new ArrayList<>();
