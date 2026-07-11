@@ -7,7 +7,6 @@ import mapobjects.components.*;
 import mapobjects.traits.*;
 import mapobjects.components.Spawner;
 
-import java.util.HashSet;
 import java.util.Set;
 
 import static game.core.GameMap.outOfMapBounds;
@@ -16,7 +15,7 @@ import mapobjects.factories.ProjectileBlueprint;
 
 public abstract class Shooter extends GridObject implements Collidable, Timed, Generator, HealthBearer, Drawable {
 
-    protected static final char ZERO = '0', VERTICAL = '|', HORIZONTAL = '—',
+    protected static final char VERTICAL = '|', HORIZONTAL = '—',
             RIGHT = '>', LEFT = '<', UP = '^', DOWN = 'v';
 
     protected final ProjectileBlueprint projectileBlueprint;
@@ -25,7 +24,7 @@ public abstract class Shooter extends GridObject implements Collidable, Timed, G
     protected final Spawner spawner;
     private final HPBar HPBar;
     protected final char type;
-    protected final Set<Projectile> projectiles = new HashSet<>();
+    protected Set<MapObject> spawnedObjects;
     protected static final double DEFAULT_COOLDOWN = 3000; // in milliseconds
     protected final GridObject[][][] layers;
     protected boolean broken;
@@ -45,6 +44,11 @@ public abstract class Shooter extends GridObject implements Collidable, Timed, G
         HPBar = new HPBar(50);
 
         drawer = new PictureDrawer(positionBox, getDirectory1());
+    }
+
+    @Override
+    public void setSpawnedObjects(Set<MapObject> spawnedObjects) {
+        this.spawnedObjects = spawnedObjects;
     }
 
     @Override
@@ -83,10 +87,6 @@ public abstract class Shooter extends GridObject implements Collidable, Timed, G
 
     @Override
     public void call(Player player) {
-        for (Projectile projectile : projectiles) {
-            projectile.call(player, layers);
-        }
-        projectiles.removeIf(Projectile::isExpired);
 
         checkDead();
         if (broken)
@@ -110,9 +110,6 @@ public abstract class Shooter extends GridObject implements Collidable, Timed, G
     public void draw() {
         drawer.draw();
         HPBar.drawHPBar(this);
-        for (Projectile projectile : projectiles) {
-            projectile.draw();
-        }
     }
 
     @Override
@@ -131,7 +128,7 @@ public abstract class Shooter extends GridObject implements Collidable, Timed, G
         };
         Projectile projectile = blueprint.mutateToProjectile(projectileBlueprint, d);
         projectile.setTargets(targets);
-        projectiles.add(projectile);
+        spawnedObjects.add(projectile);
     }
 
     public static class RegularShooter extends Shooter {
@@ -166,10 +163,6 @@ public abstract class Shooter extends GridObject implements Collidable, Timed, G
 
         @Override
         public void call(Player player) {
-            for (Projectile projectile : projectiles) {
-                projectile.call(player, layers);
-            }
-            projectiles.removeIf(Projectile::isExpired);
 
             checkDead();
             if (broken)
@@ -192,7 +185,7 @@ public abstract class Shooter extends GridObject implements Collidable, Timed, G
             Blueprint blueprint = spawner.directionSpawn(getCenterCoordinates(), player.getCenterCoordinates(), 50);
             Projectile projectile = blueprint.mutateToProjectile(projectileBlueprint, 0);
             projectile.rotate(player.getCenterCoordinates());
-            projectiles.add(projectile);
+            spawnedObjects.add(projectile);
         }
 
         @Override
@@ -225,10 +218,6 @@ public abstract class Shooter extends GridObject implements Collidable, Timed, G
 
         @Override
         public void call(Player player) {
-            for (Projectile projectile : projectiles) {
-                projectile.call(player, layers);
-            }
-            projectiles.removeIf(Projectile::isExpired);
 
             checkDead();
             if (broken)
@@ -252,7 +241,7 @@ public abstract class Shooter extends GridObject implements Collidable, Timed, G
             Projectile projectile = blueprint.mutateToProjectile(projectileBlueprint, 0);
             projectile.rotate(player.getCenterCoordinates());
             projectile.setTargets(targets);
-            projectiles.add(projectile);
+            spawnedObjects.add(projectile);
         }
 
         @Override

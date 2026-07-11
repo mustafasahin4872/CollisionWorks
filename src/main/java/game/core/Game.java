@@ -84,7 +84,6 @@ public class Game {
         Frame.clear();
         gameMap.draw();
         player.draw();
-        player.drawProjectiles();
         player.drawAccessories();
         gameScreen.draw();
         Frame.show();

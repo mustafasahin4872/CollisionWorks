@@ -127,11 +127,13 @@ public class Projectile extends MapObject implements MovingCollidable, Damaging,
 
         int checkRange = 2; //the checking checkRange
 
-        player.checkCollision(this);
-        if (xCollided || yCollided) {
-            dealDamage(player);
-            collided = true;
-            expire();
+        if (targets.contains(player)) {
+            player.checkCollision(this);
+            if (xCollided || yCollided) {
+                dealDamage(player);
+                collided = true;
+                expire();
+            }
         }
 
         for (GridObject[][] layer : layers) {
@@ -145,7 +147,9 @@ public class Projectile extends MapObject implements MovingCollidable, Damaging,
                         c.checkCollision(this);
                         if (xCollided || yCollided) {
                             collided = true;
-                            if (c instanceof HealthBearer h && targets.contains(h)) dealDamage(h);
+                            if (c instanceof HealthBearer h && targets.contains(h)) {
+                                dealDamage(h);
+                            }
                             expire();
                             break;
                         }

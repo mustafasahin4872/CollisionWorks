@@ -8,7 +8,7 @@ import mapobjects.components.Timer;
 
 import static mapobjects.traits.GridObject.TILE_SIDE;
 
-public abstract class Buff extends Equippable implements OnEffector, Timed, Drawable {
+public abstract class Buff extends Equippable implements OnEffector, Drawable {
 
     private static final int BUFF_DURATION = 10 * 1000;
     private final boolean permanent;
@@ -41,11 +41,6 @@ public abstract class Buff extends Equippable implements OnEffector, Timed, Draw
     }
 
     @Override
-    public Timer getTimer() {
-        return timer;
-    }
-
-    @Override
     public void checkPlayerIsOn(Player player) {
         checkPlayerCornerIsOn(player);
     }
@@ -54,9 +49,6 @@ public abstract class Buff extends Equippable implements OnEffector, Timed, Draw
     public void playerIsOn(Player player) {
         timer.activate();
     }
-
-    @Override
-    public void timeIsUp(Player player) {} // unused
 
     @Override
     public PictureDrawer getDrawer() {

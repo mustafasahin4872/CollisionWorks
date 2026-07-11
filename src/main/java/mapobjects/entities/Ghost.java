@@ -6,13 +6,12 @@ import game.io.Drawer.PictureDrawer;
 import mapobjects.traits.*;
 import mapobjects.components.Box;
 import mapobjects.components.Damager;
-import mapobjects.components.Timer;
 
 import java.util.Set;
 
 //passable ticking damager, moves
 //collides with everything except player and other ghosts
-public class Ghost extends GridObject implements OnEffector, MovingCollidable, Damaging, Timed, Drawable {
+public class Ghost extends GridObject implements OnEffector, MovingCollidable, Damaging, Drawable {
 
     public enum ghostTypes {
         DEMON, ANGEL, BLUE, WHITE, GOLD, SAKURA, RANDOM,
@@ -26,9 +25,9 @@ public class Ghost extends GridObject implements OnEffector, MovingCollidable, D
     private final Box collisionBox;
     private final Box effectBox;
     private final Damager damager;
-    private final Timer timer;
     private final char alignment;
-    private double speed = 3, xVelocity, yVelocity;
+    private double xVelocity;
+    private double yVelocity;
     private boolean xCollided, yCollided;
     private final GridObject[][][] layers;
     private Set<HealthBearer> targets;
@@ -41,11 +40,10 @@ public class Ghost extends GridObject implements OnEffector, MovingCollidable, D
         collisionBox = positionBox.clone();
         effectBox = positionBox.clone();
         damager = new Damager(worldIndex * 10);
-        timer = new Timer(0, 500);
         this.layers = layers;
+        double speed = 3;
         if (alignment == HORIZONTAL) {
             xVelocity = speed;
-
         } else {
             yVelocity = speed;
         }
@@ -96,9 +94,6 @@ public class Ghost extends GridObject implements OnEffector, MovingCollidable, D
 
     @Override
     public void call(Player player) {
-        updateTimer();
-        if (cooldownOver())
-            timeIsUp(player);
 
         move();
 
@@ -174,11 +169,6 @@ public class Ghost extends GridObject implements OnEffector, MovingCollidable, D
     }
 
     @Override
-    public Timer getTimer() {
-        return timer;
-    }
-
-    @Override
     public void setTargets(Set<HealthBearer> targets) {
         this.targets = targets;
     }
@@ -194,11 +184,6 @@ public class Ghost extends GridObject implements OnEffector, MovingCollidable, D
     }
 
     @Override
-    public void timeIsUp(Player player) {
-        checkPlayerIsOn(player);
-    }
-
-    @Override
     public void checkPlayerIsOn(Player player) {
         checkPlayerCornerIsOn(player);
     }
@@ -206,7 +191,6 @@ public class Ghost extends GridObject implements OnEffector, MovingCollidable, D
     @Override
     public void playerIsOn(Player player) {
         dealDamage(player);
-        activateTimer();
     }
 
     @Override

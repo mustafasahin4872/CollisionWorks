@@ -8,6 +8,8 @@ import mapobjects.components.HPBar;
 import mapobjects.components.Timer;
 import mapobjects.traits.*;
 
+import java.util.Set;
+
 public class Mortar extends GridObject implements Collidable, Ranged, Timed, Generator, HealthBearer, Drawable {
 
     private final Box collisionBox;
@@ -20,12 +22,12 @@ public class Mortar extends GridObject implements Collidable, Ranged, Timed, Gen
     private static final int RANGE = 8;
     private static final int BASE_MINE_NUM = 3;
     //period is max because the time of cooldown is determined by the mines
-    private static final double PERIOD = Double.MAX_VALUE, DEFAULT_COOLDOWN = 3000;
+    private static final double PERIOD = 3000, DEFAULT_COOLDOWN = 3000;
     private final int mineNum;
-    private final Mine[] mines;
+    private Set<MapObject> spawnedObjects;
     private final GridObject[][][] layers;
 
-    private PictureDrawer drawer;
+    private final PictureDrawer drawer;
 
     public Mortar(int worldIndex, int xNum, int yNum, GridObject[][][] layers) {
         this(worldIndex, xNum, yNum, layers, BASE_MINE_NUM*worldIndex);
@@ -40,13 +42,12 @@ public class Mortar extends GridObject implements Collidable, Ranged, Timed, Gen
         timer = new Timer(PERIOD, DEFAULT_COOLDOWN/worldIndex);
         spawner = new Spawner(this);
         HPBar = new HPBar(getWidth()*4);
-        mines = new Mine[mineNum];
         drawer = new PictureDrawer(positionBox, getDirectory1());
     }
 
-    private boolean areMinesComplete() {
-        for (Mine mine : mines) {if (!mine.isComplete()) {return false;}}
-        return true;
+    @Override
+    public void setSpawnedObjects(Set<MapObject> spawnedObjects) {
+        this.spawnedObjects = spawnedObjects;
     }
 
 
@@ -54,10 +55,9 @@ public class Mortar extends GridObject implements Collidable, Ranged, Timed, Gen
     public void call(Player player) {
         checkDead();
         updateTimer();
-        if (isComplete()) return; //in cooldown
+        if (isComplete()) return;
         if (isActive()) {
-            for (Mine mine : mines) mine.call(player);
-            if (areMinesComplete()) {timeIsUp(player);} //start cooldown
+            if (isComplete()) {timeIsUp(player);} //start cooldown
         } else if (!broken) {checkPlayerInRange(player);}
 
     }
@@ -70,9 +70,6 @@ public class Mortar extends GridObject implements Collidable, Ranged, Timed, Gen
     @Override
     public void draw() {
         drawer.draw();
-        for (Mine mine : mines) {
-            if (mine!=null) mine.draw();
-        }
         HPBar.drawHPBar(this);
     }
 
@@ -110,7 +107,6 @@ public class Mortar extends GridObject implements Collidable, Ranged, Timed, Gen
     public void playerInRange(Player player) {
         activateTimer();
         spawn();
-        for (Mine mine : mines) mine.activateTimer();
     }
 
 
@@ -121,11 +117,11 @@ public class Mortar extends GridObject implements Collidable, Ranged, Timed, Gen
 
     public void spawn() {
         Blueprint[] generators = spawner.randomSpawn(RANGE/2, mineNum, layers);
-        Mine[] newMines = new Mine[mineNum];
         for (int i = 0; i<mineNum; i++) {
-            newMines[i] = generators[i].mutateToMine();
+            Mine mine = generators[i].mutateToMine();
+            mine.activateTimer();
+            spawnedObjects.add(mine);
         }
-        System.arraycopy(newMines, 0, mines, 0, mineNum);
     }
 
 }

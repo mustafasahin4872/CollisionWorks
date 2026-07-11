@@ -14,7 +14,7 @@ import java.util.Set;
 
 import static mapobjects.traits.GridObject.TILE_SIDE;
 
-public class Player extends Equippable implements MovingCollidable, HealthBearer {
+public class Player extends Equippable implements MovingCollidable, HealthBearer, Generator {
 
     // initial fields that are unique to the player type
     private final String playerName;
@@ -113,6 +113,16 @@ public class Player extends Equippable implements MovingCollidable, HealthBearer
         return direction;
     }
 
+    @Override
+    public void setSpawnedObjects(Set<MapObject> spawnedObjects) {
+        gun.setSpawnedObjects(spawnedObjects);
+    }
+
+    @Override
+    public void spawn() {
+        gun.shoot();
+    }
+
     // UPDATES
 
     public void call(GridObject[][][] layers) {
@@ -120,8 +130,7 @@ public class Player extends Equippable implements MovingCollidable, HealthBearer
         checkDead();
 
         gun.call(this);
-        if (shoot)
-            gun.shoot();
+        if (shoot) spawn();
 
         int range = 2; // the checking range
         int[] gridNumbers = getGridNumbers();
@@ -135,11 +144,6 @@ public class Player extends Equippable implements MovingCollidable, HealthBearer
                 }
             }
         }
-        // player's projectiles are not checking player collisions
-        for (Projectile projectile : gun.getProjectiles()) {
-            projectile.call(new Player(), layers);
-        }
-        gun.getProjectiles().removeIf(MapObject::isExpired);
         updateName();
     }
 
@@ -470,11 +474,6 @@ public class Player extends Equippable implements MovingCollidable, HealthBearer
             return steps - currentStep; // ramping down
         }
         // 0(cooldown) - 1 - 2 - 3 - 4 - 5 - 4 - 3 - 2 - 1 - 0(cooldown)
-    }
-
-    public void drawProjectiles() {
-        for (Projectile projectile : gun.getProjectiles())
-            projectile.draw();
     }
 
     public void drawAccessories() {

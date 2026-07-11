@@ -24,6 +24,7 @@ public class GameMap {
     private final Set<MovingCollidable> movingCollidableObjects = new HashSet<>();
     private final Set<HealthBearer> healthBearers = new HashSet<>();
     private final Set<MapObject> alwaysCalledObjects = new HashSet<>();
+    private final Set<MapObject> spawnedObjects;
     private final Set<Drawable> drawables = new HashSet<>();
 
     // private final int totalCoinOnMap;
@@ -43,6 +44,7 @@ public class GameMap {
         mapMaker.mapMaker();
         layers = mapMaker.getLayers();
         spawnPoint = mapMaker.getSpawnPoint();
+        spawnedObjects = mapMaker.getSpawnedObjects();
 
         ArrayList<Shooter> shooters = new ArrayList<>();
         for (GridObject[][] layer : layers) {
@@ -105,7 +107,12 @@ public class GameMap {
         for (MapObject mapObject : alwaysCalledObjects) {
             mapObject.call(player);
         }
+        for (MapObject mapObject : spawnedObjects) {
+            if (mapObject instanceof Projectile p) p.call(player, layers);
+            else mapObject.call(player);
+        }
         alwaysCalledObjects.removeIf(MapObject::isExpired);
+        spawnedObjects.removeIf(MapObject::isExpired);
 
         for (GridObject[][] layer : layers) {
             for (int y = tileRange[1]; y <= tileRange[3]; y++) {
@@ -114,15 +121,14 @@ public class GameMap {
                     if (gridObject == null)
                         continue;
 
-                    if (!alwaysCalledObjects.contains(gridObject)) {
+                    if (!alwaysCalledObjects.contains(gridObject) && !spawnedObjects.contains(gridObject)) {
                         if (gridObject instanceof EmptyGridObject e) {
-                            if (!alwaysCalledObjects.contains(e.getLinkedObject())) {
+                            if (!alwaysCalledObjects.contains(e.getLinkedObject()) && !spawnedObjects.contains(e.getLinkedObject())) {
                                 gridObject.call(player);
                             }
                         } else {
                             gridObject.call(player);
                         }
-
                     }
                     if (gridObject.isExpired()) {
                         layer[y - 1][x - 1] = null;
@@ -158,6 +164,10 @@ public class GameMap {
 
     private void drawAlwaysCalledObjects() {
         for (MapObject mapObject : alwaysCalledObjects) {
+            if (mapObject instanceof Drawable d)
+                d.draw();
+        }
+        for (MapObject mapObject : spawnedObjects) {
             if (mapObject instanceof Drawable d)
                 d.draw();
         }

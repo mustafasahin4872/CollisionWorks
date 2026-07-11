@@ -1,10 +1,13 @@
 package game.core;
 
+import mapobjects.components.Spawner;
 import mapobjects.factories.Blueprint;
 import mapobjects.entities.Currency;
 import mapobjects.entities.Player;
+import mapobjects.traits.Generator;
 import mapobjects.traits.GridObject;
 import mapobjects.entities.*;
+import mapobjects.traits.MapObject;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -28,6 +31,9 @@ public class MapMaker {
     private final Currency[][] coins;
 
     private double[] spawnPoint;
+
+    // passed down to spawners, so they put the spawned objects
+    private final Set<MapObject> spawnedObjects = new HashSet<>();
 
     private static final Set<String> IMPASSABLE_CODES = new HashSet<>(Set.of("XXX", "###", "%%%"));
     private static final Set<Character>
@@ -112,6 +118,9 @@ points can have the indicator B for big displays, special to the selection scree
 
     public double[] getSpawnPoint() {return spawnPoint;}
 
+    public Set<MapObject> getSpawnedObjects() {
+        return spawnedObjects;
+    }
 
     //MAIN METHOD
 
@@ -257,10 +266,12 @@ points can have the indicator B for big displays, special to the selection scree
                 tiles[y][x] = initializedTile;
                 gridObjects[y][x] = initializedGridObject;
                 coins[y][x] = initializedCoin;
+                if (initializedGridObject instanceof Generator g) g.setSpawnedObjects(spawnedObjects);
             }
         }
         wireDoorsToButtons(objectDetails, doorsToWire, buttonMap);
         setPrevToCheckPoints(checkPointsToSetPrev);
+        player.setSpawnedObjects(spawnedObjects);
     }
 
 
