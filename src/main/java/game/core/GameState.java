@@ -1,8 +1,7 @@
 package game.core;
 
-import game.data.ShopEntry;
+import data.ShopEntry;
 import mapobjects.traits.Equippable;
-import mapobjects.traits.MapObject;
 import mapobjects.entities.Accessory;
 import mapobjects.entities.Buff;
 import mapobjects.entities.Gun;
@@ -12,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GameState {
+    public static GameState gameState;
 
     //------------------------------------------------------------------------------------------------------------------
     //------------------------------------------------------------------------------------------------------------------

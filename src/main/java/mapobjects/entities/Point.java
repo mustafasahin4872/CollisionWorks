@@ -2,7 +2,6 @@ package mapobjects.entities;
 
 import game.core.GameState;
 import game.core.GameState.STATE;
-import game.core.Main;
 import game.io.Drawer.PictureDrawer;
 import mapobjects.components.Box;
 import mapobjects.traits.Drawable;
@@ -76,7 +75,7 @@ public abstract class Point extends GridObject implements OnEffector, Drawable {
 
         @Override
         public void playerIsOn(Player player) {
-            Main.gameState.setState(state);
+            GameState.gameState.setState(state);
         }
 
     }

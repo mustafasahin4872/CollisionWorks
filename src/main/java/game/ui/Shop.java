@@ -3,7 +3,7 @@ package game.ui;
 import game.core.GameState;
 import game.io.InputHandler;
 import game.core.GameState.STATE;
-import game.data.ShopEntry;
+import data.ShopEntry;
 import mapobjects.entities.Accessory;
 import mapobjects.traits.Equippable.RARITY;
 import mapobjects.entities.Buff;

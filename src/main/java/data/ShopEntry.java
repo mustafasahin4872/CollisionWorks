@@ -1,4 +1,4 @@
-package game.data;
+package data;
 
 import mapobjects.traits.Equippable;
 

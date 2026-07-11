@@ -10,14 +10,14 @@ import mapobjects.components.Spawner;
 import java.util.HashSet;
 import java.util.Set;
 
-import static helpers.HelperMethods.outOfMapBounds;
+import static game.core.GameMap.outOfMapBounds;
 import mapobjects.entities.Projectile.ProjectileType;
 import mapobjects.factories.ProjectileBlueprint;
 
 public abstract class Shooter extends GridObject implements Collidable, Timed, Generator, HealthBearer, Drawable {
 
     protected static final char ZERO = '0', VERTICAL = '|', HORIZONTAL = '—',
-        RIGHT = '>', LEFT = '<', UP = '^', DOWN = 'v';
+            RIGHT = '>', LEFT = '<', UP = '^', DOWN = 'v';
 
     protected final ProjectileBlueprint projectileBlueprint;
     protected final Box collisionBox;
@@ -26,14 +26,15 @@ public abstract class Shooter extends GridObject implements Collidable, Timed, G
     private final HPBar HPBar;
     protected final char type;
     protected final Set<Projectile> projectiles = new HashSet<>();
-    protected static final double DEFAULT_COOLDOWN = 3000; //in milliseconds
+    protected static final double DEFAULT_COOLDOWN = 3000; // in milliseconds
     protected final GridObject[][][] layers;
     protected boolean broken;
     protected Set<HealthBearer> targets;
 
     private final PictureDrawer drawer;
 
-    public Shooter(int worldIndex, int xNum, int yNum, char type, ProjectileType projectileType, GridObject[][][] layers) {
+    public Shooter(int worldIndex, int xNum, int yNum, char type, ProjectileType projectileType,
+            GridObject[][][] layers) {
         super(worldIndex, xNum, yNum);
         this.type = type;
         this.layers = layers;
@@ -45,7 +46,6 @@ public abstract class Shooter extends GridObject implements Collidable, Timed, G
 
         drawer = new PictureDrawer(positionBox, getDirectory1());
     }
-
 
     @Override
     public Box getCollisionBox() {
@@ -89,13 +89,14 @@ public abstract class Shooter extends GridObject implements Collidable, Timed, G
         projectiles.removeIf(Projectile::isExpired);
 
         checkDead();
-        if (broken) return;
+        if (broken)
+            return;
 
         if (isActive()) {
             spawn();
         }
         updateTimer();
-        if (!isComplete() && !isActive()) { //cooldown over, activate
+        if (!isComplete() && !isActive()) { // cooldown over, activate
             activateTimer();
         }
     }
@@ -133,7 +134,6 @@ public abstract class Shooter extends GridObject implements Collidable, Timed, G
         projectiles.add(projectile);
     }
 
-
     public static class RegularShooter extends Shooter {
         public RegularShooter(int worldIndex, int xNum, int yNum, char type, GridObject[][][] layers) {
             super(worldIndex, xNum, yNum, type, ProjectileType.REGULAR, layers);
@@ -141,7 +141,6 @@ public abstract class Shooter extends GridObject implements Collidable, Timed, G
         }
 
     }
-
 
     public static class DirectionShooter extends Shooter implements Ranged {
 
@@ -151,7 +150,7 @@ public abstract class Shooter extends GridObject implements Collidable, Timed, G
 
         public DirectionShooter(int worldIndex, int xNum, int yNum, GridObject[][][] layers, Player player) {
             super(worldIndex, xNum, yNum, 'x', ProjectileType.REGULAR, layers);
-            rangeBox = new Box(positionBox.getCenterCoordinates(), RANGE*TILE_SIDE*2, RANGE*TILE_SIDE*2);
+            rangeBox = new Box(positionBox.getCenterCoordinates(), RANGE * TILE_SIDE * 2, RANGE * TILE_SIDE * 2);
             this.player = player;
         }
 
@@ -165,7 +164,6 @@ public abstract class Shooter extends GridObject implements Collidable, Timed, G
             activateTimer();
         }
 
-
         @Override
         public void call(Player player) {
             for (Projectile projectile : projectiles) {
@@ -174,7 +172,8 @@ public abstract class Shooter extends GridObject implements Collidable, Timed, G
             projectiles.removeIf(Projectile::isExpired);
 
             checkDead();
-            if (broken) return;
+            if (broken)
+                return;
 
             if (isActive()) {
                 spawn();
@@ -185,7 +184,6 @@ public abstract class Shooter extends GridObject implements Collidable, Timed, G
             if (cooldownOver()) {
                 timeIsUp(player);
             }
-
 
         }
 
@@ -203,7 +201,7 @@ public abstract class Shooter extends GridObject implements Collidable, Timed, G
         }
     }
 
-    public static class HomingShooter extends Shooter implements  Ranged {
+    public static class HomingShooter extends Shooter implements Ranged {
 
         private final Box rangeBox;
         protected final Player player;
@@ -212,7 +210,7 @@ public abstract class Shooter extends GridObject implements Collidable, Timed, G
         public HomingShooter(int worldIndex, int xNum, int yNum, GridObject[][][] layers, Player player) {
             super(worldIndex, xNum, yNum, 'h', ProjectileType.HOMING, layers);
             this.player = player;
-            rangeBox = new Box(positionBox.getCenterCoordinates(), RANGE*TILE_SIDE*2, RANGE*TILE_SIDE*2);
+            rangeBox = new Box(positionBox.getCenterCoordinates(), RANGE * TILE_SIDE * 2, RANGE * TILE_SIDE * 2);
         }
 
         @Override
@@ -225,7 +223,6 @@ public abstract class Shooter extends GridObject implements Collidable, Timed, G
             activateTimer();
         }
 
-
         @Override
         public void call(Player player) {
             for (Projectile projectile : projectiles) {
@@ -234,7 +231,8 @@ public abstract class Shooter extends GridObject implements Collidable, Timed, G
             projectiles.removeIf(Projectile::isExpired);
 
             checkDead();
-            if (broken) return;
+            if (broken)
+                return;
 
             if (isActive()) {
                 spawn();
@@ -245,7 +243,6 @@ public abstract class Shooter extends GridObject implements Collidable, Timed, G
             if (cooldownOver()) {
                 timeIsUp(player);
             }
-
 
         }
 
@@ -264,13 +261,13 @@ public abstract class Shooter extends GridObject implements Collidable, Timed, G
         }
     }
 
-
     public static class MovingShooter extends Shooter implements MovingCollidable {
 
         private static final double SPEED = -1;
         private boolean xCollided, yCollided;
         private double xVelocity, yVelocity;
         private final char alignment;
+
         public MovingShooter(int worldIndex, int xNum, int yNum, char type, char alignment, GridObject[][][] layers) {
             super(worldIndex, xNum, yNum, type, ProjectileType.REGULAR, layers);
             this.alignment = alignment;
@@ -289,16 +286,19 @@ public abstract class Shooter extends GridObject implements Collidable, Timed, G
             super.call(player);
 
             checkDead();
-            if (broken) return;
+            if (broken)
+                return;
 
             int[] gridNumbers = getGridNumbers();
-            int range = 2; //the checking range
+            int range = 2; // the checking range
             boolean collided = false;
             for (GridObject[][] layer : layers) {
-                if (collided) break;
-                for (int i = gridNumbers[1]-range; i<gridNumbers[1]+range; i++) {
-                    if (collided) break;
-                    for (int j = gridNumbers[0]-range; j<gridNumbers[0]+range; j++) {
+                if (collided)
+                    break;
+                for (int i = gridNumbers[1] - range; i < gridNumbers[1] + range; i++) {
+                    if (collided)
+                        break;
+                    for (int j = gridNumbers[0] - range; j < gridNumbers[0] + range; j++) {
                         if (alignment == HORIZONTAL && xCollided) {
                             collided = true;
                             xVelocity *= -1;
@@ -311,10 +311,12 @@ public abstract class Shooter extends GridObject implements Collidable, Timed, G
                             yCollided = false;
                             break;
                         }
-                        if (outOfMapBounds(layer, i, j)) continue;
+                        if (outOfMapBounds(layer, i, j))
+                            continue;
 
                         GridObject currentGridObject = layer[i][j];
-                        if (currentGridObject == this) continue;
+                        if (currentGridObject == this)
+                            continue;
                         if (currentGridObject instanceof Collidable c) {
                             c.checkCollision(this);
                         }
@@ -330,7 +332,6 @@ public abstract class Shooter extends GridObject implements Collidable, Timed, G
             collisionBox.xShift(xVelocity * Frame.DT);
             collisionBox.yShift(yVelocity * Frame.DT);
         }
-
 
         @Override
         public boolean isXCollided() {
@@ -374,6 +375,5 @@ public abstract class Shooter extends GridObject implements Collidable, Timed, G
             collisionBox.setCenterY(y);
         }
     }
-
 
 }

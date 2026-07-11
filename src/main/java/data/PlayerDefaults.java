@@ -1,4 +1,4 @@
-package mapobjects.data;
+package data;
 
 import game.io.Drawer.PictureDrawer.FILE_TYPE;
 import mapobjects.traits.Equippable.RARITY;

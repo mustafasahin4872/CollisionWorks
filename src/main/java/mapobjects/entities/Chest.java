@@ -6,7 +6,7 @@ import mapobjects.traits.Drawable;
 import mapobjects.traits.GridObject;
 import mapobjects.traits.OnEffector;
 
-import static game.core.Main.gameState;
+import static game.core.GameState.gameState;
 
 public class Chest extends GridObject implements OnEffector, Drawable {
 

@@ -6,7 +6,7 @@ import mapobjects.traits.Drawable;
 import mapobjects.traits.OnEffector;
 import mapobjects.traits.GridObject;
 
-import static game.core.Main.gameState;
+import static game.core.GameState.gameState;
 
 public class Currency extends GridObject implements OnEffector, Drawable {
 

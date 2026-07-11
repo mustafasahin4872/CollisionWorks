@@ -1,5 +1,6 @@
 package mapobjects.entities;
 
+import game.core.GameMap;
 import game.io.Frame;
 import game.io.Drawer.PictureDrawer;
 import mapobjects.traits.*;
@@ -8,9 +9,6 @@ import mapobjects.components.Damager;
 import mapobjects.components.Timer;
 
 import java.util.Set;
-
-import static helpers.HelperMethods.*;
-
 
 //passable ticking damager, moves
 //collides with everything except player and other ghosts
@@ -56,7 +54,7 @@ public class Ghost extends GridObject implements OnEffector, MovingCollidable, D
     }
 
     private ghostTypes rollForGhostType() {
-        int roll = (int)(Math.random() * 1000); // Use 0–999 for 0.1% granularity
+        int roll = (int) (Math.random() * 1000); // Use 0–999 for 0.1% granularity
 
         if (roll < 400) { // 40% → world default
             return switch (worldIndex) {
@@ -81,7 +79,7 @@ public class Ghost extends GridObject implements OnEffector, MovingCollidable, D
             };
         } else if (roll < 725) { // 7.5% → blue
             return ghostTypes.BLUE;
-        }  else if (roll < 800) { // 7.5% → sakura
+        } else if (roll < 800) { // 7.5% → sakura
             return ghostTypes.SAKURA;
         } else if (roll < 850) { // 5% → gold
             return ghostTypes.GOLD;
@@ -96,21 +94,23 @@ public class Ghost extends GridObject implements OnEffector, MovingCollidable, D
         }
     }
 
-
     @Override
     public void call(Player player) {
         updateTimer();
-        if (cooldownOver()) timeIsUp(player);
+        if (cooldownOver())
+            timeIsUp(player);
 
         move();
 
         int[] gridNumbers = getGridNumbers();
-        int range = 2; //the checking range
+        int range = 2; // the checking range
         boolean collided = false;
         for (GridObject[][] layer : layers) {
-            if (collided) break;
+            if (collided)
+                break;
             for (int i = gridNumbers[1] - range; i < gridNumbers[1] + range; i++) {
-                if (collided) break;
+                if (collided)
+                    break;
                 for (int j = gridNumbers[0] - range; j < gridNumbers[0] + range; j++) {
                     if (alignment == HORIZONTAL && xCollided) {
                         collided = true;
@@ -124,10 +124,12 @@ public class Ghost extends GridObject implements OnEffector, MovingCollidable, D
                         yCollided = false;
                         break;
                     }
-                    if (outOfMapBounds(layer, i, j)) continue;
+                    if (GameMap.outOfMapBounds(layer, i, j))
+                        continue;
 
                     GridObject currentGridObject = layer[i][j];
-                    if (currentGridObject == this) continue;
+                    if (currentGridObject == this)
+                        continue;
                     if (currentGridObject instanceof Collidable c && !(c instanceof Ghost)) {
                         c.checkCollision(this);
                     }
@@ -136,12 +138,16 @@ public class Ghost extends GridObject implements OnEffector, MovingCollidable, D
         }
         String direction = switch (alignment) {
             case HORIZONTAL -> {
-                if (xVelocity < 0) yield "L";
-                else yield "R";
+                if (xVelocity < 0)
+                    yield "L";
+                else
+                    yield "R";
             }
             case VERTICAL -> {
-                if (yVelocity > 0) yield "D";
-                else yield "U";
+                if (yVelocity > 0)
+                    yield "D";
+                else
+                    yield "U";
             }
             default -> "";
         };

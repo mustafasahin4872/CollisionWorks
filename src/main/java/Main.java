@@ -1,5 +1,5 @@
-package game.core;
-
+import game.core.Game;
+import game.core.GameState;
 import game.io.Frame;
 import game.ui.AccessorySelection;
 import game.ui.LevelSelection;
@@ -10,31 +10,23 @@ import game.core.GameState.STATE;
 
 public class Main {
 
-    public static final String RESOURCES_ROOT = "src/main/resources/";
-    public static final String IMAGES_ROOT = RESOURCES_ROOT + "images/";
-
-    public static GameState gameState;
-    public static InputHandler inputHandler;
-
-    public static final Long GAME_START = System.currentTimeMillis();
-
     // manage selection, in-game, shop screen calls according to gameState
     // create corresponding maps and frames, then run and edit gameState
     public static void main(String[] args) throws Exception {
 
         Frame.setCanvas();
-        gameState = new GameState();
-        inputHandler = new InputHandler();
+        GameState.gameState = new GameState();
+        final InputHandler inputHandler = new InputHandler();
 
-        MainSelection mainSelection = new MainSelection(inputHandler, gameState);
-        AccessorySelection accessorySelection = new AccessorySelection(inputHandler, gameState);
-        LevelSelection levelSelection = new LevelSelection(inputHandler, gameState);
-        Game game = new Game(inputHandler, gameState);
-        Shop shop = new Shop(inputHandler, gameState);
+        MainSelection mainSelection = new MainSelection(inputHandler, GameState.gameState);
+        AccessorySelection accessorySelection = new AccessorySelection(inputHandler, GameState.gameState);
+        LevelSelection levelSelection = new LevelSelection(inputHandler, GameState.gameState);
+        Game game = new Game(inputHandler, GameState.gameState);
+        Shop shop = new Shop(inputHandler, GameState.gameState);
 
-        while (gameState.getState() != STATE.QUIT) {
+        while (GameState.gameState.getState() != STATE.QUIT) {
 
-            switch (gameState.getState()) {
+            switch (GameState.gameState.getState()) {
                 case SELECTION -> mainSelection.mainSelectionLoop();
                 case ACCESSORY -> accessorySelection.accessorySelectionLoop();
                 case GAME -> levelSelection.levelSelectionLoop();

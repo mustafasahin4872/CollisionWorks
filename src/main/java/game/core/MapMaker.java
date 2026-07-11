@@ -11,7 +11,7 @@ import java.io.FileNotFoundException;
 import java.util.*;
 import java.util.Map;
 
-import static game.core.Main.RESOURCES_ROOT;
+import static data.Constants.RESOURCES_ROOT;
 
 //creates all the map objects from map file
 public class MapMaker {

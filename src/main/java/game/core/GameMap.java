@@ -26,27 +26,28 @@ public class GameMap {
     private final Set<MapObject> alwaysCalledObjects = new HashSet<>();
     private final Set<Drawable> drawables = new HashSet<>();
 
-    //private final int totalCoinOnMap;
+    // private final int totalCoinOnMap;
 
-    //------------------------------------------------------------------------------------------------------------
+    // ------------------------------------------------------------------------------------------------------------
 
     public GameMap(GameState gameState, MapMaker.MapType mapType) {
         xTile = mapType.xTile;
         yTile = mapType.yTile;
         this.player = gameState.getPlayer();
 
-        width = xTile*Tile.HALF_SIDE*2;
-        height = yTile*Tile.HALF_SIDE*2;
+        width = xTile * Tile.HALF_SIDE * 2;
+        height = yTile * Tile.HALF_SIDE * 2;
 
-        MapMaker mapMaker = new MapMaker(gameState.getWorldIndex(), gameState.getLevelIndex(), xTile, yTile, player, mapType);
+        MapMaker mapMaker = new MapMaker(gameState.getWorldIndex(), gameState.getLevelIndex(), xTile, yTile, player,
+                mapType);
         mapMaker.mapMaker();
         layers = mapMaker.getLayers();
         spawnPoint = mapMaker.getSpawnPoint();
 
         ArrayList<Shooter> shooters = new ArrayList<>();
         for (GridObject[][] layer : layers) {
-            for (int i = 0; i<yTile; i++) {
-                for (int j = 0; j<xTile; j++) {
+            for (int i = 0; i < yTile; i++) {
+                for (int j = 0; j < xTile; j++) {
                     GridObject gridObject = layer[i][j];
                     if (gridObject instanceof MovingCollidable movingCollidable) {
                         movingCollidableObjects.add(movingCollidable);
@@ -55,11 +56,13 @@ public class GameMap {
                     } else if (gridObject instanceof HealthBearer healthBearer) {
                         healthBearers.add(healthBearer);
                     }
-                    if (gridObject instanceof Shooter s) shooters.add(s);
+                    if (gridObject instanceof Shooter s)
+                        shooters.add(s);
                     if (gridObject instanceof Door || gridObject instanceof Shooter || gridObject instanceof Moving) {
                         alwaysCalledObjects.add(gridObject);
                     }
-                    if (gridObject instanceof Drawable d) drawables.add(d);
+                    if (gridObject instanceof Drawable d)
+                        drawables.add(d);
                 }
             }
         }
@@ -72,7 +75,11 @@ public class GameMap {
         setFrameTileRange();
     }
 
-    //------------------------------------------------------------------------------------------------------------
+    public static boolean outOfMapBounds(GridObject[][] layer, int i, int j) {
+        return i < 0 || j < 0 || i >= layer.length || j >= layer[0].length;
+    }
+
+    // ------------------------------------------------------------------------------------------------------------
 
     public Player getPlayer() {
         return player;
@@ -86,9 +93,11 @@ public class GameMap {
         return height;
     }
 
-    public double[] getSpawnPoint() {return spawnPoint;}
+    public double[] getSpawnPoint() {
+        return spawnPoint;
+    }
 
-    //------------------------------------------------------------------------------------------------------------
+    // ------------------------------------------------------------------------------------------------------------
 
     public void callMapObjects() {
         player.call(layers);
@@ -101,8 +110,9 @@ public class GameMap {
         for (GridObject[][] layer : layers) {
             for (int y = tileRange[1]; y <= tileRange[3]; y++) {
                 for (int x = tileRange[0]; x <= tileRange[2]; x++) {
-                    GridObject gridObject = layer[y-1][x-1];
-                    if (gridObject == null) continue;
+                    GridObject gridObject = layer[y - 1][x - 1];
+                    if (gridObject == null)
+                        continue;
 
                     if (!alwaysCalledObjects.contains(gridObject)) {
                         if (gridObject instanceof EmptyGridObject e) {
@@ -115,7 +125,7 @@ public class GameMap {
 
                     }
                     if (gridObject.isExpired()) {
-                        layer[y-1][x-1] = null;
+                        layer[y - 1][x - 1] = null;
                     }
                 }
             }
@@ -134,11 +144,12 @@ public class GameMap {
         int endX = tileRange[2];
         int endY = tileRange[3];
         for (GridObject[][] layer : layers) {
-            for (int i = startY; i<=endY; i++) {
-                for (int j = startX; j<=endX; j++) {
-                    GridObject gridObject = layer[i-1][j-1];
-                    if (gridObject!=null) {
-                        if (gridObject instanceof Drawable d) d.draw();
+            for (int i = startY; i <= endY; i++) {
+                for (int j = startX; j <= endX; j++) {
+                    GridObject gridObject = layer[i - 1][j - 1];
+                    if (gridObject != null) {
+                        if (gridObject instanceof Drawable d)
+                            d.draw();
                     }
                 }
             }
@@ -147,15 +158,16 @@ public class GameMap {
 
     private void drawAlwaysCalledObjects() {
         for (MapObject mapObject : alwaysCalledObjects) {
-            if (mapObject instanceof Drawable d) d.draw();
+            if (mapObject instanceof Drawable d)
+                d.draw();
         }
 
     }
 
-    //--------------------------------------------------------------------------------------------------
+    // --------------------------------------------------------------------------------------------------
 
     public void setFrameTileRange() {
-        //normally ranges should be 9 and 6, but for guarantee, set them higher
+        // normally ranges should be 9 and 6, but for guarantee, set them higher
         final int X_RANGE = 12, Y_RANGE = 10;
 
         int xNum = (int) (player.getX() / GridObject.TILE_SIDE);
@@ -164,7 +176,7 @@ public class GameMap {
         int minX = xNum - X_RANGE;
         int maxX = xNum + X_RANGE + 1;
 
-        if (minX<1) {
+        if (minX < 1) {
             minX = 1;
             maxX = Math.min(minX + X_RANGE * 2, xTile);
 
@@ -176,16 +188,15 @@ public class GameMap {
         int minY = yNum - Y_RANGE;
         int maxY = yNum + Y_RANGE + 1;
 
-        if (minY<1) {
+        if (minY < 1) {
             minY = 1;
             maxY = Math.min(minY + Y_RANGE * 2, yTile);
-        }
-        else if (maxY > yTile) {
+        } else if (maxY > yTile) {
             maxY = yTile;
-            minY = Math.max(maxY - Y_RANGE *2, 1);
+            minY = Math.max(maxY - Y_RANGE * 2, 1);
         }
 
-        tileRange = new int[]{minX, minY, maxX, maxY};
+        tileRange = new int[] { minX, minY, maxX, maxY };
     }
 
 }

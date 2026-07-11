@@ -1,18 +1,17 @@
 package mapobjects.entities;
 
+import data.Constants;
 import game.io.Frame;
 import game.core.GameState;
 import game.io.InputHandler.ArrowData;
-import game.core.Main;
 
 import game.io.Drawer.PictureDrawer;
-import mapobjects.data.PlayerDefaults;
+import data.PlayerDefaults;
 import mapobjects.components.*;
 import mapobjects.traits.*;
 
 import java.util.Set;
 
-import static helpers.HelperMethods.*;
 import static mapobjects.traits.GridObject.TILE_SIDE;
 
 public class Player extends Equippable implements MovingCollidable, HealthBearer {
@@ -49,7 +48,7 @@ public class Player extends Equippable implements MovingCollidable, HealthBearer
 
     private PictureDrawer drawer;
 
-    //CONSTRUCTORS
+    // CONSTRUCTORS
 
     // TODO: CREATE A DUMMY PLAYER TYPE, ASIDE FROM BOB
     public Player() {
@@ -57,7 +56,7 @@ public class Player extends Equippable implements MovingCollidable, HealthBearer
     }
 
     public Player(String playerName) {
-        super(0,0, 0, 0, 0, playerName, PlayerDefaults.valueOf(playerName).getRarity());
+        super(0, 0, 0, 0, 0, playerName, PlayerDefaults.valueOf(playerName).getRarity());
         this.playerName = playerName;
 
         PlayerDefaults playerDefaults = PlayerDefaults.valueOf(playerName);
@@ -88,35 +87,61 @@ public class Player extends Equippable implements MovingCollidable, HealthBearer
         updateName();
     }
 
+    public static String getDirectionString(int xDirection, int yDirection) {
+        String direction;
+        if (xDirection == 0 && yDirection == 0) {
+            direction = "0";
+        } else if (xDirection == 0 && yDirection == 1) {
+            direction = "D";
+        } else if (xDirection == 0 && yDirection == -1) {
+            direction = "U";
+        } else if (xDirection == 1 && yDirection == 0) {
+            direction = "R";
+        } else if (xDirection == -1 && yDirection == 0) {
+            direction = "L";
+        } else if (xDirection == 1 && yDirection == 1) {
+            direction = "DR";
+        } else if (xDirection == -1 && yDirection == 1) {
+            direction = "DL";
+        } else if (xDirection == 1 && yDirection == -1) {
+            direction = "UR";
+        } else if (xDirection == -1 && yDirection == -1) {
+            direction = "UL";
+        } else {
+            direction = "invalid";
+        }
+        return direction;
+    }
 
-//UPDATES
+    // UPDATES
 
     public void call(GridObject[][][] layers) {
 
         checkDead();
 
         gun.call(this);
-        if (shoot) gun.shoot();
+        if (shoot)
+            gun.shoot();
 
-        int range = 2; //the checking range
+        int range = 2; // the checking range
         int[] gridNumbers = getGridNumbers();
         for (GridObject[][] layer : layers) {
-            for (int i = gridNumbers[1]-range; i<gridNumbers[1]+range; i++) {
-                for (int j = gridNumbers[0]-range; j<gridNumbers[0]+range; j++) {
-                    if (i<0 || j<0 || i>=layer.length || j>=layer[0].length) continue;
+            for (int i = gridNumbers[1] - range; i < gridNumbers[1] + range; i++) {
+                for (int j = gridNumbers[0] - range; j < gridNumbers[0] + range; j++) {
+                    if (i < 0 || j < 0 || i >= layer.length || j >= layer[0].length)
+                        continue;
                     GridObject currentGridObject = layer[i][j];
                     checkMapObjectEffects(currentGridObject);
                 }
             }
         }
-        //player's projectiles are not checking player collisions
+        // player's projectiles are not checking player collisions
         for (Projectile projectile : gun.getProjectiles()) {
             projectile.call(new Player(), layers);
         }
         gun.getProjectiles().removeIf(MapObject::isExpired);
         updateName();
     }
-
 
     private void checkMapObjectEffects(GridObject currentGridObject) {
         if (currentGridObject instanceof Collidable c && !(c instanceof Ghost)) {
@@ -132,7 +157,7 @@ public class Player extends Equippable implements MovingCollidable, HealthBearer
     public void update() {
 
         if (!isXCollided()) {
-            setX(getX()+ getXVelocity() * Frame.DT);
+            setX(getX() + getXVelocity() * Frame.DT);
         }
         if (!isYCollided()) {
             setY(getY() + getYVelocity() * Frame.DT);
@@ -141,7 +166,8 @@ public class Player extends Equippable implements MovingCollidable, HealthBearer
         yCollided = false;
 
         for (Accessory accessory : accessories) {
-            if (accessory != null) accessory.update();
+            if (accessory != null)
+                accessory.update();
         }
     }
 
@@ -225,14 +251,13 @@ public class Player extends Equippable implements MovingCollidable, HealthBearer
 
     }
 
-
-    //GETTERS, SETTERS
+    // GETTERS, SETTERS
 
     public String getPlayerName() {
         return playerName;
     }
 
-    //ACCESSORY
+    // ACCESSORY
 
     public void setAccessories(Accessory[] accessories) {
         this.accessories = accessories;
@@ -251,7 +276,7 @@ public class Player extends Equippable implements MovingCollidable, HealthBearer
         this.gun = gun;
     }
 
-    //COLLISION
+    // COLLISION
 
     @Override
     public Box getCollisionBox() {
@@ -280,8 +305,7 @@ public class Player extends Equippable implements MovingCollidable, HealthBearer
         return yCollided;
     }
 
-
-    //MOVEMENTS
+    // MOVEMENTS
 
     public void slip() {
         double a = 0.12 * baseAcceleration;
@@ -355,8 +379,7 @@ public class Player extends Equippable implements MovingCollidable, HealthBearer
         acceleration = baseAcceleration;
     }
 
-
-    //DIRECTION VALUES
+    // DIRECTION VALUES
 
     public int getXDirection() {
         return xDirection;
@@ -366,7 +389,7 @@ public class Player extends Equippable implements MovingCollidable, HealthBearer
         return yDirection;
     }
 
-    //SIZE
+    // SIZE
 
     public double getBaseSide() {
         return baseSide;
@@ -377,8 +400,7 @@ public class Player extends Equippable implements MovingCollidable, HealthBearer
         setHeight(baseSide);
     }
 
-
-    //LIVES AND HP
+    // LIVES AND HP
 
     @Override
     public HPBar getHealthBar() {
@@ -402,11 +424,11 @@ public class Player extends Equippable implements MovingCollidable, HealthBearer
 
     @Override
     public void ifNoLivesLeft() {
-        Main.gameState.setState(GameState.STATE.DEAD);
+        GameState.gameState.setState(GameState.STATE.DEAD);
     }
 
     public void restart() {
-        //TODO: CHECK IF THERE ARE MORE FIELDS THAT NEED RESETTING
+        // TODO: CHECK IF THERE ARE MORE FIELDS THAT NEED RESETTING
         hpBar.resetLives();
         respawn();
     }
@@ -433,13 +455,14 @@ public class Player extends Equippable implements MovingCollidable, HealthBearer
         int eyeOpenDuration = 3000;
         int total = blinkDuration + eyeOpenDuration;
 
-        long delta = System.currentTimeMillis() - Main.GAME_START;
+        long delta = System.currentTimeMillis() - Constants.GAME_START;
         double progress = (delta % total) - eyeOpenDuration;
-        if (progress < 0) progress = 0;
+        if (progress < 0)
+            progress = 0;
         double progressRatio = progress / blinkDuration;
 
         int steps = 2 * (animationNumber - 1); // steps = 10 for animationNumber = 6
-        int currentStep = (int)(progressRatio * steps);
+        int currentStep = (int) (progressRatio * steps);
 
         if (currentStep < animationNumber) {
             return currentStep; // ramping up: 0 to animationNumber - 1
@@ -450,27 +473,29 @@ public class Player extends Equippable implements MovingCollidable, HealthBearer
     }
 
     public void drawProjectiles() {
-        for (Projectile projectile : gun.getProjectiles()) projectile.draw();
+        for (Projectile projectile : gun.getProjectiles())
+            projectile.draw();
     }
 
     public void drawAccessories() {
         if (accessories != null) {
             for (Accessory accessory : accessories) {
-                if (accessory != null) accessory.draw();
+                if (accessory != null)
+                    accessory.draw();
             }
         }
     }
 
     @Override
     public String[] getStats() {
-        return new String[]{
-            "Size: " + Math.round(10 * baseSide / TILE_SIDE)/10.0 + " tiles",
-            "HP: " + hpBar.getMaxHP(),
-            "Defense: " + hpBar.getDefense(),
-            "Lives: " + hpBar.getLives(),
-            "Max Speed: " + baseMaxSpeed,
-            "Acceleration: " + baseAcceleration,
-            "Deceleration: " + baseDeceleration
-            };
+        return new String[] {
+                "Size: " + Math.round(10 * baseSide / TILE_SIDE) / 10.0 + " tiles",
+                "HP: " + hpBar.getMaxHP(),
+                "Defense: " + hpBar.getDefense(),
+                "Lives: " + hpBar.getLives(),
+                "Max Speed: " + baseMaxSpeed,
+                "Acceleration: " + baseAcceleration,
+                "Deceleration: " + baseDeceleration
+        };
     }
 }

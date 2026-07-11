@@ -1,12 +1,12 @@
 package game.io;
 
-import game.core.Main;
+import data.Constants;
 import lib.StdDraw;
 import mapobjects.components.Box;
 
 import java.awt.*;
 
-import static game.core.Main.IMAGES_ROOT;
+import static data.Constants.IMAGES_ROOT;
 import static helpers.TextMethods.*;
 
 public abstract class Drawer {
@@ -66,7 +66,7 @@ public abstract class Drawer {
         double maxDiff = 0.1; // between 0 and 1 always!
         double period = 3000; // in milliseconds
 
-        double ratio = ((System.currentTimeMillis() - Main.GAME_START) % period) / period;
+        double ratio = ((System.currentTimeMillis() - Constants.GAME_START) % period) / period;
         double multiplier;
         if (ratio > 0.5) {
             multiplier = 1 + maxDiff - 2 * maxDiff * ((ratio - 0.5) / 0.5);

@@ -1,6 +1,6 @@
 package mapobjects.traits;
 
-import game.core.Main;
+import data.Constants;
 
 import java.awt.*;
 import java.io.*;
@@ -55,7 +55,7 @@ public abstract class Equippable extends MapObject implements Drawable {
     public abstract String[] getStats();
 
     public String getDescription() {
-        String pathname = Main.RESOURCES_ROOT + "infos/"  + getDirectory1() + getDrawer().getName().split("/")[0] + ".txt";
+        String pathname = Constants.RESOURCES_ROOT + "infos/"  + getDirectory1() + getDrawer().getName().split("/")[0] + ".txt";
         File infoFile = new File(pathname);
         try {
             BufferedReader reader = new BufferedReader(new FileReader(infoFile));

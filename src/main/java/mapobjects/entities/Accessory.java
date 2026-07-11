@@ -1,9 +1,10 @@
 package mapobjects.entities;
+
 import game.io.Drawer.PictureDrawer;
 import mapobjects.traits.Drawable;
 import mapobjects.traits.Equippable;
 
-import static helpers.HelperMethods.getDirectionString;
+import static mapobjects.entities.Player.getDirectionString;
 import static mapobjects.traits.GridObject.TILE_SIDE;
 
 /// different accessories are placed on different locations on player.
@@ -19,12 +20,12 @@ public abstract class Accessory extends Equippable implements Drawable {
     private final PictureDrawer drawer;
 
     public Accessory(String accessoryName, double defaultWidth, double defaultHeight, RARITY rarity) {
-        super(0, 0, 0, defaultWidth, defaultHeight, accessoryName+"/0", rarity);
+        super(0, 0, 0, defaultWidth, defaultHeight, accessoryName + "/0", rarity);
         this.player = new Player(); // replaced later
         this.accessoryName = accessoryName;
         this.defaultWidth = defaultWidth;
         this.defaultHeight = defaultHeight;
-        this.drawer = new PictureDrawer(positionBox, getDirectory1(), accessoryName+"/0");
+        this.drawer = new PictureDrawer(positionBox, getDirectory1(), accessoryName + "/0");
         update();
     }
 
@@ -51,15 +52,16 @@ public abstract class Accessory extends Equippable implements Drawable {
         this.alone = alone;
     }
 
-    //------------------------------------------------------------------------------------------
-    //------------------------------------------------------------------------------------------
+    // ------------------------------------------------------------------------------------------
+    // ------------------------------------------------------------------------------------------
 
     public void update() {
         setCoordinates();
         updateName();
     }
 
-    //sets coordinates using player's position. different coordinates for each accessory type
+    // sets coordinates using player's position. different coordinates for each
+    // accessory type
     protected abstract void setCoordinates();
 
     private void updateName() {
@@ -98,29 +100,31 @@ public abstract class Accessory extends Equippable implements Drawable {
     // TODO: ADD STATS TO EACH ACCESSORY TYPE
     @Override
     public String[] getStats() {
-        return new String[]{};
+        return new String[] {};
     }
 
-    //------------------------------------------------------------------------------------------
-    //------------------------------------------------------------------------------------------
+    // ------------------------------------------------------------------------------------------
+    // ------------------------------------------------------------------------------------------
 
-    public abstract static class Headwear extends Accessory{
+    public abstract static class Headwear extends Accessory {
         public Headwear(String accessoryName, double defaultWidth, double defaultHeight, RARITY rarity) {
             super(accessoryName, defaultWidth, defaultHeight, rarity);
         }
     }
+
     public abstract static class Brooch extends Accessory {
         public Brooch(String accessoryName, double defaultWidth, double defaultHeight, RARITY rarity) {
             super(accessoryName, defaultWidth, defaultHeight, rarity);
         }
     }
+
     public abstract static class Neckwear extends Accessory {
         public Neckwear(String accessoryName, double defaultWidth, double defaultHeight, RARITY rarity) {
             super(accessoryName, defaultWidth, defaultHeight, rarity);
         }
     }
 
-    //Stays on the middle top of the player, does not change as player moves.
+    // Stays on the middle top of the player, does not change as player moves.
     public static class Hat extends Headwear {
         public Hat(String name, RARITY rarity) {
             super(name, 65, 25, rarity);
@@ -129,7 +133,7 @@ public abstract class Accessory extends Equippable implements Drawable {
         @Override
         protected void setCoordinates() {
             double x = player.getX();
-            double y = player.getY()-(2*player.getHeight()/5)-getHeight()/2;
+            double y = player.getY() - (2 * player.getHeight() / 5) - getHeight() / 2;
 
             setX(x);
             setY(y);
@@ -137,7 +141,7 @@ public abstract class Accessory extends Equippable implements Drawable {
 
     }
 
-    //Stays in the center of the player, does not change as player moves.
+    // Stays in the center of the player, does not change as player moves.
     public static class Necklace extends Neckwear {
 
         public Necklace(String name, RARITY rarity) {
@@ -148,10 +152,10 @@ public abstract class Accessory extends Equippable implements Drawable {
         protected void setCoordinates() {
             double x = player.getX();
 
-            double baseY = player.getY()+player.getHeight()/3;
+            double baseY = player.getY() + player.getHeight() / 3;
             double yShift = player.getHeight() / 8;
             int yDir = player.getYDirection();
-            double y = baseY + yDir*yShift;
+            double y = baseY + yDir * yShift;
 
             setX(x);
             setY(y);
@@ -159,7 +163,8 @@ public abstract class Accessory extends Equippable implements Drawable {
 
     }
 
-    //sits on lower half of player, moves to the direction player moves to (stays right below the eyes)
+    // sits on lower half of player, moves to the direction player moves to (stays
+    // right below the eyes)
     public static class Tie extends Neckwear {
 
         public Tie(String name, RARITY rarity) {
@@ -168,16 +173,16 @@ public abstract class Accessory extends Equippable implements Drawable {
 
         @Override
         protected void setCoordinates() {
-            double baseY = player.getY()+player.getHeight()/2;
+            double baseY = player.getY() + player.getHeight() / 2;
             double baseX = player.getX();
-            double xShift = player.getWidth()/2 - player.getWidth()*2/5;
+            double xShift = player.getWidth() / 2 - player.getWidth() * 2 / 5;
             double yShift = player.getHeight() / 8;
 
             int xDir = player.getXDirection();
             int yDir = player.getYDirection();
 
-            double x = baseX + xDir*xShift;
-            double y = baseY + yDir*yShift;
+            double x = baseX + xDir * xShift;
+            double y = baseY + yDir * yShift;
 
             setX(x);
             setY(y);
@@ -185,7 +190,7 @@ public abstract class Accessory extends Equippable implements Drawable {
 
     }
 
-    //Stays on top of the player, moves to the left side when going right.
+    // Stays on top of the player, moves to the left side when going right.
     public static class Pin extends Brooch {
 
         public Pin(String name, RARITY rarity) {
@@ -198,7 +203,7 @@ public abstract class Accessory extends Equippable implements Drawable {
             double baseX = player.getX();
             double xShift = player.getWidth() / 2 - player.getWidth() / 5;
             int multiplier = (player.getXDirection() == -1) ? 1 : -1;
-            double x = baseX + multiplier*xShift;
+            double x = baseX + multiplier * xShift;
 
             double y = player.getY() + player.getHeight() / 4;
 
@@ -208,7 +213,7 @@ public abstract class Accessory extends Equippable implements Drawable {
 
     }
 
-    //Stays on top of the player, moves to the left side when going right.
+    // Stays on top of the player, moves to the left side when going right.
     public static class Headpiece extends Headwear {
 
         public Headpiece(String name, RARITY rarity) {
