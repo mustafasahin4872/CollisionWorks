@@ -88,7 +88,12 @@ public class HPBar {
     }
 
     public void takeDamage(double damageAmount) {
+        takeDamage(damageAmount, 0);
+    }
+
+    public void takeDamage(double damageAmount, double shredAmount) {
         if (noLivesLeft() || isDead()) return;
+        double defense = Math.max(this.defense - shredAmount, 0);
         damageAmount = Math.max(damageAmount-defense, 0);
         HP -= damageAmount;
         if (HP<=0) {

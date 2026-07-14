@@ -65,13 +65,13 @@ public abstract class Tile extends GridObject implements Drawable {
         }
 
         @Override
-        public Box getEffectBox() {
+        public Box getTriggerBox() {
             return effectBox;
         }
 
         @Override
         public void checkPlayerIsOn(Player player) {
-            checkPlayerCenterIsOn(player);
+            if (isCenterOn(player)) playerIsOn(player);
         }
 
     }
@@ -131,11 +131,6 @@ public abstract class Tile extends GridObject implements Drawable {
             player.damage(worldIndex);
         }
 
-        @Override
-        public void checkPlayerIsOn(Player player) {
-            checkPlayerCornerIsOn(player);
-        }
-
     }
 
 
@@ -149,11 +144,6 @@ public abstract class Tile extends GridObject implements Drawable {
         public void playerIsOn(Player player) {
             resetPlayerStats(player);
             player.heal(3.0 / worldIndex);
-        }
-
-        @Override
-        public void checkPlayerIsOn(Player player) {
-            checkPlayerCornerIsOn(player);
         }
 
     }

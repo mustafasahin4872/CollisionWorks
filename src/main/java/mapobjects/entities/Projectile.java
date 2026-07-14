@@ -5,6 +5,7 @@ import game.io.Drawer.PictureDrawer;
 import mapobjects.components.Box;
 import mapobjects.components.Damager;
 import mapobjects.components.Direction;
+import mapobjects.effects.DamageEffect;
 import mapobjects.traits.*;
 import java.util.Set;
 
@@ -212,6 +213,11 @@ public class Projectile extends MapObject implements MovingCollidable, Damaging,
     @Override
     public Damager getDamager() {
         return damager;
+    }
+
+    @Override
+    public DamageEffect getEffect() {
+        return new DamageEffect(damager.getDamage(), damager.getShred());
     }
 
     @Override

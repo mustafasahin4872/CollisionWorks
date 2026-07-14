@@ -1,20 +1,18 @@
 package mapobjects.traits;
 
-import mapobjects.entities.Player;
 import mapobjects.components.Box;
 
 import static helpers.CollisionMethods.intersects;
 
-public interface Ranged {
+public interface Ranged extends Triggerable<Moving> {
 
     Box getRangeBox();
 
-    default void checkPlayerInRange(Player player) {
-        if (intersects(player.getCollisionBox(), getRangeBox())) {
-            playerInRange(player);
-        }
+    @Override
+    default boolean triggered(Moving moving) {
+        return intersects(moving.getPositionBox(), getRangeBox());
     }
 
-    void playerInRange(Player player);
+    void action(Moving moving);
 
 }

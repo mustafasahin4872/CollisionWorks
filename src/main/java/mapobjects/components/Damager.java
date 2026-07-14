@@ -4,8 +4,22 @@ public class Damager {
 
     private double damage;
     private double shred; // TODO: ADD DEFENSE SHREDDING OPTION AND MORE
-    public Damager(double damage) {
+
+    public Damager(double damage, double shred) {
         this.damage = damage;
+        this.shred = shred;
+    }
+
+    public Damager(double damage) {
+        this(damage, 0);
+    }
+
+    public double getDamage() {
+        return damage;
+    }
+
+    public double getShred() {
+        return shred;
     }
 
     public void increaseDamage(double extra) {
@@ -16,8 +30,8 @@ public class Damager {
         damage *= multiplier;
     }
 
-    public void damage(HPBar HPBar) {
-        HPBar.takeDamage(damage);
+    public void dealDamage(HPBar hpBar) {
+        hpBar.takeDamage(damage);
     }
 
 }

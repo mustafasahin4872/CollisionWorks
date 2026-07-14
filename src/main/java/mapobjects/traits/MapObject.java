@@ -73,6 +73,10 @@ public abstract class MapObject {
         return positionBox.getCenterCoordinates();
     }
 
+    public Box getPositionBox() {
+        return positionBox;
+    }
+
     public double getX() {
         return positionBox.getCenterX();
     }

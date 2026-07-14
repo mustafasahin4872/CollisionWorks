@@ -1,81 +1,106 @@
 package mapobjects.components;
 
-//imitates a timer
-//when activated, starts ticking, after period is over,
-//gets deactivated and goes to cooldown if recurring.
+/// has 4 states:
+/// active: 0 -> PERIOD
+/// completed: PERIOD -> cooldown start
+/// inCooldown: 0 -> COOLDOWN
+/// cooldownOver: COOLDOWN -> reactivation
+/// has 2 modes: cyclical = true or false
+/// if true, after a period is done, stays completed for 1 frame then goes into cooldown,
+/// after cooldown, stays cooldownOver for one frame then restarts
+/// if false, needs manual calls for activate() and startCooldown(),
+/// until activation, stays in complete or cooldownOver states indefinitely.
+
 public class Timer {
 
-    protected boolean active, completed;
-    protected long startTime;
-    protected final boolean recurring;
-    protected final double period, cooldown;
+    public enum CLOCK_STATE {ACTIVE, COMPLETE, IN_COOLDOWN, COOLDOWN_OVER, INACTIVE}
+    private CLOCK_STATE clockState = CLOCK_STATE.INACTIVE;
 
-    public Timer(double period, double cooldown) {
+    private long startTime;
+    private final boolean cyclical;
+    private double period, cooldown;
+
+    public Timer(double period, double cooldown, boolean cyclical) {
         this.period = period;
         this.cooldown = cooldown;
-        recurring = !(cooldown == -1);
+        this.cyclical = cyclical;
     }
 
-
-    public boolean isCompleted() {
-        return completed;
+    public void setPeriod(double period) {
+        this.period = period;
     }
+
+    public void setCooldown(double cooldown) {
+        this.cooldown = cooldown;
+    }
+
 
     public boolean isActive() {
-        return active;
+        return clockState == CLOCK_STATE.ACTIVE;
     }
 
+    public boolean isComplete() {return clockState == CLOCK_STATE.COMPLETE;}
+
     public boolean inCooldown() {
-        return !active&&completed;
+        return clockState == CLOCK_STATE.IN_COOLDOWN;
     }
 
     public boolean cooldownOver() {
-        return !completed && !active;
+        return clockState == CLOCK_STATE.COOLDOWN_OVER;
     }
 
+    public boolean isInactive() {return clockState == CLOCK_STATE.INACTIVE;}
 
-    public void tick() {
-        long timePassed = System.currentTimeMillis() - startTime;
-        if (active && !completed && timePassed >= period) {
-            if (recurring) {startCooldown();}
-            else {complete();}
-        } else if (recurring && completed && timePassed >= cooldown) {
-            finishCooldown();
-        }
-    }
 
 
     public void activate() {
-        active = true;
-        completed = false;
+        clockState = CLOCK_STATE.ACTIVE;
         startTime = System.currentTimeMillis();
     }
 
-    private void complete() {
-        completed = true;
-        active = false;
+    public void complete() {
+        clockState = CLOCK_STATE.COMPLETE;
     }
 
     public void startCooldown() {
-        complete();
+        clockState = CLOCK_STATE.IN_COOLDOWN;
         startTime = System.currentTimeMillis();
     }
 
     private void finishCooldown() {
-        completed = false;
-        active = false;
+        clockState = CLOCK_STATE.COOLDOWN_OVER;
     }
 
+    private void inactivate() {
+        clockState = CLOCK_STATE.INACTIVE;
+    }
 
+    public void tick() {
+        long timePassed = System.currentTimeMillis() - startTime;
+        switch (clockState) {
+            case ACTIVE -> {
+                if (timePassed >= period) complete();
+            }
+            case COMPLETE -> {
+                if (cyclical) startCooldown();
+            }
+            case IN_COOLDOWN -> {
+                if (timePassed >= cooldown) finishCooldown();
+            }
+            case COOLDOWN_OVER -> {
+                if (cyclical) activate();
+            }
+        }
+    }
 
     public double progressRatio() {
-        if (!active) {
-            return 0;
-        } else if (completed) {
+        if (isComplete()) {
             return 1;
-        } else {
+        } else if (isActive()) {
             double timePassed = System.currentTimeMillis() - startTime;
             return timePassed/period % 1;
+        } else {
+            return 0;
         }
     }
 

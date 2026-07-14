@@ -1,9 +1,11 @@
 package mapobjects.traits;
 
 import game.io.Frame;
+import mapobjects.components.Box;
 
 public interface Moving {
 
+    Box getPositionBox();
     double getX();
     double getY();
     void setX(double x);

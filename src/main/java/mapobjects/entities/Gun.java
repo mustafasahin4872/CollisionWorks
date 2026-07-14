@@ -5,7 +5,6 @@ import mapobjects.factories.Blueprint;
 import mapobjects.traits.*;
 import mapobjects.components.Spawner;
 import mapobjects.components.Timer;
-import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 
@@ -27,8 +26,8 @@ public abstract class Gun extends Equippable implements Generator, Drawable {
     private final int defaultUnloadTime;
 
     private int maxAmmo;
-    private Timer reloadTimer;
-    private Timer unloadTimer;
+    private final Timer reloadTimer;
+    private final Timer unloadTimer;
 
     private final int[] levels = new int[3];
     private int ammo;
@@ -54,8 +53,8 @@ public abstract class Gun extends Equippable implements Generator, Drawable {
 
         this.maxAmmo = maxAmmo;
         ammo = maxAmmo;
-        reloadTimer = new Timer(0, reloadTime);
-        unloadTimer = new Timer(0, unloadTime);
+        reloadTimer = new Timer(Long.MAX_VALUE, reloadTime, true);
+        unloadTimer = new Timer(Long.MAX_VALUE, unloadTime, true);
 
         spawner = new Spawner(worldIndex);
         drawer = new PictureDrawer(positionBox, getDirectory1(), getClass().getName().split("\\$")[1].toLowerCase(Locale.ROOT));
@@ -78,12 +77,9 @@ public abstract class Gun extends Equippable implements Generator, Drawable {
         nextCenterCoordinates = player.getNextCenterCoordinates();
         direction = (Math.toDegrees(Math.atan2(yVelocity, xVelocity)) + 360) % 360;
 
-        if (!reloadTimer.isCompleted()) {
-            reloadTimer.activate();
-        }
-
         if (reloadTimer.isActive()) {
             reload();
+            reloadTimer.startCooldown();
         }
 
         reloadTimer.tick();
@@ -91,11 +87,11 @@ public abstract class Gun extends Equippable implements Generator, Drawable {
     }
 
     void shoot() {
-        if (ammo > 0 && !unloadTimer.isCompleted()) {
-            unloadTimer.activate();
-            reloadTimer.startCooldown();
+        if (ammo > 0 && !unloadTimer.inCooldown()) {
             spawn();
             ammo--;
+            unloadTimer.startCooldown();
+            reloadTimer.startCooldown();
         }
     }
 
@@ -159,12 +155,12 @@ public abstract class Gun extends Equippable implements Generator, Drawable {
 
     protected void reloadBuff(double buff) {
         int rt = (int) (defaultReloadTime * (1 - buff));
-        this.reloadTimer = new Timer(0, rt);
+        this.reloadTimer.setCooldown(rt);
     }
 
     protected void unloadBuff(double buff) {
         int ut = (int) (defaultUnloadTime * (1 - buff));
-        this.unloadTimer = new Timer(0, ut);
+        this.unloadTimer.setCooldown(ut);
     }
 
     protected void ammoBuff(int buff) {

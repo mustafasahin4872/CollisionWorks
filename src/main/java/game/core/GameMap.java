@@ -23,6 +23,8 @@ public class GameMap {
     private final Set<Moving> movingObjects = new HashSet<>();
     private final Set<MovingCollidable> movingCollidableObjects = new HashSet<>();
     private final Set<HealthBearer> healthBearers = new HashSet<>();
+    private final Set<Ranged> rangeds = new HashSet<>();
+    private final Set<OnTriggerable> onTriggerables = new HashSet<>();
     private final Set<MapObject> alwaysCalledObjects = new HashSet<>();
     private final Set<MapObject> spawnedObjects;
     private final Set<Drawable> drawables = new HashSet<>();
@@ -47,19 +49,30 @@ public class GameMap {
         spawnedObjects = mapMaker.getSpawnedObjects();
 
         ArrayList<Shooter> shooters = new ArrayList<>();
+        ArrayList<Sign> signs = new ArrayList<>();
+
         for (GridObject[][] layer : layers) {
             for (int i = 0; i < yTile; i++) {
                 for (int j = 0; j < xTile; j++) {
                     GridObject gridObject = layer[i][j];
-                    if (gridObject instanceof MovingCollidable movingCollidable) {
-                        movingCollidableObjects.add(movingCollidable);
-                    } else if (gridObject instanceof Moving moving) {
+                    if (gridObject instanceof Moving moving) {
                         movingObjects.add(moving);
-                    } else if (gridObject instanceof HealthBearer healthBearer) {
+                        if (gridObject instanceof MovingCollidable movingCollidable) {
+                            movingCollidableObjects.add(movingCollidable);
+                        }
+                    }
+                    if (gridObject instanceof OnTriggerable o) {
+                        onTriggerables.add(o);
+                    }
+                    if (gridObject instanceof HealthBearer healthBearer) {
                         healthBearers.add(healthBearer);
+                    }
+                    if (gridObject instanceof Ranged ranged) {
+                        rangeds.add(ranged);
                     }
                     if (gridObject instanceof Shooter s)
                         shooters.add(s);
+                    if (gridObject instanceof Sign s) signs.add(s);
                     if (gridObject instanceof Door || gridObject instanceof Shooter || gridObject instanceof Moving) {
                         alwaysCalledObjects.add(gridObject);
                     }
@@ -69,9 +82,20 @@ public class GameMap {
             }
         }
         healthBearers.add(player);
+        movingObjects.add(player);
+
+        for (Ranged ranged : rangeds) {
+            ranged.setTriggerers(movingObjects);
+        }
+        for (OnTriggerable o : onTriggerables) {
+            if (!(o instanceof Sign)) o.setTriggerers(movingObjects);
+        }
 
         for (Shooter s : shooters) {
             s.setTargets(healthBearers);
+        }
+        for (Sign sign : signs) {
+            sign.setTriggerers(new HashSet<>(Set.of(player)));
         }
         player.setTargets(healthBearers);
         setFrameTileRange();
@@ -103,13 +127,16 @@ public class GameMap {
 
     public void callMapObjects() {
         player.call(layers);
+        player.call();
 
         for (MapObject mapObject : alwaysCalledObjects) {
             mapObject.call(player);
+            if (mapObject instanceof Receiver r) r.call();
         }
         for (MapObject mapObject : spawnedObjects) {
             if (mapObject instanceof Projectile p) p.call(player, layers);
             else mapObject.call(player);
+            if (mapObject instanceof Receiver r) r.call();
         }
         alwaysCalledObjects.removeIf(MapObject::isExpired);
         spawnedObjects.removeIf(MapObject::isExpired);
@@ -125,9 +152,11 @@ public class GameMap {
                         if (gridObject instanceof EmptyGridObject e) {
                             if (!alwaysCalledObjects.contains(e.getLinkedObject()) && !spawnedObjects.contains(e.getLinkedObject())) {
                                 gridObject.call(player);
+                                if (gridObject instanceof Receiver r) r.call();
                             }
                         } else {
                             gridObject.call(player);
+                            if (gridObject instanceof Receiver r) r.call();
                         }
                     }
                     if (gridObject.isExpired()) {

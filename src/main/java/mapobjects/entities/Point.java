@@ -27,11 +27,6 @@ public abstract class Point extends GridObject implements OnEffector, Drawable {
     }
 
     @Override
-    public void checkPlayerIsOn(Player player) {
-        checkPlayerCornerIsOn(player);
-    }
-
-    @Override
     public PictureDrawer getDrawer() {
         return drawer;
     }
@@ -45,7 +40,7 @@ public abstract class Point extends GridObject implements OnEffector, Drawable {
         drawer.draw();
     }
 
-    public static class WinPoint extends Point implements OnEffector {
+    public static class WinPoint extends Point {
 
         private final Box effectBox;
         private final GameState.STATE state;
@@ -69,7 +64,7 @@ public abstract class Point extends GridObject implements OnEffector, Drawable {
 
 
         @Override
-        public Box getEffectBox() {
+        public Box getTriggerBox() {
             return effectBox;
         }
 
@@ -80,7 +75,7 @@ public abstract class Point extends GridObject implements OnEffector, Drawable {
 
     }
 
-    public static class CheckPoint extends Point implements OnEffector {
+    public static class CheckPoint extends Point {
 
         private final Box effectBox;
         private CheckPoint prev;
@@ -102,7 +97,7 @@ public abstract class Point extends GridObject implements OnEffector, Drawable {
         }
 
         @Override
-        public Box getEffectBox() {
+        public Box getTriggerBox() {
             return effectBox;
         }
 

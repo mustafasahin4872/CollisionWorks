@@ -5,18 +5,20 @@ import game.io.Drawer.FilledCircleDrawer;
 import mapobjects.components.Box;
 import mapobjects.components.Damager;
 import mapobjects.components.Timer;
+import mapobjects.effects.DamageEffect;
 import mapobjects.traits.*;
 
 import java.awt.*;
 import java.util.Set;
 
-public class Mine extends GridObject implements OnEffector, Ranged, Timed, Damaging, Drawable {
+public class Mine extends GridObject implements Ranged, Timed, OnEffector, Damaging, Drawable {
 
     private final Box rangeBox;
     private final Box effectBox;
     private final Timer timer;
     private final Damager damager;
     private Set<HealthBearer> targets;
+    private Set<Moving> triggerers;
 
     private static final double RANGE = 6; //in tiles
     private static final double DEFAULT_DAMAGE = 30;
@@ -30,7 +32,7 @@ public class Mine extends GridObject implements OnEffector, Ranged, Timed, Damag
         super(worldIndex, xNum, yNum);
         rangeBox = new Box(getCenterCoordinates(), RANGE*TILE_SIDE, RANGE*TILE_SIDE);
         effectBox = positionBox.clone();
-        timer = new Timer(DEFAULT_PERIOD / worldIndex, -1);
+        timer = new Timer(DEFAULT_PERIOD / worldIndex, 0, false);
         damager = new Damager(worldIndex* DEFAULT_DAMAGE);
 
         outlineDrawer = new CircleDrawer(positionBox, HALF_SIDE, new Color(255, 150, 30, 200));
@@ -44,7 +46,7 @@ public class Mine extends GridObject implements OnEffector, Ranged, Timed, Damag
         positionBox.setCenterY(y);
         rangeBox = new Box(x, y, RANGE*TILE_SIDE, RANGE*TILE_SIDE);
         effectBox = positionBox.clone();
-        timer = new Timer(DEFAULT_PERIOD / worldIndex, -1);
+        timer = new Timer(DEFAULT_PERIOD / worldIndex, 0, false);
         damager = new Damager(worldIndex* DEFAULT_DAMAGE);
 
         outlineDrawer = new CircleDrawer(positionBox, HALF_SIDE, new Color(255, 150, 30, 200));
@@ -52,7 +54,7 @@ public class Mine extends GridObject implements OnEffector, Ranged, Timed, Damag
     }
 
     @Override
-    public Box getEffectBox() {
+    public Box getTriggerBox() {
         return effectBox;
     }
 
@@ -67,6 +69,11 @@ public class Mine extends GridObject implements OnEffector, Ranged, Timed, Damag
     }
 
     @Override
+    public DamageEffect getEffect() {
+        return new DamageEffect(damager.getDamage(), damager.getShred());
+    }
+
+    @Override
     public void setTargets(Set<HealthBearer> targets) {
         this.targets = targets;
     }
@@ -74,6 +81,16 @@ public class Mine extends GridObject implements OnEffector, Ranged, Timed, Damag
     @Override
     public Set<HealthBearer> getTargets() {
         return targets;
+    }
+
+    @Override
+    public Set<Moving> getTriggerers() {
+        return triggerers;
+    }
+
+    @Override
+    public void setTriggerers(Set<Moving> triggerers) {
+        this.triggerers = triggerers;
     }
 
     // unused
@@ -84,15 +101,14 @@ public class Mine extends GridObject implements OnEffector, Ranged, Timed, Damag
 
     @Override
     public void call(Player player) {
-        updateTimer(); //update timer (might set complete)
-        if (!isActive() && !isComplete()) {checkPlayerInRange(player);} //trigger the timer
-        if (isComplete()) {timeIsUp(player);}
+        callTimer(); //update timer (might set complete)
+        if (!isActive() && !isComplete()) checkForTriggers(); //trigger the timer
     }
 
     @Override
     public void checkPlayerIsOn(Player player) {
         if (isComplete()) {
-            checkPlayerCornerIsOn(player);
+            OnEffector.super.checkPlayerIsOn(player);
             expire();
         }
     }
@@ -109,13 +125,13 @@ public class Mine extends GridObject implements OnEffector, Ranged, Timed, Damag
     }
 
     @Override
-    public void playerInRange(Player player) {
+    public void action(Moving moving) {
         activateTimer();
     }
 
     @Override
-    public void timeIsUp(Player player) {
-        checkPlayerIsOn(player);
+    public void whenCompleted() {
+        checkPlayerIsOn(new Player()); // TODO: ADD TARGET HERE
         expire(); //this object is set null and never called again
     }
 

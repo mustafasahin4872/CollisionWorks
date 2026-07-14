@@ -26,7 +26,7 @@ public abstract class Buff extends Equippable implements OnEffector, Drawable {
         effectBox = positionBox.clone();
 
         if (permanent) timer = null;
-        else timer = new Timer(BUFF_DURATION, 0);
+        else timer = new Timer(BUFF_DURATION, 0, true);
 
         drawer = new PictureDrawer(positionBox, getDirectory1(), name);
     }
@@ -36,13 +36,8 @@ public abstract class Buff extends Equippable implements OnEffector, Drawable {
     }
 
     @Override
-    public Box getEffectBox() {
+    public Box getTriggerBox() {
         return effectBox;
-    }
-
-    @Override
-    public void checkPlayerIsOn(Player player) {
-        checkPlayerCornerIsOn(player);
     }
 
     @Override

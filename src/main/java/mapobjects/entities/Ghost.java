@@ -3,14 +3,14 @@ package mapobjects.entities;
 import game.core.GameMap;
 import game.io.Frame;
 import game.io.Drawer.PictureDrawer;
+import mapobjects.effects.DamageEffect;
 import mapobjects.traits.*;
 import mapobjects.components.Box;
 import mapobjects.components.Damager;
 
 import java.util.Set;
 
-//passable ticking damager, moves
-//collides with everything except player and other ghosts
+// collides with everything except player and other ghosts
 public class Ghost extends GridObject implements OnEffector, MovingCollidable, Damaging, Drawable {
 
     public enum ghostTypes {
@@ -164,7 +164,7 @@ public class Ghost extends GridObject implements OnEffector, MovingCollidable, D
     }
 
     @Override
-    public Box getEffectBox() {
+    public Box getTriggerBox() {
         return effectBox;
     }
 
@@ -184,8 +184,8 @@ public class Ghost extends GridObject implements OnEffector, MovingCollidable, D
     }
 
     @Override
-    public void checkPlayerIsOn(Player player) {
-        checkPlayerCornerIsOn(player);
+    public DamageEffect getEffect() {
+        return new DamageEffect(damager.getDamage(), damager.getShred());
     }
 
     @Override

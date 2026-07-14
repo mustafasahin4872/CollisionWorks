@@ -48,13 +48,8 @@ public class Chest extends GridObject implements OnEffector, Drawable {
     }
 
     @Override
-    public Box getEffectBox() {
+    public Box getTriggerBox() {
         return effectBox;
-    }
-
-    @Override
-    public void checkPlayerIsOn(Player player) {
-        checkPlayerCornerIsOn(player);
     }
 
     @Override

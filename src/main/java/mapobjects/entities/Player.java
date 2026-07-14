@@ -8,6 +8,8 @@ import game.io.InputHandler.ArrowData;
 import game.io.Drawer.PictureDrawer;
 import data.PlayerDefaults;
 import mapobjects.components.*;
+import mapobjects.effects.DamageEffect;
+import mapobjects.effects.Effect;
 import mapobjects.traits.*;
 
 import java.util.Set;
@@ -42,6 +44,7 @@ public class Player extends Equippable implements MovingCollidable, HealthBearer
     private final Box collisionBox;
     protected final HPBar hpBar;
     private Gun gun = new Gun.Handgun();
+    private final Inbox inbox;
 
     // owned objects
     protected Accessory[] accessories;
@@ -85,6 +88,8 @@ public class Player extends Equippable implements MovingCollidable, HealthBearer
 
         drawer = new PictureDrawer(positionBox, getDirectory1(), "", playerDefaults.getImageType());
         updateName();
+
+        inbox = new Inbox();
     }
 
     public static String getDirectionString(int xDirection, int yDirection) {
@@ -154,6 +159,8 @@ public class Player extends Equippable implements MovingCollidable, HealthBearer
             e.checkPlayerIsOn(this);
         } else if (currentGridObject instanceof EmptyGridObject e) {
             checkMapObjectEffects(e.getLinkedObject());
+        } else if (currentGridObject instanceof OnTriggerable t) {
+            t.checkForTriggers();
         }
     }
 
@@ -405,6 +412,28 @@ public class Player extends Equippable implements MovingCollidable, HealthBearer
     }
 
     // LIVES AND HP
+
+    @Override
+    public Inbox getInbox() {
+        return inbox;
+    }
+
+    @Override
+    public void processEffects() {
+
+        double totalDamage = 0;
+        double totalShred = 0;
+
+        for (Effect effect : inbox.getEffects()) {
+            if (effect instanceof DamageEffect(double damage, double shred)) {
+                totalDamage += damage;
+                totalShred += shred;
+            }
+        }
+
+        hpBar.takeDamage(totalDamage, totalShred);
+
+    }
 
     @Override
     public HPBar getHealthBar() {

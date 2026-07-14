@@ -1,11 +1,10 @@
 package mapobjects.entities;
 
 import game.io.Drawer.PictureDrawer;
+import mapobjects.components.*;
+import mapobjects.effects.DamageEffect;
+import mapobjects.effects.Effect;
 import mapobjects.factories.Blueprint;
-import mapobjects.components.Spawner;
-import mapobjects.components.Box;
-import mapobjects.components.HPBar;
-import mapobjects.components.Timer;
 import mapobjects.traits.*;
 
 import java.util.Set;
@@ -16,16 +15,19 @@ public class Mortar extends GridObject implements Collidable, Ranged, Timed, Gen
     private final Timer timer;
     private final Box rangeBox;
     private final Spawner spawner;
-    private final HPBar HPBar;
+    private final HPBar hpBar;
+    private final Inbox inbox;
 
+    private boolean readyToSpawn;
     private boolean broken;
-    private static final int RANGE = 8;
+    private static final int RANGE = 5;
     private static final int BASE_MINE_NUM = 3;
     //period is max because the time of cooldown is determined by the mines
-    private static final double PERIOD = 3000, DEFAULT_COOLDOWN = 3000;
+    private static final double DEFAULT_COOLDOWN = 4000;
     private final int mineNum;
     private Set<MapObject> spawnedObjects;
     private final GridObject[][][] layers;
+    private Set<Moving> triggerers;
 
     private final PictureDrawer drawer;
 
@@ -39,10 +41,11 @@ public class Mortar extends GridObject implements Collidable, Ranged, Timed, Gen
         this.layers = layers;
         collisionBox = positionBox.clone();
         rangeBox = new Box(positionBox.getCenterCoordinates(), RANGE*TILE_SIDE*2, RANGE*TILE_SIDE*2);
-        timer = new Timer(PERIOD, DEFAULT_COOLDOWN/worldIndex);
+        timer = new Timer(Long.MAX_VALUE, DEFAULT_COOLDOWN/worldIndex, true);
         spawner = new Spawner(this);
-        HPBar = new HPBar(getWidth()*4);
+        hpBar = new HPBar(getWidth()*4);
         drawer = new PictureDrawer(positionBox, getDirectory1());
+        inbox = new Inbox();
     }
 
     @Override
@@ -50,16 +53,51 @@ public class Mortar extends GridObject implements Collidable, Ranged, Timed, Gen
         this.spawnedObjects = spawnedObjects;
     }
 
+    @Override
+    public Inbox getInbox() {
+        return inbox;
+    }
+
+    @Override
+    public void processEffects() {
+
+        double totalDamage = 0;
+        double totalShred = 0;
+
+        for (Effect effect : inbox.getEffects()) {
+            if (effect instanceof DamageEffect(double damage, double shred)) {
+                totalDamage += damage;
+                totalShred += shred;
+            }
+        }
+
+        hpBar.takeDamage(totalDamage, totalShred);
+
+    }
 
     @Override
     public void call(Player player) {
         checkDead();
-        updateTimer();
-        if (isComplete()) return;
-        if (isActive()) {
-            if (isComplete()) {timeIsUp(player);} //start cooldown
-        } else if (!broken) {checkPlayerInRange(player);}
+        callTimer();
 
+        if (!broken && !inCooldown()) {
+            checkForTriggers();
+            if (readyToSpawn) {
+                spawn();
+                startCooldown();
+                readyToSpawn = false;
+            }
+        }
+    }
+
+    @Override
+    public Set<Moving> getTriggerers() {
+        return triggerers;
+    }
+
+    @Override
+    public void setTriggerers(Set<Moving> triggerers) {
+        this.triggerers = triggerers;
     }
 
     @Override
@@ -70,7 +108,7 @@ public class Mortar extends GridObject implements Collidable, Ranged, Timed, Gen
     @Override
     public void draw() {
         drawer.draw();
-        HPBar.drawHPBar(this);
+        hpBar.drawHPBar(this);
     }
 
     @Override
@@ -90,7 +128,7 @@ public class Mortar extends GridObject implements Collidable, Ranged, Timed, Gen
 
     @Override
     public HPBar getHealthBar() {
-        return HPBar;
+        return hpBar;
     }
 
     @Override
@@ -104,15 +142,8 @@ public class Mortar extends GridObject implements Collidable, Ranged, Timed, Gen
     }
 
     @Override
-    public void playerInRange(Player player) {
-        activateTimer();
-        spawn();
-    }
-
-
-    @Override
-    public void timeIsUp(Player player) {
-        timer.startCooldown();
+    public void action(Moving moving) {
+        readyToSpawn = true;
     }
 
     public void spawn() {

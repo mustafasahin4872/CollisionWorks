@@ -1,18 +1,20 @@
 package mapobjects.entities;
 
-import mapobjects.components.Box;
 import game.io.Drawer;
 import game.io.Drawer.OutlinedBoxDrawer;
 import mapobjects.traits.Drawable;
-import mapobjects.traits.OnEffector;
 import mapobjects.traits.GridObject;
+import mapobjects.traits.Moving;
+import mapobjects.traits.OnTriggerable;
 
 import java.awt.*;
+import java.util.Set;
 
-public abstract class Button extends GridObject implements OnEffector, Drawable {
+public abstract class Button extends GridObject implements OnTriggerable, Drawable {
 
-    private final Box effectBox;
     private boolean pressed;
+    private Set<Moving> triggerers;
+
     private static final Color PRESSED_COLOR = new Color(106, 192, 45),
             FRAME_COLOR = new Color(226, 125, 125);
 
@@ -20,12 +22,6 @@ public abstract class Button extends GridObject implements OnEffector, Drawable 
 
     public Button(int worldIndex, int xNum, int yNum, double width, double height, boolean cornerAligned) {
         super(worldIndex, xNum, yNum, width, height, cornerAligned);
-        effectBox = positionBox.clone();
-    }
-
-    @Override
-    public Box getEffectBox() {
-        return effectBox;
     }
 
     public boolean isPressed() {
@@ -42,18 +38,23 @@ public abstract class Button extends GridObject implements OnEffector, Drawable 
     }
 
     @Override
+    public Set<Moving> getTriggerers() {
+        return triggerers;
+    }
+
+    @Override
+    public void setTriggerers(Set<Moving> triggerers) {
+        this.triggerers = triggerers;
+    }
+
+    @Override
+    public void action(Moving moving) {
+        press();
+    }
+
+    @Override
     public Drawer getDrawer() {
         return drawer;
-    }
-
-    @Override
-    public void checkPlayerIsOn(Player player) {
-        checkPlayerCornerIsOn(player);
-    }
-
-    @Override
-    public void playerIsOn(Player player) {
-        press();
     }
 
 
@@ -68,4 +69,5 @@ public abstract class Button extends GridObject implements OnEffector, Drawable 
             super(worldIndex, xNum, yNum, 2, 2, true);
         }
     }
+
 }
