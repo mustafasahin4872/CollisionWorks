@@ -1,10 +1,9 @@
 package mapobjects.entities;
 
 import game.io.Drawer.PictureDrawer;
-import mapobjects.components.Box;
-import mapobjects.traits.Drawable;
+import mapobjects.traits.schemas.Drawable;
 import mapobjects.traits.OnEffector;
-import mapobjects.traits.GridObject;
+import mapobjects.traits.schemas.GridObject;
 
 import static game.core.GameState.gameState;
 
@@ -23,26 +22,19 @@ public class Currency extends GridObject implements OnEffector, Drawable {
         }
     }
 
-    private final Box effectBox;
     protected final int value;
     private final CurrencyType type;
     private final PictureDrawer drawer;
 
     public Currency(int worldIndex, int xNum, int yNum, CurrencyType type) {
         super(worldIndex, xNum, yNum, type.side, type.side);
-        effectBox = positionBox.clone();
         this.value = type.value;
         this.type = type;
         drawer = new PictureDrawer(positionBox, getDirectory1(), type.name());
     }
 
     @Override
-    public Box getTriggerBox() {
-        return effectBox;
-    }
-
-    @Override
-    public void playerIsOn(Player player) {
+    public void action(Player player) {
         collect();
     }
 

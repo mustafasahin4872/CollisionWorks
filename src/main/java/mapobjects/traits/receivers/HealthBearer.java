@@ -1,24 +1,12 @@
-package mapobjects.traits;
+package mapobjects.traits.receivers;
 
 import mapobjects.components.HPBar;
-import mapobjects.effects.Effect;
+import mapobjects.traits.Collidable;
 
 // extends collidable, //TODO: IS THIS GOOD DESIGN?
 public interface HealthBearer extends Collidable, Receiver {
 
-    default void receiveEffect(Effect.HealthEffect effect) {
-        Receiver.super.receiveEffect(effect);
-    }
-
     HPBar getHealthBar();
-
-    default void heal(double healAmount) {
-        getHealthBar().heal(healAmount);
-    }
-
-    default void damage(double damageAmount) {
-        getHealthBar().takeDamage(damageAmount);
-    }
 
     default void checkDead() {
         if (getHealthBar().isDead()) ifDied();

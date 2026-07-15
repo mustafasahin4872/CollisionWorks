@@ -7,6 +7,12 @@ import mapobjects.components.Damager;
 import mapobjects.components.Timer;
 import mapobjects.effects.DamageEffect;
 import mapobjects.traits.*;
+import mapobjects.traits.effectors.Damaging;
+import mapobjects.traits.receivers.HealthBearer;
+import mapobjects.traits.schemas.Drawable;
+import mapobjects.traits.schemas.GridObject;
+import mapobjects.traits.schemas.Timed;
+import mapobjects.traits.triggerables.Ranged;
 
 import java.awt.*;
 import java.util.Set;
@@ -14,7 +20,6 @@ import java.util.Set;
 public class Mine extends GridObject implements Ranged, Timed, OnEffector, Damaging, Drawable {
 
     private final Box rangeBox;
-    private final Box effectBox;
     private final Timer timer;
     private final Damager damager;
     private Set<HealthBearer> targets;
@@ -31,7 +36,6 @@ public class Mine extends GridObject implements Ranged, Timed, OnEffector, Damag
     public Mine(int worldIndex, int xNum, int yNum) {
         super(worldIndex, xNum, yNum);
         rangeBox = new Box(getCenterCoordinates(), RANGE*TILE_SIDE, RANGE*TILE_SIDE);
-        effectBox = positionBox.clone();
         timer = new Timer(DEFAULT_PERIOD / worldIndex, 0, false);
         damager = new Damager(worldIndex* DEFAULT_DAMAGE);
 
@@ -45,17 +49,11 @@ public class Mine extends GridObject implements Ranged, Timed, OnEffector, Damag
         positionBox.setCenterX(x);
         positionBox.setCenterY(y);
         rangeBox = new Box(x, y, RANGE*TILE_SIDE, RANGE*TILE_SIDE);
-        effectBox = positionBox.clone();
         timer = new Timer(DEFAULT_PERIOD / worldIndex, 0, false);
         damager = new Damager(worldIndex* DEFAULT_DAMAGE);
 
         outlineDrawer = new CircleDrawer(positionBox, HALF_SIDE, new Color(255, 150, 30, 200));
         drawer = new FilledCircleDrawer(positionBox, 0, new Color(255, 0, 0, 100));
-    }
-
-    @Override
-    public Box getTriggerBox() {
-        return effectBox;
     }
 
     @Override
@@ -76,11 +74,6 @@ public class Mine extends GridObject implements Ranged, Timed, OnEffector, Damag
     @Override
     public void setTargets(Set<HealthBearer> targets) {
         this.targets = targets;
-    }
-
-    @Override
-    public Set<HealthBearer> getTargets() {
-        return targets;
     }
 
     @Override
@@ -115,7 +108,7 @@ public class Mine extends GridObject implements Ranged, Timed, OnEffector, Damag
 
     //triggers only if time is up!
     @Override
-    public void playerIsOn(Player player) {
+    public void action(Player player) {
         dealDamage(player);
     }
 

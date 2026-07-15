@@ -5,11 +5,16 @@ import game.io.Drawer.PictureDrawer;
 import mapobjects.components.Box;
 import mapobjects.components.Damager;
 import mapobjects.components.Direction;
-import mapobjects.effects.DamageEffect;
 import mapobjects.traits.*;
+import mapobjects.traits.effectors.Damaging;
+import mapobjects.traits.receivers.HealthBearer;
+import mapobjects.traits.schemas.Drawable;
+import mapobjects.traits.schemas.GridObject;
+import mapobjects.traits.schemas.MapObject;
+
 import java.util.Set;
 
-import static mapobjects.traits.GridObject.TILE_SIDE;
+import static mapobjects.traits.schemas.GridObject.TILE_SIDE;
 
 //projectiles are not grid objects, they are bullets that crash to collidables and pass through water and other tiles
 public class Projectile extends MapObject implements MovingCollidable, Damaging, Drawable {
@@ -216,18 +221,8 @@ public class Projectile extends MapObject implements MovingCollidable, Damaging,
     }
 
     @Override
-    public DamageEffect getEffect() {
-        return new DamageEffect(damager.getDamage(), damager.getShred());
-    }
-
-    @Override
     public void setTargets(Set<HealthBearer> targets) {
         this.targets = targets;
-    }
-
-    @Override
-    public Set<HealthBearer> getTargets() {
-        return targets;
     }
 
     // unused

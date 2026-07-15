@@ -1,11 +1,11 @@
 package mapobjects.entities;
 
 import game.io.Drawer.PictureDrawer;
-import mapobjects.traits.Drawable;
-import mapobjects.traits.Equippable;
+import mapobjects.traits.schemas.Drawable;
+import mapobjects.traits.schemas.Equippable;
 
 import static mapobjects.entities.Player.getDirectionString;
-import static mapobjects.traits.GridObject.TILE_SIDE;
+import static mapobjects.traits.schemas.GridObject.TILE_SIDE;
 
 /// different accessories are placed on different locations on player.
 /// therefore, we created many subclasses, each having their unique setCoordinates() function

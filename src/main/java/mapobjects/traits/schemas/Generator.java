@@ -1,4 +1,4 @@
-package mapobjects.traits;
+package mapobjects.traits.schemas;
 
 import java.util.Set;
 

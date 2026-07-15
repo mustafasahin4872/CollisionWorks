@@ -1,9 +1,9 @@
 package mapobjects.components;
 
 import mapobjects.factories.Blueprint;
-import mapobjects.traits.GridObject;
+import mapobjects.traits.schemas.GridObject;
 import java.util.ArrayList;
-import static mapobjects.traits.GridObject.TILE_SIDE;
+import static mapobjects.traits.schemas.GridObject.TILE_SIDE;
 
 //creates and stores blueprints for the linked object. has different spawn styles
 public class Spawner {

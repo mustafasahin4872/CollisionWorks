@@ -15,6 +15,9 @@ import java.util.Set;
 import static game.core.GameMap.outOfMapBounds;
 import mapobjects.entities.Projectile.ProjectileType;
 import mapobjects.factories.ProjectileBlueprint;
+import mapobjects.traits.receivers.HealthBearer;
+import mapobjects.traits.schemas.*;
+import mapobjects.traits.triggerables.Ranged;
 
 public abstract class Shooter extends GridObject implements Collidable, Timed, Generator, HealthBearer, Drawable {
 
@@ -277,10 +280,10 @@ public abstract class Shooter extends GridObject implements Collidable, Timed, G
             for (GridObject[][] layer : layers) {
                 if (collided)
                     break;
-                for (int i = gridNumbers[1] - range; i < gridNumbers[1] + range; i++) {
+                for (int y = gridNumbers[1] - range; y < gridNumbers[1] + range; y++) {
                     if (collided)
                         break;
-                    for (int j = gridNumbers[0] - range; j < gridNumbers[0] + range; j++) {
+                    for (int x = gridNumbers[0] - range; x < gridNumbers[0] + range; x++) {
                         if (alignment == HORIZONTAL && xCollided) {
                             collided = true;
                             xVelocity *= -1;
@@ -293,10 +296,10 @@ public abstract class Shooter extends GridObject implements Collidable, Timed, G
                             yCollided = false;
                             break;
                         }
-                        if (outOfMapBounds(layer, i, j))
+                        if (outOfMapBounds(layer, x, y))
                             continue;
 
-                        GridObject currentGridObject = layer[i][j];
+                        GridObject currentGridObject = layer[y][x];
                         if (currentGridObject == this)
                             continue;
                         if (currentGridObject instanceof Collidable c) {

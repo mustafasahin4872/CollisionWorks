@@ -2,10 +2,10 @@ package mapobjects.entities;
 
 import game.io.Drawer;
 import game.io.Drawer.OutlinedBoxDrawer;
-import mapobjects.traits.Drawable;
-import mapobjects.traits.GridObject;
+import mapobjects.traits.schemas.Drawable;
+import mapobjects.traits.schemas.GridObject;
 import mapobjects.traits.Moving;
-import mapobjects.traits.OnTriggerable;
+import mapobjects.traits.triggerables.OnTriggerable;
 
 import java.awt.*;
 import java.util.Set;

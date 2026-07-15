@@ -1,4 +1,4 @@
-package mapobjects.traits;
+package mapobjects.traits.receivers;
 
 import mapobjects.components.Inbox;
 import mapobjects.effects.Effect;

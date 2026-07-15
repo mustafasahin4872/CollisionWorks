@@ -1,5 +1,5 @@
 package mapobjects.effects;
 import mapobjects.effects.Effect.HealthEffect;
 
-record HealEffect(double heal) implements HealthEffect {}
+public record HealEffect(double heal) implements HealthEffect {}
 

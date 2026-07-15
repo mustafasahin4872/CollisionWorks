@@ -1,6 +1,7 @@
-package mapobjects.traits;
+package mapobjects.traits.triggerables;
 
 import mapobjects.components.Box;
+import mapobjects.traits.Moving;
 
 import static helpers.CollisionMethods.intersects;
 

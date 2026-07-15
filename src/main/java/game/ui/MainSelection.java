@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Set;
 
 import static helpers.TextMethods.*;
-import static mapobjects.traits.GridObject.TILE_SIDE;
+import static mapobjects.traits.schemas.GridObject.TILE_SIDE;
 
 // governs skin selection, accessory selection, gun selection and moving to level selection - shop
 public class MainSelection {

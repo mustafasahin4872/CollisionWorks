@@ -9,20 +9,16 @@ import static helpers.CollisionMethods.isIn;
 //casts custom effects to Player objects
 public interface OnEffector {
 
-    Box getTriggerBox();
+    Box getPositionBox();
 
-    void playerIsOn(Player player);
+    void action(Player player);
 
     default void checkPlayerIsOn(Player player) {
-        if (isCornerOn(player)) playerIsOn(player);
+        if (isCornerOn(player)) action(player);
     }
 
     default boolean isCornerOn(Moving moving) {
-        return intersects(moving.getPositionBox(), getTriggerBox());
-    }
-
-    default boolean isCenterOn(Moving moving) {
-        return isIn(moving.getX(), moving.getY(), getTriggerBox());
+        return intersects(moving.getPositionBox(), getPositionBox());
     }
 
 }

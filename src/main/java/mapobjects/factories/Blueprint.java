@@ -1,10 +1,10 @@
 package mapobjects.factories;
 
-import mapobjects.traits.GridObject;
+import mapobjects.traits.schemas.GridObject;
 import mapobjects.entities.Player;
 import mapobjects.entities.*;
 
-import static mapobjects.traits.GridObject.TILE_SIDE;
+import static mapobjects.traits.schemas.GridObject.TILE_SIDE;
 
 /// creates a blueprint for mapObjects, holds worldIndex, x and y.
 /// with methods and necessary parameters, mutates to/creates a new MapObject

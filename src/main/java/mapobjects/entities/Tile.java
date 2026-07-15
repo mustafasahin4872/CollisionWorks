@@ -2,7 +2,14 @@ package mapobjects.entities;
 
 import game.io.Drawer.PictureDrawer;
 import mapobjects.components.Box;
+import mapobjects.effects.DamageEffect;
+import mapobjects.effects.Effect;
+import mapobjects.effects.HealEffect;
+import mapobjects.effects.MovementEffect;
 import mapobjects.traits.*;
+import mapobjects.traits.effectors.Effector;
+import mapobjects.traits.schemas.Drawable;
+import mapobjects.traits.schemas.GridObject;
 
 public abstract class Tile extends GridObject implements Drawable {
 
@@ -10,12 +17,6 @@ public abstract class Tile extends GridObject implements Drawable {
     public Tile(int worldIndex, int xNum, int yNum) {
         super(worldIndex, xNum, yNum, worldIndex+"", "jpg");
         drawer = new PictureDrawer(positionBox, getDirectory1(), worldIndex+"", PictureDrawer.FILE_TYPE.jpg);
-    }
-
-    protected void resetPlayerStats(Player player) {
-        player.resetDeceleration();
-        player.resetAcceleration();
-        player.resetMaxSpeed();
     }
 
     @Override
@@ -56,94 +57,75 @@ public abstract class Tile extends GridObject implements Drawable {
     }
 
 
-    public static abstract class PassableTile extends Tile implements OnEffector {
+    public static abstract class PassableTile extends Tile {
 
-        private final Box effectBox;
         public PassableTile(int worldIndex, int xNum, int yNum) {
             super(worldIndex, xNum, yNum);
-            effectBox = positionBox.clone();
-        }
-
-        @Override
-        public Box getTriggerBox() {
-            return effectBox;
-        }
-
-        @Override
-        public void checkPlayerIsOn(Player player) {
-            if (isCenterOn(player)) playerIsOn(player);
         }
 
     }
 
 
-    public static class SpaceTile extends PassableTile{
+    public static class SpaceTile extends PassableTile {
 
         public SpaceTile(int worldIndex, int xNum, int yNum) {
             super(worldIndex, xNum, yNum);
         }
 
-        @Override
-        public void playerIsOn(Player player) {
-            resetPlayerStats(player);
-        }
-
     }
 
 
-    public static class SlowTile extends PassableTile {
+    public static class SlowTile extends PassableTile implements Effector {
 
         public SlowTile(int worldIndex, int xNum, int yNum) {
             super(worldIndex, xNum, yNum); // Earthy brown
         }
 
         @Override
-        public void playerIsOn(Player player) {
-            player.slow();
+        public Effect getEffect() {
+            return new MovementEffect(0.5, 0.12, 2);
         }
 
     }
 
 
-    public static class SpecialTile extends PassableTile {
+    public static class SpecialTile extends PassableTile implements Effector {
 
         public SpecialTile(int worldIndex, int xNum, int yNum) {
             super(worldIndex, xNum, yNum);
         }
 
         @Override
-        public void playerIsOn(Player player) {
-            player.slip();
+        public Effect getEffect() {
+            return new MovementEffect(3, 0.12, 0.12);
         }
 
     }
 
 
-    public static class DamageTile extends PassableTile {
+    public static class DamageTile extends PassableTile implements Effector {
 
         public DamageTile(int worldIndex, int xNum, int yNum) {
             super(worldIndex, xNum, yNum);
         }
 
         @Override
-        public void playerIsOn(Player player) {
-            resetPlayerStats(player);
-            player.damage(worldIndex);
+        public Effect getEffect() {
+            return new DamageEffect(worldIndex, 0);
         }
 
     }
 
 
-    public static class HealTile extends PassableTile {
+    public static class HealTile extends PassableTile implements Effector {
 
         public HealTile(int worldIndex, int xNum, int yNum) { // Golden yellow tile, draw a + in it
             super(worldIndex, xNum, yNum);
         }
 
         @Override
-        public void playerIsOn(Player player) {
-            resetPlayerStats(player);
-            player.heal(3.0 / worldIndex);
+        public Effect getEffect() {
+            return new HealEffect(4);
         }
 
     }

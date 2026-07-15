@@ -3,10 +3,9 @@ package mapobjects.entities;
 import game.core.GameState;
 import game.core.GameState.STATE;
 import game.io.Drawer.PictureDrawer;
-import mapobjects.components.Box;
-import mapobjects.traits.Drawable;
+import mapobjects.traits.schemas.Drawable;
 import mapobjects.traits.OnEffector;
-import mapobjects.traits.GridObject;
+import mapobjects.traits.schemas.GridObject;
 
 public abstract class Point extends GridObject implements OnEffector, Drawable {
 
@@ -42,7 +41,6 @@ public abstract class Point extends GridObject implements OnEffector, Drawable {
 
     public static class WinPoint extends Point {
 
-        private final Box effectBox;
         private final GameState.STATE state;
 
         public WinPoint(int worldIndex, int xNum, int yNum, int index) {
@@ -51,7 +49,6 @@ public abstract class Point extends GridObject implements OnEffector, Drawable {
 
         public WinPoint(int worldIndex, int xNum, int yNum, int index, boolean isBig) {
             super(worldIndex, xNum, yNum, index, isBig);
-            effectBox = positionBox.clone();
             state = switch (index) {
                 case 0 -> STATE.PASSED;
                 case 1 -> STATE.ALTERNATE1;
@@ -62,14 +59,8 @@ public abstract class Point extends GridObject implements OnEffector, Drawable {
             };
         }
 
-
         @Override
-        public Box getTriggerBox() {
-            return effectBox;
-        }
-
-        @Override
-        public void playerIsOn(Player player) {
+        public void action(Player player) {
             GameState.gameState.setState(state);
         }
 
@@ -77,7 +68,6 @@ public abstract class Point extends GridObject implements OnEffector, Drawable {
 
     public static class CheckPoint extends Point {
 
-        private final Box effectBox;
         private CheckPoint prev;
         protected boolean visited;
         private static final Sign ERROR_SIGN = new Sign(0, 0, 0, new String[]{"first unlock the previous checkpoint"}, false);
@@ -89,16 +79,10 @@ public abstract class Point extends GridObject implements OnEffector, Drawable {
 
         public CheckPoint(int worldIndex, int xNum, int yNum, int index, boolean isBig) {
             super(worldIndex, xNum, yNum, index, isBig);
-            effectBox = positionBox.clone();
         }
 
         public static void resetLastCheckPointIndex() {
             lastCheckPointIndex = 0;
-        }
-
-        @Override
-        public Box getTriggerBox() {
-            return effectBox;
         }
 
         @Override
@@ -108,7 +92,7 @@ public abstract class Point extends GridObject implements OnEffector, Drawable {
         }
 
         @Override
-        public void playerIsOn(Player player) {
+        public void action(Player player) {
 
             if (index == lastCheckPointIndex + 1) {
                 markVisited(player);
@@ -149,7 +133,7 @@ public abstract class Point extends GridObject implements OnEffector, Drawable {
         }
 
         @Override
-        public void playerIsOn(Player player) {} //no action needed
+        public void action(Player player) {} //no action needed
 
     }
 

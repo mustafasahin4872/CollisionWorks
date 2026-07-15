@@ -6,6 +6,9 @@ import mapobjects.effects.DamageEffect;
 import mapobjects.effects.Effect;
 import mapobjects.factories.Blueprint;
 import mapobjects.traits.*;
+import mapobjects.traits.receivers.HealthBearer;
+import mapobjects.traits.schemas.*;
+import mapobjects.traits.triggerables.Ranged;
 
 import java.util.Set;
 

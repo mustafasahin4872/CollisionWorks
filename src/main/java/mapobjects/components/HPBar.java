@@ -1,7 +1,7 @@
 package mapobjects.components;
 
 import game.io.Drawer.BoxDrawer;
-import mapobjects.traits.MapObject;
+import mapobjects.traits.schemas.MapObject;
 
 import java.awt.*;
 

@@ -1,4 +1,4 @@
-package mapobjects.traits;
+package mapobjects.traits.triggerables;
 
 import java.util.Set;
 

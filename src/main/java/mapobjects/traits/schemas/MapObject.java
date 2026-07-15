@@ -1,4 +1,4 @@
-package mapobjects.traits;
+package mapobjects.traits.schemas;
 
 //the most general map object class, holds attributes of a rectangular map object
 //the format of each rectangular region coordinate is {x0, y0, x1, y1} unless stated otherwise.

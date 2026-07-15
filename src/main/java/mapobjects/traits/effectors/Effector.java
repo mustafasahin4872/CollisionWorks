@@ -1,6 +1,7 @@
-package mapobjects.traits;
+package mapobjects.traits.effectors;
 
 import mapobjects.effects.Effect;
+import mapobjects.traits.receivers.Receiver;
 
 public interface Effector {
 

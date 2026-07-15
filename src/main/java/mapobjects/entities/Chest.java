@@ -1,9 +1,8 @@
 package mapobjects.entities;
 
 import game.io.Drawer.PictureDrawer;
-import mapobjects.components.Box;
-import mapobjects.traits.Drawable;
-import mapobjects.traits.GridObject;
+import mapobjects.traits.schemas.Drawable;
+import mapobjects.traits.schemas.GridObject;
 import mapobjects.traits.OnEffector;
 
 import static game.core.GameState.gameState;
@@ -22,7 +21,6 @@ public class Chest extends GridObject implements OnEffector, Drawable {
         private final int gemNum;
     }
 
-    private final Box effectBox;
     private boolean isOpen;
     private final int coinNum;
     private final int gemNum;
@@ -34,11 +32,6 @@ public class Chest extends GridObject implements OnEffector, Drawable {
         this.coinNum = chestType.coinNum;
         this.gemNum = chestType.gemNum;
         this.type = chestType.name();
-        effectBox = positionBox.clone();
-        effectBox.setCorners(new double[]{
-                positionBox.getCorner(0), (positionBox.getCorner(1) + positionBox.getCorner(3)) / 2,
-                positionBox.getCorner(2), positionBox.getCorner(3)
-        });
         drawer = new PictureDrawer(positionBox, getDirectory1(), type+"/0");
     }
 
@@ -48,12 +41,7 @@ public class Chest extends GridObject implements OnEffector, Drawable {
     }
 
     @Override
-    public Box getTriggerBox() {
-        return effectBox;
-    }
-
-    @Override
-    public void playerIsOn(Player player) {
+    public void action(Player player) {
         openChest();
     }
 

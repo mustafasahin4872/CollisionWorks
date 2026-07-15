@@ -1,7 +1,7 @@
 package mapobjects.entities;
 
 import mapobjects.traits.Collidable;
-import mapobjects.traits.GridObject;
+import mapobjects.traits.schemas.GridObject;
 
 public class EmptyGridObject extends GridObject {
 

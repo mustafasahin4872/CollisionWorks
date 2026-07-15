@@ -8,10 +8,10 @@ import java.util.Set;
 import game.io.Frame;
 import mapobjects.components.Box;
 import game.io.Drawer.OutlinedBoxDrawer;
-import mapobjects.traits.Drawable;
-import mapobjects.traits.GridObject;
+import mapobjects.traits.schemas.Drawable;
+import mapobjects.traits.schemas.GridObject;
 import mapobjects.traits.Moving;
-import mapobjects.traits.OnTriggerable;
+import mapobjects.traits.triggerables.OnTriggerable;
 
 import static helpers.TextMethods.*;
 

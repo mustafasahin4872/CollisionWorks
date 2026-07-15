@@ -1,6 +1,6 @@
 package game.ui.components;
 
-import mapobjects.traits.Equippable;
+import mapobjects.traits.schemas.Equippable;
 
 public class ShopEntry {
 

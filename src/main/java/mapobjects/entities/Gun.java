@@ -2,15 +2,20 @@ package mapobjects.entities;
 
 import game.io.Drawer.PictureDrawer;
 import mapobjects.factories.Blueprint;
-import mapobjects.traits.*;
 import mapobjects.components.Spawner;
 import mapobjects.components.Timer;
 import java.util.Locale;
 import java.util.Set;
 
-import static mapobjects.traits.GridObject.TILE_SIDE;
+import static mapobjects.traits.schemas.GridObject.TILE_SIDE;
 
 import mapobjects.factories.ProjectileBlueprint;
+import mapobjects.traits.receivers.HealthBearer;
+import mapobjects.traits.schemas.Drawable;
+import mapobjects.traits.schemas.Equippable;
+import mapobjects.traits.schemas.Generator;
+import mapobjects.traits.schemas.MapObject;
+
 import static mapobjects.entities.Projectile.ProjectileType;
 
 public abstract class Gun extends Equippable implements Generator, Drawable {

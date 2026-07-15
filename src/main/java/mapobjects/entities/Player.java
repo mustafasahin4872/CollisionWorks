@@ -10,13 +10,21 @@ import data.PlayerDefaults;
 import mapobjects.components.*;
 import mapobjects.effects.DamageEffect;
 import mapobjects.effects.Effect;
+import mapobjects.effects.MovementEffect;
 import mapobjects.traits.*;
+import mapobjects.traits.receivers.HealthBearer;
+import mapobjects.traits.receivers.TileReceiver;
+import mapobjects.traits.schemas.Equippable;
+import mapobjects.traits.schemas.Generator;
+import mapobjects.traits.schemas.GridObject;
+import mapobjects.traits.schemas.MapObject;
+import mapobjects.traits.triggerables.OnTriggerable;
 
 import java.util.Set;
 
-import static mapobjects.traits.GridObject.TILE_SIDE;
+import static mapobjects.traits.schemas.GridObject.TILE_SIDE;
 
-public class Player extends Equippable implements MovingCollidable, HealthBearer, Generator {
+public class Player extends Equippable implements MovingCollidable, HealthBearer, Generator, TileReceiver {
 
     // initial fields that are unique to the player type
     private final String playerName;
@@ -49,7 +57,7 @@ public class Player extends Equippable implements MovingCollidable, HealthBearer
     // owned objects
     protected Accessory[] accessories;
 
-    private PictureDrawer drawer;
+    private final PictureDrawer drawer;
 
     // CONSTRUCTORS
 
@@ -132,6 +140,9 @@ public class Player extends Equippable implements MovingCollidable, HealthBearer
 
     public void call(GridObject[][][] layers) {
 
+        resetAcceleration();
+        resetDeceleration();
+        resetMaxSpeed();
         checkDead();
 
         gun.call(this);
@@ -318,24 +329,6 @@ public class Player extends Equippable implements MovingCollidable, HealthBearer
 
     // MOVEMENTS
 
-    public void slip() {
-        double a = 0.12 * baseAcceleration;
-        double s = 3 * baseMaxSpeed;
-        setAcceleration(a);
-        setDeceleration(a);
-        setMaxSpeed(s);
-    }
-
-    public void slow() {
-        double a = 0.12 * baseAcceleration;
-        double d = 2 * baseAcceleration;
-        double s = 0.5 * baseMaxSpeed;
-
-        setAcceleration(a);
-        setDeceleration(d);
-        setMaxSpeed(s);
-    }
-
     @Override
     public void setX(double x) {
         super.setX(x);
@@ -424,14 +417,26 @@ public class Player extends Equippable implements MovingCollidable, HealthBearer
         double totalDamage = 0;
         double totalShred = 0;
 
+        double totalMaxSpeedMult = 1;
+        double totalAccelerationMult = 1;
+        double totalDecelerationMult = 1;
+
         for (Effect effect : inbox.getEffects()) {
             if (effect instanceof DamageEffect(double damage, double shred)) {
                 totalDamage += damage;
                 totalShred += shred;
             }
+            if (effect instanceof MovementEffect(double maxSpeedMult, double accelerationMult, double decelerationMult)) {
+                totalMaxSpeedMult *= maxSpeedMult;
+                totalAccelerationMult *= accelerationMult;
+                totalDecelerationMult *= decelerationMult;
+            }
         }
 
         hpBar.takeDamage(totalDamage, totalShred);
+        maxSpeed = baseMaxSpeed * totalMaxSpeedMult;
+        acceleration = baseAcceleration * totalAccelerationMult;
+        deceleration = baseDeceleration * totalDecelerationMult;
 
     }
 

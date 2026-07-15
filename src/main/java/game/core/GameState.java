@@ -1,7 +1,7 @@
 package game.core;
 
 import game.ui.components.ShopEntry;
-import mapobjects.traits.Equippable;
+import mapobjects.traits.schemas.Equippable;
 import mapobjects.entities.Accessory;
 import mapobjects.entities.Buff;
 import mapobjects.entities.Gun;
