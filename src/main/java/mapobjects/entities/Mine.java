@@ -3,27 +3,32 @@ package mapobjects.entities;
 import game.io.Drawer.CircleDrawer;
 import game.io.Drawer.FilledCircleDrawer;
 import mapobjects.components.Box;
-import mapobjects.components.Damager;
+import mapobjects.components.Effector;
 import mapobjects.components.Timer;
+import mapobjects.components.Trigger;
 import mapobjects.effects.DamageEffect;
-import mapobjects.traits.*;
-import mapobjects.traits.effectors.Damaging;
-import mapobjects.traits.receivers.HealthBearer;
+import mapobjects.traits.collisions.Movable;
+import mapobjects.traits.schemas.Damaging;
+import mapobjects.traits.schemas.HealthBearer;
+import mapobjects.traits.receivers.Receiver;
 import mapobjects.traits.schemas.Drawable;
 import mapobjects.traits.schemas.GridObject;
 import mapobjects.traits.schemas.Timed;
-import mapobjects.traits.triggerables.Ranged;
+import mapobjects.traits.senders.Sender;
+import mapobjects.traits.triggerables.RangeTriggerable;
+import mapobjects.traits.triggerables.MovedOverTriggerable;
 
 import java.awt.*;
 import java.util.Set;
 
-public class Mine extends GridObject implements Ranged, Timed, OnEffector, Damaging, Drawable {
+public class Mine extends GridObject implements RangeTriggerable, MovedOverTriggerable, Timed, Damaging, Drawable, Sender {
 
     private final Box rangeBox;
     private final Timer timer;
-    private final Damager damager;
+    private final Effector effector;
     private Set<HealthBearer> targets;
-    private Set<Moving> triggerers;
+    private final Trigger<Movable> rangeTrigger;
+    private final Trigger<Movable> explosionTrigger;
 
     private static final double RANGE = 6; //in tiles
     private static final double DEFAULT_DAMAGE = 30;
@@ -37,7 +42,10 @@ public class Mine extends GridObject implements Ranged, Timed, OnEffector, Damag
         super(worldIndex, xNum, yNum);
         rangeBox = new Box(getCenterCoordinates(), RANGE*TILE_SIDE, RANGE*TILE_SIDE);
         timer = new Timer(DEFAULT_PERIOD / worldIndex, 0, false);
-        damager = new Damager(worldIndex* DEFAULT_DAMAGE);
+        effector = new Effector(new DamageEffect(worldIndex * DEFAULT_DAMAGE, 0));
+
+        rangeTrigger = new Trigger<>(rangeBox, this::triggerRange);
+        explosionTrigger = new Trigger<>(positionBox, this::triggerExplosion);
 
         outlineDrawer = new CircleDrawer(positionBox, HALF_SIDE, new Color(255, 150, 30, 200));
         drawer = new FilledCircleDrawer(positionBox, 0, new Color(255, 0, 0, 100));
@@ -50,10 +58,26 @@ public class Mine extends GridObject implements Ranged, Timed, OnEffector, Damag
         positionBox.setCenterY(y);
         rangeBox = new Box(x, y, RANGE*TILE_SIDE, RANGE*TILE_SIDE);
         timer = new Timer(DEFAULT_PERIOD / worldIndex, 0, false);
-        damager = new Damager(worldIndex* DEFAULT_DAMAGE);
+        effector = new Effector(new DamageEffect(worldIndex * DEFAULT_DAMAGE, 0));
+
+        rangeTrigger = new Trigger<>(rangeBox, this::triggerRange);
+        explosionTrigger = new Trigger<>(positionBox, this::triggerExplosion);
 
         outlineDrawer = new CircleDrawer(positionBox, HALF_SIDE, new Color(255, 150, 30, 200));
         drawer = new FilledCircleDrawer(positionBox, 0, new Color(255, 0, 0, 100));
+    }
+
+    private void triggerRange(Movable movable) {
+        if (!isActive() && !isComplete()) {
+            activateTimer();
+        }
+    }
+
+    private void triggerExplosion(Movable movable) {
+        if (isComplete() && movable instanceof Receiver r) {
+            sendEffect(r);
+            expire();
+        }
     }
 
     @Override
@@ -62,13 +86,8 @@ public class Mine extends GridObject implements Ranged, Timed, OnEffector, Damag
     }
 
     @Override
-    public Damager getDamager() {
-        return damager;
-    }
-
-    @Override
-    public DamageEffect getEffect() {
-        return new DamageEffect(damager.getDamage(), damager.getShred());
+    public Effector getEffector() {
+        return effector;
     }
 
     @Override
@@ -77,14 +96,15 @@ public class Mine extends GridObject implements Ranged, Timed, OnEffector, Damag
     }
 
     @Override
-    public Set<Moving> getTriggerers() {
-        return triggerers;
+    public Trigger<Movable> getRangeTrigger() {
+        return rangeTrigger;
     }
 
     @Override
-    public void setTriggerers(Set<Moving> triggerers) {
-        this.triggerers = triggerers;
+    public Trigger<Movable> getMovedOverTrigger() {
+        return explosionTrigger;
     }
+
 
     // unused
     @Override
@@ -93,38 +113,16 @@ public class Mine extends GridObject implements Ranged, Timed, OnEffector, Damag
     }
 
     @Override
-    public void call(Player player) {
+    public void call() {
         callTimer(); //update timer (might set complete)
-        if (!isActive() && !isComplete()) checkForTriggers(); //trigger the timer
-    }
-
-    @Override
-    public void checkPlayerIsOn(Player player) {
-        if (isComplete()) {
-            OnEffector.super.checkPlayerIsOn(player);
-            expire();
+        if (!isActive() && !isComplete()) {
+            rangeTrigger.checkForTriggers();
         }
-    }
-
-    //triggers only if time is up!
-    @Override
-    public void action(Player player) {
-        dealDamage(player);
-    }
-
-    @Override
-    public Box getRangeBox() {
-        return rangeBox;
-    }
-
-    @Override
-    public void action(Moving moving) {
-        activateTimer();
     }
 
     @Override
     public void whenCompleted() {
-        checkPlayerIsOn(new Player()); // TODO: ADD TARGET HERE
+        explosionTrigger.checkForTriggers();
         expire(); //this object is set null and never called again
     }
 

@@ -2,20 +2,22 @@ package mapobjects.entities;
 
 import helpers.TextMethods;
 import game.io.Drawer.PictureDrawer;
-import mapobjects.traits.*;
 import mapobjects.components.Timer;
+import mapobjects.components.Trigger;
 import mapobjects.traits.schemas.Drawable;
 import mapobjects.traits.schemas.Equippable;
+import mapobjects.traits.triggerables.PlayerOnTriggerable;
 
 import static mapobjects.traits.schemas.GridObject.TILE_SIDE;
 
-public abstract class Buff extends Equippable implements OnEffector, Drawable {
+public abstract class Buff extends Equippable implements PlayerOnTriggerable, Drawable {
 
     private static final int BUFF_DURATION = 10 * 1000;
     private final boolean permanent;
     private static final double DEFAULT_SIDE = TILE_SIDE;
 
     private final Timer timer;
+    private final Trigger<Player> playerTrigger;
 
     private final PictureDrawer drawer;
 
@@ -27,15 +29,24 @@ public abstract class Buff extends Equippable implements OnEffector, Drawable {
         else timer = new Timer(BUFF_DURATION, 0, true);
 
         drawer = new PictureDrawer(positionBox, getDirectory1(), name);
+        playerTrigger = new Trigger<>(positionBox, this::triggerBuff);
     }
 
     public Buff(int xNum, int yNum, String name) {
         this(xNum, yNum, name,false);
     }
 
+    private void triggerBuff(Player player) {
+        applyBuff(player);
+    }
+
+    protected void applyBuff(Player player) {
+        if (timer != null) timer.activate();
+    }
+
     @Override
-    public void action(Player player) {
-        timer.activate();
+    public Trigger<Player> getPlayerOnTrigger() {
+        return playerTrigger;
     }
 
     @Override
@@ -81,7 +92,7 @@ public abstract class Buff extends Equippable implements OnEffector, Drawable {
         }
 
         @Override
-        public void action(Player player) {
+        protected void applyBuff(Player player) {
             expire();
         }
 
@@ -94,7 +105,7 @@ public abstract class Buff extends Equippable implements OnEffector, Drawable {
         }
 
         @Override
-        public void action(Player player) {
+        protected void applyBuff(Player player) {
             expire();
         }
 
@@ -107,7 +118,7 @@ public abstract class Buff extends Equippable implements OnEffector, Drawable {
         }
 
         @Override
-        public void action(Player player) {
+        protected void applyBuff(Player player) {
             expire();
         }
 
@@ -120,7 +131,7 @@ public abstract class Buff extends Equippable implements OnEffector, Drawable {
         }
 
         @Override
-        public void action(Player player) {
+        protected void applyBuff(Player player) {
             expire();
         }
 
@@ -133,7 +144,7 @@ public abstract class Buff extends Equippable implements OnEffector, Drawable {
         }
 
         @Override
-        public void action(Player player) {
+        protected void applyBuff(Player player) {
             expire();
         }
 

@@ -1,6 +1,6 @@
 package mapobjects.entities;
 
-import mapobjects.traits.Collidable;
+import mapobjects.traits.collisions.Collidable;
 import mapobjects.traits.schemas.GridObject;
 
 public class EmptyGridObject extends GridObject {
@@ -14,8 +14,8 @@ public class EmptyGridObject extends GridObject {
 
 
     @Override
-    public void call(Player player) {
-        linkedObject.call(player);
+    public void call() {
+        linkedObject.call();
         if (linkedObject.isExpired()) {expire();}
     }
 

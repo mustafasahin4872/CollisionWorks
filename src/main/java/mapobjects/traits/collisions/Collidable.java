@@ -1,10 +1,10 @@
-package mapobjects.traits;
+package mapobjects.traits.collisions;
 
 import mapobjects.components.Box;
 
 import static helpers.CollisionMethods.intersects;
 
-public interface Collidable {
+public interface Collidable extends HasBody {
 
     Box getCollisionBox();
 

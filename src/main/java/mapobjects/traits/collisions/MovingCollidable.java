@@ -1,4 +1,4 @@
-package mapobjects.traits;
+package mapobjects.traits.collisions;
 
 import mapobjects.components.Box;
 
@@ -21,8 +21,14 @@ public interface MovingCollidable extends Moving, Collidable{
 
     //need to update collision box as well
     @Override
-    void setX(double x);
+    default void setX(double x) {
+        Moving.super.setX(x);
+        getCollisionBox().setCenterX(x);
+    }
     @Override
-    void setY(double y);
+    default void setY(double y) {
+        Moving.super.setY(y);
+        getCollisionBox().setCenterY(y);
+    }
 
 }

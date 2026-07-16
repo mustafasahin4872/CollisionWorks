@@ -4,7 +4,7 @@ package mapobjects.traits.schemas;
 //height and width are now multiples of one tile side, and integers are used for width and height below this mapObject type.
 //coordinates are indicated with integers as well, they are the locations on the grid, starting from (1, 1) in the top left corner
 
-import mapobjects.traits.Collidable;
+import mapobjects.traits.collisions.Collidable;
 
 public abstract class GridObject extends MapObject {
 

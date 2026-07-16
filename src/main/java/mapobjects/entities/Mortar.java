@@ -5,14 +5,16 @@ import mapobjects.components.*;
 import mapobjects.effects.DamageEffect;
 import mapobjects.effects.Effect;
 import mapobjects.factories.Blueprint;
-import mapobjects.traits.*;
-import mapobjects.traits.receivers.HealthBearer;
+import mapobjects.traits.collisions.Collidable;
+import mapobjects.traits.collisions.Movable;
+import mapobjects.traits.schemas.HealthBearer;
+import mapobjects.traits.receivers.Receiver;
 import mapobjects.traits.schemas.*;
-import mapobjects.traits.triggerables.Ranged;
+import mapobjects.traits.triggerables.RangeTriggerable;
 
 import java.util.Set;
 
-public class Mortar extends GridObject implements Collidable, Ranged, Timed, Generator, HealthBearer, Drawable {
+public class Mortar extends GridObject implements Collidable, RangeTriggerable, Timed, Generator, HealthBearer, Drawable, Receiver {
 
     private final Box collisionBox;
     private final Timer timer;
@@ -30,7 +32,7 @@ public class Mortar extends GridObject implements Collidable, Ranged, Timed, Gen
     private final int mineNum;
     private Set<MapObject> spawnedObjects;
     private final GridObject[][][] layers;
-    private Set<Moving> triggerers;
+    private final Trigger<Movable> rangeTrigger;
 
     private final PictureDrawer drawer;
 
@@ -49,6 +51,7 @@ public class Mortar extends GridObject implements Collidable, Ranged, Timed, Gen
         hpBar = new HPBar(getWidth()*4);
         drawer = new PictureDrawer(positionBox, getDirectory1());
         inbox = new Inbox();
+        rangeTrigger = new Trigger<>(rangeBox, this::triggerSpawn);
     }
 
     @Override
@@ -79,12 +82,12 @@ public class Mortar extends GridObject implements Collidable, Ranged, Timed, Gen
     }
 
     @Override
-    public void call(Player player) {
+    public void call() {
         checkDead();
         callTimer();
 
         if (!broken && !inCooldown()) {
-            checkForTriggers();
+            rangeTrigger.checkForTriggers();
             if (readyToSpawn) {
                 spawn();
                 startCooldown();
@@ -94,13 +97,12 @@ public class Mortar extends GridObject implements Collidable, Ranged, Timed, Gen
     }
 
     @Override
-    public Set<Moving> getTriggerers() {
-        return triggerers;
+    public Trigger<Movable> getRangeTrigger() {
+        return rangeTrigger;
     }
 
-    @Override
-    public void setTriggerers(Set<Moving> triggerers) {
-        this.triggerers = triggerers;
+    private void triggerSpawn(Movable movable) {
+        readyToSpawn = true;
     }
 
     @Override
@@ -119,7 +121,6 @@ public class Mortar extends GridObject implements Collidable, Ranged, Timed, Gen
         return collisionBox;
     }
 
-    @Override
     public Box getRangeBox() {
         return rangeBox;
     }
@@ -142,11 +143,6 @@ public class Mortar extends GridObject implements Collidable, Ranged, Timed, Gen
     public void ifNoLivesLeft() {
         broken = true;
         drawer.setName("1");
-    }
-
-    @Override
-    public void action(Moving moving) {
-        readyToSpawn = true;
     }
 
     public void spawn() {

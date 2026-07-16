@@ -2,12 +2,13 @@ package mapobjects.entities;
 
 import game.io.Drawer.PictureDrawer;
 import mapobjects.components.Box;
+import mapobjects.components.Effector;
 import mapobjects.effects.DamageEffect;
 import mapobjects.effects.Effect;
 import mapobjects.effects.HealEffect;
 import mapobjects.effects.MovementEffect;
-import mapobjects.traits.*;
-import mapobjects.traits.effectors.Effector;
+import mapobjects.traits.collisions.Collidable;
+import mapobjects.traits.senders.Sender;
 import mapobjects.traits.schemas.Drawable;
 import mapobjects.traits.schemas.GridObject;
 
@@ -75,57 +76,61 @@ public abstract class Tile extends GridObject implements Drawable {
     }
 
 
-    public static class SlowTile extends PassableTile implements Effector {
+    public static class SlowTile extends PassableTile implements Sender {
 
+        private static final Effector effector = new Effector(new MovementEffect(0.5, 0.12, 2));
         public SlowTile(int worldIndex, int xNum, int yNum) {
             super(worldIndex, xNum, yNum); // Earthy brown
         }
 
         @Override
-        public Effect getEffect() {
-            return new MovementEffect(0.5, 0.12, 2);
+        public Effector getEffector() {
+            return effector;
         }
 
     }
 
 
-    public static class SpecialTile extends PassableTile implements Effector {
+    public static class IceTile extends PassableTile implements Sender {
 
-        public SpecialTile(int worldIndex, int xNum, int yNum) {
+        private static final Effector effector = new Effector(new MovementEffect(3, 0.12, 0.12));
+        public IceTile(int worldIndex, int xNum, int yNum) {
             super(worldIndex, xNum, yNum);
         }
 
         @Override
-        public Effect getEffect() {
-            return new MovementEffect(3, 0.12, 0.12);
+        public Effector getEffector() {
+            return effector;
         }
 
     }
 
 
-    public static class DamageTile extends PassableTile implements Effector {
+    public static class DamageTile extends PassableTile implements Sender {
 
+        private static final Effector effector = new Effector(new DamageEffect(2, 0));
         public DamageTile(int worldIndex, int xNum, int yNum) {
             super(worldIndex, xNum, yNum);
         }
 
         @Override
-        public Effect getEffect() {
-            return new DamageEffect(worldIndex, 0);
+        public Effector getEffector() {
+            return effector;
         }
 
     }
 
 
-    public static class HealTile extends PassableTile implements Effector {
+    public static class HealTile extends PassableTile implements Sender {
 
+        public static final Effector effector = new Effector(new HealEffect(4));
         public HealTile(int worldIndex, int xNum, int yNum) { // Golden yellow tile, draw a + in it
             super(worldIndex, xNum, yNum);
         }
 
         @Override
-        public Effect getEffect() {
-            return new HealEffect(4);
+        public Effector getEffector() {
+            return effector;
         }
 
     }

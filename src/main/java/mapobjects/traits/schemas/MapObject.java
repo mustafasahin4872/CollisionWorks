@@ -6,8 +6,9 @@ package mapobjects.traits.schemas;
 
 import mapobjects.entities.Player;
 import mapobjects.components.Box;
+import mapobjects.traits.collisions.HasBody;
 
-public abstract class MapObject {
+public abstract class MapObject implements HasBody {
 
     protected int worldIndex; //the world the object is in
 
@@ -26,7 +27,7 @@ public abstract class MapObject {
 
     //all map objects are called every iteration if they are not expired
     //each map object has their unique actions, when called, they perform them
-    public void call(Player player) {}
+    public void call() {}
 
 
     public int getWorldIndex() {
@@ -77,25 +78,10 @@ public abstract class MapObject {
         return positionBox;
     }
 
-    public double getX() {
-        return positionBox.getCenterX();
-    }
-
-    public double getY() {
-        return positionBox.getCenterY();
-    }
-
     public void setCenterCoordinates(double x, double y) {
         positionBox.setCenterCoordinates(x, y);
     }
 
-    public void setX(double x) {
-        positionBox.setCenterX(x);
-    }
-
-    public void setY(double y) {
-        positionBox.setCenterY(y);
-    }
 
     //returns the xNum and yNum of a map object's center in the grid.
     public int[] getGridNumbers() {

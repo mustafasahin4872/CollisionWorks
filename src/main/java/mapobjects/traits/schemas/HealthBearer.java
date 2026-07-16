@@ -1,10 +1,10 @@
-package mapobjects.traits.receivers;
+package mapobjects.traits.schemas;
 
 import mapobjects.components.HPBar;
-import mapobjects.traits.Collidable;
+import mapobjects.traits.collisions.HasBody;
 
-// extends collidable, //TODO: IS THIS GOOD DESIGN?
-public interface HealthBearer extends Collidable, Receiver {
+// all health bearers must have bodies
+public interface HealthBearer extends HasBody {
 
     HPBar getHealthBar();
 

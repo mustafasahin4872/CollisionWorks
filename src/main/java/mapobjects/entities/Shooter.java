@@ -6,7 +6,6 @@ import mapobjects.effects.DamageEffect;
 import mapobjects.effects.Effect;
 import mapobjects.factories.Blueprint;
 import mapobjects.components.*;
-import mapobjects.traits.*;
 import mapobjects.components.Spawner;
 
 import java.util.HashSet;
@@ -15,11 +14,15 @@ import java.util.Set;
 import static game.core.GameMap.outOfMapBounds;
 import mapobjects.entities.Projectile.ProjectileType;
 import mapobjects.factories.ProjectileBlueprint;
-import mapobjects.traits.receivers.HealthBearer;
+import mapobjects.traits.collisions.Collidable;
+import mapobjects.traits.collisions.Movable;
+import mapobjects.traits.collisions.MovingCollidable;
+import mapobjects.traits.schemas.HealthBearer;
+import mapobjects.traits.receivers.Receiver;
 import mapobjects.traits.schemas.*;
-import mapobjects.traits.triggerables.Ranged;
+import mapobjects.traits.triggerables.RangeTriggerable;
 
-public abstract class Shooter extends GridObject implements Collidable, Timed, Generator, HealthBearer, Drawable {
+public abstract class Shooter extends GridObject implements Collidable, Timed, Generator, HealthBearer, Drawable, Receiver {
 
     protected static final char VERTICAL = '|', HORIZONTAL = '—',
             RIGHT = '>', LEFT = '<', UP = '^', DOWN = 'v';
@@ -89,7 +92,7 @@ public abstract class Shooter extends GridObject implements Collidable, Timed, G
     }
 
     @Override
-    public void call(Player player) {
+    public void call() {
         checkDead();
         if (broken) return;
         callTimer();
@@ -166,56 +169,46 @@ public abstract class Shooter extends GridObject implements Collidable, Timed, G
     }
 
     // shoots only if triggered and not in cooldown
-    public static abstract class RangedShooter extends Shooter implements Ranged {
+    public static abstract class RangeTriggerableShooter extends Shooter implements RangeTriggerable {
 
         private final Box rangeBox;
-        private Set<Moving> triggerers;
+        private final Trigger<Movable> rangeTrigger;
         private static final double RANGE = 6.5;
-        private final Set<Moving> targetsInRange = new HashSet<>();
+        private final Set<Movable> targetsInRange = new HashSet<>();
 
-        public RangedShooter(int worldIndex, int xNum, int yNum, char type, ProjectileType projectileType, GridObject[][][] layers) {
+        public RangeTriggerableShooter(int worldIndex, int xNum, int yNum, char type, ProjectileType projectileType, GridObject[][][] layers) {
             super(worldIndex, xNum, yNum, type, projectileType, layers);
             rangeBox = new Box(positionBox.getCenterCoordinates(), RANGE * TILE_SIDE * 2, RANGE * TILE_SIDE * 2);
+            rangeTrigger = new Trigger<>(rangeBox, this::triggerShooter);
         }
 
-        @Override
-        public Box getRangeBox() {
-            return rangeBox;
-        }
-
-        @Override
-        public Set<Moving> getTriggerers() {
-            return triggerers;
-        }
-
-        @Override
-        public void setTriggerers(Set<Moving> triggerers) {
-            this.triggerers = triggerers;
-        }
-
-        @Override
-        public void action(Moving moving) {
-            targetsInRange.add(moving);
+        private void triggerShooter(Movable movable) {
+            targetsInRange.add(movable);
             readyToSpawn = true;
         }
 
         @Override
-        public void call(Player player) {
-            super.call(player);
-            if (!inCooldown()) checkForTriggers();
+        public Trigger<Movable> getRangeTrigger() {
+            return rangeTrigger;
+        }
+
+        @Override
+        public void call() {
+            super.call();
+            if (!inCooldown()) rangeTrigger.checkForTriggers();
         }
 
         @Override
         public void spawn() {
-            Moving closest = new Player();
+            Movable closest = new Player();
             double leastDistanceSquared = Double.MAX_VALUE;
-            for (Moving moving : targetsInRange) {
-                double dx = moving.getX() - getX();
-                double dy = moving.getY() - getY();
+            for (Movable movable : targetsInRange) {
+                double dx = movable.getX() - getX();
+                double dy = movable.getY() - getY();
                 double distSq = dx * dx + dy * dy;
                 if (distSq < leastDistanceSquared) {
                     leastDistanceSquared = distSq;
-                    closest = moving;
+                    closest = movable;
                 }
             }
 
@@ -231,7 +224,7 @@ public abstract class Shooter extends GridObject implements Collidable, Timed, G
     }
 
 
-    public static class DirectionShooter extends RangedShooter {
+    public static class DirectionShooter extends RangeTriggerableShooter {
 
         public DirectionShooter(int worldIndex, int xNum, int yNum, GridObject[][][] layers, Player player) {
             super(worldIndex, xNum, yNum, 'x', ProjectileType.REGULAR, layers);
@@ -239,7 +232,7 @@ public abstract class Shooter extends GridObject implements Collidable, Timed, G
 
     }
 
-    public static class HomingShooter extends RangedShooter {
+    public static class HomingShooter extends RangeTriggerableShooter {
 
         public HomingShooter(int worldIndex, int xNum, int yNum, GridObject[][][] layers, Player player) {
             super(worldIndex, xNum, yNum, 'h', ProjectileType.HOMING, layers);
@@ -249,6 +242,7 @@ public abstract class Shooter extends GridObject implements Collidable, Timed, G
 
     public static class MovingShooter extends RegularShooter implements MovingCollidable {
 
+        private Player player;
         private static final double SPEED = -1;
         private boolean xCollided, yCollided;
         private double xVelocity, yVelocity;
@@ -264,12 +258,16 @@ public abstract class Shooter extends GridObject implements Collidable, Timed, G
             }
         }
 
+        public void setPlayer(Player player) {
+            this.player = player;
+        }
+
         @Override
-        public void call(Player player) {
+        public void call() {
             checkCollision(player);
             player.checkCollision(this);
 
-            super.call(player);
+            super.call();
 
             checkDead();
             if (broken) return;
@@ -348,17 +346,6 @@ public abstract class Shooter extends GridObject implements Collidable, Timed, G
             return yVelocity;
         }
 
-        @Override
-        public void setX(double x) {
-            super.setX(x);
-            collisionBox.setCenterX(x);
-        }
-
-        @Override
-        public void setY(double y) {
-            super.setY(y);
-            collisionBox.setCenterY(y);
-        }
     }
 
 }

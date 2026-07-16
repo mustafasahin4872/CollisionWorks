@@ -2,6 +2,7 @@ package mapobjects.entities;
 
 import game.io.Drawer.PictureDrawer;
 import game.ui.components.TextDisplay;
+import mapobjects.components.Trigger;
 import java.awt.*;
 import java.util.Set;
 
@@ -10,12 +11,12 @@ import mapobjects.components.Box;
 import game.io.Drawer.OutlinedBoxDrawer;
 import mapobjects.traits.schemas.Drawable;
 import mapobjects.traits.schemas.GridObject;
-import mapobjects.traits.Moving;
-import mapobjects.traits.triggerables.OnTriggerable;
+import mapobjects.traits.collisions.Moving;
+import mapobjects.traits.triggerables.PlayerOnTriggerable;
 
 import static helpers.TextMethods.*;
 
-public class Sign extends GridObject implements OnTriggerable, Drawable {
+public class Sign extends GridObject implements PlayerOnTriggerable, Drawable {
 
     private static final Font FONT = new Font("Arial", Font.PLAIN, 32);
     private static final Color COLOR = new Color(103, 2, 9);
@@ -27,7 +28,7 @@ public class Sign extends GridObject implements OnTriggerable, Drawable {
     private final OutlinedBoxDrawer displayDrawer;
     private final PictureDrawer drawer;
 
-    private Set<Moving> triggerers;
+    private final Trigger<Player> playerTrigger;
 
     public Sign(int worldIndex, int xNum, int yNum, String[] messages) {
         this(worldIndex, xNum, yNum, messages, true);
@@ -44,7 +45,12 @@ public class Sign extends GridObject implements OnTriggerable, Drawable {
 
         displayDrawer = new OutlinedBoxDrawer(textDisplay.getDisplayBox(), COLOR);
         drawer = new PictureDrawer(positionBox, getDirectory1());
+        playerTrigger = new Trigger<>(positionBox, this::triggerSign);
 
+    }
+
+    private void triggerSign(Player player) {
+        setDisplay();
     }
 
 
@@ -66,7 +72,7 @@ public class Sign extends GridObject implements OnTriggerable, Drawable {
     }
 
     @Override
-    public void call(Player player) {
+    public void call() {
         if (displayMessage) {
             textDisplay.update();
         }
@@ -92,34 +98,8 @@ public class Sign extends GridObject implements OnTriggerable, Drawable {
 
 
     @Override
-    public Set<Moving> getTriggerers() {
-        return triggerers;
-    }
-
-    @Override
-    public void setTriggerers(Set<Moving> triggerers) {
-        boolean safe = true;
-        if (triggerers.size() != 1) {
-            System.out.println("ONE PLAYER CAN TRIGGER SIGNS PER DEVICE");
-            safe = false;
-        } else {
-            for (Moving moving : triggerers) {
-                if (!(moving instanceof Player)) {
-                    System.out.println("NON-PLAYER ENTITY CANNOT TRIGGER SIGN");
-                    safe = false;
-                }
-            }
-        }
-        if (safe) {
-            this.triggerers = triggerers;
-        } else {
-            System.out.println("UNSAFE CONFIG: WILL CRASH");
-        }
-    }
-
-    @Override
-    public void action(Moving moving) {
-        setDisplay();
+    public Trigger<Player> getPlayerOnTrigger() {
+        return playerTrigger;
     }
 
 }

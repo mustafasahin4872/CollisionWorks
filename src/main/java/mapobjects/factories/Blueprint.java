@@ -96,7 +96,7 @@ public class Blueprint {
         return switch (type) {
             case ' ', '_' -> new Tile.SpaceTile(worldIndex, xNum, yNum);
             case 'w' -> new Tile.SlowTile(worldIndex, xNum, yNum);
-            case '!' -> new Tile.SpecialTile(worldIndex, xNum, yNum);
+            case '!' -> new Tile.IceTile(worldIndex, xNum, yNum);
             case '-' -> new Tile.DamageTile(worldIndex, xNum, yNum);
             case '+' -> new Tile.HealTile(worldIndex, xNum, yNum);
             case 'X' -> new Tile.WallTile(worldIndex, xNum, yNum);

@@ -3,19 +3,25 @@ package mapobjects.entities;
 import game.core.GameMap;
 import game.io.Frame;
 import game.io.Drawer.PictureDrawer;
+import mapobjects.components.Effector;
 import mapobjects.effects.DamageEffect;
-import mapobjects.traits.*;
 import mapobjects.components.Box;
-import mapobjects.components.Damager;
-import mapobjects.traits.effectors.Damaging;
-import mapobjects.traits.receivers.HealthBearer;
+import mapobjects.traits.collisions.Collidable;
+import mapobjects.traits.collisions.Movable;
+import mapobjects.traits.collisions.MovingCollidable;
+import mapobjects.traits.receivers.Receiver;
+import mapobjects.traits.schemas.Damaging;
+import mapobjects.traits.schemas.HealthBearer;
 import mapobjects.traits.schemas.Drawable;
 import mapobjects.traits.schemas.GridObject;
+import mapobjects.traits.senders.Sender;
+import mapobjects.traits.triggerables.MovedOverTriggerable;
 
+import mapobjects.components.Trigger;
 import java.util.Set;
 
 // collides with everything except player and other ghosts
-public class Ghost extends GridObject implements OnEffector, MovingCollidable, Damaging, Drawable {
+public class Ghost extends GridObject implements MovedOverTriggerable, MovingCollidable, Damaging, Drawable, Sender {
 
     public enum ghostTypes {
         DEMON, ANGEL, BLUE, WHITE, GOLD, SAKURA, RANDOM,
@@ -27,21 +33,23 @@ public class Ghost extends GridObject implements OnEffector, MovingCollidable, D
 
     private final ghostTypes type;
     private final Box collisionBox;
-    private final Damager damager;
+    private final Effector effector;
     private final char alignment;
     private double xVelocity;
     private double yVelocity;
     private boolean xCollided, yCollided;
     private final GridObject[][][] layers;
-    private Set<HealthBearer> targets;
     private final PictureDrawer drawer;
+    private Set<HealthBearer> targets;
+    private final Trigger<Movable> collisionTrigger;
 
     public Ghost(int worldIndex, int xNum, int yNum, char alignment, GridObject[][][] layers) {
         super(worldIndex, xNum, yNum);
         this.alignment = alignment;
         type = rollForGhostType();
         collisionBox = positionBox.clone();
-        damager = new Damager(worldIndex * 10);
+        effector = new Effector(new DamageEffect(worldIndex * 10, 0));
+        collisionTrigger = new Trigger<>(positionBox, this::triggerCollision);
         this.layers = layers;
         double speed = 3;
         if (alignment == HORIZONTAL) {
@@ -95,7 +103,7 @@ public class Ghost extends GridObject implements OnEffector, MovingCollidable, D
     }
 
     @Override
-    public void call(Player player) {
+    public void call() {
 
         move();
 
@@ -169,18 +177,19 @@ public class Ghost extends GridObject implements OnEffector, MovingCollidable, D
     }
 
     @Override
-    public Damager getDamager() {
-        return damager;
+    public Trigger<Movable> getMovedOverTrigger() {
+        return collisionTrigger;
+    }
+
+    private void triggerCollision(Movable movable) {
+        if (movable instanceof Receiver r) {
+            sendEffect(r);
+        }
     }
 
     @Override
-    public DamageEffect getEffect() {
-        return new DamageEffect(damager.getDamage(), damager.getShred());
-    }
-
-    @Override
-    public void action(Player player) {
-        dealDamage(player);
+    public Effector getEffector() {
+        return effector;
     }
 
     @Override

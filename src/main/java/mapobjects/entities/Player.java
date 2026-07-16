@@ -8,23 +8,24 @@ import game.io.InputHandler.ArrowData;
 import game.io.Drawer.PictureDrawer;
 import data.PlayerDefaults;
 import mapobjects.components.*;
-import mapobjects.effects.DamageEffect;
-import mapobjects.effects.Effect;
-import mapobjects.effects.MovementEffect;
-import mapobjects.traits.*;
-import mapobjects.traits.receivers.HealthBearer;
+import mapobjects.effects.*;
+import mapobjects.traits.collisions.Collidable;
+import mapobjects.traits.collisions.MovingCollidable;
+import mapobjects.traits.schemas.HealthBearer;
+import mapobjects.traits.receivers.Receiver;
 import mapobjects.traits.receivers.TileReceiver;
 import mapobjects.traits.schemas.Equippable;
 import mapobjects.traits.schemas.Generator;
 import mapobjects.traits.schemas.GridObject;
 import mapobjects.traits.schemas.MapObject;
-import mapobjects.traits.triggerables.OnTriggerable;
+import mapobjects.traits.triggerables.MovedOverTriggerable;
+import mapobjects.traits.triggerables.PlayerOnTriggerable;
 
 import java.util.Set;
 
 import static mapobjects.traits.schemas.GridObject.TILE_SIDE;
 
-public class Player extends Equippable implements MovingCollidable, HealthBearer, Generator, TileReceiver {
+public class Player extends Equippable implements MovingCollidable, HealthBearer, Generator, TileReceiver, Receiver {
 
     // initial fields that are unique to the player type
     private final String playerName;
@@ -145,8 +146,9 @@ public class Player extends Equippable implements MovingCollidable, HealthBearer
         resetMaxSpeed();
         checkDead();
 
-        gun.call(this);
-        if (shoot) spawn();
+        gun.call();
+        if (shoot)
+            spawn();
 
         int range = 2; // the checking range
         int[] gridNumbers = getGridNumbers();
@@ -166,12 +168,12 @@ public class Player extends Equippable implements MovingCollidable, HealthBearer
     private void checkMapObjectEffects(GridObject currentGridObject) {
         if (currentGridObject instanceof Collidable c && !(c instanceof Ghost)) {
             c.checkCollision(this);
-        } else if (currentGridObject instanceof OnEffector e) {
-            e.checkPlayerIsOn(this);
         } else if (currentGridObject instanceof EmptyGridObject e) {
             checkMapObjectEffects(e.getLinkedObject());
-        } else if (currentGridObject instanceof OnTriggerable t) {
-            t.checkForTriggers();
+        } else if (currentGridObject instanceof MovedOverTriggerable t) {
+            t.getMovedOverTrigger().checkForTriggers();
+        } else if (currentGridObject instanceof PlayerOnTriggerable p) {
+            p.getPlayerOnTrigger().checkForTriggers();
         }
     }
 
@@ -296,6 +298,7 @@ public class Player extends Equippable implements MovingCollidable, HealthBearer
 
     public void setGun(Gun gun) {
         this.gun = gun;
+        gun.setPlayer(this);
     }
 
     // COLLISION
@@ -328,18 +331,6 @@ public class Player extends Equippable implements MovingCollidable, HealthBearer
     }
 
     // MOVEMENTS
-
-    @Override
-    public void setX(double x) {
-        super.setX(x);
-        collisionBox.setCenterX(x);
-    }
-
-    @Override
-    public void setY(double y) {
-        super.setY(y);
-        collisionBox.setCenterY(y);
-    }
 
     @Override
     public double getXVelocity() {
@@ -431,6 +422,16 @@ public class Player extends Equippable implements MovingCollidable, HealthBearer
                 totalAccelerationMult *= accelerationMult;
                 totalDecelerationMult *= decelerationMult;
             }
+            if (effect instanceof SpawnPointEffect(double x, double y)) {
+                setSpawnPoint(x, y); // the last-sent message determines the spawn point
+            }
+            if (effect instanceof StateEffect(GameState.STATE state)) {
+                GameState.gameState.setState(state);
+            }
+            if (effect instanceof CurrencyCollectEffect(int coinAmount, int gemAmount)) {
+                GameState.gameState.collectCoin(coinAmount);
+                GameState.gameState.collectGem(gemAmount);
+            }
         }
 
         hpBar.takeDamage(totalDamage, totalShred);
@@ -471,9 +472,9 @@ public class Player extends Equippable implements MovingCollidable, HealthBearer
         respawn();
     }
 
-    public void setSpawnPoint(double[] spawnPoint) {
-        spawnX = spawnPoint[0];
-        spawnY = spawnPoint[1];
+    public void setSpawnPoint(double x, double y) {
+        spawnX = x;
+        spawnY = y;
     }
 
     public void setTargets(Set<HealthBearer> targets) {

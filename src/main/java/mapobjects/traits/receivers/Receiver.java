@@ -13,7 +13,7 @@ public interface Receiver {
 
     default void clearEffects() {getInbox().clear();}
 
-    default void call() {
+    default void callReceiver() {
         processEffects();
         clearEffects();
     }

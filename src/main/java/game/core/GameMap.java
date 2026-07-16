@@ -1,23 +1,25 @@
 package game.core;
 
-import mapobjects.traits.*;
 import mapobjects.entities.*;
-import mapobjects.traits.effectors.Effector;
-import mapobjects.traits.receivers.HealthBearer;
+import mapobjects.traits.collisions.Movable;
+import mapobjects.traits.collisions.Moving;
+import mapobjects.traits.collisions.MovingCollidable;
+import mapobjects.traits.senders.Sender;
+import mapobjects.traits.schemas.HealthBearer;
 import mapobjects.traits.receivers.Receiver;
 import mapobjects.traits.receivers.TileReceiver;
 import mapobjects.traits.schemas.Drawable;
 import mapobjects.traits.schemas.GridObject;
 import mapobjects.traits.schemas.MapObject;
-import mapobjects.traits.triggerables.OnTriggerable;
-import mapobjects.traits.triggerables.Ranged;
+import mapobjects.traits.triggerables.MovedOverTriggerable;
+import mapobjects.traits.triggerables.PlayerOnTriggerable;
+import mapobjects.traits.triggerables.RangeTriggerable;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
 import static helpers.CollisionMethods.isIn;
-import static mapobjects.traits.schemas.GridObject.TILE_SIDE;
 
 public class GameMap {
 
@@ -34,14 +36,16 @@ public class GameMap {
     private final GridObject[][] gridObjects;
     private final EmptyGridObject[][] emptyGridObjects;
 
-    private final Set<Moving> movingObjects = new HashSet<>();
+    private final Set<Movable> movables = new HashSet<>();
     private final Set<MovingCollidable> movingCollidableObjects = new HashSet<>();
     private final Set<HealthBearer> healthBearers = new HashSet<>();
-    private final Set<Ranged> rangeds = new HashSet<>();
-    private final Set<OnTriggerable> onTriggerables = new HashSet<>();
+    private final Set<RangeTriggerable> rangeTriggerables = new HashSet<>();
+    private final Set<MovedOverTriggerable> movedOverTriggerables = new HashSet<>();
+    private final Set<PlayerOnTriggerable> playerOnTriggerables = new HashSet<>();
     private final Set<MapObject> alwaysCalledObjects = new HashSet<>();
     private final Set<MapObject> spawnedObjects;
     private final Set<TileReceiver> tileReceivers = new HashSet<>();
+    private final Set<Shooter.MovingShooter> movingShooters = new HashSet<>();
     private final Set<Drawable> drawables = new HashSet<>();
 
     // private final int totalCoinOnMap;
@@ -70,54 +74,71 @@ public class GameMap {
         ArrayList<Shooter> shooters = new ArrayList<>();
         ArrayList<Sign> signs = new ArrayList<>();
 
-        for (int i = 0; i < yTile; i++) {
-            for (int j = 0; j < xTile; j++) {
-                GridObject gridObject = gridObjects[i][j];
-                if (gridObject instanceof Moving moving) {
-                    movingObjects.add(moving);
-                    if (gridObject instanceof MovingCollidable movingCollidable) {
-                        movingCollidableObjects.add(movingCollidable);
+        for (GridObject[][] layer: layers) {
+            for (int i = 0; i < yTile; i++) {
+                for (int j = 0; j < xTile; j++) {
+                    GridObject gridObject = layer[i][j];
+                    if (gridObject instanceof Movable movable) {
+                        movables.add(movable);
+                        if (gridObject instanceof Moving moving) {
+                            if (gridObject instanceof MovingCollidable movingCollidable) {
+                                movingCollidableObjects.add(movingCollidable);
+                            }
+                        }
+                    }
+                    if (gridObject instanceof MovedOverTriggerable o) {
+                        movedOverTriggerables.add(o);
+                    }
+                    if (gridObject instanceof PlayerOnTriggerable p) {
+                        playerOnTriggerables.add(p);
+                    }
+                    if (gridObject instanceof TileReceiver tileReceiver) {
+                        tileReceivers.add(tileReceiver);
+                    }
+                    if (gridObject instanceof HealthBearer healthBearer) {
+                        healthBearers.add(healthBearer);
+                    }
+                    if (gridObject instanceof RangeTriggerable rangeTriggerable) {
+                        rangeTriggerables.add(rangeTriggerable);
+                    }
+                    if (gridObject instanceof Shooter s) {
+                        shooters.add(s);
+                        if (gridObject instanceof Shooter.MovingShooter m) {
+                            movingShooters.add(m);
+                        }
+                    }
+                    if (gridObject instanceof Sign s) {
+                        signs.add(s);
+                    }
+                    if (gridObject instanceof Door || gridObject instanceof Shooter || gridObject instanceof Moving) {
+                        alwaysCalledObjects.add(gridObject);
+                    }
+                    if (gridObject instanceof Drawable d) {
+                        drawables.add(d);
                     }
                 }
-                if (gridObject instanceof OnTriggerable o) {
-                    onTriggerables.add(o);
-                }
-                if (gridObject instanceof TileReceiver tileReceiver) {
-                    tileReceivers.add(tileReceiver);
-                }
-                if (gridObject instanceof HealthBearer healthBearer) {
-                    healthBearers.add(healthBearer);
-                }
-                if (gridObject instanceof Ranged ranged) {
-                    rangeds.add(ranged);
-                }
-                if (gridObject instanceof Shooter s)
-                    shooters.add(s);
-                if (gridObject instanceof Sign s) signs.add(s);
-                if (gridObject instanceof Door || gridObject instanceof Shooter || gridObject instanceof Moving) {
-                    alwaysCalledObjects.add(gridObject);
-                }
-                if (gridObject instanceof Drawable d)
-                    drawables.add(d);
             }
         }
 
         healthBearers.add(player);
         tileReceivers.add(player);
-        movingObjects.add(player);
+        movables.add(player);
 
-        for (Ranged ranged : rangeds) {
-            ranged.setTriggerers(movingObjects);
+        for (RangeTriggerable rangeTriggerable : rangeTriggerables) {
+            rangeTriggerable.setRangeTriggerers(movables);
         }
-        for (OnTriggerable o : onTriggerables) {
-            if (!(o instanceof Sign)) o.setTriggerers(movingObjects);
+        for (MovedOverTriggerable o : movedOverTriggerables) {
+            o.setMovedOverTriggerers(movables);
+        }
+        for (PlayerOnTriggerable p : playerOnTriggerables) {
+            p.setPlayerOnTriggerers(Set.of(player));
         }
 
         for (Shooter s : shooters) {
             s.setTargets(healthBearers);
         }
-        for (Sign sign : signs) {
-            sign.setTriggerers(new HashSet<>(Set.of(player)));
+        for (Shooter.MovingShooter m : movingShooters) {
+            m.setPlayer(player);
         }
         player.setTargets(healthBearers);
         setFrameTileRange();
@@ -149,19 +170,28 @@ public class GameMap {
 
     public void callMapObjects() {
         player.call(layers);
-        player.call();
+        player.callReceiver();
 
         // dump all spawned objects into respective sets and clear
         for (MapObject mapObject : spawnedObjects) {
             alwaysCalledObjects.add(mapObject);
             if (mapObject instanceof TileReceiver t) tileReceivers.add(t);
+            if (mapObject instanceof RangeTriggerable rt) {
+                rt.setRangeTriggerers(movables);
+            }
+            if (mapObject instanceof MovedOverTriggerable mt) {
+                mt.setMovedOverTriggerers(movables);
+            }
+            if (mapObject instanceof PlayerOnTriggerable pt) {
+                pt.setPlayerOnTriggerers(Set.of(player));
+            }
         }
         spawnedObjects.clear();
 
         for (MapObject mapObject : alwaysCalledObjects) {
             if (mapObject instanceof Projectile p) p.call(player, layers);
-            else mapObject.call(player);
-            if (mapObject instanceof Receiver r) r.call();
+            else mapObject.call();
+            if (mapObject instanceof Receiver r) r.callReceiver();
         }
 
         for (TileReceiver tileReceiver : tileReceivers) {
@@ -170,7 +200,7 @@ public class GameMap {
                 for (int j = indexes[1]; j<= indexes[3]; j++) {
                     if (outOfMapBounds(tiles, x, j)) continue;
                     Tile tile = tiles[j][x];
-                    if (tile instanceof Effector e) {
+                    if (tile instanceof Sender e) {
                         e.sendEffect(tileReceiver);
                     }
                 }
@@ -190,12 +220,12 @@ public class GameMap {
                     if (!alwaysCalledObjects.contains(gridObject)) {
                         if (gridObject instanceof EmptyGridObject e) {
                             if (!alwaysCalledObjects.contains(e.getLinkedObject())) {
-                                gridObject.call(player);
-                                if (gridObject instanceof Receiver r) r.call();
+                                gridObject.call();
+                                if (gridObject instanceof Receiver r) r.callReceiver();
                             }
                         } else {
-                            gridObject.call(player);
-                            if (gridObject instanceof Receiver r) r.call();
+                            gridObject.call();
+                            if (gridObject instanceof Receiver r) r.callReceiver();
                         }
                     }
                     if (gridObject.isExpired()) {

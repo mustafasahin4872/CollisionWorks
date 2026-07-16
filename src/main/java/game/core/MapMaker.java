@@ -313,7 +313,7 @@ points can have the indicator B for big displays, special to the selection scree
             if (i!=0) {
                 currentCheckPoint.setPrev(checkPoints[i-1]);
             } else {
-                player.setSpawnPoint(currentCheckPoint.getCenterCoordinates());
+                player.setSpawnPoint(currentCheckPoint.getX(), currentCheckPoint.getY());
                 Point.CheckPoint.resetLastCheckPointIndex();
                 player.respawn();
                 spawnPoint = currentCheckPoint.getCenterCoordinates();
