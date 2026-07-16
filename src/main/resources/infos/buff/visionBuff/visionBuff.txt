@@ -1,0 +1,1 @@
+When equipped, the player becomes able to see a bigger portion of the map.

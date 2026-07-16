@@ -1,0 +1,516 @@
+package mapobjects.entities;
+
+import data.Constants;
+import game.io.Frame;
+import game.core.GameState;
+import game.io.InputHandler.ArrowData;
+
+import game.io.Drawer.PictureDrawer;
+import data.PlayerDefaults;
+import mapobjects.components.*;
+import mapobjects.traits.collisions.Collidable;
+import mapobjects.traits.collisions.MovingCollidable;
+import mapobjects.traits.receivers.*;
+import mapobjects.traits.schemas.Equippable;
+import mapobjects.traits.schemas.Generator;
+import mapobjects.traits.schemas.GridObject;
+import mapobjects.traits.schemas.MapObject;
+import mapobjects.traits.triggerables.MovedOverTriggerable;
+import mapobjects.traits.triggerables.PlayerOnTriggerable;
+
+import java.util.Set;
+
+import static mapobjects.traits.schemas.GridObject.TILE_SIDE;
+
+public class Player extends Equippable implements GameStateReceiver, HealthEffectReceiver, MovementEffectReceiver, SpawnPointEffectReceiver, TileReceiver, MovingCollidable, Generator, Receiver {
+
+    // initial fields that are unique to the player type
+    private final String playerName;
+    private final boolean animated;
+
+    // the base stats of a player
+    // they are kept in case of non-permanent buffs are needed to be reverted
+    // the permanent buff values are applied to here
+    private double baseSide;
+    private double baseMaxSpeed;
+    private double baseAcceleration;
+    private double baseDeceleration;
+
+    // positioning, moving and collision logic fields - current values, mutable
+    private double spawnX, spawnY;
+    private double xVelocity, yVelocity;
+    private double maxSpeed, acceleration, deceleration;
+    private int xDirection, yDirection;
+    private boolean xCollided, yCollided;
+
+    // shooting logic fields
+    private boolean shoot;
+
+    // player's collision, spawn, health, time components
+    private final Box collisionBox;
+    protected final HPBar hpBar;
+    private Gun gun = new Gun.Handgun();
+    private final Inbox inbox;
+
+    // owned objects
+    protected Accessory[] accessories;
+
+    private final PictureDrawer drawer;
+
+    // CONSTRUCTORS
+
+    // TODO: CREATE A DUMMY PLAYER TYPE, ASIDE FROM BOB
+    public Player() {
+        this("Bob");
+    }
+
+    public Player(String playerName) {
+        super(0, 0, 0, 0, 0, playerName, PlayerDefaults.valueOf(playerName).getRarity());
+        this.playerName = playerName;
+
+        PlayerDefaults playerDefaults = PlayerDefaults.valueOf(playerName);
+
+        animated = playerDefaults.isAnimated();
+
+        baseSide = playerDefaults.getSide();
+        baseMaxSpeed = playerDefaults.getMaxSpeed();
+        baseAcceleration = playerDefaults.getAcceleration();
+        baseDeceleration = playerDefaults.getDeceleration();
+
+        setWidth(baseSide);
+        setHeight(baseSide);
+        setMaxSpeed(baseMaxSpeed);
+        setAcceleration(baseAcceleration);
+        setDeceleration(baseDeceleration);
+
+        int defaultMaxLives = playerDefaults.getMaxLives();
+        double defaultMaxHP = playerDefaults.getMaxHP();
+        double defaultDef = playerDefaults.getDefence();
+        hpBar = new HPBar(defaultMaxHP, defaultMaxLives, defaultDef);
+
+        collisionBox = positionBox.clone();
+
+        respawn();
+
+        drawer = new PictureDrawer(positionBox, getDirectory1(), "", playerDefaults.getImageType());
+        updateName();
+
+        inbox = new Inbox();
+    }
+
+    public static String getDirectionString(int xDirection, int yDirection) {
+        String direction;
+        if (xDirection == 0 && yDirection == 0) {
+            direction = "0";
+        } else if (xDirection == 0 && yDirection == 1) {
+            direction = "D";
+        } else if (xDirection == 0 && yDirection == -1) {
+            direction = "U";
+        } else if (xDirection == 1 && yDirection == 0) {
+            direction = "R";
+        } else if (xDirection == -1 && yDirection == 0) {
+            direction = "L";
+        } else if (xDirection == 1 && yDirection == 1) {
+            direction = "DR";
+        } else if (xDirection == -1 && yDirection == 1) {
+            direction = "DL";
+        } else if (xDirection == 1 && yDirection == -1) {
+            direction = "UR";
+        } else if (xDirection == -1 && yDirection == -1) {
+            direction = "UL";
+        } else {
+            direction = "invalid";
+        }
+        return direction;
+    }
+
+    @Override
+    public void setSpawnedObjects(Set<MapObject> spawnedObjects) {
+        gun.setSpawnedObjects(spawnedObjects);
+    }
+
+    @Override
+    public void spawn() {
+        gun.shoot();
+    }
+
+    // UPDATES
+
+    public void call(GridObject[][][] layers) {
+
+        resetAcceleration();
+        resetDeceleration();
+        resetMaxSpeed();
+        checkDead();
+
+        gun.call();
+        if (shoot)
+            spawn();
+
+        int range = 2; // the checking range
+        int[] gridNumbers = getGridNumbers();
+        for (GridObject[][] layer : layers) {
+            for (int i = gridNumbers[1] - range; i < gridNumbers[1] + range; i++) {
+                for (int j = gridNumbers[0] - range; j < gridNumbers[0] + range; j++) {
+                    if (i < 0 || j < 0 || i >= layer.length || j >= layer[0].length)
+                        continue;
+                    GridObject currentGridObject = layer[i][j];
+                    checkMapObjectEffects(currentGridObject);
+                }
+            }
+        }
+        updateName();
+    }
+
+    private void checkMapObjectEffects(GridObject currentGridObject) {
+        if (currentGridObject instanceof Collidable c && !(c instanceof Ghost)) {
+            c.checkCollision(this);
+        } else if (currentGridObject instanceof EmptyGridObject e) {
+            checkMapObjectEffects(e.getLinkedObject());
+        } else if (currentGridObject instanceof MovedOverTriggerable t) {
+            t.getMovedOverTrigger().checkForTriggers();
+        } else if (currentGridObject instanceof PlayerOnTriggerable p) {
+            p.getPlayerOnTrigger().checkForTriggers();
+        }
+    }
+
+    // update position and accessory positions
+    public void update() {
+
+        if (!isXCollided()) {
+            setX(getX() + getXVelocity() * Frame.DT);
+        }
+        if (!isYCollided()) {
+            setY(getY() + getYVelocity() * Frame.DT);
+        }
+        xCollided = false;
+        yCollided = false;
+
+        for (Accessory accessory : accessories) {
+            if (accessory != null)
+                accessory.update();
+        }
+    }
+
+    public void acceptInput(ArrowData arrowData) {
+        xDirection = switch (arrowData.xDirection) {
+            case RIGHT -> 1;
+            case LEFT -> -1;
+            default -> 0;
+        };
+        yDirection = switch (arrowData.yDirection) {
+            case UP -> -1;
+            case DOWN -> 1;
+            default -> 0;
+        };
+        shoot = arrowData.space;
+    }
+
+    public void resetInput() {
+        xDirection = 0;
+        yDirection = 0;
+        shoot = false;
+    }
+
+    public void updateVelocity() {
+
+        final double DT = Frame.DT;
+        final double SQRT2 = Math.sqrt(2);
+
+        double effectiveAccelX = acceleration;
+        double effectiveAccelY = acceleration;
+
+        if (xDirection != 0 && Math.signum(xDirection) != Math.signum(xVelocity)) {
+            effectiveAccelX += deceleration;
+        }
+
+        if (yDirection != 0 && Math.signum(yDirection) != Math.signum(yVelocity)) {
+            effectiveAccelY += deceleration;
+        }
+
+        double nextVx, nextVy;
+
+        if (xDirection != 0 && yDirection != 0) {
+            nextVx = xVelocity + xDirection * effectiveAccelX / SQRT2 * DT;
+            nextVy = yVelocity + yDirection * effectiveAccelY / SQRT2 * DT;
+        } else {
+            nextVx = xVelocity + xDirection * effectiveAccelX * DT;
+            nextVy = yVelocity + yDirection * effectiveAccelY * DT;
+        }
+
+        double nextVSquared = nextVx * nextVx + nextVy * nextVy;
+        double nextSpeed = Math.sqrt(nextVSquared);
+
+        if (nextVSquared > maxSpeed * maxSpeed) {
+            double scale = maxSpeed / nextSpeed;
+            setXVelocity(nextVx * scale);
+            setYVelocity(nextVy * scale);
+        } else {
+            setXVelocity(nextVx);
+            setYVelocity(nextVy);
+        }
+
+        // X friction (no input)
+        if (xDirection == 0) {
+            if ((xVelocity >= 0 && xVelocity - deceleration * DT < 0) ||
+                    (xVelocity <= 0 && xVelocity + deceleration * DT > 0)) {
+                setXVelocity(0);
+            } else {
+                setXVelocity(xVelocity + (xVelocity > 0 ? -1 : 1) * deceleration * DT);
+            }
+        }
+
+        // Y friction (no input)
+        if (yDirection == 0) {
+            if ((yVelocity >= 0 && yVelocity - deceleration * DT < 0) ||
+                    (yVelocity <= 0 && yVelocity + deceleration * DT > 0)) {
+                setYVelocity(0);
+            } else {
+                setYVelocity(yVelocity + (yVelocity > 0 ? -1 : 1) * deceleration * DT);
+            }
+        }
+
+    }
+
+    // GETTERS, SETTERS
+
+    public String getPlayerName() {
+        return playerName;
+    }
+
+    // ACCESSORY
+
+    public void setAccessories(Accessory[] accessories) {
+        this.accessories = accessories;
+    }
+
+    @Override
+    public PictureDrawer getDrawer() {
+        return drawer;
+    }
+
+    public int getAmmo() {
+        return gun.getAmmo();
+    }
+
+    public void setGun(Gun gun) {
+        this.gun = gun;
+        gun.setPlayer(this);
+    }
+
+    // COLLISION
+
+    @Override
+    public Box getCollisionBox() {
+        return collisionBox;
+    }
+
+    @Override
+    public void xCollide() {
+        xCollided = true;
+        xVelocity = 0;
+    }
+
+    @Override
+    public void yCollide() {
+        yCollided = true;
+        yVelocity = 0;
+    }
+
+    @Override
+    public boolean isXCollided() {
+        return xCollided;
+    }
+
+    @Override
+    public boolean isYCollided() {
+        return yCollided;
+    }
+
+    // MOVEMENTS
+
+    @Override
+    public double getXVelocity() {
+        return xVelocity;
+    }
+
+    @Override
+    public double getYVelocity() {
+        return yVelocity;
+    }
+
+    private void setXVelocity(double xVelocity) {
+        this.xVelocity = xVelocity;
+    }
+
+    private void setYVelocity(double yVelocity) {
+        this.yVelocity = yVelocity;
+    }
+
+    @Override
+    public void setMaxSpeed(double maxSpeed) {
+        this.maxSpeed = maxSpeed;
+    }
+
+    public void resetMaxSpeed() {
+        maxSpeed = baseMaxSpeed;
+    }
+
+    @Override
+    public void setDeceleration(double deceleration) {
+        this.deceleration = deceleration;
+    }
+
+    public void resetDeceleration() {
+        deceleration = baseDeceleration;
+    }
+
+    @Override
+    public void setAcceleration(double acceleration) {
+        this.acceleration = acceleration;
+    }
+
+    public void resetAcceleration() {
+        acceleration = baseAcceleration;
+    }
+
+    @Override
+    public double getBaseMaxSpeed() {
+        return baseMaxSpeed;
+    }
+
+    @Override
+    public double getBaseAcceleration() {
+        return baseAcceleration;
+    }
+
+    @Override
+    public double getBaseDeceleration() {
+        return baseDeceleration;
+    }
+
+    // DIRECTION VALUES
+
+    public int getXDirection() {
+        return xDirection;
+    }
+
+    public int getYDirection() {
+        return yDirection;
+    }
+
+    // SIZE
+
+    public double getBaseSide() {
+        return baseSide;
+    }
+
+    public void resetSize() {
+        setWidth(baseSide);
+        setHeight(baseSide);
+    }
+
+    // LIVES AND HP
+
+    @Override
+    public Inbox getInbox() {
+        return inbox;
+    }
+
+    @Override
+    public GameState getGameState() {
+        return GameState.gameState;
+    }
+
+    @Override
+    public HPBar getHealthBar() {
+        return hpBar;
+    }
+
+    public void respawn() {
+        setX(spawnX);
+        setY(spawnY);
+        xVelocity = 0;
+        yVelocity = 0;
+        acceleration = 0;
+        deceleration = 0;
+        hpBar.revive();
+    }
+
+    @Override
+    public void ifDied() {
+        respawn();
+    }
+
+    @Override
+    public void ifNoLivesLeft() {
+        GameState.gameState.setState(GameState.STATE.DEAD);
+    }
+
+    public void restart() {
+        // TODO: CHECK IF THERE ARE MORE FIELDS THAT NEED RESETTING
+        hpBar.resetLives();
+        respawn();
+    }
+
+    public void setSpawnPoint(double x, double y) {
+        spawnX = x;
+        spawnY = y;
+    }
+
+    public void setTargets(Set<HealthEffectReceiver> targets) {
+        gun.setTargets(targets);
+    }
+
+    private void updateName() {
+        String base = playerName + "/" + getDirectionString(getXDirection(), getYDirection());
+        String plus = (animated) ? ("_" + getCurrentAnimationNum()) : "";
+        drawer.setName(base + plus);
+    }
+
+    private int getCurrentAnimationNum() {
+
+        int animationNumber = 6;
+        int blinkDuration = 300;
+        int eyeOpenDuration = 3000;
+        int total = blinkDuration + eyeOpenDuration;
+
+        long delta = System.currentTimeMillis() - Constants.GAME_START;
+        double progress = (delta % total) - eyeOpenDuration;
+        if (progress < 0)
+            progress = 0;
+        double progressRatio = progress / blinkDuration;
+
+        int steps = 2 * (animationNumber - 1); // steps = 10 for animationNumber = 6
+        int currentStep = (int) (progressRatio * steps);
+
+        if (currentStep < animationNumber) {
+            return currentStep; // ramping up: 0 to animationNumber - 1
+        } else {
+            return steps - currentStep; // ramping down
+        }
+        // 0(cooldown) - 1 - 2 - 3 - 4 - 5 - 4 - 3 - 2 - 1 - 0(cooldown)
+    }
+
+    public void drawAccessories() {
+        if (accessories != null) {
+            for (Accessory accessory : accessories) {
+                if (accessory != null)
+                    accessory.draw();
+            }
+        }
+    }
+
+    @Override
+    public String[] getStats() {
+        return new String[] {
+                "Size: " + Math.round(10 * baseSide / TILE_SIDE) / 10.0 + " tiles",
+                "HP: " + hpBar.getMaxHP(),
+                "Defense: " + hpBar.getDefense(),
+                "Lives: " + hpBar.getLives(),
+                "Max Speed: " + baseMaxSpeed,
+                "Acceleration: " + baseAcceleration,
+                "Deceleration: " + baseDeceleration
+        };
+    }
+}
