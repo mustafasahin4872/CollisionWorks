@@ -10,7 +10,7 @@ import mapobjects.traits.collisions.Collidable;
 import mapobjects.traits.collisions.MovingCollidable;
 import mapobjects.traits.receivers.Receiver;
 import mapobjects.traits.schemas.Damaging;
-import mapobjects.traits.schemas.HealthBearer;
+import mapobjects.traits.receivers.HealthEffectReceiver;
 import mapobjects.traits.schemas.Drawable;
 import mapobjects.traits.schemas.GridObject;
 import mapobjects.traits.schemas.MapObject;
@@ -87,7 +87,7 @@ public class Projectile extends MapObject implements MovingCollidable, Damaging,
 
     private final Box collisionBox;
     boolean xCollided, yCollided;
-    private Set<HealthBearer> targets = Set.of();
+    private Set<HealthEffectReceiver> targets = Set.of();
     private final Effector effector;
 
     protected final Direction direction;
@@ -157,7 +157,7 @@ public class Projectile extends MapObject implements MovingCollidable, Damaging,
                         c.checkCollision(this);
                         if (xCollided || yCollided) {
                             collided = true;
-                            if (c instanceof Receiver r && c instanceof HealthBearer h && targets.contains(h)) {
+                            if (c instanceof Receiver r && c instanceof HealthEffectReceiver h && targets.contains(h)) {
                                 sendEffect(r);
                             }
                             expire();
@@ -225,7 +225,7 @@ public class Projectile extends MapObject implements MovingCollidable, Damaging,
     }
 
     @Override
-    public void setTargets(Set<HealthBearer> targets) {
+    public void setTargets(Set<HealthEffectReceiver> targets) {
         this.targets = targets;
     }
 

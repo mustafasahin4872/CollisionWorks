@@ -9,7 +9,7 @@ import mapobjects.components.Trigger;
 import mapobjects.effects.DamageEffect;
 import mapobjects.traits.collisions.Movable;
 import mapobjects.traits.schemas.Damaging;
-import mapobjects.traits.schemas.HealthBearer;
+import mapobjects.traits.receivers.HealthEffectReceiver;
 import mapobjects.traits.receivers.Receiver;
 import mapobjects.traits.schemas.Drawable;
 import mapobjects.traits.schemas.GridObject;
@@ -26,7 +26,7 @@ public class Mine extends GridObject implements RangeTriggerable, MovedOverTrigg
     private final Box rangeBox;
     private final Timer timer;
     private final Effector effector;
-    private Set<HealthBearer> targets;
+    private Set<HealthEffectReceiver> targets;
     private final Trigger<Movable> rangeTrigger;
     private final Trigger<Movable> explosionTrigger;
 
@@ -91,7 +91,7 @@ public class Mine extends GridObject implements RangeTriggerable, MovedOverTrigg
     }
 
     @Override
-    public void setTargets(Set<HealthBearer> targets) {
+    public void setTargets(Set<HealthEffectReceiver> targets) {
         this.targets = targets;
     }
 

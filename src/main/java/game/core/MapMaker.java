@@ -40,7 +40,7 @@ public class MapMaker {
                     ' ', '_', // space
                     'X', '%', '#', // wall/boundary/river
                     'w', // mud
-                    '-', '+', // damage/heal
+                    '-', '*', // damage/heal
                     '!' // special
             )), //special characters must not clash with basic characters
             SPECIAL_CHARACTERS = new HashSet<>(Set.of(

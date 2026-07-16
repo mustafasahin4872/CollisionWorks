@@ -11,7 +11,7 @@ import mapobjects.traits.collisions.Movable;
 import mapobjects.traits.collisions.MovingCollidable;
 import mapobjects.traits.receivers.Receiver;
 import mapobjects.traits.schemas.Damaging;
-import mapobjects.traits.schemas.HealthBearer;
+import mapobjects.traits.receivers.HealthEffectReceiver;
 import mapobjects.traits.schemas.Drawable;
 import mapobjects.traits.schemas.GridObject;
 import mapobjects.traits.senders.Sender;
@@ -40,7 +40,7 @@ public class Ghost extends GridObject implements MovedOverTriggerable, MovingCol
     private boolean xCollided, yCollided;
     private final GridObject[][][] layers;
     private final PictureDrawer drawer;
-    private Set<HealthBearer> targets;
+    private Set<HealthEffectReceiver> targets;
     private final Trigger<Movable> collisionTrigger;
 
     public Ghost(int worldIndex, int xNum, int yNum, char alignment, GridObject[][][] layers) {
@@ -172,7 +172,7 @@ public class Ghost extends GridObject implements MovedOverTriggerable, MovingCol
     }
 
     @Override
-    public void setTargets(Set<HealthBearer> targets) {
+    public void setTargets(Set<HealthEffectReceiver> targets) {
         this.targets = targets;
     }
 

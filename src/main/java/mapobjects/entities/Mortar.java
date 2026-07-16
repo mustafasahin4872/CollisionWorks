@@ -7,14 +7,14 @@ import mapobjects.effects.Effect;
 import mapobjects.factories.Blueprint;
 import mapobjects.traits.collisions.Collidable;
 import mapobjects.traits.collisions.Movable;
-import mapobjects.traits.schemas.HealthBearer;
+import mapobjects.traits.receivers.HealthEffectReceiver;
 import mapobjects.traits.receivers.Receiver;
 import mapobjects.traits.schemas.*;
 import mapobjects.traits.triggerables.RangeTriggerable;
 
 import java.util.Set;
 
-public class Mortar extends GridObject implements Collidable, RangeTriggerable, Timed, Generator, HealthBearer, Drawable, Receiver {
+public class Mortar extends GridObject implements Collidable, RangeTriggerable, Timed, Generator, HealthEffectReceiver, Drawable, Receiver {
 
     private final Box collisionBox;
     private final Timer timer;
@@ -62,23 +62,6 @@ public class Mortar extends GridObject implements Collidable, RangeTriggerable, 
     @Override
     public Inbox getInbox() {
         return inbox;
-    }
-
-    @Override
-    public void processEffects() {
-
-        double totalDamage = 0;
-        double totalShred = 0;
-
-        for (Effect effect : inbox.getEffects()) {
-            if (effect instanceof DamageEffect(double damage, double shred)) {
-                totalDamage += damage;
-                totalShred += shred;
-            }
-        }
-
-        hpBar.takeDamage(totalDamage, totalShred);
-
     }
 
     @Override

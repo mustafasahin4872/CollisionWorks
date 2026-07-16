@@ -17,12 +17,12 @@ import mapobjects.factories.ProjectileBlueprint;
 import mapobjects.traits.collisions.Collidable;
 import mapobjects.traits.collisions.Movable;
 import mapobjects.traits.collisions.MovingCollidable;
-import mapobjects.traits.schemas.HealthBearer;
+import mapobjects.traits.receivers.HealthEffectReceiver;
 import mapobjects.traits.receivers.Receiver;
 import mapobjects.traits.schemas.*;
 import mapobjects.traits.triggerables.RangeTriggerable;
 
-public abstract class Shooter extends GridObject implements Collidable, Timed, Generator, HealthBearer, Drawable, Receiver {
+public abstract class Shooter extends GridObject implements Collidable, Timed, Generator, HealthEffectReceiver, Drawable, Receiver {
 
     protected static final char VERTICAL = '|', HORIZONTAL = '—',
             RIGHT = '>', LEFT = '<', UP = '^', DOWN = 'v';
@@ -37,7 +37,7 @@ public abstract class Shooter extends GridObject implements Collidable, Timed, G
     protected static final double DEFAULT_COOLDOWN = 3000; // in milliseconds
     protected final GridObject[][][] layers;
     protected boolean broken;
-    protected Set<HealthBearer> targets;
+    protected Set<HealthEffectReceiver> targets;
     private final Inbox inbox;
     protected boolean readyToSpawn;
 
@@ -87,7 +87,7 @@ public abstract class Shooter extends GridObject implements Collidable, Timed, G
         drawer.setName("1");
     }
 
-    public void setTargets(Set<HealthBearer> targets) {
+    public void setTargets(Set<HealthEffectReceiver> targets) {
         this.targets = targets;
     }
 
@@ -136,23 +136,6 @@ public abstract class Shooter extends GridObject implements Collidable, Timed, G
     @Override
     public Inbox getInbox() {
         return inbox;
-    }
-
-    @Override
-    public void processEffects() {
-
-        double totalDamage = 0;
-        double totalShred = 0;
-
-        for (Effect effect : inbox.getEffects()) {
-            if (effect instanceof DamageEffect(double damage, double shred)) {
-                totalDamage += damage;
-                totalShred += shred;
-            }
-        }
-
-        hpBar.takeDamage(totalDamage, totalShred);
-
     }
 
     // shoots periodically

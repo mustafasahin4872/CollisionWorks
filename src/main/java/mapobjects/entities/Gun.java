@@ -10,7 +10,7 @@ import java.util.Set;
 import static mapobjects.traits.schemas.GridObject.TILE_SIDE;
 
 import mapobjects.factories.ProjectileBlueprint;
-import mapobjects.traits.schemas.HealthBearer;
+import mapobjects.traits.receivers.HealthEffectReceiver;
 import mapobjects.traits.schemas.Drawable;
 import mapobjects.traits.schemas.Equippable;
 import mapobjects.traits.schemas.Generator;
@@ -43,7 +43,7 @@ public abstract class Gun extends Equippable implements Generator, Drawable {
 
     protected final Spawner spawner;
     protected Set<MapObject> spawnedObjects;
-    protected Set<HealthBearer> targets;
+    protected Set<HealthEffectReceiver> targets;
 
     private final PictureDrawer drawer;
     private Player player;
@@ -75,7 +75,7 @@ public abstract class Gun extends Equippable implements Generator, Drawable {
         this.spawnedObjects = spawnedObjects;
     }
 
-    public void setTargets(Set<HealthBearer> targets) {
+    public void setTargets(Set<HealthEffectReceiver> targets) {
         this.targets = targets;
     }
 

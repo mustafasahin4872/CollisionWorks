@@ -98,7 +98,7 @@ public class Blueprint {
             case 'w' -> new Tile.SlowTile(worldIndex, xNum, yNum);
             case '!' -> new Tile.IceTile(worldIndex, xNum, yNum);
             case '-' -> new Tile.DamageTile(worldIndex, xNum, yNum);
-            case '+' -> new Tile.HealTile(worldIndex, xNum, yNum);
+            case '*' -> new Tile.HealTile(worldIndex, xNum, yNum);
             case 'X' -> new Tile.WallTile(worldIndex, xNum, yNum);
             case '#' -> new Tile.RiverTile(worldIndex, xNum, yNum);
             default -> {

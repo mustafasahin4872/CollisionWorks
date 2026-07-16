@@ -8,12 +8,9 @@ import game.io.InputHandler.ArrowData;
 import game.io.Drawer.PictureDrawer;
 import data.PlayerDefaults;
 import mapobjects.components.*;
-import mapobjects.effects.*;
 import mapobjects.traits.collisions.Collidable;
 import mapobjects.traits.collisions.MovingCollidable;
-import mapobjects.traits.schemas.HealthBearer;
-import mapobjects.traits.receivers.Receiver;
-import mapobjects.traits.receivers.TileReceiver;
+import mapobjects.traits.receivers.*;
 import mapobjects.traits.schemas.Equippable;
 import mapobjects.traits.schemas.Generator;
 import mapobjects.traits.schemas.GridObject;
@@ -25,7 +22,7 @@ import java.util.Set;
 
 import static mapobjects.traits.schemas.GridObject.TILE_SIDE;
 
-public class Player extends Equippable implements MovingCollidable, HealthBearer, Generator, TileReceiver, Receiver {
+public class Player extends Equippable implements GameStateReceiver, HealthEffectReceiver, MovementEffectReceiver, SpawnPointEffectReceiver, TileReceiver, MovingCollidable, Generator, Receiver {
 
     // initial fields that are unique to the player type
     private final String playerName;
@@ -350,7 +347,8 @@ public class Player extends Equippable implements MovingCollidable, HealthBearer
         this.yVelocity = yVelocity;
     }
 
-    private void setMaxSpeed(double maxSpeed) {
+    @Override
+    public void setMaxSpeed(double maxSpeed) {
         this.maxSpeed = maxSpeed;
     }
 
@@ -358,7 +356,8 @@ public class Player extends Equippable implements MovingCollidable, HealthBearer
         maxSpeed = baseMaxSpeed;
     }
 
-    private void setDeceleration(double deceleration) {
+    @Override
+    public void setDeceleration(double deceleration) {
         this.deceleration = deceleration;
     }
 
@@ -366,12 +365,28 @@ public class Player extends Equippable implements MovingCollidable, HealthBearer
         deceleration = baseDeceleration;
     }
 
+    @Override
     public void setAcceleration(double acceleration) {
         this.acceleration = acceleration;
     }
 
     public void resetAcceleration() {
         acceleration = baseAcceleration;
+    }
+
+    @Override
+    public double getBaseMaxSpeed() {
+        return baseMaxSpeed;
+    }
+
+    @Override
+    public double getBaseAcceleration() {
+        return baseAcceleration;
+    }
+
+    @Override
+    public double getBaseDeceleration() {
+        return baseDeceleration;
     }
 
     // DIRECTION VALUES
@@ -403,42 +418,8 @@ public class Player extends Equippable implements MovingCollidable, HealthBearer
     }
 
     @Override
-    public void processEffects() {
-
-        double totalDamage = 0;
-        double totalShred = 0;
-
-        double totalMaxSpeedMult = 1;
-        double totalAccelerationMult = 1;
-        double totalDecelerationMult = 1;
-
-        for (Effect effect : inbox.getEffects()) {
-            if (effect instanceof DamageEffect(double damage, double shred)) {
-                totalDamage += damage;
-                totalShred += shred;
-            }
-            if (effect instanceof MovementEffect(double maxSpeedMult, double accelerationMult, double decelerationMult)) {
-                totalMaxSpeedMult *= maxSpeedMult;
-                totalAccelerationMult *= accelerationMult;
-                totalDecelerationMult *= decelerationMult;
-            }
-            if (effect instanceof SpawnPointEffect(double x, double y)) {
-                setSpawnPoint(x, y); // the last-sent message determines the spawn point
-            }
-            if (effect instanceof StateEffect(GameState.STATE state)) {
-                GameState.gameState.setState(state);
-            }
-            if (effect instanceof CurrencyCollectEffect(int coinAmount, int gemAmount)) {
-                GameState.gameState.collectCoin(coinAmount);
-                GameState.gameState.collectGem(gemAmount);
-            }
-        }
-
-        hpBar.takeDamage(totalDamage, totalShred);
-        maxSpeed = baseMaxSpeed * totalMaxSpeedMult;
-        acceleration = baseAcceleration * totalAccelerationMult;
-        deceleration = baseDeceleration * totalDecelerationMult;
-
+    public GameState getGameState() {
+        return GameState.gameState;
     }
 
     @Override
@@ -477,7 +458,7 @@ public class Player extends Equippable implements MovingCollidable, HealthBearer
         spawnY = y;
     }
 
-    public void setTargets(Set<HealthBearer> targets) {
+    public void setTargets(Set<HealthEffectReceiver> targets) {
         gun.setTargets(targets);
     }
 

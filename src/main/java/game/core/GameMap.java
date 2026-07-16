@@ -5,7 +5,7 @@ import mapobjects.traits.collisions.Movable;
 import mapobjects.traits.collisions.Moving;
 import mapobjects.traits.collisions.MovingCollidable;
 import mapobjects.traits.senders.Sender;
-import mapobjects.traits.schemas.HealthBearer;
+import mapobjects.traits.receivers.HealthEffectReceiver;
 import mapobjects.traits.receivers.Receiver;
 import mapobjects.traits.receivers.TileReceiver;
 import mapobjects.traits.schemas.Drawable;
@@ -38,7 +38,7 @@ public class GameMap {
 
     private final Set<Movable> movables = new HashSet<>();
     private final Set<MovingCollidable> movingCollidableObjects = new HashSet<>();
-    private final Set<HealthBearer> healthBearers = new HashSet<>();
+    private final Set<HealthEffectReceiver> healthEffectReceivers = new HashSet<>();
     private final Set<RangeTriggerable> rangeTriggerables = new HashSet<>();
     private final Set<MovedOverTriggerable> movedOverTriggerables = new HashSet<>();
     private final Set<PlayerOnTriggerable> playerOnTriggerables = new HashSet<>();
@@ -95,8 +95,8 @@ public class GameMap {
                     if (gridObject instanceof TileReceiver tileReceiver) {
                         tileReceivers.add(tileReceiver);
                     }
-                    if (gridObject instanceof HealthBearer healthBearer) {
-                        healthBearers.add(healthBearer);
+                    if (gridObject instanceof HealthEffectReceiver healthEffectReceiver) {
+                        healthEffectReceivers.add(healthEffectReceiver);
                     }
                     if (gridObject instanceof RangeTriggerable rangeTriggerable) {
                         rangeTriggerables.add(rangeTriggerable);
@@ -120,7 +120,7 @@ public class GameMap {
             }
         }
 
-        healthBearers.add(player);
+        healthEffectReceivers.add(player);
         tileReceivers.add(player);
         movables.add(player);
 
@@ -135,12 +135,12 @@ public class GameMap {
         }
 
         for (Shooter s : shooters) {
-            s.setTargets(healthBearers);
+            s.setTargets(healthEffectReceivers);
         }
         for (Shooter.MovingShooter m : movingShooters) {
             m.setPlayer(player);
         }
-        player.setTargets(healthBearers);
+        player.setTargets(healthEffectReceivers);
         setFrameTileRange();
     }
 
