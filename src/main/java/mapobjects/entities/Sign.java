@@ -2,22 +2,24 @@ package mapobjects.entities;
 
 import game.io.Drawer.PictureDrawer;
 import game.ui.components.TextDisplay;
+import mapobjects.components.Trigger;
 import java.awt.*;
+import java.util.Set;
+
 import game.io.Frame;
 import mapobjects.components.Box;
 import game.io.Drawer.OutlinedBoxDrawer;
-import mapobjects.traits.Drawable;
-import mapobjects.traits.GridObject;
-import mapobjects.traits.OnEffector;
+import mapobjects.traits.schemas.Drawable;
+import mapobjects.traits.schemas.GridObject;
+import mapobjects.traits.collisions.Moving;
+import mapobjects.traits.triggerables.PlayerOnTriggerable;
 
 import static helpers.TextMethods.*;
 
-public class Sign extends GridObject implements OnEffector, Drawable {
+public class Sign extends GridObject implements PlayerOnTriggerable, Drawable {
 
     private static final Font FONT = new Font("Arial", Font.PLAIN, 32);
     private static final Color COLOR = new Color(103, 2, 9);
-
-    private final Box effectBox;
 
     private final boolean displaySign;
     private boolean displayMessage;
@@ -26,13 +28,14 @@ public class Sign extends GridObject implements OnEffector, Drawable {
     private final OutlinedBoxDrawer displayDrawer;
     private final PictureDrawer drawer;
 
+    private final Trigger<Player> playerTrigger;
+
     public Sign(int worldIndex, int xNum, int yNum, String[] messages) {
         this(worldIndex, xNum, yNum, messages, true);
     }
 
     public Sign(int worldIndex, int xNum, int yNum, String[] messages, boolean displaySign) {
         super(worldIndex, xNum, yNum);
-        effectBox = positionBox.clone();
 
         this.displaySign = displaySign;
 
@@ -42,6 +45,12 @@ public class Sign extends GridObject implements OnEffector, Drawable {
 
         displayDrawer = new OutlinedBoxDrawer(textDisplay.getDisplayBox(), COLOR);
         drawer = new PictureDrawer(positionBox, getDirectory1());
+        playerTrigger = new Trigger<>(positionBox, this::triggerSign);
+
+    }
+
+    private void triggerSign(Player player) {
+        setDisplay();
     }
 
 
@@ -63,17 +72,7 @@ public class Sign extends GridObject implements OnEffector, Drawable {
     }
 
     @Override
-    public Box getEffectBox() {
-        return effectBox;
-    }
-
-    @Override
-    public void checkPlayerIsOn(Player player) {
-        checkPlayerCenterIsOn(player);
-    }
-
-    @Override
-    public void call(Player player) {
+    public void call() {
         if (displayMessage) {
             textDisplay.update();
         }
@@ -97,9 +96,10 @@ public class Sign extends GridObject implements OnEffector, Drawable {
         }
     }
 
+
     @Override
-    public void playerIsOn(Player player) {
-        setDisplay();
+    public Trigger<Player> getPlayerOnTrigger() {
+        return playerTrigger;
     }
 
 }

@@ -1,31 +1,38 @@
 package mapobjects.entities;
 
 import game.io.Drawer.PictureDrawer;
+import mapobjects.components.*;
+import mapobjects.effects.DamageEffect;
+import mapobjects.effects.Effect;
 import mapobjects.factories.Blueprint;
-import mapobjects.components.Spawner;
-import mapobjects.components.Box;
-import mapobjects.components.HPBar;
-import mapobjects.components.Timer;
-import mapobjects.traits.*;
+import mapobjects.traits.collisions.Collidable;
+import mapobjects.traits.collisions.Movable;
+import mapobjects.traits.receivers.HealthEffectReceiver;
+import mapobjects.traits.receivers.Receiver;
+import mapobjects.traits.schemas.*;
+import mapobjects.traits.triggerables.RangeTriggerable;
 
 import java.util.Set;
 
-public class Mortar extends GridObject implements Collidable, Ranged, Timed, Generator, HealthBearer, Drawable {
+public class Mortar extends GridObject implements Collidable, RangeTriggerable, Timed, Generator, HealthEffectReceiver, Drawable, Receiver {
 
     private final Box collisionBox;
     private final Timer timer;
     private final Box rangeBox;
     private final Spawner spawner;
-    private final HPBar HPBar;
+    private final HPBar hpBar;
+    private final Inbox inbox;
 
+    private boolean readyToSpawn;
     private boolean broken;
-    private static final int RANGE = 8;
+    private static final int RANGE = 5;
     private static final int BASE_MINE_NUM = 3;
     //period is max because the time of cooldown is determined by the mines
-    private static final double PERIOD = 3000, DEFAULT_COOLDOWN = 3000;
+    private static final double DEFAULT_COOLDOWN = 4000;
     private final int mineNum;
     private Set<MapObject> spawnedObjects;
     private final GridObject[][][] layers;
+    private final Trigger<Movable> rangeTrigger;
 
     private final PictureDrawer drawer;
 
@@ -39,10 +46,12 @@ public class Mortar extends GridObject implements Collidable, Ranged, Timed, Gen
         this.layers = layers;
         collisionBox = positionBox.clone();
         rangeBox = new Box(positionBox.getCenterCoordinates(), RANGE*TILE_SIDE*2, RANGE*TILE_SIDE*2);
-        timer = new Timer(PERIOD, DEFAULT_COOLDOWN/worldIndex);
+        timer = new Timer(Long.MAX_VALUE, DEFAULT_COOLDOWN/worldIndex, true);
         spawner = new Spawner(this);
-        HPBar = new HPBar(getWidth()*4);
+        hpBar = new HPBar(getWidth()*4);
         drawer = new PictureDrawer(positionBox, getDirectory1());
+        inbox = new Inbox();
+        rangeTrigger = new Trigger<>(rangeBox, this::triggerSpawn);
     }
 
     @Override
@@ -50,16 +59,33 @@ public class Mortar extends GridObject implements Collidable, Ranged, Timed, Gen
         this.spawnedObjects = spawnedObjects;
     }
 
+    @Override
+    public Inbox getInbox() {
+        return inbox;
+    }
 
     @Override
-    public void call(Player player) {
+    public void call() {
         checkDead();
-        updateTimer();
-        if (isComplete()) return;
-        if (isActive()) {
-            if (isComplete()) {timeIsUp(player);} //start cooldown
-        } else if (!broken) {checkPlayerInRange(player);}
+        callTimer();
 
+        if (!broken && !inCooldown()) {
+            rangeTrigger.checkForTriggers();
+            if (readyToSpawn) {
+                spawn();
+                startCooldown();
+                readyToSpawn = false;
+            }
+        }
+    }
+
+    @Override
+    public Trigger<Movable> getRangeTrigger() {
+        return rangeTrigger;
+    }
+
+    private void triggerSpawn(Movable movable) {
+        readyToSpawn = true;
     }
 
     @Override
@@ -70,7 +96,7 @@ public class Mortar extends GridObject implements Collidable, Ranged, Timed, Gen
     @Override
     public void draw() {
         drawer.draw();
-        HPBar.drawHPBar(this);
+        hpBar.drawHPBar(this);
     }
 
     @Override
@@ -78,7 +104,6 @@ public class Mortar extends GridObject implements Collidable, Ranged, Timed, Gen
         return collisionBox;
     }
 
-    @Override
     public Box getRangeBox() {
         return rangeBox;
     }
@@ -90,7 +115,7 @@ public class Mortar extends GridObject implements Collidable, Ranged, Timed, Gen
 
     @Override
     public HPBar getHealthBar() {
-        return HPBar;
+        return hpBar;
     }
 
     @Override
@@ -101,18 +126,6 @@ public class Mortar extends GridObject implements Collidable, Ranged, Timed, Gen
     public void ifNoLivesLeft() {
         broken = true;
         drawer.setName("1");
-    }
-
-    @Override
-    public void playerInRange(Player player) {
-        activateTimer();
-        spawn();
-    }
-
-
-    @Override
-    public void timeIsUp(Player player) {
-        timer.startCooldown();
     }
 
     public void spawn() {

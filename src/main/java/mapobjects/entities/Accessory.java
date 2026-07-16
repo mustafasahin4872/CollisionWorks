@@ -1,17 +1,18 @@
 package mapobjects.entities;
 
 import game.io.Drawer.PictureDrawer;
-import mapobjects.traits.Drawable;
-import mapobjects.traits.Equippable;
+import mapobjects.traits.collisions.Movable;
+import mapobjects.traits.schemas.Drawable;
+import mapobjects.traits.schemas.Equippable;
 
 import static mapobjects.entities.Player.getDirectionString;
-import static mapobjects.traits.GridObject.TILE_SIDE;
+import static mapobjects.traits.schemas.GridObject.TILE_SIDE;
 
 /// different accessories are placed on different locations on player.
 /// therefore, we created many subclasses, each having their unique setCoordinates() function
 /// also, each accessory has 9 images, and their names change depending on the player's direction.
 /// there are 3 main accessory interfaces: Hat, Necklace and Pin. these interfaces categorize the different subclasses.
-public abstract class Accessory extends Equippable implements Drawable {
+public abstract class Accessory extends Equippable implements Drawable, Movable {
 
     protected Player player;
     private final String accessoryName;

@@ -3,32 +3,46 @@ package mapobjects.entities;
 import game.core.GameState;
 import game.core.GameState.STATE;
 import game.io.Drawer.PictureDrawer;
-import mapobjects.components.Box;
-import mapobjects.traits.Drawable;
-import mapobjects.traits.OnEffector;
-import mapobjects.traits.GridObject;
+import mapobjects.components.Effector;
+import mapobjects.components.Trigger;
+import mapobjects.effects.SpawnPointEffect;
+import mapobjects.effects.StateEffect;
+import mapobjects.traits.senders.Sender;
+import mapobjects.traits.schemas.Drawable;
+import mapobjects.traits.schemas.GridObject;
+import mapobjects.traits.triggerables.PlayerOnTriggerable;
 
-public abstract class Point extends GridObject implements OnEffector, Drawable {
+import java.util.Set;
+
+public abstract class Point extends GridObject implements Drawable, Sender, PlayerOnTriggerable {
 
     protected final int index;
     protected boolean isBig;
     protected final PictureDrawer drawer;
     private static final double DEFAULT_SIDE = TILE_SIDE;
+    private final Trigger<Player> playerTrigger;
 
     public Point(int worldIndex, int xNum, int yNum, int index, boolean isBig) {
         super(worldIndex, xNum, yNum, getSize(isBig), getSize(isBig), index+"", isBig);
         this.index = index;
         this.isBig = isBig;
         drawer = new PictureDrawer(positionBox, getDirectory1(), index+"");
+        playerTrigger = new Trigger<>(positionBox, this::triggerPoint);
     }
 
     private static int getSize(boolean isBig) {
         return isBig ? 2 : 1;
     }
 
+    private void triggerPoint(Player player) {
+        applyPoint(player);
+    }
+
+    protected abstract void applyPoint(Player player);
+
     @Override
-    public void checkPlayerIsOn(Player player) {
-        checkPlayerCornerIsOn(player);
+    public Trigger<Player> getPlayerOnTrigger() {
+        return playerTrigger;
     }
 
     @Override
@@ -45,10 +59,10 @@ public abstract class Point extends GridObject implements OnEffector, Drawable {
         drawer.draw();
     }
 
-    public static class WinPoint extends Point implements OnEffector {
 
-        private final Box effectBox;
-        private final GameState.STATE state;
+    public static class WinPoint extends Point {
+
+        private final Effector effector;
 
         public WinPoint(int worldIndex, int xNum, int yNum, int index) {
             this(worldIndex, xNum, yNum, index, false);
@@ -56,8 +70,7 @@ public abstract class Point extends GridObject implements OnEffector, Drawable {
 
         public WinPoint(int worldIndex, int xNum, int yNum, int index, boolean isBig) {
             super(worldIndex, xNum, yNum, index, isBig);
-            effectBox = positionBox.clone();
-            state = switch (index) {
+            STATE state = switch (index) {
                 case 0 -> STATE.PASSED;
                 case 1 -> STATE.ALTERNATE1;
                 case 2 -> STATE.ALTERNATE2;
@@ -65,28 +78,28 @@ public abstract class Point extends GridObject implements OnEffector, Drawable {
                 case 4 -> STATE.SHOP;
                 default -> STATE.GAME;
             };
-        }
-
-
-        @Override
-        public Box getEffectBox() {
-            return effectBox;
+            effector = new Effector(new StateEffect(state));
         }
 
         @Override
-        public void playerIsOn(Player player) {
-            GameState.gameState.setState(state);
+        protected void applyPoint(Player player) {
+            sendEffect(player);
+        }
+
+        @Override
+        public Effector getEffector() {
+            return effector;
         }
 
     }
 
-    public static class CheckPoint extends Point implements OnEffector {
+    public static class CheckPoint extends Point {
 
-        private final Box effectBox;
         private CheckPoint prev;
         protected boolean visited;
         private static final Sign ERROR_SIGN = new Sign(0, 0, 0, new String[]{"first unlock the previous checkpoint"}, false);
         private static int lastCheckPointIndex;
+        private final Effector effector;
 
         public CheckPoint(int worldIndex, int xNum, int yNum, int index) {
             this(worldIndex, xNum, yNum, index, false);
@@ -94,7 +107,7 @@ public abstract class Point extends GridObject implements OnEffector, Drawable {
 
         public CheckPoint(int worldIndex, int xNum, int yNum, int index, boolean isBig) {
             super(worldIndex, xNum, yNum, index, isBig);
-            effectBox = positionBox.clone();
+            effector = new Effector(new SpawnPointEffect(getX(), getY()));
         }
 
         public static void resetLastCheckPointIndex() {
@@ -102,32 +115,33 @@ public abstract class Point extends GridObject implements OnEffector, Drawable {
         }
 
         @Override
-        public Box getEffectBox() {
-            return effectBox;
-        }
-
-        @Override
-        public void call(Player player) {
+        public void call() {
             if (visited) return;
-            ERROR_SIGN.call(player);
+            ERROR_SIGN.call();
         }
 
         @Override
-        public void playerIsOn(Player player) {
+        protected void applyPoint(Player player) {
 
             if (index == lastCheckPointIndex + 1) {
-                markVisited(player);
+                markVisited();
+                sendEffect(player);
             } else if (index > lastCheckPointIndex) {
                 ERROR_SIGN.setDisplay();
             }
+
         }
 
-        private void markVisited(Player player) {
+        @Override
+        public Effector getEffector() {
+            return effector;
+        }
+
+        private void markVisited() {
             visited = true;
             drawer.setName("0");
             if (prev != null) prev.getDrawer().setName("-1");
             lastCheckPointIndex++;
-            player.setSpawnPoint(getCenterCoordinates());
         }
 
         @Override
@@ -154,7 +168,7 @@ public abstract class Point extends GridObject implements OnEffector, Drawable {
         }
 
         @Override
-        public void playerIsOn(Player player) {} //no action needed
+        protected void applyPoint(Player player) {} //no action needed
 
     }
 

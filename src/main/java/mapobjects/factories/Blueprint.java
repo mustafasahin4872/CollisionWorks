@@ -1,10 +1,10 @@
 package mapobjects.factories;
 
-import mapobjects.traits.GridObject;
+import mapobjects.traits.schemas.GridObject;
 import mapobjects.entities.Player;
 import mapobjects.entities.*;
 
-import static mapobjects.traits.GridObject.TILE_SIDE;
+import static mapobjects.traits.schemas.GridObject.TILE_SIDE;
 
 /// creates a blueprint for mapObjects, holds worldIndex, x and y.
 /// with methods and necessary parameters, mutates to/creates a new MapObject
@@ -96,9 +96,9 @@ public class Blueprint {
         return switch (type) {
             case ' ', '_' -> new Tile.SpaceTile(worldIndex, xNum, yNum);
             case 'w' -> new Tile.SlowTile(worldIndex, xNum, yNum);
-            case '!' -> new Tile.SpecialTile(worldIndex, xNum, yNum);
+            case '!' -> new Tile.IceTile(worldIndex, xNum, yNum);
             case '-' -> new Tile.DamageTile(worldIndex, xNum, yNum);
-            case '+' -> new Tile.HealTile(worldIndex, xNum, yNum);
+            case '*' -> new Tile.HealTile(worldIndex, xNum, yNum);
             case 'X' -> new Tile.WallTile(worldIndex, xNum, yNum);
             case '#' -> new Tile.RiverTile(worldIndex, xNum, yNum);
             default -> {

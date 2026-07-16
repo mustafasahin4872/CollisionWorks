@@ -5,7 +5,7 @@ import mapobjects.entities.Accessory;
 import mapobjects.entities.Buff;
 import mapobjects.entities.Gun;
 import mapobjects.entities.Player;
-import mapobjects.traits.Equippable;
+import mapobjects.traits.schemas.Equippable;
 
 import java.util.List;
 

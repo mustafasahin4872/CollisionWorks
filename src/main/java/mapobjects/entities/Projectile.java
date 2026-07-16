@@ -3,15 +3,25 @@ package mapobjects.entities;
 import game.io.Frame;
 import game.io.Drawer.PictureDrawer;
 import mapobjects.components.Box;
-import mapobjects.components.Damager;
 import mapobjects.components.Direction;
-import mapobjects.traits.*;
+import mapobjects.components.Effector;
+import mapobjects.effects.DamageEffect;
+import mapobjects.traits.collisions.Collidable;
+import mapobjects.traits.collisions.MovingCollidable;
+import mapobjects.traits.receivers.Receiver;
+import mapobjects.traits.schemas.Damaging;
+import mapobjects.traits.receivers.HealthEffectReceiver;
+import mapobjects.traits.schemas.Drawable;
+import mapobjects.traits.schemas.GridObject;
+import mapobjects.traits.schemas.MapObject;
+import mapobjects.traits.senders.Sender;
+
 import java.util.Set;
 
-import static mapobjects.traits.GridObject.TILE_SIDE;
+import static mapobjects.traits.schemas.GridObject.TILE_SIDE;
 
 //projectiles are not grid objects, they are bullets that crash to collidables and pass through water and other tiles
-public class Projectile extends MapObject implements MovingCollidable, Damaging, Drawable {
+public class Projectile extends MapObject implements MovingCollidable, Damaging, Drawable, Sender {
 
     public enum ProjectileType {
         REGULAR(DEFAULT_WIDTH, DEFAULT_HEIGHT, DEFAULT_SPEED, DEFAULT_DAMAGE, 7, false, 0, 0),
@@ -76,9 +86,9 @@ public class Projectile extends MapObject implements MovingCollidable, Damaging,
     }
 
     private final Box collisionBox;
-    private final Damager damager;
     boolean xCollided, yCollided;
-    private Set<HealthBearer> targets = Set.of();
+    private Set<HealthEffectReceiver> targets = Set.of();
+    private final Effector effector;
 
     protected final Direction direction;
     private final double speed;
@@ -107,7 +117,7 @@ public class Projectile extends MapObject implements MovingCollidable, Damaging,
         this.piercing = piercing;
 
         collisionBox = new Box(x, y, width, height);
-        damager = new Damager(damage);
+        effector = new Effector(new DamageEffect(damage, 0));
 
         drawer = new PictureDrawer(positionBox, getDirectory1(), name);
 
@@ -130,7 +140,7 @@ public class Projectile extends MapObject implements MovingCollidable, Damaging,
         if (targets.contains(player)) {
             player.checkCollision(this);
             if (xCollided || yCollided) {
-                dealDamage(player);
+                sendEffect(player);
                 collided = true;
                 expire();
             }
@@ -147,8 +157,8 @@ public class Projectile extends MapObject implements MovingCollidable, Damaging,
                         c.checkCollision(this);
                         if (xCollided || yCollided) {
                             collided = true;
-                            if (c instanceof HealthBearer h && targets.contains(h)) {
-                                dealDamage(h);
+                            if (c instanceof Receiver r && c instanceof HealthEffectReceiver h && targets.contains(h)) {
+                                sendEffect(r);
                             }
                             expire();
                             break;
@@ -210,18 +220,13 @@ public class Projectile extends MapObject implements MovingCollidable, Damaging,
     }
 
     @Override
-    public Damager getDamager() {
-        return damager;
+    public Effector getEffector() {
+        return effector;
     }
 
     @Override
-    public void setTargets(Set<HealthBearer> targets) {
+    public void setTargets(Set<HealthEffectReceiver> targets) {
         this.targets = targets;
-    }
-
-    @Override
-    public Set<HealthBearer> getTargets() {
-        return targets;
     }
 
     // unused

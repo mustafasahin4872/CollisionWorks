@@ -1,18 +1,22 @@
 package mapobjects.entities;
 
-import mapobjects.components.Box;
 import game.io.Drawer;
 import game.io.Drawer.OutlinedBoxDrawer;
-import mapobjects.traits.Drawable;
-import mapobjects.traits.OnEffector;
-import mapobjects.traits.GridObject;
+import mapobjects.traits.collisions.Movable;
+import mapobjects.traits.schemas.Drawable;
+import mapobjects.traits.schemas.GridObject;
+import mapobjects.traits.collisions.Moving;
+import mapobjects.traits.triggerables.MovedOverTriggerable;
 
+import mapobjects.components.Trigger;
 import java.awt.*;
+import java.util.Set;
 
-public abstract class Button extends GridObject implements OnEffector, Drawable {
+public abstract class Button extends GridObject implements MovedOverTriggerable, Drawable {
 
-    private final Box effectBox;
     private boolean pressed;
+    private final Trigger<Movable> pressTrigger;
+
     private static final Color PRESSED_COLOR = new Color(106, 192, 45),
             FRAME_COLOR = new Color(226, 125, 125);
 
@@ -20,12 +24,11 @@ public abstract class Button extends GridObject implements OnEffector, Drawable 
 
     public Button(int worldIndex, int xNum, int yNum, double width, double height, boolean cornerAligned) {
         super(worldIndex, xNum, yNum, width, height, cornerAligned);
-        effectBox = positionBox.clone();
+        pressTrigger = new Trigger<>(positionBox, this::triggerPress);
     }
 
-    @Override
-    public Box getEffectBox() {
-        return effectBox;
+    private void triggerPress(Movable movable) {
+        press();
     }
 
     public boolean isPressed() {
@@ -42,18 +45,13 @@ public abstract class Button extends GridObject implements OnEffector, Drawable 
     }
 
     @Override
+    public Trigger<Movable> getMovedOverTrigger() {
+        return pressTrigger;
+    }
+
+    @Override
     public Drawer getDrawer() {
         return drawer;
-    }
-
-    @Override
-    public void checkPlayerIsOn(Player player) {
-        checkPlayerCornerIsOn(player);
-    }
-
-    @Override
-    public void playerIsOn(Player player) {
-        press();
     }
 
 
@@ -68,4 +66,5 @@ public abstract class Button extends GridObject implements OnEffector, Drawable 
             super(worldIndex, xNum, yNum, 2, 2, true);
         }
     }
+
 }

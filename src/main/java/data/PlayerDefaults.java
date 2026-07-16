@@ -1,7 +1,7 @@
 package data;
 
 import game.io.Drawer.PictureDrawer.FILE_TYPE;
-import mapobjects.traits.Equippable.RARITY;
+import mapobjects.traits.schemas.Equippable.RARITY;
 
 public enum PlayerDefaults {
 

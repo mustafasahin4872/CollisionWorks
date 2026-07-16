@@ -2,16 +2,20 @@ package mapobjects.entities;
 
 import game.io.Drawer.PictureDrawer;
 import mapobjects.factories.Blueprint;
-import mapobjects.traits.*;
 import mapobjects.components.Spawner;
 import mapobjects.components.Timer;
-import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 
-import static mapobjects.traits.GridObject.TILE_SIDE;
+import static mapobjects.traits.schemas.GridObject.TILE_SIDE;
 
 import mapobjects.factories.ProjectileBlueprint;
+import mapobjects.traits.receivers.HealthEffectReceiver;
+import mapobjects.traits.schemas.Drawable;
+import mapobjects.traits.schemas.Equippable;
+import mapobjects.traits.schemas.Generator;
+import mapobjects.traits.schemas.MapObject;
+
 import static mapobjects.entities.Projectile.ProjectileType;
 
 public abstract class Gun extends Equippable implements Generator, Drawable {
@@ -27,8 +31,8 @@ public abstract class Gun extends Equippable implements Generator, Drawable {
     private final int defaultUnloadTime;
 
     private int maxAmmo;
-    private Timer reloadTimer;
-    private Timer unloadTimer;
+    private final Timer reloadTimer;
+    private final Timer unloadTimer;
 
     private final int[] levels = new int[3];
     private int ammo;
@@ -39,9 +43,10 @@ public abstract class Gun extends Equippable implements Generator, Drawable {
 
     protected final Spawner spawner;
     protected Set<MapObject> spawnedObjects;
-    protected Set<HealthBearer> targets;
+    protected Set<HealthEffectReceiver> targets;
 
     private final PictureDrawer drawer;
+    private Player player;
 
     protected Gun(ProjectileType projectileType, int maxAmmo, int reloadTime, int unloadTime, RARITY rarity) {
         super(0, 0, 0, TILE_SIDE, TILE_SIDE, rarity);
@@ -54,11 +59,15 @@ public abstract class Gun extends Equippable implements Generator, Drawable {
 
         this.maxAmmo = maxAmmo;
         ammo = maxAmmo;
-        reloadTimer = new Timer(0, reloadTime);
-        unloadTimer = new Timer(0, unloadTime);
+        reloadTimer = new Timer(Long.MAX_VALUE, reloadTime, true);
+        unloadTimer = new Timer(Long.MAX_VALUE, unloadTime, true);
 
         spawner = new Spawner(worldIndex);
         drawer = new PictureDrawer(positionBox, getDirectory1(), getClass().getName().split("\\$")[1].toLowerCase(Locale.ROOT));
+    }
+
+    public void setPlayer(Player player) {
+        this.player = player;
     }
 
     @Override
@@ -66,24 +75,21 @@ public abstract class Gun extends Equippable implements Generator, Drawable {
         this.spawnedObjects = spawnedObjects;
     }
 
-    public void setTargets(Set<HealthBearer> targets) {
+    public void setTargets(Set<HealthEffectReceiver> targets) {
         this.targets = targets;
     }
 
     @Override
-    public void call(Player player) {
+    public void call() {
         double xVelocity = player.getXVelocity();
         double yVelocity = player.getYVelocity();
         centerCoordinates = player.getCenterCoordinates();
         nextCenterCoordinates = player.getNextCenterCoordinates();
         direction = (Math.toDegrees(Math.atan2(yVelocity, xVelocity)) + 360) % 360;
 
-        if (!reloadTimer.isCompleted()) {
-            reloadTimer.activate();
-        }
-
         if (reloadTimer.isActive()) {
             reload();
+            reloadTimer.startCooldown();
         }
 
         reloadTimer.tick();
@@ -91,11 +97,11 @@ public abstract class Gun extends Equippable implements Generator, Drawable {
     }
 
     void shoot() {
-        if (ammo > 0 && !unloadTimer.isCompleted()) {
-            unloadTimer.activate();
-            reloadTimer.startCooldown();
+        if (ammo > 0 && !unloadTimer.inCooldown()) {
             spawn();
             ammo--;
+            unloadTimer.startCooldown();
+            reloadTimer.startCooldown();
         }
     }
 
@@ -107,6 +113,12 @@ public abstract class Gun extends Equippable implements Generator, Drawable {
 
     public int getAmmo() {
         return ammo;
+    }
+
+    protected void spawnProjectile(Blueprint blueprint, double projDirection) {
+        Projectile projectile = blueprint.mutateToProjectile(projectileBlueprint, projDirection);
+        projectile.setTargets(targets);
+        spawnedObjects.add(projectile);
     }
 
     @Override
@@ -159,12 +171,12 @@ public abstract class Gun extends Equippable implements Generator, Drawable {
 
     protected void reloadBuff(double buff) {
         int rt = (int) (defaultReloadTime * (1 - buff));
-        this.reloadTimer = new Timer(0, rt);
+        this.reloadTimer.setCooldown(rt);
     }
 
     protected void unloadBuff(double buff) {
         int ut = (int) (defaultUnloadTime * (1 - buff));
-        this.unloadTimer = new Timer(0, ut);
+        this.unloadTimer.setCooldown(ut);
     }
 
     protected void ammoBuff(int buff) {
@@ -209,10 +221,7 @@ public abstract class Gun extends Equippable implements Generator, Drawable {
         public void spawn() {
             Blueprint blueprint = spawner.directionSpawn(centerCoordinates, nextCenterCoordinates, 30);
 
-            Projectile projectile = blueprint.mutateToProjectile(projectileBlueprint, direction);
-
-            projectile.setTargets(targets);
-            spawnedObjects.add(projectile);
+            spawnProjectile(blueprint, direction);
         }
 
         @Override
@@ -267,9 +276,7 @@ public abstract class Gun extends Equippable implements Generator, Drawable {
             double diff = shifts[shiftIndex] * SPREAD;
             shiftIndex = (shiftIndex +1) % shifts.length;
 
-            Projectile projectile = blueprint.mutateToProjectile(projectileBlueprint, direction + diff);
-            projectile.setTargets(targets);
-            spawnedObjects.add(projectile);
+            spawnProjectile(blueprint, direction + diff);
         }
 
         @Override
@@ -330,10 +337,7 @@ public abstract class Gun extends Equippable implements Generator, Drawable {
                 int mult = i - projectileCount / 2;
                 double diff = spread * mult;
 
-                Projectile projectile = blueprint.mutateToProjectile(projectileBlueprint, d + diff);
-
-                projectile.setTargets(targets);
-                spawnedObjects.add(projectile);
+                spawnProjectile(blueprint, d + diff);
             }
         }
 
@@ -413,10 +417,7 @@ public abstract class Gun extends Equippable implements Generator, Drawable {
                 int mult = i - projectileCount / 2;
                 double diff = spread * mult;
 
-                Projectile projectile = blueprint.mutateToProjectile(projectileBlueprint, d + diff + shift);
-
-                projectile.setTargets(targets);
-                spawnedObjects.add(projectile);
+                spawnProjectile(blueprint, d + diff + shift);
             }
         }
 
@@ -479,10 +480,7 @@ public abstract class Gun extends Equippable implements Generator, Drawable {
                 int mult = i - projectileCount / 2;
                 double diff = SPREAD * mult;
 
-                Projectile projectile = blueprint.mutateToProjectile(projectileBlueprint, d + diff);
-
-                projectile.setTargets(targets);
-                spawnedObjects.add(projectile);
+                spawnProjectile(blueprint, d + diff);
             }
         }
 
@@ -531,10 +529,7 @@ public abstract class Gun extends Equippable implements Generator, Drawable {
         public void spawn() {
             Blueprint blueprint = spawner.directionSpawn(centerCoordinates, nextCenterCoordinates, 30);
 
-            Projectile projectile = blueprint.mutateToProjectile(projectileBlueprint, direction);
-
-            projectile.setTargets(targets);
-            spawnedObjects.add(projectile);
+            spawnProjectile(blueprint, direction);
         }
 
         @Override

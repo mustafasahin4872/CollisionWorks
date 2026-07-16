@@ -8,13 +8,21 @@ import game.io.InputHandler.ArrowData;
 import game.io.Drawer.PictureDrawer;
 import data.PlayerDefaults;
 import mapobjects.components.*;
-import mapobjects.traits.*;
+import mapobjects.traits.collisions.Collidable;
+import mapobjects.traits.collisions.MovingCollidable;
+import mapobjects.traits.receivers.*;
+import mapobjects.traits.schemas.Equippable;
+import mapobjects.traits.schemas.Generator;
+import mapobjects.traits.schemas.GridObject;
+import mapobjects.traits.schemas.MapObject;
+import mapobjects.traits.triggerables.MovedOverTriggerable;
+import mapobjects.traits.triggerables.PlayerOnTriggerable;
 
 import java.util.Set;
 
-import static mapobjects.traits.GridObject.TILE_SIDE;
+import static mapobjects.traits.schemas.GridObject.TILE_SIDE;
 
-public class Player extends Equippable implements MovingCollidable, HealthBearer, Generator {
+public class Player extends Equippable implements GameStateReceiver, HealthEffectReceiver, MovementEffectReceiver, SpawnPointEffectReceiver, TileReceiver, MovingCollidable, Generator, Receiver {
 
     // initial fields that are unique to the player type
     private final String playerName;
@@ -42,11 +50,12 @@ public class Player extends Equippable implements MovingCollidable, HealthBearer
     private final Box collisionBox;
     protected final HPBar hpBar;
     private Gun gun = new Gun.Handgun();
+    private final Inbox inbox;
 
     // owned objects
     protected Accessory[] accessories;
 
-    private PictureDrawer drawer;
+    private final PictureDrawer drawer;
 
     // CONSTRUCTORS
 
@@ -85,6 +94,8 @@ public class Player extends Equippable implements MovingCollidable, HealthBearer
 
         drawer = new PictureDrawer(positionBox, getDirectory1(), "", playerDefaults.getImageType());
         updateName();
+
+        inbox = new Inbox();
     }
 
     public static String getDirectionString(int xDirection, int yDirection) {
@@ -127,10 +138,14 @@ public class Player extends Equippable implements MovingCollidable, HealthBearer
 
     public void call(GridObject[][][] layers) {
 
+        resetAcceleration();
+        resetDeceleration();
+        resetMaxSpeed();
         checkDead();
 
-        gun.call(this);
-        if (shoot) spawn();
+        gun.call();
+        if (shoot)
+            spawn();
 
         int range = 2; // the checking range
         int[] gridNumbers = getGridNumbers();
@@ -150,10 +165,12 @@ public class Player extends Equippable implements MovingCollidable, HealthBearer
     private void checkMapObjectEffects(GridObject currentGridObject) {
         if (currentGridObject instanceof Collidable c && !(c instanceof Ghost)) {
             c.checkCollision(this);
-        } else if (currentGridObject instanceof OnEffector e) {
-            e.checkPlayerIsOn(this);
         } else if (currentGridObject instanceof EmptyGridObject e) {
             checkMapObjectEffects(e.getLinkedObject());
+        } else if (currentGridObject instanceof MovedOverTriggerable t) {
+            t.getMovedOverTrigger().checkForTriggers();
+        } else if (currentGridObject instanceof PlayerOnTriggerable p) {
+            p.getPlayerOnTrigger().checkForTriggers();
         }
     }
 
@@ -278,6 +295,7 @@ public class Player extends Equippable implements MovingCollidable, HealthBearer
 
     public void setGun(Gun gun) {
         this.gun = gun;
+        gun.setPlayer(this);
     }
 
     // COLLISION
@@ -311,36 +329,6 @@ public class Player extends Equippable implements MovingCollidable, HealthBearer
 
     // MOVEMENTS
 
-    public void slip() {
-        double a = 0.12 * baseAcceleration;
-        double s = 3 * baseMaxSpeed;
-        setAcceleration(a);
-        setDeceleration(a);
-        setMaxSpeed(s);
-    }
-
-    public void slow() {
-        double a = 0.12 * baseAcceleration;
-        double d = 2 * baseAcceleration;
-        double s = 0.5 * baseMaxSpeed;
-
-        setAcceleration(a);
-        setDeceleration(d);
-        setMaxSpeed(s);
-    }
-
-    @Override
-    public void setX(double x) {
-        super.setX(x);
-        collisionBox.setCenterX(x);
-    }
-
-    @Override
-    public void setY(double y) {
-        super.setY(y);
-        collisionBox.setCenterY(y);
-    }
-
     @Override
     public double getXVelocity() {
         return xVelocity;
@@ -359,7 +347,8 @@ public class Player extends Equippable implements MovingCollidable, HealthBearer
         this.yVelocity = yVelocity;
     }
 
-    private void setMaxSpeed(double maxSpeed) {
+    @Override
+    public void setMaxSpeed(double maxSpeed) {
         this.maxSpeed = maxSpeed;
     }
 
@@ -367,7 +356,8 @@ public class Player extends Equippable implements MovingCollidable, HealthBearer
         maxSpeed = baseMaxSpeed;
     }
 
-    private void setDeceleration(double deceleration) {
+    @Override
+    public void setDeceleration(double deceleration) {
         this.deceleration = deceleration;
     }
 
@@ -375,12 +365,28 @@ public class Player extends Equippable implements MovingCollidable, HealthBearer
         deceleration = baseDeceleration;
     }
 
+    @Override
     public void setAcceleration(double acceleration) {
         this.acceleration = acceleration;
     }
 
     public void resetAcceleration() {
         acceleration = baseAcceleration;
+    }
+
+    @Override
+    public double getBaseMaxSpeed() {
+        return baseMaxSpeed;
+    }
+
+    @Override
+    public double getBaseAcceleration() {
+        return baseAcceleration;
+    }
+
+    @Override
+    public double getBaseDeceleration() {
+        return baseDeceleration;
     }
 
     // DIRECTION VALUES
@@ -405,6 +411,16 @@ public class Player extends Equippable implements MovingCollidable, HealthBearer
     }
 
     // LIVES AND HP
+
+    @Override
+    public Inbox getInbox() {
+        return inbox;
+    }
+
+    @Override
+    public GameState getGameState() {
+        return GameState.gameState;
+    }
 
     @Override
     public HPBar getHealthBar() {
@@ -437,12 +453,12 @@ public class Player extends Equippable implements MovingCollidable, HealthBearer
         respawn();
     }
 
-    public void setSpawnPoint(double[] spawnPoint) {
-        spawnX = spawnPoint[0];
-        spawnY = spawnPoint[1];
+    public void setSpawnPoint(double x, double y) {
+        spawnX = x;
+        spawnY = y;
     }
 
-    public void setTargets(Set<HealthBearer> targets) {
+    public void setTargets(Set<HealthEffectReceiver> targets) {
         gun.setTargets(targets);
     }
 

@@ -99,7 +99,7 @@ public abstract class UIButton {
         private final int indexShift; // can be positive or negative!
 
         private static final double COOLDOWN = 200; // in milliseconds
-        private final Timer cooldown = new Timer(Long.MAX_VALUE, COOLDOWN);
+        private final Timer cooldown = new Timer(Long.MAX_VALUE, COOLDOWN, true);
 
         public GenericIndexKey(GenericKey key, Index index, int indexShift) {
             this.key = key;

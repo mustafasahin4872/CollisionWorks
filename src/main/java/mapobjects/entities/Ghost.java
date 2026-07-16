@@ -3,15 +3,25 @@ package mapobjects.entities;
 import game.core.GameMap;
 import game.io.Frame;
 import game.io.Drawer.PictureDrawer;
-import mapobjects.traits.*;
+import mapobjects.components.Effector;
+import mapobjects.effects.DamageEffect;
 import mapobjects.components.Box;
-import mapobjects.components.Damager;
+import mapobjects.traits.collisions.Collidable;
+import mapobjects.traits.collisions.Movable;
+import mapobjects.traits.collisions.MovingCollidable;
+import mapobjects.traits.receivers.Receiver;
+import mapobjects.traits.schemas.Damaging;
+import mapobjects.traits.receivers.HealthEffectReceiver;
+import mapobjects.traits.schemas.Drawable;
+import mapobjects.traits.schemas.GridObject;
+import mapobjects.traits.senders.Sender;
+import mapobjects.traits.triggerables.MovedOverTriggerable;
 
+import mapobjects.components.Trigger;
 import java.util.Set;
 
-//passable ticking damager, moves
-//collides with everything except player and other ghosts
-public class Ghost extends GridObject implements OnEffector, MovingCollidable, Damaging, Drawable {
+// collides with everything except player and other ghosts
+public class Ghost extends GridObject implements MovedOverTriggerable, MovingCollidable, Damaging, Drawable, Sender {
 
     public enum ghostTypes {
         DEMON, ANGEL, BLUE, WHITE, GOLD, SAKURA, RANDOM,
@@ -23,23 +33,23 @@ public class Ghost extends GridObject implements OnEffector, MovingCollidable, D
 
     private final ghostTypes type;
     private final Box collisionBox;
-    private final Box effectBox;
-    private final Damager damager;
+    private final Effector effector;
     private final char alignment;
     private double xVelocity;
     private double yVelocity;
     private boolean xCollided, yCollided;
     private final GridObject[][][] layers;
-    private Set<HealthBearer> targets;
     private final PictureDrawer drawer;
+    private Set<HealthEffectReceiver> targets;
+    private final Trigger<Movable> collisionTrigger;
 
     public Ghost(int worldIndex, int xNum, int yNum, char alignment, GridObject[][][] layers) {
         super(worldIndex, xNum, yNum);
         this.alignment = alignment;
         type = rollForGhostType();
         collisionBox = positionBox.clone();
-        effectBox = positionBox.clone();
-        damager = new Damager(worldIndex * 10);
+        effector = new Effector(new DamageEffect(worldIndex * 10, 0));
+        collisionTrigger = new Trigger<>(positionBox, this::triggerCollision);
         this.layers = layers;
         double speed = 3;
         if (alignment == HORIZONTAL) {
@@ -93,7 +103,7 @@ public class Ghost extends GridObject implements OnEffector, MovingCollidable, D
     }
 
     @Override
-    public void call(Player player) {
+    public void call() {
 
         move();
 
@@ -103,10 +113,10 @@ public class Ghost extends GridObject implements OnEffector, MovingCollidable, D
         for (GridObject[][] layer : layers) {
             if (collided)
                 break;
-            for (int i = gridNumbers[1] - range; i < gridNumbers[1] + range; i++) {
+            for (int y = gridNumbers[1] - range; y < gridNumbers[1] + range; y++) {
                 if (collided)
                     break;
-                for (int j = gridNumbers[0] - range; j < gridNumbers[0] + range; j++) {
+                for (int x = gridNumbers[0] - range; x < gridNumbers[0] + range; x++) {
                     if (alignment == HORIZONTAL && xCollided) {
                         collided = true;
                         xVelocity *= -1;
@@ -119,10 +129,10 @@ public class Ghost extends GridObject implements OnEffector, MovingCollidable, D
                         yCollided = false;
                         break;
                     }
-                    if (GameMap.outOfMapBounds(layer, i, j))
+                    if (GameMap.outOfMapBounds(layer, x, y))
                         continue;
 
-                    GridObject currentGridObject = layer[i][j];
+                    GridObject currentGridObject = layer[y][x];
                     if (currentGridObject == this)
                         continue;
                     if (currentGridObject instanceof Collidable c && !(c instanceof Ghost)) {
@@ -152,8 +162,6 @@ public class Ghost extends GridObject implements OnEffector, MovingCollidable, D
     public void move() {
         positionBox.xShift(xVelocity * Frame.DT);
         positionBox.yShift(yVelocity * Frame.DT);
-        effectBox.xShift(xVelocity * Frame.DT);
-        effectBox.yShift(yVelocity * Frame.DT);
         collisionBox.xShift(xVelocity * Frame.DT);
         collisionBox.yShift(yVelocity * Frame.DT);
     }
@@ -164,33 +172,24 @@ public class Ghost extends GridObject implements OnEffector, MovingCollidable, D
     }
 
     @Override
-    public Box getEffectBox() {
-        return effectBox;
-    }
-
-    @Override
-    public void setTargets(Set<HealthBearer> targets) {
+    public void setTargets(Set<HealthEffectReceiver> targets) {
         this.targets = targets;
     }
 
     @Override
-    public Set<HealthBearer> getTargets() {
-        return targets;
+    public Trigger<Movable> getMovedOverTrigger() {
+        return collisionTrigger;
+    }
+
+    private void triggerCollision(Movable movable) {
+        if (movable instanceof Receiver r) {
+            sendEffect(r);
+        }
     }
 
     @Override
-    public Damager getDamager() {
-        return damager;
-    }
-
-    @Override
-    public void checkPlayerIsOn(Player player) {
-        checkPlayerCornerIsOn(player);
-    }
-
-    @Override
-    public void playerIsOn(Player player) {
-        dealDamage(player);
+    public Effector getEffector() {
+        return effector;
     }
 
     @Override

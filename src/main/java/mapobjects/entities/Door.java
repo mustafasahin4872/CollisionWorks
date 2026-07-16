@@ -6,9 +6,9 @@ import java.util.Arrays;
 import game.io.Frame;
 import mapobjects.components.Box;
 import game.io.Drawer;
-import mapobjects.traits.Collidable;
-import mapobjects.traits.Drawable;
-import mapobjects.traits.GridObject;
+import mapobjects.traits.collisions.Collidable;
+import mapobjects.traits.schemas.Drawable;
+import mapobjects.traits.schemas.GridObject;
 
 public class Door extends GridObject implements Collidable, Drawable {
 
@@ -58,7 +58,7 @@ public class Door extends GridObject implements Collidable, Drawable {
     }
 
     @Override
-    public void call(Player player) {
+    public void call() {
         checkOpen();
         slideDoor();
         if (fullyOpened()) {expire();}

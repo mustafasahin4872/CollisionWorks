@@ -1,13 +1,12 @@
 package game.core;
 
-import mapobjects.components.Spawner;
 import mapobjects.factories.Blueprint;
 import mapobjects.entities.Currency;
 import mapobjects.entities.Player;
-import mapobjects.traits.Generator;
-import mapobjects.traits.GridObject;
+import mapobjects.traits.schemas.Generator;
+import mapobjects.traits.schemas.GridObject;
 import mapobjects.entities.*;
-import mapobjects.traits.MapObject;
+import mapobjects.traits.schemas.MapObject;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -41,7 +40,7 @@ public class MapMaker {
                     ' ', '_', // space
                     'X', '%', '#', // wall/boundary/river
                     'w', // mud
-                    '-', '+', // damage/heal
+                    '-', '*', // damage/heal
                     '!' // special
             )), //special characters must not clash with basic characters
             SPECIAL_CHARACTERS = new HashSet<>(Set.of(
@@ -114,6 +113,22 @@ points can have the indicator B for big displays, special to the selection scree
 
     public GridObject[][][] getLayers() {
         return layers;
+    }
+
+    public Tile[][] getTiles() {
+        return tiles;
+    }
+
+    public GridObject[][] getGridObjects() {
+        return gridObjects;
+    }
+
+    public EmptyGridObject[][] getEmptyGridObjects() {
+        return emptyGridObjects;
+    }
+
+    public Currency[][] getCoins() {
+        return coins;
     }
 
     public double[] getSpawnPoint() {return spawnPoint;}
@@ -298,7 +313,7 @@ points can have the indicator B for big displays, special to the selection scree
             if (i!=0) {
                 currentCheckPoint.setPrev(checkPoints[i-1]);
             } else {
-                player.setSpawnPoint(currentCheckPoint.getCenterCoordinates());
+                player.setSpawnPoint(currentCheckPoint.getX(), currentCheckPoint.getY());
                 Point.CheckPoint.resetLastCheckPointIndex();
                 player.respawn();
                 spawnPoint = currentCheckPoint.getCenterCoordinates();

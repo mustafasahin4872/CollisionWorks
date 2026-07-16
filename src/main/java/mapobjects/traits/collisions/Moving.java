@@ -1,13 +1,9 @@
-package mapobjects.traits;
+package mapobjects.traits.collisions;
 
 import game.io.Frame;
 
-public interface Moving {
+public interface Moving extends HasBody, Movable {
 
-    double getX();
-    double getY();
-    void setX(double x);
-    void setY(double y);
     double getXVelocity();
     double getYVelocity();
 

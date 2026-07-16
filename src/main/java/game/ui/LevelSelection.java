@@ -20,7 +20,7 @@ import java.util.Set;
 import static helpers.CollisionMethods.isIn;
 import static game.io.InputHandler.MouseData;
 import static game.io.InputHandler.ArrowData;
-import static mapobjects.traits.GridObject.TILE_SIDE;
+import static mapobjects.traits.schemas.GridObject.TILE_SIDE;
 
 // governs level selection
 // runs when gameState.getState() == STATE.GAME

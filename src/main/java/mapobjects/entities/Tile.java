@@ -2,7 +2,15 @@ package mapobjects.entities;
 
 import game.io.Drawer.PictureDrawer;
 import mapobjects.components.Box;
-import mapobjects.traits.*;
+import mapobjects.components.Effector;
+import mapobjects.effects.DamageEffect;
+import mapobjects.effects.Effect;
+import mapobjects.effects.HealEffect;
+import mapobjects.effects.MovementEffect;
+import mapobjects.traits.collisions.Collidable;
+import mapobjects.traits.senders.Sender;
+import mapobjects.traits.schemas.Drawable;
+import mapobjects.traits.schemas.GridObject;
 
 public abstract class Tile extends GridObject implements Drawable {
 
@@ -10,12 +18,6 @@ public abstract class Tile extends GridObject implements Drawable {
     public Tile(int worldIndex, int xNum, int yNum) {
         super(worldIndex, xNum, yNum, worldIndex+"", "jpg");
         drawer = new PictureDrawer(positionBox, getDirectory1(), worldIndex+"", PictureDrawer.FILE_TYPE.jpg);
-    }
-
-    protected void resetPlayerStats(Player player) {
-        player.resetDeceleration();
-        player.resetAcceleration();
-        player.resetMaxSpeed();
     }
 
     @Override
@@ -56,104 +58,79 @@ public abstract class Tile extends GridObject implements Drawable {
     }
 
 
-    public static abstract class PassableTile extends Tile implements OnEffector {
+    public static abstract class PassableTile extends Tile {
 
-        private final Box effectBox;
         public PassableTile(int worldIndex, int xNum, int yNum) {
             super(worldIndex, xNum, yNum);
-            effectBox = positionBox.clone();
-        }
-
-        @Override
-        public Box getEffectBox() {
-            return effectBox;
-        }
-
-        @Override
-        public void checkPlayerIsOn(Player player) {
-            checkPlayerCenterIsOn(player);
         }
 
     }
 
 
-    public static class SpaceTile extends PassableTile{
+    public static class SpaceTile extends PassableTile {
 
         public SpaceTile(int worldIndex, int xNum, int yNum) {
             super(worldIndex, xNum, yNum);
         }
 
-        @Override
-        public void playerIsOn(Player player) {
-            resetPlayerStats(player);
-        }
-
     }
 
 
-    public static class SlowTile extends PassableTile {
+    public static class SlowTile extends PassableTile implements Sender {
 
+        private static final Effector effector = new Effector(new MovementEffect(0.5, 0.12, 2));
         public SlowTile(int worldIndex, int xNum, int yNum) {
             super(worldIndex, xNum, yNum); // Earthy brown
         }
 
         @Override
-        public void playerIsOn(Player player) {
-            player.slow();
+        public Effector getEffector() {
+            return effector;
         }
 
     }
 
 
-    public static class SpecialTile extends PassableTile {
+    public static class IceTile extends PassableTile implements Sender {
 
-        public SpecialTile(int worldIndex, int xNum, int yNum) {
+        private static final Effector effector = new Effector(new MovementEffect(3, 0.12, 0.12));
+        public IceTile(int worldIndex, int xNum, int yNum) {
             super(worldIndex, xNum, yNum);
         }
 
         @Override
-        public void playerIsOn(Player player) {
-            player.slip();
+        public Effector getEffector() {
+            return effector;
         }
 
     }
 
 
-    public static class DamageTile extends PassableTile {
+    public static class DamageTile extends PassableTile implements Sender {
 
+        private static final Effector effector = new Effector(new DamageEffect(2, 0));
         public DamageTile(int worldIndex, int xNum, int yNum) {
             super(worldIndex, xNum, yNum);
         }
 
         @Override
-        public void playerIsOn(Player player) {
-            resetPlayerStats(player);
-            player.damage(worldIndex);
-        }
-
-        @Override
-        public void checkPlayerIsOn(Player player) {
-            checkPlayerCornerIsOn(player);
+        public Effector getEffector() {
+            return effector;
         }
 
     }
 
 
-    public static class HealTile extends PassableTile {
+    public static class HealTile extends PassableTile implements Sender {
 
+        public static final Effector effector = new Effector(new HealEffect(4));
         public HealTile(int worldIndex, int xNum, int yNum) { // Golden yellow tile, draw a + in it
             super(worldIndex, xNum, yNum);
         }
 
         @Override
-        public void playerIsOn(Player player) {
-            resetPlayerStats(player);
-            player.heal(3.0 / worldIndex);
-        }
-
-        @Override
-        public void checkPlayerIsOn(Player player) {
-            checkPlayerCornerIsOn(player);
+        public Effector getEffector() {
+            return effector;
         }
 
     }
