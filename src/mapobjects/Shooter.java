@@ -19,7 +19,7 @@ public class Shooter extends MapObject {
     private int shotProjectilesNumber;
 
     public Shooter(int worldIndex, int xNum, int yNum, Alignment alignment, Direction direction) {
-        super(worldIndex, xNum, yNum);
+        super(worldIndex, xNum, yNum, "misc/misc/shooter.png");
         this.alignment = alignment;
         this.direction = direction;
         period = DEFAULT_PERIOD/worldIndex;
@@ -41,8 +41,4 @@ public class Shooter extends MapObject {
     @Override
     public void playerIsOn(Player player) {} //impossible
 
-    @Override
-    public void draw() {
-        StdDraw.picture(centerCoordinates[0], centerCoordinates[1], "misc/misc/shooter.png", TILE_SIDE, TILE_SIDE);
-    }
 }

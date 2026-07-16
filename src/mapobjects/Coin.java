@@ -1,62 +1,69 @@
 package mapobjects;
 
 import game.Player;
-import lib.StdDraw;
 
-public class Coin extends MapObject {
+public abstract class Coin extends MapObject {
 
-    private boolean collected = false;
-    private final String fileName;
-    private final int coinAmount;
-    private final double size;
+    private boolean collected;
+    private final int value;
 
-    public Coin(int xNum, int yNum, double size, int coinAmount, String fileName) {
-        super(xNum, yNum);
-        this.size = size;
-        this.coinAmount = coinAmount;
-        this.fileName = fileName;
-
-        double spaceOnSide = (TILE_SIDE - size) / 2;
-        coordinates[0] += spaceOnSide;
-        coordinates[1] += spaceOnSide;
-        coordinates[2] -= spaceOnSide;
-        coordinates[3] -= spaceOnSide;
-        collisionBox = coordinates;
+    public Coin(int worldIndex, int xNum, int yNum, double size, int value, String fileName) {
+        super(worldIndex, xNum, yNum, size, size, fileName);
+        this.value = value;
     }
 
-    public int getCoinAmount() {
-        return coinAmount;
+    public boolean isCollected() {
+        return collected;
+    }
+
+    public int getValue() {
+        return value;
+    }
+
+    public void collect(Player player) {
+        if (collected) return;
+        player.collectCoin(value);
+        collected = true;
     }
 
     @Override
     public void playerIsOn(Player player) {
-        if (collected) return;
-        player.collectCoin(coinAmount);
-        collected = true;
+        collect(player);
     }
 
     @Override
     public void draw() {
         if (collected) return;
-        StdDraw.picture(centerCoordinates[0], centerCoordinates[1], fileName, size, size);
+        super.draw();
     }
 
     public static class SingleCoin extends Coin {
+        private static final double SIZE = 0.6;
+        private static final int VALUE = 1;
+        private static final String FILE = "misc/coinImages/coin.png";
 
-        public SingleCoin(int xNum, int yNum) {
-            super(xNum, yNum, 30, 1, "misc/coinImages/coin.png");
+        public SingleCoin(int worldIndex, int xNum, int yNum) {
+            super(worldIndex, xNum, yNum, SIZE, VALUE, FILE);
         }
     }
 
     public static class TripleCoin extends Coin {
-        public TripleCoin(int xNum, int yNum) {
-            super(xNum, yNum, 40, 3, "misc/coinImages/tripleCoin.png");
+        private static final double SIZE = 0.8;
+        private static final int VALUE = 3;
+        private static final String FILE = "misc/coinImages/tripleCoin.png";
+
+        public TripleCoin(int worldIndex, int xNum, int yNum) {
+            super(worldIndex, xNum, yNum, SIZE, VALUE, FILE);
         }
     }
 
     public static class CoinBag extends Coin {
-        public CoinBag(int xNum, int yNum) {
-            super(xNum, yNum, 60,10, "misc/coinImages/coinBag.png");
+        private static final double SIZE = 1.2;
+        private static final int VALUE = 10;
+        private static final String FILE = "misc/coinImages/coinBag.png";
+
+        public CoinBag(int worldIndex, int xNum, int yNum) {
+            super(worldIndex, xNum, yNum, SIZE, VALUE, FILE);
         }
     }
 }

@@ -1,6 +1,7 @@
 package mapobjects;
 
 import java.awt.*;
+import java.util.Arrays;
 
 import helperobjects.Alignment;
 import lib.StdDraw;
@@ -8,85 +9,65 @@ import game.Player;
 import game.Frame;
 import static helperobjects.DrawMethods.drawRectangle;
 
-public abstract class Door extends MapObject {
+public class Door extends MapObject {
 
     private final Alignment alignment;
     private final Button[] buttons;
-
     private boolean isOpen;
     private final double doorFloor;
+    private final Color color = new Color((int) (Math.random() * 255), 0, (int) (Math.random() * 255));
+    private static final double THICKNESS = 0.8, // in tiles
+            SPEED = 2, DELTA = SPEED * Frame.DT; // in pixels
 
-    private final Color color = new Color((int) (Math.random()*255), 0, (int) (Math.random()*255));
-    private static final double THICKNESS = 40, SPACE_ON_SIDE = (TILE_SIDE-THICKNESS)/2,
-            SPEED = 2, DELTA = SPEED * Frame.DT;
 
-
-    public Door(Alignment alignment, int xNum, int yNum) {
-        this(alignment, xNum, yNum, 4, null);
+    public Door(int worldIndex, int xNum, int yNum, Alignment alignment) {
+        this(worldIndex, xNum, yNum, alignment, 4, null);
     }
 
-    // door without buttons, it is just an obstacle
-    public Door(Alignment alignment, int xNum, int yNum, int length) {
-        this(alignment, xNum, yNum, length, null);
+    public Door(int worldIndex, int xNum, int yNum, Alignment alignment, int length) {
+        this(worldIndex, xNum, yNum, alignment, length, null);
     }
 
-    public Door(Alignment alignment, int xNum, int yNum, Button[] buttons) {
-        this(alignment, xNum, yNum, 4, buttons);
+    public Door(int worldIndex, int xNum, int yNum, Alignment alignment, Button[] buttons) {
+        this(worldIndex, xNum, yNum, alignment, 4, buttons);
     }
 
-    // door with buttons wired to it, defined by its alignment and the tiles it lies on.
-    public Door(Alignment alignment, int xNum, int yNum, int length, Button[] buttons) {
-        super(xNum, yNum);
+    public Door(int worldIndex, int xNum, int yNum, Alignment alignment, int length, Button[] buttons) {
+        super(worldIndex, xNum, yNum, getWidth(alignment, length), getHeight(alignment, length), true);
         this.alignment = alignment;
-        //length value in tiles
         this.buttons = buttons;
-
-        if (alignment == Alignment.V) {
-            coordinates[0] += SPACE_ON_SIDE;
-            coordinates[2] -= SPACE_ON_SIDE;
-            coordinates[3] += (length-1)*TILE_SIDE;
-            doorFloor = coordinates[1];
-        } else {
-            coordinates[1] += SPACE_ON_SIDE;
-            coordinates[3] -= SPACE_ON_SIDE;
-            coordinates[2] += (length-1)*TILE_SIDE;
-            doorFloor = coordinates[0];
-        }
-        collisionBox = coordinates;
+        this.doorFloor = (alignment == Alignment.V) ? coordinates[1] : coordinates[0];
 
         if (buttons != null) {
-            for (Button button : buttons) {
-                button.setUnpressedColor(color);
-            }
+            Arrays.stream(buttons).forEach(button -> button.setUnpressedColor(color));
         }
+    }
+
+    private static double getWidth(Alignment alignment, int length) {
+        return (alignment == Alignment.H) ? length : THICKNESS;
+    }
+
+    private static double getHeight(Alignment alignment, int length) {
+        return (alignment == Alignment.V) ? length : THICKNESS;
     }
 
     public void checkOpen() {
-        if (buttons == null) return;
-
-        boolean pressed = true;
-        for (Button button : buttons) {
-            if (!button.isPressed()) {
-                pressed = false;
-                break;
-            }
+        if (buttons != null) {
+            isOpen = Arrays.stream(buttons).allMatch(Button::isPressed);
         }
-        isOpen = pressed;
     }
 
-    //decreases the door's y coordinates by doorSpeed*timeStep if door is set to be open and is not fully opened(vertical)
     private void slideDoor() {
         if (!isOpen) return;
+        adjustCoordinate();
 
-        if (alignment == Alignment.V && coordinates[3] > doorFloor) {
-            coordinates[3] = Math.max(coordinates[3] - DELTA, doorFloor); // Ensure top >= bottom
-            collisionBox[3] = Math.max(collisionBox[3] - DELTA, doorFloor);
-        } else if (alignment == Alignment.H && coordinates[2] > doorFloor) {
-            coordinates[2] = Math.max(coordinates[2] - DELTA, doorFloor); // Ensure right >= left
-            collisionBox[2] = Math.max(collisionBox[2] - DELTA, doorFloor);
-        }
     }
 
+    private void adjustCoordinate() {
+        int index = (alignment == Alignment.V) ? 3 : 2;
+        coordinates[index] = Math.max(coordinates[index] - DELTA, doorFloor);
+        collisionBox[index] = Math.max(collisionBox[index] - DELTA, doorFloor);
+    }
 
     @Override
     public void draw() {
@@ -96,30 +77,5 @@ public abstract class Door extends MapObject {
     }
 
     @Override
-    public void playerIsOn(Player player) {} //not possible
-
-
-    public static class VerticalDoor extends Door {
-        public VerticalDoor(int xNum, int yNum, int length, Button[] buttons) {
-            super(Alignment.V, xNum, yNum, length, buttons);
-        }
-        public VerticalDoor(int xNum, int yNum, int length) {
-            super(Alignment.V, xNum, yNum, length);
-        }
-        public VerticalDoor(int xNum, int yNum) {
-            super(Alignment.V, xNum, yNum);
-        }
-    }
-
-    public static class HorizontalDoor extends Door {
-        public HorizontalDoor(int xNum, int yNum, int length, Button[] buttons) {
-            super(Alignment.H, xNum, yNum, length, buttons);
-        }
-        public HorizontalDoor(int xNum, int yNum, int length) {
-            super(Alignment.H, xNum, yNum, length);
-        }
-        public HorizontalDoor(int xNum, int yNum) {
-            super(Alignment.H, xNum, yNum);
-        }
-    }
+    public void playerIsOn(Player player) {} // not applicable
 }

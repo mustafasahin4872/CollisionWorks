@@ -23,4 +23,19 @@ public class CollisionMethods {
         return ((x > obstacle[0]) && (x < obstacle[2]) && (y > obstacle[1]) && (y < obstacle[3]));
     }
 
+
+    public static void xShiftBox(double delta, double[] box) {
+        shiftBoxCoordinate(delta, box, 0);
+        shiftBoxCoordinate(delta, box, 2);
+    }
+
+    public static void yShiftBox(double delta, double[] box) {
+        shiftBoxCoordinate(delta, box, 1);
+        shiftBoxCoordinate(delta, box, 3);
+    }
+
+    public static void shiftBoxCoordinate(double delta, double[] box, int index) {
+        box[index] += delta;
+    }
+
 }
