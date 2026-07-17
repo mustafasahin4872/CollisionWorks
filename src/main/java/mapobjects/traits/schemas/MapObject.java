@@ -1,13 +1,9 @@
 package mapobjects.traits.schemas;
 
-//the most general map object class, holds attributes of a rectangular map object
-//the format of each rectangular region coordinate is {x0, y0, x1, y1} unless stated otherwise.
-//(x0, y0) and (x1, y1) are the rectangle's bottom left and top right corners.
-
-import mapobjects.entities.Player;
 import mapobjects.components.Box;
 import mapobjects.traits.collisions.HasBody;
 
+//the most general map object class, holds attributes of a rectangular map object
 public abstract class MapObject implements HasBody {
 
     protected int worldIndex; //the world the object is in
@@ -45,23 +41,6 @@ public abstract class MapObject implements HasBody {
 
     public boolean isExpired() {
         return expired;
-    }
-
-
-    public double getWidth() {
-        return positionBox.getWidth();
-    }
-
-    public double getHeight() {
-        return positionBox.getHeight();
-    }
-
-    public void setWidth(double width) {
-        positionBox.setWidth(width);
-    }
-
-    public void setHeight(double height) {
-        positionBox.setHeight(height);
     }
 
     public void resize(double multiplier) {
