@@ -8,6 +8,7 @@ import mapobjects.entities.Projectile;
 import mapobjects.traits.collisions.MovingCollidable;
 import mapobjects.traits.collisions.Collidable;
 import mapobjects.traits.collisions.Movable;
+import mapobjects.traits.receivers.Receiver;
 import mapobjects.traits.schemas.MapObject;
 import mapobjects.traits.triggerables.MovedOverTriggerable;
 import mapobjects.traits.triggerables.PlayerOnTriggerable;
@@ -43,9 +44,13 @@ public class CollisionEngine {
                 if (neighbor == moving || neighbor.isExpired()) continue;
 
                 if (moving instanceof Projectile projectile) {
-                    if (neighbor instanceof HealthEffectReceiver target && projectile.getTargetClass().isInstance(target)) {
+                    boolean isTarget = neighbor instanceof HealthEffectReceiver target && projectile.getTargetClass().isInstance(target);
+                    boolean isSolid = neighbor instanceof Collidable && !(neighbor instanceof Projectile) && !(neighbor instanceof Ghost);
+                    if (isTarget || isSolid) {
                         if (intersects(projectile.getCollisionBox(), neighbor.getPositionBox())) {
-                            projectile.sendEffect(target);
+                            if (isTarget) {
+                                projectile.sendEffect((Receiver) neighbor);
+                            }
                             projectile.expire();
                             continue;
                         }
@@ -53,17 +58,6 @@ public class CollisionEngine {
                 }
 
                 if (neighbor instanceof Collidable obstacle) {
-                    // Ignore ghost-to-ghost solid collision (but check triggers if applicable)
-                    switch (moving) {
-                        case Ghost _, Player _ when obstacle instanceof Ghost -> {
-                            continue;
-                        }
-                        case Ghost _ when obstacle instanceof Player -> {
-                            continue;
-                        }
-                        default -> {
-                        }
-                    }
                     resolveCollision(moving, obstacle);
                 }
 

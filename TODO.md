@@ -26,10 +26,9 @@
 - [x] CLEAN UP `HelperMethods` (Moved logic to `GameMap` & `Player`)
 - [x] DECOUPLING OF PLAYER AND MAPOBJECT CALLS
 - [ ] DECOUPLING OF PLAYER AND INPUT TAKING
-- [ ] COLLISION MECHANICS 
+- [x] CENTRALIZE COLLISION MECHANICS 
 - [ ] CREATE DISTINCT BOX CLASSES: COLLISIONBOX, EFFECTBOX ...
 - [x] DECOUPLE EFFECTS FROM PLAYER: EFFECT WRAPPERS TO SEND TO TARGET
-- [ ] IMPLEMENT FACTION/TARGET SHARED REFERENCES (GameMap holds Sets like gunTargets, tileTargets and passes references to Aiming objects)
 - [ ] IMPLEMENT PLAYER I-FRAMES (Requires Effect Wrapper Architecture)
 - [ ] DECOUPLING OF BUYABLES AND MAPOBJECTS
 
@@ -147,8 +146,7 @@
 
 ### Collision / Entity System
 - [ ] Always-called objects should also be checked in projectile collision logic
-- [ ] Fix empty grid object collision trigger causing unwanted projectile behavior
-- [ ] Fix moving entity check inconsistencies
+- [x] Fix moving entity check inconsistencies
 - [ ] Consider redesigning or removing "always called objects" system
 
 ### Spawn / Lifetime Issues
@@ -166,17 +164,17 @@
 - [ ] Improve naming in shooter MapMaker
 
 ### Game Physics
-- [ ] Improve collision system design
-- [ ] Possibly redesign movement/collision system entirely
+- [x] Improve collision system design
+- [ ] Possibly redesign movement/collision system entirely - effect system
 
 ### Architecture Cleanup
-- [ ] Consider introducing a generic `Movable` class
-- [ ] Generalize collision logic for all movable entities
+- [x] Consider introducing a generic `Movable` class
+- [x] Generalize collision logic for all movable entities
 - [ ] Fix or redesign always-called object system
 
 ### Entity Enhancements
 - [ ] Mines should not be gridObjects
-- [ ] Enhance player shooting mechanism
+- [ ] Enhance player shooting mechanism, better controls
 
 ### File System - Indexing
 - [ ] Fix selection world index system

@@ -6,6 +6,7 @@ import mapobjects.components.Effector;
 import mapobjects.effects.DamageEffect;
 import mapobjects.components.Box;
 import mapobjects.traits.collisions.Movable;
+import mapobjects.traits.collisions.Moving;
 import mapobjects.traits.collisions.MovingCollidable;
 import mapobjects.traits.receivers.Receiver;
 import mapobjects.traits.senders.Damaging;
@@ -18,7 +19,7 @@ import mapobjects.traits.triggerables.MovedOverTriggerable;
 import mapobjects.components.Trigger;
 
 // collides with everything except player and other ghosts
-public class Ghost extends GridObject implements MovedOverTriggerable, MovingCollidable, Damaging, Drawable, Sender {
+public class Ghost extends GridObject implements MovedOverTriggerable, Moving, Damaging, Drawable, Sender {
 
     public enum ghostTypes {
         DEMON, ANGEL, BLUE, WHITE, GOLD, SAKURA, RANDOM,
@@ -27,14 +28,13 @@ public class Ghost extends GridObject implements MovedOverTriggerable, MovingCol
     }
 
     protected static final char VERTICAL = '|', HORIZONTAL = '—';
+    private double start, end;
 
     private final ghostTypes type;
-    private final Box collisionBox;
     private final Effector effector;
     private final char alignment;
     private double xVelocity;
     private double yVelocity;
-    private boolean xCollided, yCollided;
     private final PictureDrawer drawer;
     private final Class<? extends HealthEffectReceiver> targetClass = Player.class;
     private final Trigger<Movable> collisionTrigger;
@@ -43,7 +43,6 @@ public class Ghost extends GridObject implements MovedOverTriggerable, MovingCol
         super(worldIndex, xNum, yNum);
         this.alignment = alignment;
         type = rollForGhostType();
-        collisionBox = positionBox.clone();
         effector = new Effector(new DamageEffect(worldIndex * 10, 0));
         collisionTrigger = new Trigger<>(positionBox, this::triggerCollision);
         double speed = 3;
@@ -100,13 +99,23 @@ public class Ghost extends GridObject implements MovedOverTriggerable, MovingCol
     @Override
     public void call() {
 
-        if (alignment == HORIZONTAL && xCollided) {
-            xVelocity *= -1;
-            xCollided = false;
+        if (alignment == HORIZONTAL) {
+            if (getX() > end) {
+                xVelocity *= -1;
+                setX(end);
+            } else if (getX() < start) {
+                xVelocity *= -1;
+                setX(start);
+            }
         }
-        if (alignment == VERTICAL && yCollided) {
-            yVelocity *= -1;
-            yCollided = false;
+        if (alignment == VERTICAL) {
+            if (getY() > end) {
+                yVelocity *= -1;
+                setY(end);
+            } else if (getY() < start) {
+                yVelocity *= -1;
+                setY(start);
+            }
         }
 
         move();
@@ -129,16 +138,18 @@ public class Ghost extends GridObject implements MovedOverTriggerable, MovingCol
         drawer.setName(type.name() + direction);
     }
 
+    public void setRange(double start, double end) {
+        this.start = start;
+        this.end = end;
+    }
+
     public void move() {
         positionBox.xShift(xVelocity * Frame.DT);
         positionBox.yShift(yVelocity * Frame.DT);
-        collisionBox.xShift(xVelocity * Frame.DT);
-        collisionBox.yShift(yVelocity * Frame.DT);
     }
 
-    @Override
-    public Box getCollisionBox() {
-        return collisionBox;
+    public char getAlignment() {
+        return alignment;
     }
 
     @Override
@@ -170,26 +181,6 @@ public class Ghost extends GridObject implements MovedOverTriggerable, MovingCol
     @Override
     public double getYVelocity() {
         return yVelocity;
-    }
-
-    @Override
-    public boolean isXCollided() {
-        return xCollided;
-    }
-
-    @Override
-    public boolean isYCollided() {
-        return yCollided;
-    }
-
-    @Override
-    public void xCollide() {
-        xCollided = true;
-    }
-
-    @Override
-    public void yCollide() {
-        yCollided = true;
     }
 
     @Override

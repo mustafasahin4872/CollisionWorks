@@ -3,6 +3,7 @@ package game.core;
 import mapobjects.factories.Blueprint;
 import mapobjects.entities.Currency;
 import mapobjects.entities.Player;
+import mapobjects.traits.collisions.Collidable;
 import mapobjects.traits.schemas.Generator;
 import mapobjects.traits.schemas.GridObject;
 import mapobjects.entities.*;
@@ -14,6 +15,7 @@ import java.util.*;
 import java.util.Map;
 
 import static data.Constants.RESOURCES_ROOT;
+import static mapobjects.traits.schemas.GridObject.TILE_SIDE;
 
 //creates all the map objects from map file
 public class MapMaker {
@@ -154,6 +156,7 @@ points can have the indicator B for big displays, special to the selection scree
         // hold the A37 codes here with their locations to later wire them to buttons
         Map<Door, Integer> doorsToWire = new HashMap<>();
         Map<String, Button> buttonMap = new HashMap<>();
+        List<Ghost> ghostsToSetRange = new ArrayList<>();
 
         Point.CheckPoint[] checkPointsToSetPrev = {
                 new Point.SpawnPoint(0,0,0),
@@ -191,7 +194,11 @@ points can have the indicator B for big displays, special to the selection scree
                                 yield blueprint.mutateToHomingShooter();
                             } else yield blueprint.mutateToRegularShooter(char2);
                         }
-                        case ';' -> blueprint.mutateToGhost(char2);
+                        case ';' -> {
+                            Ghost ghost = blueprint.mutateToGhost(char2);
+                            ghostsToSetRange.add(ghost);
+                            yield ghost;
+                        }
                         case ':' -> {
                             Button button = blueprint.mutateToBigButton();
                             buttonMap.put("%d:%d".formatted(xNum, yNum), button);
@@ -264,6 +271,15 @@ points can have the indicator B for big displays, special to the selection scree
                             };
                         }
                         case 'O' -> blueprint.mutateToMovingShooter(details[1].charAt(0), details[2].charAt(0));
+                        case 'G' -> {
+                            char alignment = details[1].charAt(0);
+                            Ghost ghost = blueprint.mutateToGhost(alignment);
+                            String[] range = details[2].split(":");
+                            double start = (Integer.parseInt(range[0]) - 0.5) * TILE_SIDE;
+                            double end = (Integer.parseInt(range[1]) - 0.5) * TILE_SIDE;
+                            ghost.setRange(start, end);
+                            yield ghost;
+                        }
                         default -> {
                             System.out.println("default message for A37, an error occurred.");
                             yield null;
@@ -283,6 +299,7 @@ points can have the indicator B for big displays, special to the selection scree
                 if (initializedGridObject instanceof Generator g) g.setSpawnedObjects(spawnedObjects);
             }
         }
+        setGhostRanges(ghostsToSetRange);
         wireDoorsToButtons(objectDetails, doorsToWire, buttonMap);
         setPrevToCheckPoints(checkPointsToSetPrev);
         setPlayerSpawnPoint();
@@ -306,6 +323,56 @@ points can have the indicator B for big displays, special to the selection scree
 
 
     //LAST WIRING METHODS
+
+    private void setGhostRanges(List<Ghost> ghostsToSetRange) {
+        for (Ghost ghost : ghostsToSetRange) {
+            int ghostYNum = ghost.getYNum();
+            int ghostXNum = ghost.getXNum();
+            if (ghost.getAlignment() == '|') {
+                int y;
+                double start = 0.5 * TILE_SIDE, end = (yTile - 0.5) * TILE_SIDE;
+
+                y = ghostYNum - 1;
+                while (y>=0) {
+                    if (tiles[y][ghostXNum] instanceof Collidable) {
+                        start = (y+1.5) * TILE_SIDE;
+                        break;
+                    }
+                    y--;
+                }
+                y = ghostYNum + 1;
+                while (y<yTile) {
+                    if (tiles[y][ghostXNum] instanceof Collidable) {
+                        end = (y-0.5) * TILE_SIDE;
+                        break;
+                    }
+                    y++;
+                }
+                ghost.setRange(start, end);
+            } else if (ghost.getAlignment() == '—') {
+                int x;
+                double start = 0.5 * TILE_SIDE, end = (xTile - 0.5) * TILE_SIDE;
+
+                x = ghostXNum - 1;
+                while (x>=0) {
+                    if (tiles[ghostYNum][x] instanceof Collidable) {
+                        start = (x+1.5) * TILE_SIDE;
+                        break;
+                    }
+                    x--;
+                }
+                x = ghostXNum + 1;
+                while (x<xTile) {
+                    if (tiles[ghostYNum][x] instanceof Collidable) {
+                        end = (x-0.5) * TILE_SIDE;
+                        break;
+                    }
+                    x++;
+                }
+                ghost.setRange(start, end);
+            }
+        }
+    }
 
     private void setPlayerSpawnPoint() {
         player.setSpawnPoint(spawnPoint[0], spawnPoint[1]);
