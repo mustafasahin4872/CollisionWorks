@@ -2,8 +2,6 @@ package mapobjects.entities;
 
 import game.io.Drawer.PictureDrawer;
 import mapobjects.components.*;
-import mapobjects.effects.DamageEffect;
-import mapobjects.effects.Effect;
 import mapobjects.factories.Blueprint;
 import mapobjects.traits.collisions.Collidable;
 import mapobjects.traits.collisions.Movable;
@@ -31,19 +29,17 @@ public class Mortar extends GridObject implements Collidable, RangeTriggerable, 
     private static final double DEFAULT_COOLDOWN = 4000;
     private final int mineNum;
     private Set<MapObject> spawnedObjects;
-    private final GridObject[][][] layers;
     private final Trigger<Movable> rangeTrigger;
 
     private final PictureDrawer drawer;
 
-    public Mortar(int worldIndex, int xNum, int yNum, GridObject[][][] layers) {
-        this(worldIndex, xNum, yNum, layers, BASE_MINE_NUM*worldIndex);
+    public Mortar(int worldIndex, int xNum, int yNum) {
+        this(worldIndex, xNum, yNum, BASE_MINE_NUM*worldIndex);
     }
 
-    public Mortar(int worldIndex, int xNum, int yNum, GridObject[][][] layers, int mineNum) {
+    public Mortar(int worldIndex, int xNum, int yNum, int mineNum) {
         super(worldIndex, xNum, yNum, 2, 2, true);
         this.mineNum = mineNum;
-        this.layers = layers;
         collisionBox = positionBox.clone();
         rangeBox = new Box(positionBox.getCenterCoordinates(), RANGE*TILE_SIDE*2, RANGE*TILE_SIDE*2);
         timer = new Timer(Long.MAX_VALUE, DEFAULT_COOLDOWN/worldIndex, true);
@@ -129,7 +125,7 @@ public class Mortar extends GridObject implements Collidable, RangeTriggerable, 
     }
 
     public void spawn() {
-        Blueprint[] generators = spawner.randomSpawn(RANGE/2, mineNum, layers);
+        Blueprint[] generators = spawner.randomSpawn(RANGE/2, mineNum);
         for (int i = 0; i<mineNum; i++) {
             Mine mine = generators[i].mutateToMine();
             mine.activateTimer();

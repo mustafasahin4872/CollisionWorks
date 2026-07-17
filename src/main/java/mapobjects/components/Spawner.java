@@ -79,9 +79,9 @@ public class Spawner {
 
     /// spawns many generators inside the range
     /// the helper getRandomCoordinates provides the locations
-    public Blueprint[] randomSpawn(int range, int spawnNum, GridObject[][][] layers) {
+    public Blueprint[] randomSpawn(int range, int spawnNum) {
         Blueprint[] spawned = new Blueprint[spawnNum];
-        int[][] coordinates = getRandomCoordinates(range, spawnNum, layers);
+        int[][] coordinates = getRandomCoordinates(range, spawnNum);
         for (int i = 0; i<spawnNum; i++) {
             int[] coordinate = coordinates[i];
             spawned[i] = new Blueprint(worldIndex, coordinate[0], coordinate[1]);
@@ -91,7 +91,7 @@ public class Spawner {
 
     /// returns spawnNum unique coordinate pair
     /// checks for not spawning on solid objects
-    private int[][] getRandomCoordinates(int range, int spawnNum, GridObject[][][] layers) {
+    private int[][] getRandomCoordinates(int range, int spawnNum) {
         ArrayList<int[]> holder = new ArrayList<>();
         int xBound = xNum - range, yBound = yNum - range;
         int SIDE = range*2+2;
@@ -104,10 +104,6 @@ public class Spawner {
                     valid = false;
                     break;
                 }
-            }
-            for (GridObject[][] layer : layers) {
-                GridObject gridObject = layer[y-1][x-1];
-                if (gridObject != null && gridObject.isSolid()) {valid = false;}
             }
 
             if (valid) {

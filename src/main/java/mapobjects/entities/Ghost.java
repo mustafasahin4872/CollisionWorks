@@ -1,12 +1,10 @@
 package mapobjects.entities;
 
-import game.core.GameMap;
 import game.io.Frame;
 import game.io.Drawer.PictureDrawer;
 import mapobjects.components.Effector;
 import mapobjects.effects.DamageEffect;
 import mapobjects.components.Box;
-import mapobjects.traits.collisions.Collidable;
 import mapobjects.traits.collisions.Movable;
 import mapobjects.traits.collisions.MovingCollidable;
 import mapobjects.traits.receivers.Receiver;
@@ -38,19 +36,17 @@ public class Ghost extends GridObject implements MovedOverTriggerable, MovingCol
     private double xVelocity;
     private double yVelocity;
     private boolean xCollided, yCollided;
-    private final GridObject[][][] layers;
     private final PictureDrawer drawer;
     private Set<HealthEffectReceiver> targets;
     private final Trigger<Movable> collisionTrigger;
 
-    public Ghost(int worldIndex, int xNum, int yNum, char alignment, GridObject[][][] layers) {
+    public Ghost(int worldIndex, int xNum, int yNum, char alignment) {
         super(worldIndex, xNum, yNum);
         this.alignment = alignment;
         type = rollForGhostType();
         collisionBox = positionBox.clone();
         effector = new Effector(new DamageEffect(worldIndex * 10, 0));
         collisionTrigger = new Trigger<>(positionBox, this::triggerCollision);
-        this.layers = layers;
         double speed = 3;
         if (alignment == HORIZONTAL) {
             xVelocity = speed;
@@ -105,42 +101,17 @@ public class Ghost extends GridObject implements MovedOverTriggerable, MovingCol
     @Override
     public void call() {
 
+        if (alignment == HORIZONTAL && xCollided) {
+            xVelocity *= -1;
+            xCollided = false;
+        }
+        if (alignment == VERTICAL && yCollided) {
+            yVelocity *= -1;
+            yCollided = false;
+        }
+
         move();
 
-        int[] gridNumbers = getGridNumbers();
-        int range = 2; // the checking range
-        boolean collided = false;
-        for (GridObject[][] layer : layers) {
-            if (collided)
-                break;
-            for (int y = gridNumbers[1] - range; y < gridNumbers[1] + range; y++) {
-                if (collided)
-                    break;
-                for (int x = gridNumbers[0] - range; x < gridNumbers[0] + range; x++) {
-                    if (alignment == HORIZONTAL && xCollided) {
-                        collided = true;
-                        xVelocity *= -1;
-                        xCollided = false;
-                        break;
-                    }
-                    if (alignment == VERTICAL && yCollided) {
-                        collided = true;
-                        yVelocity *= -1;
-                        yCollided = false;
-                        break;
-                    }
-                    if (GameMap.outOfMapBounds(layer, x, y))
-                        continue;
-
-                    GridObject currentGridObject = layer[y][x];
-                    if (currentGridObject == this)
-                        continue;
-                    if (currentGridObject instanceof Collidable c && !(c instanceof Ghost)) {
-                        c.checkCollision(this);
-                    }
-                }
-            }
-        }
         String direction = switch (alignment) {
             case HORIZONTAL -> {
                 if (xVelocity < 0)

@@ -19,8 +19,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
-import static helpers.CollisionMethods.isIn;
-
 public class GameMap {
 
     private final Player player;
@@ -31,10 +29,9 @@ public class GameMap {
 
     private int[] tileRange;
 
-    private final GridObject[][][] layers;
+    private final Set<MapObject> allMapObjects;
+    private final Set<MapObject>[][] map;
     private final Tile[][] tiles;
-    private final GridObject[][] gridObjects;
-    private final EmptyGridObject[][] emptyGridObjects;
 
     private final Set<Movable> movables = new HashSet<>();
     private final Set<MovingCollidable> movingCollidableObjects = new HashSet<>();
@@ -63,10 +60,9 @@ public class GameMap {
         MapMaker mapMaker = new MapMaker(gameState.getWorldIndex(), gameState.getLevelIndex(), xTile, yTile, player,
                 mapType);
         mapMaker.mapMaker();
-        layers = mapMaker.getLayers();
+        allMapObjects = mapMaker.getAllMapObjects();
+        map = mapMaker.getMap();
         tiles = mapMaker.getTiles();
-        gridObjects = mapMaker.getGridObjects();
-        emptyGridObjects = mapMaker.getEmptyGridObjects();
 
         spawnPoint = mapMaker.getSpawnPoint();
         spawnedObjects = mapMaker.getSpawnedObjects();
@@ -74,55 +70,60 @@ public class GameMap {
         ArrayList<Shooter> shooters = new ArrayList<>();
         ArrayList<Sign> signs = new ArrayList<>();
 
-        for (GridObject[][] layer: layers) {
-            for (int i = 0; i < yTile; i++) {
-                for (int j = 0; j < xTile; j++) {
-                    GridObject gridObject = layer[i][j];
-                    if (gridObject instanceof Movable movable) {
+        for (int y = 0; y < yTile; y++) {
+            for (int x = 0; x < xTile; x++) {
+                Set<MapObject> objects = map[y][x];
+                for (MapObject mapObject : objects) {
+
+                    if (mapObject instanceof Movable movable) {
                         movables.add(movable);
-                        if (gridObject instanceof Moving moving) {
-                            if (gridObject instanceof MovingCollidable movingCollidable) {
+                        if (mapObject instanceof Moving moving) {
+                            if (mapObject instanceof MovingCollidable movingCollidable) {
                                 movingCollidableObjects.add(movingCollidable);
                             }
                         }
                     }
-                    if (gridObject instanceof MovedOverTriggerable o) {
+                    if (mapObject instanceof MovedOverTriggerable o) {
                         movedOverTriggerables.add(o);
                     }
-                    if (gridObject instanceof PlayerOnTriggerable p) {
+                    if (mapObject instanceof PlayerOnTriggerable p) {
                         playerOnTriggerables.add(p);
                     }
-                    if (gridObject instanceof TileReceiver tileReceiver) {
+                    if (mapObject instanceof TileReceiver tileReceiver) {
                         tileReceivers.add(tileReceiver);
                     }
-                    if (gridObject instanceof HealthEffectReceiver healthEffectReceiver) {
+                    if (mapObject instanceof HealthEffectReceiver healthEffectReceiver) {
                         healthEffectReceivers.add(healthEffectReceiver);
                     }
-                    if (gridObject instanceof RangeTriggerable rangeTriggerable) {
+                    if (mapObject instanceof RangeTriggerable rangeTriggerable) {
                         rangeTriggerables.add(rangeTriggerable);
                     }
-                    if (gridObject instanceof Shooter s) {
+                    if (mapObject instanceof Shooter s) {
                         shooters.add(s);
-                        if (gridObject instanceof Shooter.MovingShooter m) {
+                        if (mapObject instanceof Shooter.MovingShooter m) {
                             movingShooters.add(m);
                         }
                     }
-                    if (gridObject instanceof Sign s) {
+                    if (mapObject instanceof Sign s) {
                         signs.add(s);
                     }
-                    if (gridObject instanceof Door || gridObject instanceof Shooter || gridObject instanceof Moving) {
-                        alwaysCalledObjects.add(gridObject);
+                    if (mapObject instanceof Door || mapObject instanceof Shooter || mapObject instanceof Moving) {
+                        alwaysCalledObjects.add(mapObject);
                     }
-                    if (gridObject instanceof Drawable d) {
+                    if (mapObject instanceof Drawable d) {
                         drawables.add(d);
                     }
+
                 }
+
             }
         }
+
 
         healthEffectReceivers.add(player);
         tileReceivers.add(player);
         movables.add(player);
+        movingCollidableObjects.add(player);
 
         for (RangeTriggerable rangeTriggerable : rangeTriggerables) {
             rangeTriggerable.setRangeTriggerers(movables);
@@ -136,9 +137,6 @@ public class GameMap {
 
         for (Shooter s : shooters) {
             s.setTargets(healthEffectReceivers);
-        }
-        for (Shooter.MovingShooter m : movingShooters) {
-            m.setPlayer(player);
         }
         player.setTargets(healthEffectReceivers);
         setFrameTileRange();
@@ -166,16 +164,67 @@ public class GameMap {
         return spawnPoint;
     }
 
+    public Set<MovingCollidable> getMovingCollidableObjects() {
+        return movingCollidableObjects;
+    }
+
+    // ------------------------------------------------------------------------------------------------------------
+
+    public void rebuildGrid() {
+
+        for (int y = 0; y < yTile; y++) {
+            for (int x = 0; x < xTile; x++) {
+                map[y][x].clear();
+            }
+        }
+
+        for (MapObject mapObject : allMapObjects) {
+
+            if (mapObject.isExpired()) continue;
+
+            int[] coveredTileIndexes = mapObject.getCoveredTileIndexes();
+            int startX = coveredTileIndexes[0];
+            int endX = coveredTileIndexes[2];
+            int startY = coveredTileIndexes[1];
+            int endY = coveredTileIndexes[3];
+
+            for (int y = startY; y < endY; y++) {
+                for (int x = startX; x < endX; x++) {
+                    map[y][x].add(mapObject);
+                }
+            }
+
+        }
+
+    }
+
+    public Set<MapObject> getObjectsInTileRange(int startX, int startY, int endX, int endY) {
+
+        Set<MapObject> objects = new HashSet<>();
+
+        for (int y = startY; y < endY; y++) {
+            for (int x = startX; x < endX; x++) {
+                objects.addAll(map[y][x]);
+                objects.add(tiles[y][x]);
+            }
+        }
+
+
+        return objects;
+
+    }
+
     // ------------------------------------------------------------------------------------------------------------
 
     public void callMapObjects() {
-        player.call(layers);
+        player.call();
         player.callReceiver();
 
         // dump all spawned objects into respective sets and clear
         for (MapObject mapObject : spawnedObjects) {
             alwaysCalledObjects.add(mapObject);
             if (mapObject instanceof TileReceiver t) tileReceivers.add(t);
+            if (mapObject instanceof MovingCollidable mc) movingCollidableObjects.add(mc);
             if (mapObject instanceof RangeTriggerable rt) {
                 rt.setRangeTriggerers(movables);
             }
@@ -189,8 +238,7 @@ public class GameMap {
         spawnedObjects.clear();
 
         for (MapObject mapObject : alwaysCalledObjects) {
-            if (mapObject instanceof Projectile p) p.call(player, layers);
-            else mapObject.call();
+            mapObject.call();
             if (mapObject instanceof Receiver r) r.callReceiver();
         }
 
@@ -208,32 +256,24 @@ public class GameMap {
         }
 
         alwaysCalledObjects.removeIf(MapObject::isExpired);
+        movingCollidableObjects.removeIf(mc -> mc instanceof MapObject mo && mo.isExpired());
 
+        for (int y = tileRange[1]; y <= tileRange[3]; y++) {
+            for (int x = tileRange[0]; x <= tileRange[2]; x++) {
+                Set<MapObject> objects = map[y][x];
 
-        for (GridObject[][] layer : layers) {
-            for (int y = tileRange[1]; y <= tileRange[3]; y++) {
-                for (int x = tileRange[0]; x <= tileRange[2]; x++) {
-                    GridObject gridObject = layer[y][x];
-                    if (gridObject == null)
-                        continue;
+                for (MapObject mapObject : objects) {
+                    if (!alwaysCalledObjects.contains(mapObject)) {
 
-                    if (!alwaysCalledObjects.contains(gridObject)) {
-                        if (gridObject instanceof EmptyGridObject e) {
-                            if (!alwaysCalledObjects.contains(e.getLinkedObject())) {
-                                gridObject.call();
-                                if (gridObject instanceof Receiver r) r.callReceiver();
-                            }
-                        } else {
-                            gridObject.call();
-                            if (gridObject instanceof Receiver r) r.callReceiver();
-                        }
-                    }
-                    if (gridObject.isExpired()) {
-                        layer[y][x] = null;
+                        mapObject.call();
+                        if (mapObject instanceof Receiver r) r.callReceiver();
+
                     }
                 }
+
             }
         }
+
 
     }
 
@@ -247,17 +287,22 @@ public class GameMap {
         int startY = tileRange[1];
         int endX = tileRange[2];
         int endY = tileRange[3];
-        for (GridObject[][] layer : layers) {
-            for (int y = startY; y <= endY; y++) {
-                for (int x = startX; x <= endX; x++) {
-                    GridObject gridObject = layer[y][x];
-                    if (gridObject != null) {
-                        if (gridObject instanceof Drawable d)
-                            d.draw();
-                    }
+
+        for (int y = startY; y <= endY; y++) {
+            for (int x = startX; x <= endX; x++) {
+                tiles[y][x].draw();
+            }
+        }
+
+        for (int y = startY; y <= endY; y++) {
+            for (int x = startX; x <= endX; x++) {
+                Set<MapObject> objects = map[y][x];
+                for (MapObject mapObject : objects) {
+                    if (mapObject instanceof Drawable d) d.draw();
                 }
             }
         }
+
     }
 
     private void drawAlwaysCalledObjects() {

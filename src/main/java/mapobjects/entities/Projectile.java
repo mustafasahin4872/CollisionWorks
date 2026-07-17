@@ -123,51 +123,16 @@ public class Projectile extends MapObject implements MovingCollidable, Damaging,
 
     }
 
-    public void call(Player player, GridObject[][][] layers) {
+    @Override
+    public void call() {
 
         if (inertia != 0) {
+            Player player = game.core.GameState.gameState.getPlayer();
             direction.rotateTowards(getCenterCoordinates(), player.getCenterCoordinates(), inertia);
         }
 
         if (totalDistance >= range) expire();
         move();
-        boolean collided = false;
-
-        int[] gridNumbers = getGridNumbers();
-
-        int checkRange = 2; //the checking checkRange
-
-        if (targets.contains(player)) {
-            player.checkCollision(this);
-            if (xCollided || yCollided) {
-                sendEffect(player);
-                collided = true;
-                expire();
-            }
-        }
-
-        for (GridObject[][] layer : layers) {
-            if (collided) break;
-            for (int i = gridNumbers[1]-checkRange; i<gridNumbers[1]+checkRange; i++) {
-                if (collided) break;
-                for (int j = gridNumbers[0]-checkRange; j<gridNumbers[0]+checkRange; j++) {
-                    if (i<0 || j<0 || i>=layer.length || j>=layer[0].length) continue;
-                    GridObject currentGridObject = layer[i][j];
-                    if (currentGridObject instanceof Collidable c) {
-                        c.checkCollision(this);
-                        if (xCollided || yCollided) {
-                            collided = true;
-                            if (c instanceof Receiver r && c instanceof HealthEffectReceiver h && targets.contains(h)) {
-                                sendEffect(r);
-                            }
-                            expire();
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-
     }
 
     private void move() {
@@ -227,6 +192,10 @@ public class Projectile extends MapObject implements MovingCollidable, Damaging,
     @Override
     public void setTargets(Set<HealthEffectReceiver> targets) {
         this.targets = targets;
+    }
+
+    public Set<HealthEffectReceiver> getTargets() {
+        return targets;
     }
 
     // unused

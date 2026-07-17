@@ -33,6 +33,7 @@ public class Game {
         Frame frame = new Frame(gameMap.getWidth(), gameMap.getHeight());
         GameScreen gameScreen = new GameScreen(gameState);
         Player player = gameState.getPlayer();
+        helpers.CollisionEngine collisionEngine = new helpers.CollisionEngine(gameMap);
 
         gameState.setState(STATE.GAME);
 
@@ -52,6 +53,8 @@ public class Game {
                 player.updateVelocity();
                 //checks for collisions with player and the on tile effects, also updates the map objects
                 gameMap.callMapObjects();
+                //resolve collisions
+                collisionEngine.checkAndResolveCollisions();
                 //updates player position and other attributes at last
                 player.update();
             }

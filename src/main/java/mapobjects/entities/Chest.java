@@ -1,12 +1,11 @@
 package mapobjects.entities;
 
+import game.io.Drawer;
 import game.io.Drawer.PictureDrawer;
 import mapobjects.components.Trigger;
 import mapobjects.traits.schemas.Drawable;
 import mapobjects.traits.schemas.GridObject;
 import mapobjects.traits.triggerables.PlayerOnTriggerable;
-
-import java.util.Set;
 
 import static game.core.GameState.gameState;
 

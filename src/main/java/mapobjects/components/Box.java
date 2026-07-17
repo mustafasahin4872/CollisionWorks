@@ -1,5 +1,7 @@
 package mapobjects.components;
 
+import static mapobjects.traits.schemas.GridObject.TILE_SIDE;
+
 //represents a rectangle object, stores coordinates of center and corners along with values of width, height
 public class Box implements Cloneable {
 
@@ -125,4 +127,14 @@ public class Box implements Cloneable {
     public Box clone() {
         return new Box(centerCoordinates[0], centerCoordinates[1], width, height);
     }
+
+
+    public int[] getCoveredTileIndexes() {
+        int startX = (int) ((getCenterX() - width / 2) / TILE_SIDE);
+        int endX = (int) ((getCenterX() + width / 2) / TILE_SIDE);
+        int startY = (int) ((getCenterY() - height / 2) / TILE_SIDE);
+        int endY = (int) ((getCenterY() + height / 2) / TILE_SIDE);
+        return new int[]{startX, startY, endX, endY};
+    }
+
 }

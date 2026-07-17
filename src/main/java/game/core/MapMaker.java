@@ -23,12 +23,9 @@ public class MapMaker {
     private final int xTile, yTile;
     private final Player player;
 
-    private final GridObject[][][] layers;
+    private final Set<MapObject> allMapObjects; // contains all non-tile map objects
+    private final Set<MapObject>[][] map;
     private final Tile[][] tiles;
-    private final GridObject[][] gridObjects;
-    private final EmptyGridObject[][] emptyGridObjects;
-    private final Currency[][] coins;
-
     private double[] spawnPoint;
 
     // passed down to spawners, so they put the spawned objects
@@ -97,11 +94,15 @@ points can have the indicator B for big displays, special to the selection scree
         this.xTile = xTile;
         this.yTile = yTile;
         this.player = player;
+        allMapObjects = new HashSet<>();
         tiles = new Tile[yTile][xTile];
-        gridObjects = new GridObject[yTile][xTile];
-        emptyGridObjects = new EmptyGridObject[yTile][xTile];
-        coins = new Currency[yTile][xTile];
-        layers = new GridObject[][][]{tiles, gridObjects, emptyGridObjects, coins};
+        map = new Set[yTile][xTile];
+        for (int i = 0; i < yTile; i++) {
+            Set<MapObject>[] row = map[i];
+            for (int j = 0; j < xTile; j++) {
+                row[j] = new HashSet<>();
+            }
+        }
         switch (mapType) {
             case SELECTION -> mapFile = new File((RESOURCES_ROOT + "maps/selectionMaps/%d%d.txt").formatted(worldIndex, levelIndex));
             case IN_BETWEEN -> mapFile = new File((RESOURCES_ROOT + "maps/inBetweenMaps/%d.txt").formatted(worldIndex));
@@ -111,24 +112,16 @@ points can have the indicator B for big displays, special to the selection scree
 
     //GETTERS
 
-    public GridObject[][][] getLayers() {
-        return layers;
+    public Set<MapObject>[][] getMap() {
+        return map;
     }
 
     public Tile[][] getTiles() {
         return tiles;
     }
 
-    public GridObject[][] getGridObjects() {
-        return gridObjects;
-    }
-
-    public EmptyGridObject[][] getEmptyGridObjects() {
-        return emptyGridObjects;
-    }
-
-    public Currency[][] getCoins() {
-        return coins;
+    public Set<MapObject> getAllMapObjects() {
+        return allMapObjects;
     }
 
     public double[] getSpawnPoint() {return spawnPoint;}
@@ -158,7 +151,7 @@ points can have the indicator B for big displays, special to the selection scree
     //creates all objects
     private void initializeObjects(String[][] mapData, ArrayList<String> objectDetails) {
 
-        // hold the D37 codes here with their locations to later wire them to buttons
+        // hold the A37 codes here with their locations to later wire them to buttons
         Map<Door, Integer> doorsToWire = new HashMap<>();
         Map<String, Button> buttonMap = new HashMap<>();
 
@@ -167,8 +160,8 @@ points can have the indicator B for big displays, special to the selection scree
                 new Point.CheckPoint(0,0,0,1),
                 new Point.CheckPoint(0,0,0,2),
                 new Point.CheckPoint(0,0,0,3),
-                new Point.CheckPoint(0,0,0,4),
-                };
+                new Point.CheckPoint(0,0,0,4)
+        };
 
         for (int y = 0; y < yTile; y++) {
             for (int x = 0; x < xTile; x++) {
@@ -191,14 +184,14 @@ points can have the indicator B for big displays, special to the selection scree
                     initializedCoin = initializeCurrency(char1, blueprint);
                     initializedGridObject = switch (char1) {
                         case '@' -> blueprint.mutateToMine();
-                        case '%' -> blueprint.mutateToMortar(layers);
+                        case '%' -> blueprint.mutateToMortar();
                         case '+' -> {
-                            if (char2 == 'x') yield blueprint.mutateToDirectionShooter(layers, player);
+                            if (char2 == 'x') yield blueprint.mutateToDirectionShooter();
                             else if (char2 == 'h') {
-                                yield blueprint.mutateToHomingShooter(layers, player);
-                            } else yield blueprint.mutateToRegularShooter(char2, layers);
+                                yield blueprint.mutateToHomingShooter();
+                            } else yield blueprint.mutateToRegularShooter(char2);
                         }
-                        case ';' -> blueprint.mutateToGhost(char2, layers);
+                        case ';' -> blueprint.mutateToGhost(char2);
                         case ':' -> {
                             Button button = blueprint.mutateToBigButton();
                             buttonMap.put("%d:%d".formatted(xNum, yNum), button);
@@ -270,22 +263,29 @@ points can have the indicator B for big displays, special to the selection scree
                                 }
                             };
                         }
-                        case 'O' -> blueprint.mutateToMovingShooter(details[1].charAt(0), details[2].charAt(0), layers);
+                        case 'O' -> blueprint.mutateToMovingShooter(details[1].charAt(0), details[2].charAt(0));
                         default -> {
                             System.out.println("default message for A37, an error occurred.");
                             yield null;
                         }
                     };
                 }
-                addEmptyGridObjects(initializedGridObject);
                 tiles[y][x] = initializedTile;
-                gridObjects[y][x] = initializedGridObject;
-                coins[y][x] = initializedCoin;
+                Set<MapObject> grid = map[y][x];
+                if (initializedGridObject != null) {
+                    grid.add(initializedGridObject);
+                    allMapObjects.add(initializedGridObject);
+                }
+                if (initializedCoin != null) {
+                    grid.add(initializedCoin);
+                    allMapObjects.add(initializedCoin);
+                }
                 if (initializedGridObject instanceof Generator g) g.setSpawnedObjects(spawnedObjects);
             }
         }
         wireDoorsToButtons(objectDetails, doorsToWire, buttonMap);
         setPrevToCheckPoints(checkPointsToSetPrev);
+        setPlayerSpawnPoint();
         player.setSpawnedObjects(spawnedObjects);
     }
 
@@ -301,11 +301,16 @@ points can have the indicator B for big displays, special to the selection scree
             default -> null;
         };
         if (currencyType == null) return null;
-        return blueprint.mutateToCoin(currencyType);
+        return blueprint.mutateToCurrency(currencyType);
     }
 
 
     //LAST WIRING METHODS
+
+    private void setPlayerSpawnPoint() {
+        player.setSpawnPoint(spawnPoint[0], spawnPoint[1]);
+        player.respawn();
+    }
 
     private void setPrevToCheckPoints(Point.CheckPoint[] checkPoints) {
         for (int i = 0; i<5; i++) {
@@ -313,16 +318,16 @@ points can have the indicator B for big displays, special to the selection scree
             if (i!=0) {
                 currentCheckPoint.setPrev(checkPoints[i-1]);
             } else {
-                player.setSpawnPoint(currentCheckPoint.getX(), currentCheckPoint.getY());
                 Point.CheckPoint.resetLastCheckPointIndex();
-                player.respawn();
                 spawnPoint = currentCheckPoint.getCenterCoordinates();
             }
         }
     }
 
     private void wireDoorsToButtons(ArrayList<String> objectDetails, Map<Door, Integer> doorsToWire, Map<String, Button> buttonMap) {
-        //wire doors to buttons:
+        /// objectDetails structure for Doors:
+        /// <tile code>; <alignment>; <button1x>:<button1y>, <button2x>:<button2y>, ...; <length>
+        /// example line: "___; |; 9:18, 26:25; 4"
         for (Map.Entry<Door, Integer> pair : doorsToWire.entrySet()) {
             Door door = pair.getKey();
             String[] items = objectDetails.get(pair.getValue()).split("; ");
@@ -340,34 +345,7 @@ points can have the indicator B for big displays, special to the selection scree
     }
 
 
-    private void addEmptyGridObjects(GridObject gridObject) {
-        if (gridObject == null) return;
-        int xNum = gridObject.getXNum();
-        int yNum = gridObject.getYNum();
-        int x = xNum - 1, y = yNum - 1;
-        double tileSide = GridObject.TILE_SIDE;
-
-        if (gridObject.isCornerAligned()) {
-            int xSpan = (int)Math.ceil(gridObject.getWidth() / tileSide);
-            int ySpan = (int)Math.ceil(gridObject.getHeight() / tileSide);
-            for (int i = 0; i < ySpan; i++) {
-                for (int j = 0; j < xSpan; j++) {
-                    emptyGridObjects[y + i][x + j] = new EmptyGridObject(worldIndex, xNum + j, yNum + i, gridObject);
-                }
-            }
-        } else {
-            int xSpan = (int)Math.ceil((gridObject.getWidth() / tileSide - 1) / 2);
-            int ySpan = (int)Math.ceil((gridObject.getHeight() / tileSide - 1) / 2);
-            for (int i = -ySpan; i <= ySpan; i++) {
-                for (int j = -xSpan; j <= xSpan; j++) {
-                    emptyGridObjects[y + i][x + j] = new EmptyGridObject(worldIndex, xNum + j, yNum + i, gridObject);
-                }
-            }
-        }
-    }
-
-
-    //EXTRACT
+    // EXTRACT
 
     private void extractMapData(String[][] mapData, ArrayList<String> objectDetails) {
         try (Scanner scanner = new Scanner(mapFile)) {
@@ -390,6 +368,8 @@ points can have the indicator B for big displays, special to the selection scree
             System.out.println("File couldn't be opened: " + mapFile.getAbsolutePath());
         }
     }
+
+    // MAP TYPE
 
     public enum MapType {
 

@@ -27,7 +27,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import static helpers.CollisionMethods.isIn;
+import static helpers.CollisionEngine.isIn;
 import static helpers.TextMethods.*;
 import static game.ui.components.FrameBox.*;
 import static mapobjects.traits.schemas.GridObject.TILE_SIDE;

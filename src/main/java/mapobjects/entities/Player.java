@@ -136,7 +136,8 @@ public class Player extends Equippable implements GameStateReceiver, HealthEffec
 
     // UPDATES
 
-    public void call(GridObject[][][] layers) {
+    @Override
+    public void call() {
 
         resetAcceleration();
         resetDeceleration();
@@ -147,31 +148,7 @@ public class Player extends Equippable implements GameStateReceiver, HealthEffec
         if (shoot)
             spawn();
 
-        int range = 2; // the checking range
-        int[] gridNumbers = getGridNumbers();
-        for (GridObject[][] layer : layers) {
-            for (int i = gridNumbers[1] - range; i < gridNumbers[1] + range; i++) {
-                for (int j = gridNumbers[0] - range; j < gridNumbers[0] + range; j++) {
-                    if (i < 0 || j < 0 || i >= layer.length || j >= layer[0].length)
-                        continue;
-                    GridObject currentGridObject = layer[i][j];
-                    checkMapObjectEffects(currentGridObject);
-                }
-            }
-        }
         updateName();
-    }
-
-    private void checkMapObjectEffects(GridObject currentGridObject) {
-        if (currentGridObject instanceof Collidable c && !(c instanceof Ghost)) {
-            c.checkCollision(this);
-        } else if (currentGridObject instanceof EmptyGridObject e) {
-            checkMapObjectEffects(e.getLinkedObject());
-        } else if (currentGridObject instanceof MovedOverTriggerable t) {
-            t.getMovedOverTrigger().checkForTriggers();
-        } else if (currentGridObject instanceof PlayerOnTriggerable p) {
-            p.getPlayerOnTrigger().checkForTriggers();
-        }
     }
 
     // update position and accessory positions

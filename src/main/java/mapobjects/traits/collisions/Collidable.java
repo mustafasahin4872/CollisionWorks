@@ -2,7 +2,7 @@ package mapobjects.traits.collisions;
 
 import mapobjects.components.Box;
 
-import static helpers.CollisionMethods.intersects;
+import static helpers.CollisionEngine.intersects;
 
 public interface Collidable extends HasBody {
 
@@ -36,6 +36,10 @@ public interface Collidable extends HasBody {
                 movingCollidable.setY(collidedBox.getCorner(3) + movingBox.getHeight() / 2);
             }
         }
+    }
+
+    default int[] getCollidedTileIndexes() {
+        return getCollisionBox().getCoveredTileIndexes();
     }
 
 }

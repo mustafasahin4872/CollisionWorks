@@ -15,7 +15,7 @@ import mapobjects.entities.Player;
 
 import java.awt.*;
 
-import static helpers.CollisionMethods.isIn;
+import static helpers.CollisionEngine.isIn;
 import static game.ui.components.FrameBox.*;
 
 // the drawing and input handling of buttons and stats on in-game screen

@@ -18,4 +18,8 @@ public interface HasBody {
         getPositionBox().setHeight(height);
     }
 
+    default int[] getCoveredTileIndexes() {
+        return getPositionBox().getCoveredTileIndexes();
+    }
+
 }

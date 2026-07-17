@@ -10,4 +10,7 @@ public interface Movable extends HasBody {
         getPositionBox().setCenterY(y);
     }
 
+    // if an external object is applying force, weight is considered.
+    default double getWeight() {return 100;}
+
 }

@@ -8,7 +8,7 @@ import mapobjects.components.Timer;
 import java.util.HashSet;
 import java.util.Set;
 
-import static helpers.CollisionMethods.isIn;
+import static helpers.CollisionEngine.isIn;
 
 public abstract class UIButton {
 

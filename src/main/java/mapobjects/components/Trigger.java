@@ -5,7 +5,7 @@ import mapobjects.traits.collisions.HasBody;
 import java.util.Set;
 import java.util.function.Consumer;
 
-import static helpers.CollisionMethods.intersects;
+import static helpers.CollisionEngine.intersects;
 
 public class Trigger<T extends HasBody> {
 

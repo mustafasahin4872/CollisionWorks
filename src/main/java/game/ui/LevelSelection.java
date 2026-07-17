@@ -17,7 +17,7 @@ import java.awt.*;
 import java.util.HashSet;
 import java.util.Set;
 
-import static helpers.CollisionMethods.isIn;
+import static helpers.CollisionEngine.isIn;
 import static game.io.InputHandler.MouseData;
 import static game.io.InputHandler.ArrowData;
 import static mapobjects.traits.schemas.GridObject.TILE_SIDE;
