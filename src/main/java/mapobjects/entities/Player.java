@@ -435,9 +435,6 @@ public class Player extends Equippable implements GameStateReceiver, HealthEffec
         spawnY = y;
     }
 
-    public void setTargets(Set<HealthEffectReceiver> targets) {
-        gun.setTargets(targets);
-    }
 
     private void updateName() {
         String base = playerName + "/" + getDirectionString(getXDirection(), getYDirection());

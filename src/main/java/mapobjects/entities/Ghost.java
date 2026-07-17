@@ -8,7 +8,7 @@ import mapobjects.components.Box;
 import mapobjects.traits.collisions.Movable;
 import mapobjects.traits.collisions.MovingCollidable;
 import mapobjects.traits.receivers.Receiver;
-import mapobjects.traits.schemas.Damaging;
+import mapobjects.traits.senders.Damaging;
 import mapobjects.traits.receivers.HealthEffectReceiver;
 import mapobjects.traits.schemas.Drawable;
 import mapobjects.traits.schemas.GridObject;
@@ -16,7 +16,6 @@ import mapobjects.traits.senders.Sender;
 import mapobjects.traits.triggerables.MovedOverTriggerable;
 
 import mapobjects.components.Trigger;
-import java.util.Set;
 
 // collides with everything except player and other ghosts
 public class Ghost extends GridObject implements MovedOverTriggerable, MovingCollidable, Damaging, Drawable, Sender {
@@ -37,7 +36,7 @@ public class Ghost extends GridObject implements MovedOverTriggerable, MovingCol
     private double yVelocity;
     private boolean xCollided, yCollided;
     private final PictureDrawer drawer;
-    private Set<HealthEffectReceiver> targets;
+    private final Class<? extends HealthEffectReceiver> targetClass = Player.class;
     private final Trigger<Movable> collisionTrigger;
 
     public Ghost(int worldIndex, int xNum, int yNum, char alignment) {
@@ -143,8 +142,8 @@ public class Ghost extends GridObject implements MovedOverTriggerable, MovingCol
     }
 
     @Override
-    public void setTargets(Set<HealthEffectReceiver> targets) {
-        this.targets = targets;
+    public Class<? extends HealthEffectReceiver> getTargetClass() {
+        return targetClass;
     }
 
     @Override

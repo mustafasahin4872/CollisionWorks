@@ -14,12 +14,13 @@ import mapobjects.factories.ProjectileBlueprint;
 import mapobjects.traits.collisions.Collidable;
 import mapobjects.traits.collisions.Movable;
 import mapobjects.traits.collisions.MovingCollidable;
+import mapobjects.traits.receivers.Enemy;
 import mapobjects.traits.receivers.HealthEffectReceiver;
 import mapobjects.traits.receivers.Receiver;
 import mapobjects.traits.schemas.*;
 import mapobjects.traits.triggerables.RangeTriggerable;
 
-public abstract class Shooter extends GridObject implements Collidable, Timed, Generator, HealthEffectReceiver, Drawable, Receiver {
+public abstract class Shooter extends GridObject implements Collidable, Timed, Generator, HealthEffectReceiver, Drawable, Receiver, Enemy {
 
     protected static final char VERTICAL = '|', HORIZONTAL = '—',
             RIGHT = '>', LEFT = '<', UP = '^', DOWN = 'v';
@@ -33,7 +34,7 @@ public abstract class Shooter extends GridObject implements Collidable, Timed, G
     protected Set<MapObject> spawnedObjects;
     protected static final double DEFAULT_COOLDOWN = 3000; // in milliseconds
     protected boolean broken;
-    protected Set<HealthEffectReceiver> targets;
+    protected Class<? extends HealthEffectReceiver> targetClass = Player.class;
     private final Inbox inbox;
     protected boolean readyToSpawn;
 
@@ -81,9 +82,6 @@ public abstract class Shooter extends GridObject implements Collidable, Timed, G
         drawer.setName("1");
     }
 
-    public void setTargets(Set<HealthEffectReceiver> targets) {
-        this.targets = targets;
-    }
 
     @Override
     public void call() {
@@ -123,7 +121,7 @@ public abstract class Shooter extends GridObject implements Collidable, Timed, G
             }
         };
         Projectile projectile = blueprint.mutateToProjectile(projectileBlueprint, d);
-        projectile.setTargets(targets);
+        projectile.setTargetClass(targetClass);
         spawnedObjects.add(projectile);
     }
 
@@ -169,11 +167,7 @@ public abstract class Shooter extends GridObject implements Collidable, Timed, G
             return rangeTrigger;
         }
 
-        @Override
-        public void call() {
-            super.call();
-            if (!inCooldown()) rangeTrigger.checkForTriggers();
-        }
+
 
         @Override
         public void spawn() {
@@ -193,7 +187,7 @@ public abstract class Shooter extends GridObject implements Collidable, Timed, G
             Blueprint blueprint = spawner.directionSpawn(getCenterCoordinates(), target, 50);
             Projectile projectile = blueprint.mutateToProjectile(projectileBlueprint, 0);
             projectile.rotate(target);
-            projectile.setTargets(targets);
+            projectile.setTargetClass(targetClass);
             spawnedObjects.add(projectile);
 
         }

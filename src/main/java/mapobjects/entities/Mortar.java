@@ -5,6 +5,7 @@ import mapobjects.components.*;
 import mapobjects.factories.Blueprint;
 import mapobjects.traits.collisions.Collidable;
 import mapobjects.traits.collisions.Movable;
+import mapobjects.traits.receivers.Enemy;
 import mapobjects.traits.receivers.HealthEffectReceiver;
 import mapobjects.traits.receivers.Receiver;
 import mapobjects.traits.schemas.*;
@@ -12,7 +13,7 @@ import mapobjects.traits.triggerables.RangeTriggerable;
 
 import java.util.Set;
 
-public class Mortar extends GridObject implements Collidable, RangeTriggerable, Timed, Generator, HealthEffectReceiver, Drawable, Receiver {
+public class Mortar extends GridObject implements Collidable, RangeTriggerable, Timed, Generator, HealthEffectReceiver, Drawable, Receiver, Enemy {
 
     private final Box collisionBox;
     private final Timer timer;
@@ -66,13 +67,16 @@ public class Mortar extends GridObject implements Collidable, RangeTriggerable, 
         callTimer();
 
         if (!broken && !inCooldown()) {
-            rangeTrigger.checkForTriggers();
             if (readyToSpawn) {
                 spawn();
                 startCooldown();
                 readyToSpawn = false;
             }
         }
+    }
+
+    public boolean isBroken() {
+        return broken;
     }
 
     @Override

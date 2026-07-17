@@ -6,17 +6,12 @@ import mapobjects.components.Box;
 import mapobjects.components.Direction;
 import mapobjects.components.Effector;
 import mapobjects.effects.DamageEffect;
-import mapobjects.traits.collisions.Collidable;
 import mapobjects.traits.collisions.MovingCollidable;
-import mapobjects.traits.receivers.Receiver;
-import mapobjects.traits.schemas.Damaging;
+import mapobjects.traits.senders.Damaging;
 import mapobjects.traits.receivers.HealthEffectReceiver;
 import mapobjects.traits.schemas.Drawable;
-import mapobjects.traits.schemas.GridObject;
 import mapobjects.traits.schemas.MapObject;
 import mapobjects.traits.senders.Sender;
-
-import java.util.Set;
 
 import static mapobjects.traits.schemas.GridObject.TILE_SIDE;
 
@@ -87,7 +82,7 @@ public class Projectile extends MapObject implements MovingCollidable, Damaging,
 
     private final Box collisionBox;
     boolean xCollided, yCollided;
-    private Set<HealthEffectReceiver> targets = Set.of();
+    private Class<? extends HealthEffectReceiver> targetClass;
     private final Effector effector;
 
     protected final Direction direction;
@@ -190,12 +185,12 @@ public class Projectile extends MapObject implements MovingCollidable, Damaging,
     }
 
     @Override
-    public void setTargets(Set<HealthEffectReceiver> targets) {
-        this.targets = targets;
+    public Class<? extends HealthEffectReceiver> getTargetClass() {
+        return targetClass;
     }
 
-    public Set<HealthEffectReceiver> getTargets() {
-        return targets;
+    public void setTargetClass(Class<? extends HealthEffectReceiver> targetClass) {
+        this.targetClass = targetClass;
     }
 
     // unused

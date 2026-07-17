@@ -8,7 +8,7 @@ import mapobjects.components.Timer;
 import mapobjects.components.Trigger;
 import mapobjects.effects.DamageEffect;
 import mapobjects.traits.collisions.Movable;
-import mapobjects.traits.schemas.Damaging;
+import mapobjects.traits.senders.Damaging;
 import mapobjects.traits.receivers.HealthEffectReceiver;
 import mapobjects.traits.receivers.Receiver;
 import mapobjects.traits.schemas.Drawable;
@@ -19,14 +19,13 @@ import mapobjects.traits.triggerables.RangeTriggerable;
 import mapobjects.traits.triggerables.MovedOverTriggerable;
 
 import java.awt.*;
-import java.util.Set;
 
 public class Mine extends GridObject implements RangeTriggerable, MovedOverTriggerable, Timed, Damaging, Drawable, Sender {
 
     private final Box rangeBox;
     private final Timer timer;
     private final Effector effector;
-    private Set<HealthEffectReceiver> targets;
+    private final Class<? extends HealthEffectReceiver> targetClass = Player.class;
     private final Trigger<Movable> rangeTrigger;
     private final Trigger<Movable> explosionTrigger;
 
@@ -37,26 +36,10 @@ public class Mine extends GridObject implements RangeTriggerable, MovedOverTrigg
     private final CircleDrawer outlineDrawer;
     private final FilledCircleDrawer drawer;
 
-    // TODO: FIX THE DUPLICATE CONSTRUCTORS AND MAKE MINE A MAPOBJECT, NOT A GRIDOBJECT
+    // TODO: MAKE MINE A MAPOBJECT, ABLE TO SPAWN WHEREVER
     public Mine(int worldIndex, int xNum, int yNum) {
         super(worldIndex, xNum, yNum);
         rangeBox = new Box(getCenterCoordinates(), RANGE*TILE_SIDE, RANGE*TILE_SIDE);
-        timer = new Timer(DEFAULT_PERIOD / worldIndex, 0, false);
-        effector = new Effector(new DamageEffect(worldIndex * DEFAULT_DAMAGE, 0));
-
-        rangeTrigger = new Trigger<>(rangeBox, this::triggerRange);
-        explosionTrigger = new Trigger<>(positionBox, this::triggerExplosion);
-
-        outlineDrawer = new CircleDrawer(positionBox, HALF_SIDE, new Color(255, 150, 30, 200));
-        drawer = new FilledCircleDrawer(positionBox, 0, new Color(255, 0, 0, 100));
-    }
-
-    //non grid mine, cannot initialize in mapmaker
-    public Mine(int worldIndex, double x, double y) {
-        super(worldIndex, 0, 0);
-        positionBox.setCenterX(x);
-        positionBox.setCenterY(y);
-        rangeBox = new Box(x, y, RANGE*TILE_SIDE, RANGE*TILE_SIDE);
         timer = new Timer(DEFAULT_PERIOD / worldIndex, 0, false);
         effector = new Effector(new DamageEffect(worldIndex * DEFAULT_DAMAGE, 0));
 
@@ -91,8 +74,8 @@ public class Mine extends GridObject implements RangeTriggerable, MovedOverTrigg
     }
 
     @Override
-    public void setTargets(Set<HealthEffectReceiver> targets) {
-        this.targets = targets;
+    public Class<? extends HealthEffectReceiver> getTargetClass() {
+        return targetClass;
     }
 
     @Override
@@ -115,14 +98,14 @@ public class Mine extends GridObject implements RangeTriggerable, MovedOverTrigg
     @Override
     public void call() {
         callTimer(); //update timer (might set complete)
-        if (!isActive() && !isComplete()) {
-            rangeTrigger.checkForTriggers();
-        }
     }
 
     @Override
     public void whenCompleted() {
-        explosionTrigger.checkForTriggers();
+        Player player = game.core.GameState.gameState.getPlayer();
+        if (targetClass.isInstance(player) && helpers.CollisionEngine.intersects(positionBox, player.getPositionBox())) {
+            explosionTrigger.whenTriggered(player);
+        }
         expire(); //this object is set null and never called again
     }
 

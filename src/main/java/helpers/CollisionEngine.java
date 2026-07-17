@@ -7,10 +7,15 @@ import mapobjects.entities.Ghost;
 import mapobjects.entities.Projectile;
 import mapobjects.traits.collisions.MovingCollidable;
 import mapobjects.traits.collisions.Collidable;
+import mapobjects.traits.collisions.Movable;
 import mapobjects.traits.schemas.MapObject;
 import mapobjects.traits.triggerables.MovedOverTriggerable;
 import mapobjects.traits.triggerables.PlayerOnTriggerable;
+import mapobjects.traits.triggerables.RangeTriggerable;
 import mapobjects.traits.receivers.HealthEffectReceiver;
+import mapobjects.entities.Mine;
+import mapobjects.entities.Mortar;
+import mapobjects.entities.Shooter;
 
 import java.util.Set;
 
@@ -32,16 +37,13 @@ public class CollisionEngine {
             if (moving instanceof MapObject mo && mo.isExpired()) continue;
 
             int[] bounds = moving.getCollidedTileIndexes();
-            // Since getObjectsInTileRange uses exclusive upper bounds (y < endY),
-            // we add 1 to the end index to query the tiles inclusively.
-            Set<MapObject> neighbors = gameMap.getObjectsInTileRange(bounds[0], bounds[1], bounds[2] + 1, bounds[3] + 1);
+            Set<MapObject> neighbors = gameMap.getObjectsInTileRange(bounds[0]-1, bounds[1]-1, bounds[2]+1, bounds[3]+1);
 
             for (MapObject neighbor : neighbors) {
                 if (neighbor == moving || neighbor.isExpired()) continue;
 
-                // --- A. Projectile Hits ---
                 if (moving instanceof Projectile projectile) {
-                    if (neighbor instanceof HealthEffectReceiver target && projectile.getTargets().contains(target)) {
+                    if (neighbor instanceof HealthEffectReceiver target && projectile.getTargetClass().isInstance(target)) {
                         if (intersects(projectile.getCollisionBox(), neighbor.getPositionBox())) {
                             projectile.sendEffect(target);
                             projectile.expire();
@@ -50,33 +52,53 @@ public class CollisionEngine {
                     }
                 }
 
-                // --- B. Solid AABB Collisions ---
                 if (neighbor instanceof Collidable obstacle) {
                     // Ignore ghost-to-ghost solid collision (but check triggers if applicable)
-                    if (moving instanceof Ghost && obstacle instanceof Ghost) {
-                        continue;
+                    switch (moving) {
+                        case Ghost _, Player _ when obstacle instanceof Ghost -> {
+                            continue;
+                        }
+                        case Ghost _ when obstacle instanceof Player -> {
+                            continue;
+                        }
+                        default -> {
+                        }
                     }
                     resolveCollision(moving, obstacle);
                 }
 
-                // --- C. MovedOver Triggers (Buttons, Chests, etc.) ---
                 if (neighbor instanceof MovedOverTriggerable triggerable) {
                     if (intersects(moving.getCollisionBox(), neighbor.getPositionBox())) {
-                        triggerable.getMovedOverTrigger().checkForTriggers();
+                        triggerable.getMovedOverTrigger().whenTriggered(moving);
                     }
                 }
 
-                // --- D. PlayerOn Triggers (Only applies if moving is the Player) ---
                 if (moving instanceof Player player && neighbor instanceof PlayerOnTriggerable triggerable) {
                     if (intersects(player.getCollisionBox(), neighbor.getPositionBox())) {
-                        triggerable.getPlayerOnTrigger().checkForTriggers();
+                        triggerable.getPlayerOnTrigger().whenTriggered(player);
                     }
+                }
+            }
+        }
+
+        for (RangeTriggerable rt : gameMap.getRangeTriggerables()) {
+            if (rt instanceof MapObject mo && mo.isExpired()) continue;
+            if (rt instanceof Mine mine && (mine.isActive() || mine.isComplete())) continue;
+            if (rt instanceof Shooter shooter && shooter.inCooldown()) continue;
+            if (rt instanceof Mortar mortar && (mortar.isBroken() || mortar.inCooldown())) continue;
+
+            int[] bounds = rt.getRangeTrigger().getTriggerBox().getCoveredTileIndexes();
+            Set<MapObject> targets = gameMap.getObjectsInTileRange(bounds[0], bounds[1], bounds[2] + 1, bounds[3] + 1);
+            for (MapObject target : targets) {
+                if (target instanceof Movable movable && !target.isExpired()) {
+                    rt.getRangeTrigger().whenTriggered(movable);
                 }
             }
         }
     }
 
     private void resolveCollision(MovingCollidable moving, Collidable obstacle) {
+
         boolean xCollided = moving.isXCollided();
         boolean yCollided = moving.isYCollided();
 

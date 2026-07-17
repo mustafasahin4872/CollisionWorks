@@ -1,16 +1,12 @@
 package mapobjects.components;
 
 import mapobjects.traits.collisions.HasBody;
-
-import java.util.Set;
 import java.util.function.Consumer;
-
 import static helpers.CollisionEngine.intersects;
 
 public class Trigger<T extends HasBody> {
 
     private final Box triggerBox;
-    private Set<T> triggerers = Set.of();
     private final Consumer<T> action;
 
     public Trigger(Box triggerBox, Consumer<T> action) {
@@ -18,18 +14,12 @@ public class Trigger<T extends HasBody> {
         this.action = action;
     }
 
-    public void setTriggerers(Set<T> triggerers) {
-        this.triggerers = triggerers;
+    public Box getTriggerBox() {
+        return triggerBox;
     }
 
-    public void checkForTriggers() {
-        for (T t : triggerers) {
-            if (triggered(t)) action.accept(t);
-        }
-    }
-
-    public boolean triggered(T t) {
-        return intersects(triggerBox, t.getPositionBox());
+    public void whenTriggered(T t) {
+        action.accept(t);
     }
 
 }

@@ -5,7 +5,6 @@ import mapobjects.traits.collisions.Movable;
 import mapobjects.traits.collisions.Moving;
 import mapobjects.traits.collisions.MovingCollidable;
 import mapobjects.traits.senders.Sender;
-import mapobjects.traits.receivers.HealthEffectReceiver;
 import mapobjects.traits.receivers.Receiver;
 import mapobjects.traits.receivers.TileReceiver;
 import mapobjects.traits.schemas.Drawable;
@@ -35,14 +34,12 @@ public class GameMap {
 
     private final Set<Movable> movables = new HashSet<>();
     private final Set<MovingCollidable> movingCollidableObjects = new HashSet<>();
-    private final Set<HealthEffectReceiver> healthEffectReceivers = new HashSet<>();
     private final Set<RangeTriggerable> rangeTriggerables = new HashSet<>();
     private final Set<MovedOverTriggerable> movedOverTriggerables = new HashSet<>();
     private final Set<PlayerOnTriggerable> playerOnTriggerables = new HashSet<>();
     private final Set<MapObject> alwaysCalledObjects = new HashSet<>();
     private final Set<MapObject> spawnedObjects;
     private final Set<TileReceiver> tileReceivers = new HashSet<>();
-    private final Set<Shooter.MovingShooter> movingShooters = new HashSet<>();
     private final Set<Drawable> drawables = new HashSet<>();
 
     // private final int totalCoinOnMap;
@@ -67,9 +64,6 @@ public class GameMap {
         spawnPoint = mapMaker.getSpawnPoint();
         spawnedObjects = mapMaker.getSpawnedObjects();
 
-        ArrayList<Shooter> shooters = new ArrayList<>();
-        ArrayList<Sign> signs = new ArrayList<>();
-
         for (int y = 0; y < yTile; y++) {
             for (int x = 0; x < xTile; x++) {
                 Set<MapObject> objects = map[y][x];
@@ -92,20 +86,8 @@ public class GameMap {
                     if (mapObject instanceof TileReceiver tileReceiver) {
                         tileReceivers.add(tileReceiver);
                     }
-                    if (mapObject instanceof HealthEffectReceiver healthEffectReceiver) {
-                        healthEffectReceivers.add(healthEffectReceiver);
-                    }
                     if (mapObject instanceof RangeTriggerable rangeTriggerable) {
                         rangeTriggerables.add(rangeTriggerable);
-                    }
-                    if (mapObject instanceof Shooter s) {
-                        shooters.add(s);
-                        if (mapObject instanceof Shooter.MovingShooter m) {
-                            movingShooters.add(m);
-                        }
-                    }
-                    if (mapObject instanceof Sign s) {
-                        signs.add(s);
                     }
                     if (mapObject instanceof Door || mapObject instanceof Shooter || mapObject instanceof Moving) {
                         alwaysCalledObjects.add(mapObject);
@@ -119,31 +101,16 @@ public class GameMap {
             }
         }
 
-
-        healthEffectReceivers.add(player);
         tileReceivers.add(player);
         movables.add(player);
         movingCollidableObjects.add(player);
+        allMapObjects.add(player);
 
-        for (RangeTriggerable rangeTriggerable : rangeTriggerables) {
-            rangeTriggerable.setRangeTriggerers(movables);
-        }
-        for (MovedOverTriggerable o : movedOverTriggerables) {
-            o.setMovedOverTriggerers(movables);
-        }
-        for (PlayerOnTriggerable p : playerOnTriggerables) {
-            p.setPlayerOnTriggerers(Set.of(player));
-        }
-
-        for (Shooter s : shooters) {
-            s.setTargets(healthEffectReceivers);
-        }
-        player.setTargets(healthEffectReceivers);
         setFrameTileRange();
     }
 
-    public static boolean outOfMapBounds(GridObject[][] layer, int x, int y) {
-        return y < 0 || x < 0 || y >= layer.length || x >= layer[0].length;
+    public boolean outOfMapBounds(int x, int y) {
+        return y < 0 || x < 0 || y >= map.length || x >= map[0].length;
     }
 
     // ------------------------------------------------------------------------------------------------------------
@@ -202,8 +169,9 @@ public class GameMap {
 
         Set<MapObject> objects = new HashSet<>();
 
-        for (int y = startY; y < endY; y++) {
-            for (int x = startX; x < endX; x++) {
+        for (int y = startY; y <= endY; y++) {
+            for (int x = startX; x <= endX; x++) {
+                if (outOfMapBounds(x, y)) continue;
                 objects.addAll(map[y][x]);
                 objects.add(tiles[y][x]);
             }
@@ -225,15 +193,7 @@ public class GameMap {
             alwaysCalledObjects.add(mapObject);
             if (mapObject instanceof TileReceiver t) tileReceivers.add(t);
             if (mapObject instanceof MovingCollidable mc) movingCollidableObjects.add(mc);
-            if (mapObject instanceof RangeTriggerable rt) {
-                rt.setRangeTriggerers(movables);
-            }
-            if (mapObject instanceof MovedOverTriggerable mt) {
-                mt.setMovedOverTriggerers(movables);
-            }
-            if (mapObject instanceof PlayerOnTriggerable pt) {
-                pt.setPlayerOnTriggerers(Set.of(player));
-            }
+            if (mapObject instanceof RangeTriggerable rt) rangeTriggerables.add(rt);
         }
         spawnedObjects.clear();
 
@@ -245,9 +205,9 @@ public class GameMap {
         for (TileReceiver tileReceiver : tileReceivers) {
             int[] indexes = tileReceiver.getCoveredTileIndexes();
             for (int x = indexes[0]; x<=indexes[2]; x++) {
-                for (int j = indexes[1]; j<= indexes[3]; j++) {
-                    if (outOfMapBounds(tiles, x, j)) continue;
-                    Tile tile = tiles[j][x];
+                for (int y = indexes[1]; y<= indexes[3]; y++) {
+                    if (outOfMapBounds(x, y)) continue;
+                    Tile tile = tiles[y][x];
                     if (tile instanceof Sender e) {
                         e.sendEffect(tileReceiver);
                     }
@@ -344,6 +304,10 @@ public class GameMap {
         }
 
         tileRange = new int[] { minX, minY, maxX, maxY };
+    }
+
+    public Set<RangeTriggerable> getRangeTriggerables() {
+        return rangeTriggerables;
     }
 
 }

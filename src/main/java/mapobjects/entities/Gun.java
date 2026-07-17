@@ -10,11 +10,8 @@ import java.util.Set;
 import static mapobjects.traits.schemas.GridObject.TILE_SIDE;
 
 import mapobjects.factories.ProjectileBlueprint;
-import mapobjects.traits.receivers.HealthEffectReceiver;
-import mapobjects.traits.schemas.Drawable;
-import mapobjects.traits.schemas.Equippable;
-import mapobjects.traits.schemas.Generator;
-import mapobjects.traits.schemas.MapObject;
+import mapobjects.traits.receivers.Enemy;
+import mapobjects.traits.schemas.*;
 
 import static mapobjects.entities.Projectile.ProjectileType;
 
@@ -43,7 +40,7 @@ public abstract class Gun extends Equippable implements Generator, Drawable {
 
     protected final Spawner spawner;
     protected Set<MapObject> spawnedObjects;
-    protected Set<HealthEffectReceiver> targets;
+    protected Class<? extends mapobjects.traits.receivers.HealthEffectReceiver> targetClass = Enemy.class;
 
     private final PictureDrawer drawer;
     private Player player;
@@ -73,10 +70,6 @@ public abstract class Gun extends Equippable implements Generator, Drawable {
     @Override
     public void setSpawnedObjects(Set<MapObject> spawnedObjects) {
         this.spawnedObjects = spawnedObjects;
-    }
-
-    public void setTargets(Set<HealthEffectReceiver> targets) {
-        this.targets = targets;
     }
 
     @Override
@@ -117,7 +110,7 @@ public abstract class Gun extends Equippable implements Generator, Drawable {
 
     protected void spawnProjectile(Blueprint blueprint, double projDirection) {
         Projectile projectile = blueprint.mutateToProjectile(projectileBlueprint, projDirection);
-        projectile.setTargets(targets);
+        projectile.setTargetClass(targetClass);
         spawnedObjects.add(projectile);
     }
 
