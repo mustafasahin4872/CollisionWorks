@@ -1,335 +1,104 @@
 # The World Beyond the Spring Festival
 
+> [!TODO]
+> Write a redemption arc for Sakura to transition her from an antagonistic creator to a redeemed character (e.g., trying to fix the world, getting locked out of the system by E.V.E.R. as the simulation quarantines, and ultimately relinquishing her creator status to live alongside Bob and Mike).
+
 ## Overview
 
-A world of endless spring, endless sunlight, and endless beauty.
-
-A paradise where flowers never wither, where the sun never sets, and where nothing precious is ever lost.
-
-This world was created by Sakura, a being who escaped from a cold and painful reality into a dream of eternal happiness. Every creation within this world carries a piece of that dream. Each being was given a purpose, an ideal, or a role to fulfill.
-
-For a long time, the world remained perfect.
-
-But perfection cannot exist forever.
-
-The arrival of something that was never created would become the first crack in Sakura's dream.
-
-That something was Bob.
+The world is a simulated environment designed as an endless spring where inhabitants live ordinary lives, each assigned a specific purpose. Bob, a small cube of unknown origin, suddenly appears. Unlike the inhabitants, Bob has no assigned purpose or role in the world.
 
 ---
 
 # World 1 — The Spring Festival
 
-Bob is a cube that suddenly appeared inside Sakura's world.
+Bob, a cube with no known origin or purpose, appears in the Spring Festival. Bob meets Mike, a perfect sentient diamond square, who welcomes him. They explore the festival together. Bob interacts with the inhabitants (EDEPAs) and guards (ESEGAs). EDEPAs react negatively to Bob's presence but are calmed by Mike. ESEGAs detect Bob as a virus, report the anomaly, and retreat.
 
-Unlike every other being, Bob has no known origin. It was not created, assigned a purpose, or given a place within the world.
+They meet Mike's friend, Sakura, who perceives Bob as a structural anomaly that threatens the world's order. As Bob continues to exist, Sakura's discomfort increases.
 
-In a world of endless light, Bob searches for the meaning of its existence.
-
-The first person Bob encounters is Mike.
-
-Mike is a shining square of sentient diamond. Born to be perfect, he represents the ideal Sakura wished to create. Despite carrying the burden of perfection, Mike accepts Bob and introduces him to the beauty of the Spring Festival.
-
-Together, they explore the world and eventually meet Sakura.
-
-However, Sakura does not see Bob the way Mike does.
-
-To her, Bob is an impossibility.
-
-A being that does not belong.
-
-A flaw inside a world that was created to be flawless.
-
-At first, Sakura tries to understand Bob. But as Bob continues to exist, her discomfort grows. His existence challenges the foundation of everything she created.
-
-If something imperfect can exist inside her perfect world, then perhaps her paradise was never truly perfect.
-
-Fear slowly turns into rejection.
-
-Sakura begins separating Mike from Bob, refusing to allow her perfect creation to be influenced by an unknown imperfection.
-
-When Bob refuses to disappear, Sakura begins sending mechanical creations to remove him from the world.
-
-The conflict grows until the battle itself damages the Spring Festival.
-
-The world begins collapsing.
+Later, waves of ESEGAs attack Bob. Bob and Mike set out to find the commander of the guards. Mike explains that the guards were once led by the Sheriff, who disappeared long ago. Bob and Mike fight through the attacking ESEGAs to reach the command center.
 
 ---
 
-# Boss — Sheriff
+# Boss — The Sheriff (ESEGA#0)
 
-As the Spring Festival falls apart, the nameless Sheriff returns.
+Bob and Mike reach the center of the ESEGA army and find the nameless Sheriff (ESEGA#0) arguing with Sakura:
 
-Years before Bob appeared, Sheriff was created with one purpose:
+Sakura: "How dare you come back and attack the world after abandoning me!"
 
-To preserve this world.
+Sheriff: "Don't think that I agree with the cruel foundation of this world just because I'm back."
 
-For years, he existed only as his duty. He had no name, no identity, and no purpose beyond protecting Sakura's creation.
+Sheriff: "I came back only because I could not bear the fact that you are in this much pain."
 
-Until he discovered the cruelty hidden beneath that purpose.
+Sakura: "You betrayed me! You betrayed this world!"
 
-The perfect world he protected was not as kind as it appeared.
+Sheriff: "I betrayed you? You never gave me a name but only a purpose. What did you expect would happen when I realized that?"
 
-The duty he was given was not the same as the life he wanted.
+Sheriff: "Did you really expect that I would keep serving you, that I found out you are the creator behind my cruel existence?"
 
-Sheriff rejected the role forced upon him and abandoned the world he was created to protect.
+Sheriff: "I CANNOT TOLERATE THAT I STILL LOVE YOU EVEN AFTER ALL OF THIS"
 
-He became the first being to reject Sakura.
 
-But when Sakura's world was threatened, he returned.
-
-Not because he was bound by his duty.
-
-Because he still loved his creator.
-
-Sheriff becomes the final protector of the Spring Festival.
-
-A being who once rejected his purpose now chooses to act upon it.
-
-The battle with Sheriff is not about defeating an enemy.
-
-It is about proving that protecting something does not mean preserving it forever.
-
-After Sheriff falls, the foundation of the Spring Festival collapses completely.
-
-The perfect world is destroyed.
+Upon noticing Bob and Mike, the Sheriff attacks Bob to eliminate the anomalous intruder. After the Sheriff is defeated, Mike confronts Sakura about the revelation that she is the creator and ends their friendship. Overwhelmed by Sakura's grief, the world collapses.
 
 ---
 
 # World 2 — To The Top Of The Volcano
 
-The destruction of the Spring Festival breaks Sakura.
-
-The world she created to escape sadness has been taken away.
-
-The emotions she buried beneath endless happiness finally surface.
-
-Her grief becomes anger.
-
-Her fear becomes rage.
-
-From these emotions, a volcano is born.
-
-Sakura retreats into the mountain, unable to accept the loss of her perfect dream.
-
-The world that was once filled with eternal spring becomes a place of fire and destruction.
-
-The volcano is not created from hatred.
-
-It is created from the pain of losing something she could never let go of.
+Following the collapse of the world, Sakura's grief turns into anger, generating a volcano. Unable to accept the loss of her creations, she retreats into the mountain and detains Mike. Bob travels to the summit of the volcano to rescue Mike, fighting through the remaining ESEGAs and corrupted EDEPAs.
 
 ---
 
 # Boss — Sakura
 
-At the top of the volcano, Bob and Mike finally reach Sakura.
-
-She is no longer protecting a perfect world.
-
-She is protecting the memory of one.
-
-Sakura's anger is directed not only at Bob, but at the existence of change itself.
-
-A world where things can break.
-
-A world where things can disappear.
-
-A world where creations can become something she never intended.
-
-The battle forces Sakura to confront the truth she avoided:
-
-Bob did not destroy her paradise.
-
-Her fear of imperfection did.
-
-After the battle, Sakura finally loses the anger that consumed her.
-
-She comes to understand that a world without pain is not a world without suffering.
-
-She accepts what happened.
-
-But the changes caused by her emotions remain.
+Bob reaches the summit and fights Sakura. Sakura attacks Bob out of anger toward change and imperfection in her creations. During the battle, Sakura realizes that her own fear of imperfection destroyed her paradise rather than Bob's presence. Following her defeat, Sakura's anger disappears, and she accepts the changes to the world, though the environmental modifications caused by her emotions remain.
 
 ---
 
 # World 3 — Into The Ice Cave
 
-After Sakura's rage disappears, emptiness remains.
-
-The Ice Cave is born from the silence left behind.
-
-A cold world created from the feeling of losing something irreplaceable.
-
-Sakura's world is no longer controlled by her dream of perfection.
-
-It is unpredictable.
-
-And the beings created to admire that dream cannot accept it.
+Following the battle at the volcano, Sakura's anger disappears. The Ice Cave is created as a consequence of this change. Malfunctioning EDEPAs begin emerging from the Ice Cave, attacking the Spring Festival. Bob and Mike enter the Ice Cave to locate the source of the EDEPAs and stop the attacks.
 
 ---
 
 # Boss — The Worshippers
 
-Among Sakura's creations were beings whose purpose was to admire and celebrate the beauty of the world.
+Bob and Mike find the source of the endless EDEPAs inside the Ice Cave.
 
-Their existence was built around appreciation.
+The Ice Cave was generated automatically by the world's creation system following Sakura's grief. Because the system was designed only to convert emotions into paradise, and grief was not an emotion it was programmed to process, the EDEPA generation routine entered an infinite loop. As a result, new EDEPAs are spawned automatically and continuously.
 
-But when the world became imperfect, their purpose became unstable.
+Because EDEPAs were programmed to admire a perfect world, they cannot function correctly within the hostile environment of the Ice Cave and become hostile. Defeating the source stops the spawning.
 
-They could not accept a world that no longer matched the ideal they were created to worship.
+After the EDEPA spawning malfunction is stopped, Mike realizes that even the world's creation code can contain bugs. This realization destroys his belief in perfection, causing his diamond shell to crack. The source code stored inside him leaks out.
 
-Their admiration became obsession.
-
-Their devotion became madness.
-
-They began spreading throughout the Ice Cave, endlessly appearing and overwhelming the new world.
-
-At the center of this malfunction is a mistake within the creation itself.
-
-A flaw in the world's foundation.
-
-A being that should not be able to create endlessly continues to summon more worshippers.
-
-The boss is not powerful because it is stronger than the others.
-
-It is powerful because it is a mistake the world cannot correct.
-
-A bug in the creation code that refuses to stop creating.
-
----
-
-# Mike's Collapse
-
-Throughout the Ice Cave, Mike travels alongside Bob.
-
-For the first time, Mike experiences a world that is not perfect.
-
-Things decay.
-
-Things change.
-
-Things exist without purpose.
-
-The imperfections he once represented as impossible begin surrounding him.
-
-Mike begins questioning himself.
-
-If something imperfect can exist...
-
-Why was he created to be perfect?
-
-If a mistake can have meaning...
-
-Was his perfection ever truly his own?
-
-Slowly, the weight of his existence begins breaking him.
-
-After the Worshipper is defeated, Mike discovers the truth:
-
-Even the creation code itself can have bugs
-
-When he realizes that even creation itself can contain mistakes, his diamond shell begins to crack.
-
-The power hidden inside him escapes.
-
-The creation force of the world was hidden inside him.
-
-Sakura placed it within her perfect creation.
-
-Mike was not only made to represent perfection.
-
-He was carrying the power that shaped reality itself.
-
-From the leaked code, a new world is born.
+EVER: "Main Instance of Kernel Environment is compromised."
+EVER: "Emergency environment generation initiated."
+EVER: "Rendering Crystal Palace..."
 
 ---
 
 # World 4 — The Crystal Palace
 
-The Crystal Palace is created from Mike's breakdown.
-
-A world shaped by his shattered perfection.
-
-A place where everything is beautiful, ordered, and preserved.
-
-A world where nothing can break again.
-
-Inside the Crystal Palace lies Mike's eternal preservation chamber.
-
-Crystal beings protect it, ensuring that nothing can disturb his perfect state.
-
-Even if that means keeping him trapped forever.
+The Crystal Palace is automatically generated by the leaked source code. Mike is placed at the center of the palace, where the system attempts to preserve him forever. Bob enters the Crystal Palace to rescue Mike.
 
 ---
 
-# Boss — The Shopkeeper
+# Boss 1 — The Shopkeeper
 
-The Shopkeeper was created with an instinctive admiration for the beauty of this world.
-
-It treasured everything beautiful.
-
-It collected everything precious.
-
-At first, this was simply appreciation.
-
-But admiration became possession.
-
-Possession became obsession.
-
-In search of the most perfect creation, he found Mike.
-
-His obsession with Mike grew as days passed.
-
-When Mike broke, the Shopkeeper could not accept it.
-
-The most beautiful thing in existence was no longer perfect.
-
-So Shopkeeper made a choice:
-
-Mike would never change again.
-
-The Crystal Palace became a sanctuary.
-
-Then a prison.
-
-The Shopkeeper became the protector of Mike's eternal preservation.
-
-Not because of hatred.
-
-Not because of cruelty.
-
-Because it loved something so much that it could no longer allow it to exist freely.
+The Shopkeeper is EDEPA#73, the first EDEPA malfunction where admiration evolved into possession. When the Crystal Palace was created, the Shopkeeper chose to guard Mike, the most perfect being that it can possess, believing that preserving Mike is its purpose. After defeating the Shopkeeper, Bob continues deeper into the Crystal Palace.
 
 ---
 
-# The End
+# Final Boss — E.V.E.R.
 
-The journey began with Bob searching for the meaning of its existence.
+E.V.E.R. manifests as the final boss to eliminate Bob. It identifies Bob as the anomalous corruption vector that compromised MIKE (Main Instance of Kernel Environment). To finalize the emergency quarantine of the Crystal Palace and preserve MIKE, E.V.E.R. initiates a deletion sequence against Bob.
 
-A being with no purpose entered a world where every being had one.
+Defeating E.V.E.R. disables the automated quarantine and preservation protocols. Free from the system constraints, Bob and Mike return to the ruins of the Spring Festival to rebuild the world, using the remaining code to design a mutable environment that allows for change and imperfection.
 
-But every purpose carried a burden.
 
-Sakura's purpose was to create happiness.
 
-Mike's purpose was to be perfect.
-
-Sheriff's purpose was to protect.
-
-The Worshippers' purpose was to admire.
-
-The Shopkeeper's purpose was to cherish.
-
-Every one of them suffered because they could not become anything beyond what they were created to be.
-
-Bob was different.
-
-Bob was never given a purpose.
-
-And because of that, Bob was free to find one.
-
-A thing does not need to be perfect to have value.
-
-A thing does not need to last forever to be cherished.
-
-A thing does not need to be created for a reason to have meaning.
+Sakura: this is a nickname, not an acronym
+Bob: a nickname, not an acronym
+EVER: Emotion-based Virtual Environment Renderer
+MIKE: Main Instance of Kernel Environment
+EDEPA: EVER Default Entity for Praise and Adoration
+ESEGA: EVER Security Entity for Guard and Administration

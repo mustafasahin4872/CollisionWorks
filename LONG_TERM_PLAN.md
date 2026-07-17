@@ -28,7 +28,6 @@ the code is extremely entangled and written poorly. this is fixed in v2
   - addition of lore-important trinkets: sheriff set, sakura set
 
 very few in-game mechanics are added in this version, most of the new features are ui related.
-near
 
 ## future(v3+): 
 - moving to a better drawing engine from StdDraw
